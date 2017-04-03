@@ -27,7 +27,10 @@ endfunction
 function! s:handler_diffy_exec(cmd, toplevel, output)
     let lines = []
     let max = 0
+
     call map(a:output, { i,x -> sillyiconv#iconv_one_nothrow(x) })
+
+    " calcate the width of first column
     for line in a:output
         let xs = split(line, '|')
         if 2 == len(xs)
@@ -39,6 +42,8 @@ function! s:handler_diffy_exec(cmd, toplevel, output)
             endif
         endif
     endfor
+
+    " make lines
     for line in a:output
         let xs = split(line, '|')
         if 2 == len(xs)
@@ -48,6 +53,15 @@ function! s:handler_diffy_exec(cmd, toplevel, output)
             endif
         endif
     endfor
+
+    " find the line about insertions and deletions
+    for line in a:output
+        if line =~# '^\s*\d\+ files changed, \d\+ insertions(+), \d\+ deletions(-)$'
+            let lines = [('#' . line), '#'] + lines
+            break
+        endif
+    endfor
+
     if 1 == len(lines)
         call diffy#git_diff(a:toplevel, lines[0], a:cmd)
     elseif 0 < len(lines)
@@ -62,7 +76,6 @@ function! s:handler_diffy_exec(cmd, toplevel, output)
                 \ '#   q key:      Close this window',
                 \ '#',
                 \ ] + lines
-        "call map(lines, { i,x -> sillyiconv#iconv_one_nothrow(x) })
         call s:new_window(lines)
         setlocal filetype=diffy
         let &l:statusline = printf('[diffy] %s', join(a:cmd))
@@ -83,6 +96,8 @@ function! s:close_handler_diff(cmd, toplevel, output)
                 \ '#',
                 \ '# KeyMapping',
                 \ '#   return key: Open the file at the cursor line',
+                \ '#   [ key:      Go to a previous diff-section',
+                \ '#   ] key:      Go to a next diff-section',
                 \ '#   q key:      Close this window',
                 \ '#',
                 \ ] + lines
@@ -93,6 +108,8 @@ function! s:close_handler_diff(cmd, toplevel, output)
         setlocal filetype=diff
         let &l:statusline = printf('[diffy] %s', join(a:cmd))
         execute printf('nnoremap <silent><buffer><nowait><cr>    :<C-u>call diffy#git_diff_jump(%s)<cr>', string(a:toplevel))
+        execute printf('nnoremap <silent><buffer><nowait>[       :<C-u>call diffy#git_diff_prev(%s)<cr>zz', string(a:toplevel))
+        execute printf('nnoremap <silent><buffer><nowait>]       :<C-u>call diffy#git_diff_next(%s)<cr>zz', string(a:toplevel))
     else
         call s:error('No modified!')
     endif
@@ -122,6 +139,56 @@ function! diffy#git_diff(toplevel, line, cmd) abort
             \ )
     else
         call s:error('Can not jump this!')
+    endif
+endfunction
+
+function! diffy#git_diff_prev(toplevel) abort
+    if &l:filetype == 'diff'
+        let pos = getpos('.')
+        let found = 0
+        let lnum = line('.')
+        while 1
+            if 0 < search('^[+-]', 'b')
+                if lnum - 1 == line('.')
+                    let lnum = line('.')
+                else
+                    let found = 1
+                    break
+                endif
+            else
+                break
+            endif
+        endwhile
+        if !found
+            call setpos('.', pos)
+        endif
+    else
+        call s:error('filetype is not diff!')
+    endif
+endfunction
+
+function! diffy#git_diff_next(toplevel) abort
+    if &l:filetype == 'diff'
+        let pos = getpos('.')
+        let found = 0
+        let lnum = line('.')
+        while 1
+            if 0 < search('^[+-]')
+                if lnum + 1 == line('.')
+                    let lnum = line('.')
+                else
+                    let found = 1
+                    break
+                endif
+            else
+                break
+            endif
+        endwhile
+        if !found
+            call setpos('.', pos)
+        endif
+    else
+        call s:error('filetype is not diff!')
     endif
 endfunction
 
