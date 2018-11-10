@@ -1,0 +1,6 @@
+
+*.log
+.DS_Store
+.nuget/
+bin/
+vterm.lib

@@ -1,0 +1,44 @@
+
+[include]
+    path = ~/.gitconfig.local
+
+[user]
+  name = rbtnn
+  email = naru123456789@gmail.com
+
+[http]
+    sslVerify = false
+
+[core]
+    autocrlf = false
+    quotepath = false
+    editor = vim
+    excludesfile = ~/.gitignore.global
+
+[alias]
+    save=stash save
+    pop=stash pop
+    br=branch
+    ci=commit
+    co=checkout
+    ls=ls-files
+    lg=log --pretty=oneline --graph --abbrev-commit
+    po=push -u origin
+    st=status
+    empty=commit --allow-empty -m "Initial"
+    revim=remote add vim https://github.com/vim/vim.git
+    reclpum=remote add clpum https://github.com/h-east/vim.git
+
+[color]
+    diff = true
+    status = true
+    branch = true
+    interactive = false
+
+[help]
+    format = man
+
+[credential]
+    helper = wincred
+
+;  vim: set ft=gitconfig ff=unix :

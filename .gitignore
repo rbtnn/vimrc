@@ -1,0 +1,91 @@
+
+vim-on-windows/
+スタート メニュー/
+.cargo/
+.CFUserTextEncoding
+.ICEauthority
+.Trash/
+.Xauthority
+.asoundrc
+.bash_history
+.bash_logout
+.bash_profile
+.bash_sessions/
+.bashrc
+.cabal/
+.cache/
+.compiz/
+.config/
+.dart/
+.dbus/
+.dmrc
+.dotnet/
+.dropbox/
+.electron/
+.gem/
+.ghc/
+.gitconfig.local
+.gstreamer-0.10/
+.gtkrc-2.0
+.lldb/
+.local/
+.mono/
+.mozilla/
+.multirust/
+.netrc
+.npm/
+.oracle_jre_usage/
+.pki/
+.profile
+.psql_history
+.pub-cache/
+.rustup/
+.sh_history
+.subversion/
+.sudo_as_admin_successful
+.themes/
+.vim/
+.viminfo
+.vimrc.*
+.xinputrc
+.xsession-errors
+.xsession-errors.old
+3D Objects/
+AppData/
+Application Data/
+Applications/
+Contacts/
+Cookies/
+Creative Cloud Files/
+Desktop/
+Documents/
+Downloads/
+Dropbox/
+Favorites/
+IntelGraphicsProfiles/
+Library/
+Links/
+Local Settings/
+MicrosoftEdgeBackups/
+Movies/
+Music/
+My Documents/
+NetHood/
+OneDrive/
+Pictures/
+PrintHood/
+Public/
+Recent/
+Saved Games/
+Searches/
+SendTo/
+Start Menu/
+Templates/
+Videos/
+_viminfo
+examples.desktop
+go/
+init.local.cmd
+ntuser.*
+python_games/
+vimtemp/
