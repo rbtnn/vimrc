@@ -24,6 +24,7 @@ set runtimepath+=$VIMPLUGINS/vim-helper
 set runtimepath+=$VIMPLUGINS/vim-msbuild
 set runtimepath+=$VIMPLUGINS/vim-qfreplace
 set runtimepath+=$VIMPLUGINS/vim-restart
+set runtimepath+=$VIMPLUGINS/vim-runtest
 set runtimepath+=$VIMPLUGINS/vim-vimbuild
 set runtimepath+=$VIMRUNTIME
 
@@ -50,7 +51,7 @@ set noshellslash
 set nowrap list listchars=trail:.,tab:>-
 set nowrapscan
 set pumheight=10 completeopt=menu
-set scrolloff=0 number norelativenumber
+set scrolloff=0 nonumber norelativenumber
 set sessionoptions=blank,buffers,curdir,tabpages,terminal
 set shortmess& shortmess+=I
 set tags=./tags;
