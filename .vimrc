@@ -75,6 +75,11 @@ if has('persistent_undo')
     set undodir=$VIMTEMP/undofiles//
 endif
 
+if has('clpum')
+    set wildmode=popup
+    set clpumheight=10
+endif
+
 if has('tabsidebar')
     set laststatus=2
     set statusline=%#TabSideBarFill#

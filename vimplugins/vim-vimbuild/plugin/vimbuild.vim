@@ -136,6 +136,7 @@ function! s:close_handler_vimbuild(path, cmd, output)
     endtry
 endfunction
 
-command! -nargs=* VimBuild    :call <SID>vimbuild(<q-args>)
-command! -nargs=* VimGVimOpen :call <SID>gvimopen(<q-args>)
+command! -nargs=* VimBuild           :call <SID>vimbuild(<q-args>)
+command! -nargs=* VimBuildWithClpum  :call <SID>vimbuild('CLPUM=yes')
+command! -nargs=* VimGVimOpen        :call <SID>gvimopen(<q-args>)
 
