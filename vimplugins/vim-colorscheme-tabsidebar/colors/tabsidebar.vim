@@ -8,11 +8,14 @@ if has('gui_running')
 
     let g:colors_name = 'tabsidebar'
 
-    highlight! Cursor           guibg=#dddddd guifg=#000000 gui=NONE
+    highlight! Cursor           guibg=#dddddd guifg=NONE    gui=NONE
+    highlight! CursorLine       guibg=#393946 guifg=NONE    gui=NONE
+    highlight! CursorColumn     guibg=#393946 guifg=NONE    gui=NONE
+
     highlight! MatchParen       guibg=NONE    guifg=#dddddd gui=NONE
 
     highlight! SignColumn       guibg=#030306 guifg=#101010 gui=NONE
-    highlight! Normal           guibg=#2c2c36 guifg=#888888 gui=NONE
+    highlight! Normal           guibg=#30303d guifg=#aaaaaa gui=NONE
     highlight! NonText          guibg=#161620 guifg=#161620 gui=NONE
     highlight! WildMenu         guibg=#030306 guifg=#dddddd gui=NONE
     highlight! StatusLine       guibg=#030306 guifg=#888888 gui=NONE
@@ -50,12 +53,12 @@ if has('gui_running')
     highlight! DiffText         guibg=NONE    guifg=NONE    gui=NONE
 
     highlight! Ignore           guibg=#ff0000 guifg=#dddddd gui=NONE
-    highlight! Search           guibg=NONE    guifg=#00cc00 gui=BOLD
+    highlight! Search           guibg=NONE    guifg=#00cc00 gui=UNDERLINE
     highlight! LineNr           guibg=#161620 guifg=#555555 gui=NONE
-    highlight! Title            guibg=NONE    guifg=#00cc00 gui=NONE
+    highlight! Title            guibg=NONE    guifg=#0ccccc gui=NONE
 
     highlight! Comment          guibg=NONE    guifg=#555555 gui=NONE
-    highlight! Folded           guibg=NONE    guifg=#555555 gui=NONE
+    highlight! Folded           guibg=#161620 guifg=#555555 gui=NONE
     highlight! SpecialKey       guibg=NONE    guifg=#222222 gui=NONE
     highlight! Visual           guibg=#4a4a55 guifg=NONE    gui=NONE
 
@@ -79,8 +82,6 @@ if has('gui_running')
 
     " TODO
     " ColorColumn
-    " CursorColumn
-    " CursorLine
     " CursorLineNr
     " FoldColumn
     " Question

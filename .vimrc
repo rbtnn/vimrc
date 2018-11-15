@@ -46,7 +46,7 @@ set ignorecase
 set incsearch hlsearch
 set keywordprg=:help
 set matchpairs+=<:>
-set nocursorline nocursorcolumn
+set cursorline nocursorcolumn
 set noshellslash
 set nowrap list listchars=trail:.,tab:>-
 set nowrapscan
@@ -54,6 +54,7 @@ set pumheight=10 completeopt=menu
 set scrolloff=0 nonumber norelativenumber
 set sessionoptions=blank,buffers,curdir,tabpages,terminal
 set shortmess& shortmess+=I
+set signcolumn=yes
 set tags=./tags;
 set visualbell noerrorbells t_vb=
 set wildignore&
@@ -76,7 +77,7 @@ if has('persistent_undo')
 endif
 
 if has('clpum')
-    set wildmode=popup
+    set wildmode=longest,popup
     set clpumheight=10
 endif
 
@@ -142,7 +143,13 @@ inoremap <silent><tab>       <C-v><tab>
 nnoremap <nowait><C-j>       :<C-u>cnext<cr>
 nnoremap <nowait><C-k>       :<C-u>cprevious<cr>
 
-nnoremap <nowait><space>     :<C-u>echo synIDattr(synIDtrans(synID(line('.'), col('.'), 1)), 'name')<cr>
+if has('win32')
+    nnoremap <nowait><space>     :<C-u>terminal cmd.exe /k "prompt $E[32m($P)$_$E[0m$$"<cr>
+else
+    nnoremap <nowait><space>     :<C-u>terminal<cr>
+endif
+"nnoremap <nowait><space>     :<C-u>echo synIDattr(synIDtrans(synID(line('.'), col('.'), 1)), 'name')<cr>
+"nnoremap <nowait>s           viw"_dP
 
 if has('win32') && has('gui_running')
     command! -bar -nargs=0 FullScreenToggle   :call libcallnr('gvimfullscreen.dll', 'ToggleFullScreen', 0)
