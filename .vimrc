@@ -17,7 +17,6 @@ silent! source $VIMPLUGINS/vim-gloaded/gloaded.vim
 silent! unlet g:loaded_matchparen
 
 set runtimepath=
-set runtimepath+=$VIMPLUGINS/vim-cargo
 set runtimepath+=$VIMPLUGINS/vim-colorscheme-tabsidebar
 set runtimepath+=$VIMPLUGINS/vim-git
 set runtimepath+=$VIMPLUGINS/vim-helper
@@ -35,6 +34,7 @@ set secure
 set ambiwidth=double
 set autoread
 set clipboard=unnamed
+set cursorline nocursorcolumn
 set display=lastline
 set equalalways
 set expandtab softtabstop=-1 shiftwidth=4 tabstop=4
@@ -46,15 +46,13 @@ set ignorecase
 set incsearch hlsearch
 set keywordprg=:help
 set matchpairs+=<:>
-set cursorline nocursorcolumn
 set noshellslash
 set nowrap list listchars=trail:.,tab:>-
 set nowrapscan
 set pumheight=10 completeopt=menu
-set scrolloff=0 nonumber norelativenumber
+set scrolloff=0 number norelativenumber
 set sessionoptions=blank,buffers,curdir,tabpages,terminal
 set shortmess& shortmess+=I
-set signcolumn=yes
 set tags=./tags;
 set visualbell noerrorbells t_vb=
 set wildignore&
@@ -144,12 +142,11 @@ nnoremap <nowait><C-j>       :<C-u>cnext<cr>
 nnoremap <nowait><C-k>       :<C-u>cprevious<cr>
 
 if has('win32')
-    nnoremap <nowait><space>     :<C-u>terminal cmd.exe /k "prompt $E[32m($P)$_$E[0m$$"<cr>
+    nnoremap <nowait><space>     :<C-u>terminal cmd.exe /k "prompt [$P]$_$$"<cr>
 else
     nnoremap <nowait><space>     :<C-u>terminal<cr>
 endif
 "nnoremap <nowait><space>     :<C-u>echo synIDattr(synIDtrans(synID(line('.'), col('.'), 1)), 'name')<cr>
-"nnoremap <nowait>s           viw"_dP
 
 if has('win32') && has('gui_running')
     command! -bar -nargs=0 FullScreenToggle   :call libcallnr('gvimfullscreen.dll', 'ToggleFullScreen', 0)
