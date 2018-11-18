@@ -1,12 +1,24 @@
 
-if has('gui_running')
+"nnoremap <nowait><space>     :<C-u>echo synIDattr(synIDtrans(synID(line('.'), col('.'), 1)), 'name')<cr>
+
+" TODO
+" ColorColumn
+" CursorLineNr
+" FoldColumn
+" Question
+" SpellBad
+" SpellCap
+" SpellLocal
+" SpellRare
+
+if has('gui_running') || 256 <= &t_Co
     highlight clear
 
     if exists('syntax_on')
         syntax reset
     endif
 
-    let g:colors_name = 'tabsidebar'
+    let g:colors_name = 'amethyst'
 
     highlight! Cursor           guibg=#dddddd guifg=NONE    gui=NONE
     highlight! CursorLine       guibg=#393946 guifg=NONE    gui=NONE
@@ -15,6 +27,7 @@ if has('gui_running')
     highlight! MatchParen       guibg=NONE    guifg=#dddddd gui=NONE
 
     highlight! SignColumn       guibg=#030306 guifg=#101010 gui=NONE
+    highlight! Terminal         guibg=#30303d guifg=#aaaaaa gui=NONE
     highlight! Normal           guibg=#30303d guifg=#aaaaaa gui=NONE
     highlight! NonText          guibg=#161620 guifg=#161620 gui=NONE
     highlight! WildMenu         guibg=#030306 guifg=#dddddd gui=NONE
@@ -62,32 +75,23 @@ if has('gui_running')
     highlight! SpecialKey       guibg=NONE    guifg=#222222 gui=NONE
     highlight! Visual           guibg=#4a4a55 guifg=NONE    gui=NONE
 
-    highlight! Statement        guibg=NONE    guifg=#a7a777 gui=NONE
+    highlight! Statement        guibg=NONE    guifg=#c9c999 gui=NONE
 
-    highlight! Function         guibg=NONE    guifg=#7777a7 gui=NONE
-    highlight! Identifier       guibg=NONE    guifg=#7777a7 gui=NONE
-    highlight! Operator         guibg=NONE    guifg=#7777a7 gui=NONE
-    highlight! Special          guibg=NONE    guifg=#7777a7 gui=NONE
-    highlight! Directory        guibg=NONE    guifg=#7777a7 gui=NONE
-    highlight! Delimiter        guibg=NONE    guifg=#7777a7 gui=NONE
-    highlight! Type             guibg=NONE    guifg=#7777a7 gui=NONE
-    highlight! Structure        guibg=NONE    guifg=#7777a7 gui=NONE
+    highlight! Function         guibg=NONE    guifg=#9999c9 gui=NONE
+    highlight! Identifier       guibg=NONE    guifg=#9999c9 gui=NONE
+    highlight! Operator         guibg=NONE    guifg=#9999c9 gui=NONE
+    highlight! Special          guibg=NONE    guifg=#9999c9 gui=NONE
+    highlight! Directory        guibg=NONE    guifg=#9999c9 gui=NONE
+    highlight! Delimiter        guibg=NONE    guifg=#9999c9 gui=NONE
+    highlight! Type             guibg=NONE    guifg=#9999c9 gui=NONE
+    highlight! Structure        guibg=NONE    guifg=#9999c9 gui=NONE
 
-    highlight! PreProc          guibg=NONE    guifg=#a77777 gui=NONE
-    highlight! Constant         guibg=NONE    guifg=#a77777 gui=NONE
-    highlight! String           guibg=NONE    guifg=#a77777 gui=NONE
+    highlight! PreProc          guibg=NONE    guifg=#c99999 gui=NONE
+    highlight! Constant         guibg=NONE    guifg=#c99999 gui=NONE
+    highlight! String           guibg=NONE    guifg=#c99999 gui=NONE
 
     highlight! Todo             guibg=NONE    guifg=#7777ff gui=BOLD
     highlight! ModeMsg          guibg=NONE    guifg=#77ff77 gui=NONE
 
-    " TODO
-    " ColorColumn
-    " CursorLineNr
-    " FoldColumn
-    " Question
-    " SpellBad
-    " SpellCap
-    " SpellLocal
-    " SpellRare
 endif
 

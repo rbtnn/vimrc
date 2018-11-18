@@ -17,14 +17,11 @@ silent! source $VIMPLUGINS/vim-gloaded/gloaded.vim
 silent! unlet g:loaded_matchparen
 
 set runtimepath=
-set runtimepath+=$VIMPLUGINS/vim-colorscheme-tabsidebar
+set runtimepath+=$VIMPLUGINS/vim-amethyst
 set runtimepath+=$VIMPLUGINS/vim-git
 set runtimepath+=$VIMPLUGINS/vim-helper
 set runtimepath+=$VIMPLUGINS/vim-msbuild
 set runtimepath+=$VIMPLUGINS/vim-qfreplace
-set runtimepath+=$VIMPLUGINS/vim-restart
-set runtimepath+=$VIMPLUGINS/vim-runtest
-set runtimepath+=$VIMPLUGINS/vim-vimbuild
 set runtimepath+=$VIMRUNTIME
 
 syntax on
@@ -75,7 +72,7 @@ if has('persistent_undo')
 endif
 
 if has('clpum')
-    set wildmode=longest,popup
+    set wildmode=popup
     set clpumheight=10
 endif
 
@@ -127,9 +124,9 @@ if has('tabsidebar')
             return string(v:exception)
         endtry
     endfunction
-
-    colorscheme tabsidebar
 endif
+
+colorscheme amethyst
 
 vnoremap <silent>p           "_dP
 
@@ -141,13 +138,6 @@ inoremap <silent><tab>       <C-v><tab>
 nnoremap <nowait><C-j>       :<C-u>cnext<cr>
 nnoremap <nowait><C-k>       :<C-u>cprevious<cr>
 
-if has('win32')
-    nnoremap <nowait><space>     :<C-u>terminal cmd.exe /k "prompt [$P]$_$$"<cr>
-else
-    nnoremap <nowait><space>     :<C-u>terminal<cr>
-endif
-"nnoremap <nowait><space>     :<C-u>echo synIDattr(synIDtrans(synID(line('.'), col('.'), 1)), 'name')<cr>
-
 if has('win32') && has('gui_running')
     command! -bar -nargs=0 FullScreenToggle   :call libcallnr('gvimfullscreen.dll', 'ToggleFullScreen', 0)
     command!      -nargs=1 SetAlpha           :call libcallnr('vimtweak.dll', 'SetAlpha', <args>)
@@ -155,6 +145,14 @@ endif
 
 command! -bar -nargs=0 SessionLoad   :source     $VIMTEMP/session.vim
 command! -bar -nargs=0 SessionSave   :mksession! $VIMTEMP/session.vim
+
+if has('win32')
+    command! -bar -nargs=0 Terminal      :terminal cmd.exe /k "prompt [$P]$_$$"
+else
+    command! -bar -nargs=0 Terminal      :terminal
+endif
+
+command! -bar -nargs=0 VimNew      :execute printf('!start %s', expand('~/Desktop/vim/src/gvim.exe'))
 
 " https://github.com/rprichard/winpty/releases/
 if has('win32') && has('terminal')
