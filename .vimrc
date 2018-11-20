@@ -80,7 +80,7 @@ if has('tabsidebar')
     set laststatus=2
     set statusline=%#TabSideBarFill#
     set showtabline=2
-    set tabline=%#TabSideBarFill#
+    set tabline=%#StatusLine#%{getcwd()}%#StatusLineNC#
     set showtabsidebar=2
     set tabsidebarcolumns=30
     set tabsidebarwrap
@@ -146,16 +146,14 @@ endif
 command! -bar -nargs=0 SessionLoad   :source     $VIMTEMP/session.vim
 command! -bar -nargs=0 SessionSave   :mksession! $VIMTEMP/session.vim
 
-if has('win32')
-    command! -bar -nargs=0 Terminal      :terminal cmd.exe /k "prompt [$P]$_$$"
-else
-    command! -bar -nargs=0 Terminal      :terminal
-endif
-
 command! -bar -nargs=0 VimNew      :execute printf('!start %s', expand('~/Desktop/vim/src/gvim.exe'))
 
 " https://github.com/rprichard/winpty/releases/
 if has('win32') && has('terminal')
+    augroup term-vimrc
+        autocmd!
+        autocmd TerminalOpen * :call term_sendkeys(term_list()[-1],  join(['prompt [$P]$_$$', 'cls', ''], "\r"))
+    augroup END
     tnoremap <silent><C-p>       <up>
     tnoremap <silent><C-n>       <down>
     tnoremap <silent><C-b>       <left>
