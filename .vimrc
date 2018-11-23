@@ -146,7 +146,9 @@ endif
 command! -bar -nargs=0 SessionLoad   :source     $VIMTEMP/session.vim
 command! -bar -nargs=0 SessionSave   :mksession! $VIMTEMP/session.vim
 
-command! -bar -nargs=0 VimNew      :execute printf('!start %s', expand('~/Desktop/vim/src/gvim.exe'))
+command! -bar -nargs=0 VimOpen     :execute printf('!start %s', expand('~/Desktop/vim/src/gvim.exe'))
+command! -bar -nargs=* VimBuild    :execute printf('terminal cmd /C "%s" %s', expand('~/vimbatchfiles/vim-4-build-gvim.bat'), <q-args>)
+command! -bar -nargs=0 VimTest     :execute printf('terminal cmd /C "%s"', expand('~/vimbatchfiles/vim-7-test.bat'))
 
 " https://github.com/rprichard/winpty/releases/
 if has('win32') && has('terminal')
