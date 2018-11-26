@@ -47,7 +47,7 @@ set noshellslash
 set nowrap list listchars=trail:.,tab:>-
 set nowrapscan
 set pumheight=10 completeopt=menu
-set scrolloff=0 number norelativenumber
+set scrolloff=0 nonumber norelativenumber
 set sessionoptions=blank,buffers,curdir,tabpages,terminal
 set shortmess& shortmess+=I
 set tags=./tags;
