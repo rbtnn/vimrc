@@ -1,7 +1,5 @@
 
-let g:loaded_msbuild = 1
-
-function! s:msbuild(q_args) abort
+function! msbuild#exec(q_args) abort
     let args = helper#trim(a:q_args)
     let cmd = [(has('win32')
             \ ? 'C:\Windows\Microsoft.NET\Framework\v4.0.30319\msbuild.exe'
@@ -56,6 +54,4 @@ function! s:close_handler_msbuild(path, cmd, output)
         endif
     endif
 endfunction
-
-command! -nargs=* -complete=file MSBuild :call <SID>msbuild(<q-args>)
 

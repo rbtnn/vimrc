@@ -13,14 +13,10 @@ let $VIMTEMP = expand('~/vimtemp')
 let g:vim_indent_cont = &g:shiftwidth
 let g:mapleader = ' '
 
-silent! source $VIMPLUGINS/vim-gloaded/gloaded.vim
-silent! unlet g:loaded_matchparen
-
 set runtimepath=
+set runtimepath+=$VIMPLUGINS/vim-gloaded
 set runtimepath+=$VIMPLUGINS/vim-amethyst
-set runtimepath+=$VIMPLUGINS/vim-git
-set runtimepath+=$VIMPLUGINS/vim-helper
-set runtimepath+=$VIMPLUGINS/vim-msbuild
+set runtimepath+=$VIMPLUGINS/vim-various
 set runtimepath+=$VIMPLUGINS/vim-qfreplace
 set runtimepath+=$VIMRUNTIME
 
@@ -82,7 +78,7 @@ if has('tabsidebar')
     set showtabline=2
     set tabline=%#StatusLine#%{getcwd()}%#StatusLineNC#
     set showtabsidebar=2
-    set tabsidebarcolumns=30
+    set tabsidebarcolumns=20
     set tabsidebarwrap
     set tabsidebar=%!TabSideBar()
     function! TabSideBar() abort
@@ -146,15 +142,24 @@ endif
 command! -bar -nargs=0 SessionLoad   :source     $VIMTEMP/session.vim
 command! -bar -nargs=0 SessionSave   :mksession! $VIMTEMP/session.vim
 
-command! -bar -nargs=0 VimOpen     :execute printf('!start %s', expand('~/Desktop/vim/src/gvim.exe'))
-command! -bar -nargs=* VimBuild    :execute printf('terminal cmd /C "%s" %s', expand('~/vimbatchfiles/vim-4-build-gvim.bat'), <q-args>)
-command! -bar -nargs=0 VimTest     :execute printf('terminal cmd /C "%s"', expand('~/vimbatchfiles/vim-7-test.bat'))
+if isdirectory(expand('~/Desktop/vim/src')) && isdirectory(expand('~/vimbatchfiles'))
+    command! -bar -nargs=0 VimOpen     :execute printf('!start %s', expand('~/Desktop/vim/src/gvim.exe'))
+    command! -bar -nargs=* VimBuild    :execute printf('terminal cmd /C "%s" %s', expand('~/vimbatchfiles/vim-4-build-gvim.bat'), <q-args>)
+    command! -bar -nargs=0 VimTest     :execute printf('terminal cmd /C "%s"', expand('~/vimbatchfiles/vim-7-test.bat'))
+endif
 
 " https://github.com/rprichard/winpty/releases/
 if has('win32') && has('terminal')
+    function! TerminalOpenEvent() abort
+        let last_term = term_list()[-1]
+        let job = job_info(term_getjob(last_term))
+        if fnamemodify(get(job.cmd, 0, ''), ':t') == 'cmd.exe'
+            call term_sendkeys(last_term,  join(['prompt [$P]$_$$', 'cls', ''], "\r"))
+        endif
+    endfunction
     augroup term-vimrc
         autocmd!
-        autocmd TerminalOpen * :call term_sendkeys(term_list()[-1],  join(['prompt [$P]$_$$', 'cls', ''], "\r"))
+        autocmd TerminalOpen * :call TerminalOpenEvent()
     augroup END
     tnoremap <silent><C-p>       <up>
     tnoremap <silent><C-n>       <down>
