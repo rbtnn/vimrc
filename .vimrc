@@ -15,8 +15,8 @@ let g:mapleader = ' '
 
 set runtimepath=
 set runtimepath+=$VIMPLUGINS/vim-gloaded
-set runtimepath+=$VIMPLUGINS/vim-amethyst
 set runtimepath+=$VIMPLUGINS/vim-various
+set runtimepath+=$VIMPLUGINS/iceberg.vim
 set runtimepath+=$VIMPLUGINS/vim-qfreplace
 set runtimepath+=$VIMRUNTIME
 
@@ -44,7 +44,7 @@ set nowrap list listchars=trail:.,tab:>-
 set nowrapscan
 set pumheight=10 completeopt=menu
 set scrolloff=0 nonumber norelativenumber
-set sessionoptions=blank,buffers,curdir,tabpages,terminal
+set sessionoptions=buffers,curdir,tabpages
 set shortmess& shortmess+=I
 set tags=./tags;
 set visualbell noerrorbells t_vb=
@@ -80,7 +80,7 @@ endif
 
 if has('tabsidebar')
     set laststatus=2
-    set statusline=%#StatusLineNC#
+    set statusline=%#TabLineFill#
     set showtabline=2
     set tabline=%#TabLine#%{getcwd()}%#TabLineFill#
     set showtabsidebar=2
@@ -96,7 +96,7 @@ if has('tabsidebar')
             else
                 let t = 'TabSideBarOdd'
             endif
-            let lines = [printf('%%#%s#TabPage %d', t, g:actual_curtabpage)]
+            let lines = [printf('%%#%s#Tab page %d', t, g:actual_curtabpage)]
             for x in getwininfo()
                 if x.tabnr == g:actual_curtabpage
                     let s = '[No Name]'
@@ -118,8 +118,7 @@ if has('tabsidebar')
                         endif
                     endif
                     let iscurr = (winnr() == x.winnr) && (g:actual_curtabpage == tabpagenr())
-                    let wincnt_of_curtabpage = len(gettabinfo()[g:actual_curtabpage - 1].windows)
-                    let lines += [printf('%%#%s#  %s %%#%s#%s', t, (x.winnr != wincnt_of_curtabpage ? '┣' : '┗'), (iscurr ? 'TabSideBarSelWin' : t), s)]
+                    let lines += [printf('%s %s', (iscurr ? '>' : ' '), s)]
                 endif
             endfor
             return join(lines, "\n")
@@ -129,7 +128,15 @@ if has('tabsidebar')
     endfunction
 endif
 
-colorscheme amethyst
+augroup iceberg-additional
+    autocmd!
+    autocmd ColorScheme * :highlight! VertSplit          guifg=#818596 guibg=#818596
+    autocmd ColorScheme * :highlight! StatusLine         guifg=NONE    guibg=#818596
+    autocmd ColorScheme * :highlight! StatusLineNC       guifg=#818596 guibg=#818596
+    autocmd ColorScheme * :highlight! StatusLineTermNC   guifg=#818596 guibg=#818596
+augroup END
+
+colorscheme iceberg
 
 vnoremap <silent>p           "_dP
 
