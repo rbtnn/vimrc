@@ -51,6 +51,12 @@ set visualbell noerrorbells t_vb=
 set wildignore&
 set wildmenu wildmode&
 
+" BALLOON
+function! MyBalloonExpr() abort
+	return printf('Cursor is at line %d, column %d on word "%s"', v:beval_lnum, v:beval_col, v:beval_text)
+endfunction
+set ballooneval balloondelay& balloonexpr=MyBalloonExpr()
+
 " SWAP FILES
 set noswapfile
 
@@ -74,9 +80,9 @@ endif
 
 if has('tabsidebar')
     set laststatus=2
-    set statusline=%#TabSideBarFill#
+    set statusline=%#StatusLineNC#
     set showtabline=2
-    set tabline=%#StatusLine#%{getcwd()}%#StatusLineNC#
+    set tabline=%#TabLine#%{getcwd()}%#TabLineFill#
     set showtabsidebar=2
     set tabsidebarcolumns=20
     set tabsidebarwrap
@@ -90,7 +96,7 @@ if has('tabsidebar')
             else
                 let t = 'TabSideBarOdd'
             endif
-            let lines = [printf('%%#%s#TabPage:%d', t, g:actual_curtabpage)]
+            let lines = [printf('%%#%s#TabPage %d', t, g:actual_curtabpage)]
             for x in getwininfo()
                 if x.tabnr == g:actual_curtabpage
                     let s = '[No Name]'
@@ -112,7 +118,8 @@ if has('tabsidebar')
                         endif
                     endif
                     let iscurr = (winnr() == x.winnr) && (g:actual_curtabpage == tabpagenr())
-                    let lines += [printf('%%#%s#  %d) %s', (iscurr ? 'Title' : t), x.winnr, s)]
+                    let wincnt_of_curtabpage = len(gettabinfo()[g:actual_curtabpage - 1].windows)
+                    let lines += [printf('%%#%s#  %s %%#%s#%s', t, (x.winnr != wincnt_of_curtabpage ? '┣' : '┗'), (iscurr ? 'TabSideBarSelWin' : t), s)]
                 endif
             endfor
             return join(lines, "\n")
@@ -142,14 +149,18 @@ endif
 command! -bar -nargs=0 SessionLoad   :source     $VIMTEMP/session.vim
 command! -bar -nargs=0 SessionSave   :mksession! $VIMTEMP/session.vim
 
-if isdirectory(expand('~/Desktop/vim/src')) && isdirectory(expand('~/vimbatchfiles'))
-    command! -bar -nargs=0 VimOpen     :execute printf('!start %s', expand('~/Desktop/vim/src/gvim.exe'))
-    command! -bar -nargs=* VimBuild    :execute printf('terminal cmd /C "%s" %s', expand('~/vimbatchfiles/vim-4-build-gvim.bat'), <q-args>)
-    command! -bar -nargs=0 VimTest     :execute printf('terminal cmd /C "%s"', expand('~/vimbatchfiles/vim-7-test.bat'))
-endif
-
 " https://github.com/rprichard/winpty/releases/
 if has('win32') && has('terminal')
+    if isdirectory(expand('~/Desktop/vim/src')) && isdirectory(expand('~/vimbatchfiles'))
+        command! -bar -nargs=0 VimOpen         :execute printf('!start %s', expand('~/Desktop/vim/src/gvim.exe'))
+        command! -bar -nargs=* VimFetch        :execute printf('terminal cmd /C "%s" %s', expand('~/vimbatchfiles/vim-1-fetch.bat'), <q-args>)
+        command! -bar -nargs=* VimTabSideBar   :execute printf('terminal cmd /C "%s" %s', expand('~/vimbatchfiles/vim-2-tabsidebar.bat'), <q-args>)
+        command! -bar -nargs=* VimClpumAndTab  :execute printf('terminal cmd /C "%s" %s', expand('~/vimbatchfiles/vim-3-clpum_and_tabsidebar.bat'), <q-args>)
+        command! -bar -nargs=* VimBuildgVim    :execute printf('terminal cmd /C "%s" %s', expand('~/vimbatchfiles/vim-4-build-gvim.bat'), <q-args>)
+        command! -bar -nargs=* VimBuildVim     :execute printf('terminal cmd /C "%s" %s', expand('~/vimbatchfiles/vim-5-build-vim.bat'), <q-args>)
+        command! -bar -nargs=* VimTest         :execute printf('terminal cmd /C "%s" %s', expand('~/vimbatchfiles/vim-7-test.bat'), <q-args>)
+        command! -bar -nargs=* VimPushToGithub :execute printf('terminal cmd /C "%s" %s', expand('~/vimbatchfiles/vim-8-push_to_github.bat'), <q-args>)
+    endif
     function! TerminalOpenEvent() abort
         let last_term = term_list()[-1]
         let job = job_info(term_getjob(last_term))

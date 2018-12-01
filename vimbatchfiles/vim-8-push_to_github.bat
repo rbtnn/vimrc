@@ -5,5 +5,5 @@ pushd %VIMDIR%
     git po tabsidebar
     git po clpum_and_tabsidebar
 popd
-pause
+rem pause
 endlocal

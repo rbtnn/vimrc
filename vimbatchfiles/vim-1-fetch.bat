@@ -7,5 +7,5 @@ pushd %VIMDIR%
     git remote add clpum https://github.com/h-east/vim.git
     git fetch clpum
 popd
-pause
+rem pause
 endlocal
