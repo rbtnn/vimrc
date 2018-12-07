@@ -140,6 +140,8 @@ colorscheme iceberg
 
 vnoremap <silent>p           "_dP
 
+nnoremap <silent>*           :<C-u>set hlsearch \| let @/ = printf('\<%s\>', expand('<cword>'))<cr>
+
 noremap <silent><C-u>        15k
 noremap <silent><C-d>        15j
 
@@ -169,10 +171,17 @@ if has('win32') && has('terminal')
         command! -bar -nargs=* VimPushToGithub :execute printf('terminal cmd /C "%s" %s', expand('~/vimbatchfiles/vim-8-push_to_github.bat'), <q-args>)
     endif
     function! TerminalOpenEvent() abort
-        let last_term = term_list()[-1]
-        let job = job_info(term_getjob(last_term))
+        let curr_terminal = bufnr('%')
+        let job = job_info(term_getjob(curr_terminal))
         if fnamemodify(get(job.cmd, 0, ''), ':t') == 'cmd.exe'
-            call term_sendkeys(last_term,  join(['prompt [$P]$_$$', 'cls', ''], "\r"))
+            call term_sendkeys(curr_terminal,  join([
+                    \ 'prompt [$P]$_$$',
+                    \ 'doskey ls=dir /B $*',
+                    \ 'doskey pwd=cd',
+                    \ 'doskey rm=del /Q $*',
+                    \ 'doskey mv=move /Y $*',
+                    \ 'doskey cp=copy /Y $*',
+                    \ 'cls', ''], "\r"))
         endif
     endfunction
     augroup term-vimrc
