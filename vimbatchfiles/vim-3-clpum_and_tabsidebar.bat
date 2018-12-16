@@ -7,5 +7,5 @@ pushd %VIMDIR%
     git merge clpum/clpum
     git merge tabsidebar
 popd
-rem pause
+if exist pause ( pause )
 endlocal

@@ -13,5 +13,5 @@ pushd %VIMDIR%
         )
     popd
 popd
-rem pause
+if exist pause ( pause )
 endlocal

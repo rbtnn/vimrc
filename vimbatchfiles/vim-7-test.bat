@@ -7,5 +7,5 @@ pushd %VIMDIR%
         nmake -f Make_dos.mak VIMPROG=..\gvim
     popd
 popd
-rem pause
+if exist pause ( pause )
 endlocal

@@ -6,5 +6,5 @@ pushd %VIMDIR%
      git pull
      git merge vim/master
 popd
-rem pause
+if exist pause ( pause )
 endlocal
