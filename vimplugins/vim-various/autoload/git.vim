@@ -1,4 +1,9 @@
 
+function! git#cmd_diffhash(target, hash) abort
+    let cmd = ['git', 'diff', (a:hash . '~1'), (a:hash)]
+    call job#new_on_toplevel(cmd, a:target, function('s:close_handler_diff', [(cmd)]))
+endfunction
+
 function! git#cmd_stat(target, q_bang, q_args) abort
     if &filetype != 'gstat'
         let args = helper#trim(a:q_args)
@@ -26,7 +31,7 @@ function! git#cmd_diffthis(target, q_bang, q_args) abort
         let target = fnamemodify(fullpath, ':h')
         let diffcmd = s:diffcmd(fullpath, args)
         call job#new_on_toplevel(diffcmd, target,
-                \ function('s:close_handler_diff', [diffcmd, (fullpath), []])
+                \ function('s:close_handler_diff', [diffcmd])
                 \ )
     else
         call helper#error('Can not get the file path in this buffer!')
@@ -90,21 +95,17 @@ function! s:close_handler_stat(cmd, toplevel, output)
     endif
 endfunction
 
-function! s:close_handler_diff(cmd, fullpath, pos, toplevel, output)
+function! s:close_handler_diff(cmd, toplevel, output)
     call helper#echo(join(a:cmd, ' '))
     let lines = a:output
     if !empty(lines)
         call map(lines, { i,x -> sillyiconv#iconv_one_nothrow(x) })
         call helper#new_window(lines)
         wincmd H
-        if !empty(a:pos)
-            call setpos('.', a:pos)
-        endif
         redraw!
         setlocal filetype=diff
         let &l:statusline = join(a:cmd)
         execute printf('nnoremap <silent><buffer><nowait><cr>    :<C-u>call git#diff_jump(%s)<cr>', string(a:toplevel))
-        execute printf("nnoremap <silent><buffer><nowait>r       :<C-u>call git#rediff(%s, %s)<cr>", string(a:cmd), string(a:fullpath))
     else
         call helper#error('No modified!')
     endif
@@ -139,19 +140,6 @@ function! git#open(toplevel, line) abort
     endif
 endfunction
 
-function! git#rediff(cmd, fullpath) abort
-    let pos = getpos('.')
-    close
-    if filereadable(a:fullpath)
-        let target = fnamemodify(a:fullpath, ':h')
-        call job#new_on_toplevel(a:cmd, target,
-                \ function('s:close_handler_diff', [(a:cmd), (a:fullpath), pos])
-                \ )
-    else
-        call helper#error('Can not get the file path in this buffer!')
-    endif
-endfunction
-
 function! git#diff(cmd, fullpath) abort
     if filereadable(a:fullpath)
         let args = ''
@@ -162,7 +150,7 @@ function! git#diff(cmd, fullpath) abort
         let target = fnamemodify(a:fullpath, ':h')
         let diffcmd = s:diffcmd(a:fullpath, args)
         call job#new_on_toplevel(diffcmd, target,
-                \ function('s:close_handler_diff', [diffcmd, (a:fullpath), []])
+                \ function('s:close_handler_diff', [diffcmd])
                 \ )
     else
         call helper#error('Can not get the file path in this buffer!')
