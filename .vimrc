@@ -38,14 +38,14 @@ set grepprg=internal
 set incsearch hlsearch
 set keywordprg=:help
 set matchpairs+=<:>
-set mouse=
+set mouse&
 set noignorecase
-set noshellslash
 set nowrap list listchars=trail:.,tab:>-
 set nowrapscan
 set pumheight=10 completeopt=menu
 set scrolloff=0 nonumber norelativenumber
 set sessionoptions=buffers,curdir,tabpages
+set shellslash
 set shortmess& shortmess+=I
 set tags=./tags;
 set visualbell noerrorbells t_vb=
@@ -163,13 +163,9 @@ command! -bar -nargs=0 SessionSave   :mksession! $VIMTEMP/session.vim
 if has('win32') && has('terminal')
     if isdirectory(expand('~/Desktop/vim/src')) && isdirectory(expand('~/vimbatchfiles'))
         command! -bar -nargs=0 VimOpen         :execute printf('!start %s', expand('~/Desktop/vim/src/gvim.exe'))
-        "command! -bar -nargs=* VimFetch        :execute printf('terminal cmd /C "%s" %s', expand('~/vimbatchfiles/vim-1-fetch.bat'), <q-args>)
-        "command! -bar -nargs=* VimTabSideBar   :execute printf('terminal cmd /C "%s" %s', expand('~/vimbatchfiles/vim-2-tabsidebar.bat'), <q-args>)
-        "command! -bar -nargs=* VimClpumAndTab  :execute printf('terminal cmd /C "%s" %s', expand('~/vimbatchfiles/vim-3-clpum_and_tabsidebar.bat'), <q-args>)
-        command! -bar -nargs=* VimBuildgVim    :execute printf('terminal cmd /C "%s" %s', expand('~/vimbatchfiles/vim-4-build-gvim.bat'), <q-args>)
-        command! -bar -nargs=* VimBuildVim     :execute printf('terminal cmd /C "%s" %s', expand('~/vimbatchfiles/vim-5-build-vim.bat'), <q-args>)
-        "command! -bar -nargs=* VimTest         :execute printf('terminal cmd /C "%s" %s', expand('~/vimbatchfiles/vim-7-test.bat'), <q-args>)
-        "command! -bar -nargs=* VimPushToGithub :execute printf('terminal cmd /C "%s" %s', expand('~/vimbatchfiles/vim-8-push_to_github.bat'), <q-args>)
+        command! -bar -nargs=* VimBuild        :execute printf('terminal cmd /C "%s" %s', expand('~/vimbatchfiles/vim-4-build-gvim.bat'), <q-args>)
+        command! -bar -nargs=* VimBuildTerm    :execute printf('terminal cmd /C "%s" %s', expand('~/vimbatchfiles/vim-5-build-vim.bat'), <q-args>)
+        command! -bar -nargs=* VimTest         :execute printf('terminal cmd /C "%s" %s', expand('~/vimbatchfiles/vim-7-test.bat'), <q-args>)
     endif
     function! TerminalOpenEvent() abort
         let curr_terminal = bufnr('%')
