@@ -15,9 +15,10 @@ let g:mapleader = ' '
 
 set runtimepath=
 set runtimepath+=$VIMPLUGINS/vim-gloaded
-set runtimepath+=$VIMPLUGINS/vim-various
+set runtimepath+=$VIMPLUGINS/vim-diffy
 set runtimepath+=$VIMPLUGINS/iceberg.vim
 set runtimepath+=$VIMPLUGINS/vim-qfreplace
+set runtimepath+=$VIMPLUGINS/vim-readingvimrc
 set runtimepath+=$VIMRUNTIME
 
 syntax on
@@ -54,7 +55,7 @@ set wildmenu wildmode&
 
 " BALLOON
 function! MyBalloonExpr() abort
-	return printf('Cursor is at line %d, column %d on word "%s"', v:beval_lnum, v:beval_col, v:beval_text)
+    return printf('Cursor is at line %d, column %d on word "%s"', v:beval_lnum, v:beval_col, v:beval_text)
 endfunction
 set ballooneval balloondelay& balloonexpr=MyBalloonExpr()
 
@@ -83,7 +84,7 @@ if has('tabsidebar')
     set laststatus=2
     set statusline=%#TabLineFill#
     set showtabline=2
-    set tabline=%#TabLine#%{getcwd()}%#TabLineFill#
+    set tabline=%#TabLineFill#
     set showtabsidebar=2
     set tabsidebarcolumns=20
     set tabsidebarwrap
@@ -172,13 +173,13 @@ if has('win32') && has('terminal')
         let job = job_info(term_getjob(curr_terminal))
         if fnamemodify(get(job.cmd, 0, ''), ':t') == 'cmd.exe'
             call term_sendkeys(curr_terminal,  join([
-                    \ 'prompt [$P]$_$$',
-                    \ 'doskey ls=dir /B $*',
-                    \ 'doskey pwd=cd',
-                    \ 'doskey rm=del /Q $*',
-                    \ 'doskey mv=move /Y $*',
-                    \ 'doskey cp=copy /Y $*',
-                    \ 'cls', ''], "\r"))
+                \ 'prompt [$P]$_$$',
+                \ 'doskey ls=dir /B $*',
+                \ 'doskey pwd=cd',
+                \ 'doskey rm=del /Q $*',
+                \ 'doskey mv=move /Y $*',
+                \ 'doskey cp=copy /Y $*',
+                \ 'cls', ''], "\r"))
         endif
     endfunction
     augroup term-vimrc
