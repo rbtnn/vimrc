@@ -5,15 +5,15 @@ let s:cnt = 0
 function! diffy#exec(target, q_bang, q_args) abort
     if &filetype != 'gstat'
         let args = s:trim(a:q_args)
-        if !empty(a:q_bang)
-            let rev = args
-            if !empty(rev)
-                let args = printf('%s^..%s', rev, rev)
-            else
-                call s:error('Invalid revision!')
-                return
-            endif
-        endif
+        "if !empty(a:q_bang)
+        "    let rev = args
+        "    if !empty(rev)
+        "        let args = printf('%s^..%s', rev, rev)
+        "    else
+        "        call s:error('Invalid revision!')
+        "        return
+        "    endif
+        "endif
         let cmd = ['git', 'diff', '--stat-width=800', '--stat']
         if !empty(args)
             let cmd += split(args, '\s\+')

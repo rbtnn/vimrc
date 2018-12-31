@@ -14,9 +14,9 @@ let g:vim_indent_cont = &g:shiftwidth
 let g:mapleader = ' '
 
 set runtimepath=
-set runtimepath+=$VIMPLUGINS/vim-gloaded
+set runtimepath+=$VIMPLUGINS/gruvbox
 set runtimepath+=$VIMPLUGINS/vim-diffy
-set runtimepath+=$VIMPLUGINS/iceberg.vim
+set runtimepath+=$VIMPLUGINS/vim-gloaded
 set runtimepath+=$VIMPLUGINS/vim-qfreplace
 set runtimepath+=$VIMPLUGINS/vim-readingvimrc
 set runtimepath+=$VIMRUNTIME
@@ -75,10 +75,10 @@ if has('persistent_undo')
     set undodir=$VIMTEMP/undofiles//
 endif
 
-"if has('clpum')
-"    set wildmode=popup
-"    set clpumheight=10
-"endif
+if has('clpum')
+    set wildmode=popup
+    set clpumheight=10
+endif
 
 if has('tabsidebar')
     set laststatus=2
@@ -138,7 +138,7 @@ augroup iceberg-additional
     autocmd ColorScheme * :highlight! StatusLineTermNC   guifg=#818596 guibg=#818596
 augroup END
 
-colorscheme iceberg
+colorscheme gruvbox
 
 vnoremap <silent>p           "_dP
 
@@ -173,7 +173,7 @@ if has('win32') && has('terminal')
         let job = job_info(term_getjob(curr_terminal))
         if fnamemodify(get(job.cmd, 0, ''), ':t') == 'cmd.exe'
             call term_sendkeys(curr_terminal,  join([
-                \ 'prompt [$P]$_$$',
+                \ 'prompt $e[32m[$P]$_$e[30;m$$',
                 \ 'doskey ls=dir /B $*',
                 \ 'doskey pwd=cd',
                 \ 'doskey rm=del /Q $*',

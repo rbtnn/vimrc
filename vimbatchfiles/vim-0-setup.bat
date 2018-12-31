@@ -16,6 +16,7 @@ If "%1"=="yes" (goto SETUPVC) ELSE (goto FINISH)
     set OPT1= IME=yes MBYTE=yes ICONV=yes CSCOPE=yes DEBUG=no NETBEANS=no XPM=no USE_MSVCRT=1
     set OPT2= SDK_INCLUDE_DIR=%SDK_INCLUDE_DIR%
     set OPT3= CLPUM=yes
+    rem DYNAMIC_PYTHON=yes PYTHON3_VER=37 DYNAMIC_PYTHON3=yes PYTHON3=%USERPROFILE%\AppData\Local\Programs\Python\Python37-32
 
     set PATH=%SystemRoot%
     set PATH=%PATH%;%SystemRoot%\System32
