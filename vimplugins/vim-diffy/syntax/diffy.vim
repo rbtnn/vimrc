@@ -1,13 +1,15 @@
 
-syntax region  gstatInfoDiff        start='|\s*\d\+'      end='$' contains=gstatDelimiter,gstatInsertion,gstatDeletion
-syntax region  gstatInfoBin         start='|\s*Bin'       end='$' contains=gstatDelimiter
-syntax region  gstatInfoUnmerged    start='|\s*Unmerged'  end='$' contains=gstatDelimiter
-syntax match   gstatDelimiter  '|' contained
-syntax match   gstatInsertion  '+' contained
-syntax match   gstatDeletion   '-' contained
+syntax region  diffyComment         start='^#'            end='$'
+syntax region  diffyInfoDiff        start='|\s*\d\+'      end='$' contains=diffyDelimiter,diffyInsertion,diffyDeletion
+syntax region  diffyInfoBin         start='|\s*Bin'       end='$' contains=diffyDelimiter
+syntax region  diffyInfoUnmerged    start='|\s*Unmerged'  end='$' contains=diffyDelimiter
+syntax match   diffyDelimiter  '|' contained
+syntax match   diffyInsertion  '+' contained
+syntax match   diffyDeletion   '-' contained
 
-highlight! def link gstatInsertion       DiffAdd
-highlight! def link gstatDeletion        DiffDelete
-highlight! def link gstatDelimiter       NonText
-highlight! def link gstatInfoBin         Error
-highlight! def link gstatInfoUnmerged    Error
+highlight! def link diffyComment         Comment
+highlight! def link diffyInsertion       DiffAdd
+highlight! def link diffyDeletion        DiffDelete
+highlight! def link diffyDelimiter       NonText
+highlight! def link diffyInfoBin         Error
+highlight! def link diffyInfoUnmerged    Error

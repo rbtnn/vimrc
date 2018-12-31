@@ -3,31 +3,29 @@ let s:jobs = []
 let s:cnt = 0
 
 function! diffy#exec(target, q_bang, q_args) abort
-    if &filetype != 'gstat'
+    let ok = 0
+    if &filetype != 'diffy'
         let args = s:trim(a:q_args)
-        "if !empty(a:q_bang)
-        "    let rev = args
-        "    if !empty(rev)
-        "        let args = printf('%s^..%s', rev, rev)
-        "    else
-        "        call s:error('Invalid revision!')
-        "        return
-        "    endif
-        "endif
         let cmd = ['git', 'diff', '--stat-width=800', '--stat']
-        if !empty(args)
-            let cmd += split(args, '\s\+')
+        if a:q_bang == '!'
+            echo string(args)
+            if args =~# '^[0-9a-f]\{7,7\}$'
+                let cmd += [printf('%s..%s~1', args, args)]
+                let ok = 1
+            endif
+        else
+            if !empty(args)
+                let cmd += split(args, '\s\+')
+            endif
+            let ok = 1
         endif
-        call s:job_new_on_toplevel(cmd, a:target, function('s:close_handler_stat', [(cmd)]))
+    endif
+    if ok
+        call s:job_new_on_toplevel(cmd, a:target, function('s:handler_diffy_exec', [(cmd)]))
     endif
 endfunction
 
-"function! git#cmd_diffhash(target, hash) abort
-"    let cmd = ['git', 'diff', (a:hash . '~1'), (a:hash)]
-"    call s:job_new_on_toplevel(cmd, a:target, function('s:close_handler_diff', [(cmd)]))
-"endfunction
-
-function! s:close_handler_stat(cmd, toplevel, output)
+function! s:handler_diffy_exec(cmd, toplevel, output)
     call s:echo(join(a:cmd, ' '))
     let lines = []
     let max = 0
@@ -52,12 +50,20 @@ function! s:close_handler_stat(cmd, toplevel, output)
         endif
     endfor
     if 1 == len(lines)
-        call diffy#git_diff(a:cmd, diffy#get_path(a:toplevel, lines[0]))
+        call diffy#git_diff(a:toplevel, lines[0], a:cmd)
     elseif 0 < len(lines)
+        let lines = [
+                \ '#',
+                \ '# KeyMapping',
+                \ '#   return: open the file under the cursor',
+                \ '#   Ctrl-d: open diff-window under the cursor',
+                \ '#   q:      close this window',
+                \ '#',
+                \ ] + lines
         call s:new_window(lines)
         setlocal filetype=diffy
         let &l:statusline = join(a:cmd)
-        execute printf("nnoremap <silent><buffer><nowait>d       :<C-u>call diffy#git_diff(%s, diffy#get_path(%s, getline('.')))<cr>", string(a:cmd), string(a:toplevel))
+        execute printf("nnoremap <silent><buffer><nowait>d       :<C-u>call diffy#git_diff(%s, getline('.'), %s)<cr>", string(a:toplevel), string(a:cmd))
         execute printf("nnoremap <silent><buffer><nowait><cr>    :<C-u>call diffy#git_open(%s, getline('.'))<cr>", string(a:toplevel))
     else
         call s:error('No modified file!')
@@ -87,20 +93,19 @@ function! diffy#git_open(toplevel, line) abort
     endif
 endfunction
 
-function! diffy#git_diff(cmd, fullpath) abort
-    if filereadable(a:fullpath)
+function! diffy#git_diff(toplevel, line, cmd) abort
+    let path = diffy#get_path(a:toplevel, a:line)
+    if filereadable(path)
         let args = ''
         let idx = index(a:cmd, '--stat')
         if 0 <= idx
             let args = join(a:cmd[(idx + 1):])
         endif
-        let target = fnamemodify(a:fullpath, ':h')
-        let diffcmd = s:diffcmd(a:fullpath, args)
+        let target = fnamemodify(path, ':h')
+        let diffcmd = s:diffcmd(path, args)
         call s:job_new_on_toplevel(diffcmd, target,
                 \ function('s:close_handler_diff', [diffcmd])
                 \ )
-    else
-        call s:error('Can not get the file path in this buffer!')
     endif
 endfunction
 
@@ -172,7 +177,7 @@ function! s:job_new(cmd, cwd, callback) abort
     call timer_start(1000, function('s:job_outcb'), { 'repeat' : -1, })
     return job
 endfunction
-"
+
 function! s:job_outcb(timer) abort
     let nojob = 1
     for x in s:jobs

@@ -80,7 +80,7 @@ if has('clpum')
     set clpumheight=10
 endif
 
-if has('tabsidebar')
+if has('win32') && has('tabsidebar')
     set laststatus=2
     set statusline=%#TabLineFill#
     set showtabline=2
@@ -138,6 +138,7 @@ augroup iceberg-additional
     autocmd ColorScheme * :highlight! StatusLineTermNC   guifg=#818596 guibg=#818596
 augroup END
 
+set background=dark
 colorscheme gruvbox
 
 vnoremap <silent>p           "_dP
