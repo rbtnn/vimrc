@@ -38,6 +38,7 @@
 .profile
 .psql_history
 .pub-cache/
+.python_history
 .rustup/
 .sh_history
 .subversion/

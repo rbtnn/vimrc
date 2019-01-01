@@ -28,7 +28,6 @@ set secure
 set ambiwidth=double
 set autoread
 set clipboard=unnamed
-set cursorline nocursorcolumn
 set display=lastline
 set equalalways
 set expandtab softtabstop=-1 shiftwidth=4 tabstop=4
@@ -40,6 +39,7 @@ set incsearch hlsearch
 set keywordprg=:help
 set matchpairs+=<:>
 set mouse&
+set nocursorline nocursorcolumn
 set noignorecase
 set nowrap list listchars=trail:.,tab:>-
 set nowrapscan
@@ -80,10 +80,10 @@ if has('clpum')
     set clpumheight=10
 endif
 
-if has('win32') && has('tabsidebar')
+if has('tabsidebar')
     set laststatus=2
     set statusline=%#TabLineFill#
-    set showtabline=2
+    set showtabline=0
     set tabline=%#TabLineFill#
     set showtabsidebar=2
     set tabsidebarcolumns=20
@@ -130,16 +130,10 @@ if has('win32') && has('tabsidebar')
     endfunction
 endif
 
-augroup iceberg-additional
-    autocmd!
-    autocmd ColorScheme * :highlight! VertSplit          guifg=#818596 guibg=#818596
-    autocmd ColorScheme * :highlight! StatusLine         guifg=NONE    guibg=#818596
-    autocmd ColorScheme * :highlight! StatusLineNC       guifg=#818596 guibg=#818596
-    autocmd ColorScheme * :highlight! StatusLineTermNC   guifg=#818596 guibg=#818596
-augroup END
-
-set background=dark
-colorscheme gruvbox
+if 0 <= index(getcompletion('*', 'color'), 'gruvbox')
+    set background=dark
+    colorscheme gruvbox
+endif
 
 vnoremap <silent>p           "_dP
 
@@ -153,47 +147,48 @@ inoremap <silent><tab>       <C-v><tab>
 nnoremap <nowait><C-j>       :<C-u>cnext<cr>
 nnoremap <nowait><C-k>       :<C-u>cprevious<cr>
 
-if has('win32') && has('gui_running')
-    command! -bar -nargs=0 FullScreenToggle   :call libcallnr('gvimfullscreen.dll', 'ToggleFullScreen', 0)
-    command!      -nargs=1 SetAlpha           :call libcallnr('vimtweak.dll', 'SetAlpha', <args>)
-endif
-
 command! -bar -nargs=0 SessionLoad   :source     $VIMTEMP/session.vim
 command! -bar -nargs=0 SessionSave   :mksession! $VIMTEMP/session.vim
 
-" https://github.com/rprichard/winpty/releases/
-if has('win32') && has('terminal')
-    if isdirectory(expand('~/Desktop/vim/src')) && isdirectory(expand('~/vimbatchfiles'))
-        command! -bar -nargs=0 VimOpen         :execute printf('!start %s', expand('~/Desktop/vim/src/gvim.exe'))
-        command! -bar -nargs=* VimBuild        :execute printf('terminal cmd /C "%s" %s', expand('~/vimbatchfiles/vim-4-build-gvim.bat'), <q-args>)
-        command! -bar -nargs=* VimBuildTerm    :execute printf('terminal cmd /C "%s" %s', expand('~/vimbatchfiles/vim-5-build-vim.bat'), <q-args>)
-        command! -bar -nargs=* VimTest         :execute printf('terminal cmd /C "%s" %s', expand('~/vimbatchfiles/vim-7-test.bat'), <q-args>)
+if has('win32')
+    if has('gui_running')
+        command! -bar -nargs=0 FullScreenToggle   :call libcallnr('gvimfullscreen.dll', 'ToggleFullScreen', 0)
+        command!      -nargs=1 SetAlpha           :call libcallnr('vimtweak.dll', 'SetAlpha', <args>)
     endif
-    function! TerminalOpenEvent() abort
-        let curr_terminal = bufnr('%')
-        let job = job_info(term_getjob(curr_terminal))
-        if fnamemodify(get(job.cmd, 0, ''), ':t') == 'cmd.exe'
-            call term_sendkeys(curr_terminal,  join([
-                \ 'prompt $e[32m[$P]$_$e[30;m$$',
-                \ 'doskey ls=dir /B $*',
-                \ 'doskey pwd=cd',
-                \ 'doskey rm=del /Q $*',
-                \ 'doskey mv=move /Y $*',
-                \ 'doskey cp=copy /Y $*',
-                \ 'cls', ''], "\r"))
+    " https://github.com/rprichard/winpty/releases/
+    if has('terminal')
+        if isdirectory(expand('~/Desktop/vim/src')) && isdirectory(expand('~/vimbatchfiles'))
+            command! -bar -nargs=0 VimOpen         :execute printf('!start %s', expand('~/Desktop/vim/src/gvim.exe'))
+            command! -bar -nargs=* VimBuild        :execute printf('terminal cmd /C "%s" %s', expand('~/vimbatchfiles/vim-4-build-gvim.bat'), <q-args>)
+            command! -bar -nargs=* VimBuildTerm    :execute printf('terminal cmd /C "%s" %s', expand('~/vimbatchfiles/vim-5-build-vim.bat'), <q-args>)
+            command! -bar -nargs=* VimTest         :execute printf('terminal cmd /C "%s" %s', expand('~/vimbatchfiles/vim-7-test.bat'), <q-args>)
         endif
-    endfunction
-    augroup term-vimrc
-        autocmd!
-        autocmd TerminalOpen * :call TerminalOpenEvent()
-    augroup END
-    tnoremap <silent><C-p>       <up>
-    tnoremap <silent><C-n>       <down>
-    tnoremap <silent><C-b>       <left>
-    tnoremap <silent><C-f>       <right>
-    tnoremap <silent><C-e>       <end>
-    tnoremap <silent><C-a>       <home>
-    tnoremap <silent><C-u>       <esc>
+        function! TerminalOpenEvent() abort
+            let curr_terminal = bufnr('%')
+            let job = job_info(term_getjob(curr_terminal))
+            if fnamemodify(get(job.cmd, 0, ''), ':t') == 'cmd.exe'
+                call term_sendkeys(curr_terminal,  join([
+                    \ 'prompt $e[32m[$P]$_$e[30;m$$',
+                    \ 'doskey ls=dir /B $*',
+                    \ 'doskey pwd=cd',
+                    \ 'doskey rm=del /Q $*',
+                    \ 'doskey mv=move /Y $*',
+                    \ 'doskey cp=copy /Y $*',
+                    \ 'cls', ''], "\r"))
+            endif
+        endfunction
+        augroup term-vimrc
+            autocmd!
+            autocmd TerminalOpen * :call TerminalOpenEvent()
+        augroup END
+        tnoremap <silent><C-p>       <up>
+        tnoremap <silent><C-n>       <down>
+        tnoremap <silent><C-b>       <left>
+        tnoremap <silent><C-f>       <right>
+        tnoremap <silent><C-e>       <end>
+        tnoremap <silent><C-a>       <home>
+        tnoremap <silent><C-u>       <esc>
+    endif
 endif
 
 if filereadable(expand('~/.vimrc.local'))

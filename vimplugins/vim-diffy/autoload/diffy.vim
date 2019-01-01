@@ -8,7 +8,6 @@ function! diffy#exec(target, q_bang, q_args) abort
         let args = s:trim(a:q_args)
         let cmd = ['git', 'diff', '--stat-width=800', '--stat']
         if a:q_bang == '!'
-            echo string(args)
             if args =~# '^[0-9a-f]\{7,7\}$'
                 let cmd += [printf('%s..%s~1', args, args)]
                 let ok = 1
@@ -26,7 +25,6 @@ function! diffy#exec(target, q_bang, q_args) abort
 endfunction
 
 function! s:handler_diffy_exec(cmd, toplevel, output)
-    call s:echo(join(a:cmd, ' '))
     let lines = []
     let max = 0
     for line in a:output
@@ -54,15 +52,18 @@ function! s:handler_diffy_exec(cmd, toplevel, output)
     elseif 0 < len(lines)
         let lines = [
                 \ '#',
+                \ '# GitRootDirectory',
+                \ '#   ' . a:toplevel,
+                \ '#',
                 \ '# KeyMapping',
-                \ '#   return: open the file under the cursor',
-                \ '#   Ctrl-d: open diff-window under the cursor',
-                \ '#   q:      close this window',
+                \ '#   return key: Open the file under the cursor',
+                \ '#   d key:      Open diff-window under the cursor',
+                \ '#   q key:      Close this window',
                 \ '#',
                 \ ] + lines
         call s:new_window(lines)
         setlocal filetype=diffy
-        let &l:statusline = join(a:cmd)
+        let &l:statusline = printf('[diffy] %s', join(a:cmd))
         execute printf("nnoremap <silent><buffer><nowait>d       :<C-u>call diffy#git_diff(%s, getline('.'), %s)<cr>", string(a:toplevel), string(a:cmd))
         execute printf("nnoremap <silent><buffer><nowait><cr>    :<C-u>call diffy#git_open(%s, getline('.'))<cr>", string(a:toplevel))
     else
@@ -71,15 +72,24 @@ function! s:handler_diffy_exec(cmd, toplevel, output)
 endfunction
 
 function! s:close_handler_diff(cmd, toplevel, output)
-    call s:echo(join(a:cmd, ' '))
     let lines = a:output
     if !empty(lines)
+        let lines = [
+                \ '#',
+                \ '# GitRootDirectory',
+                \ '#   ' . a:toplevel,
+                \ '#',
+                \ '# KeyMapping',
+                \ '#   return key: Open the file at the cursor line',
+                \ '#   q key:      Close this window',
+                \ '#',
+                \ ] + lines
         call map(lines, { i,x -> sillyiconv#iconv_one_nothrow(x) })
         call s:new_window(lines)
         wincmd H
         redraw!
         setlocal filetype=diff
-        let &l:statusline = join(a:cmd)
+        let &l:statusline = printf('[diffy] %s', join(a:cmd))
         execute printf('nnoremap <silent><buffer><nowait><cr>    :<C-u>call diffy#git_diff_jump(%s)<cr>', string(a:toplevel))
     else
         call s:error('No modified!')
@@ -90,6 +100,8 @@ function! diffy#git_open(toplevel, line) abort
     let path = diffy#get_path(a:toplevel, a:line)
     if filereadable(path)
         call s:open_file(path, -1)
+    else
+        call s:error('Can not jump this!')
     endif
 endfunction
 
@@ -104,8 +116,10 @@ function! diffy#git_diff(toplevel, line, cmd) abort
         let target = fnamemodify(path, ':h')
         let diffcmd = s:diffcmd(path, args)
         call s:job_new_on_toplevel(diffcmd, target,
-                \ function('s:close_handler_diff', [diffcmd])
-                \ )
+            \ function('s:close_handler_diff', [diffcmd])
+            \ )
+    else
+        call s:error('Can not jump this!')
     endif
 endfunction
 
@@ -162,18 +176,18 @@ endfunction
 function! s:job_new(cmd, cwd, callback) abort
     let expanded_cwd = expand(a:cwd)
     let job = job_start(a:cmd, {
-            \ 'close_cb' : function('s:handler_close_cb', [(a:callback)]),
-            \ 'cwd' : expand(a:cwd),
-            \ 'in_io' : 'pipe',
-            \ 'out_io' : 'pipe',
-            \ 'err_io' : 'out',
-            \ })
+        \ 'close_cb' : function('s:handler_close_cb', [(a:callback)]),
+        \ 'cwd' : expand(a:cwd),
+        \ 'in_io' : 'pipe',
+        \ 'out_io' : 'pipe',
+        \ 'err_io' : 'out',
+        \ })
     let s:jobs += [{
-            \   'timestamp' : strftime('%c'),
-            \   'cmd' : join(a:cmd),
-            \   'cwd' : expanded_cwd,
-            \   'job' : job,
-            \ }]
+        \   'timestamp' : strftime('%c'),
+        \   'cmd' : join(a:cmd),
+        \   'cwd' : expanded_cwd,
+        \   'job' : job,
+        \ }]
     call timer_start(1000, function('s:job_outcb'), { 'repeat' : -1, })
     return job
 endfunction
@@ -196,7 +210,7 @@ endfunction
 function! s:job_new_on_toplevel(cmd, target, callback) abort
     if executable('git')
         call s:job_new(['git', 'rev-parse', '--show-toplevel'], a:target,
-                \ function('s:handler_new_on_toplevel', [(a:callback), (a:cmd)]))
+            \ function('s:handler_new_on_toplevel', [(a:callback), (a:cmd)]))
     else
         call s:error('Can not execute git!')
     endif
