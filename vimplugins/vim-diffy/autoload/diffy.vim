@@ -8,8 +8,8 @@ function! diffy#exec(target, q_bang, q_args) abort
         let args = s:trim(a:q_args)
         let cmd = ['git', 'diff', '--stat-width=800', '--stat']
         if a:q_bang == '!'
-            if args =~# '^[0-9a-f]\{7,7\}$'
-                let cmd += [printf('%s..%s~1', args, args)]
+            if args =~# '^[0-9a-f]\{7,\}$'
+                let cmd += [printf('%s~1..%s', args, args)]
                 let ok = 1
             endif
         else

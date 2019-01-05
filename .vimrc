@@ -17,6 +17,7 @@ set runtimepath=
 set runtimepath+=$VIMPLUGINS/gruvbox
 set runtimepath+=$VIMPLUGINS/vim-diffy
 set runtimepath+=$VIMPLUGINS/vim-gloaded
+set runtimepath+=$VIMPLUGINS/vim-runtest
 set runtimepath+=$VIMPLUGINS/vim-qfreplace
 set runtimepath+=$VIMPLUGINS/vim-readingvimrc
 set runtimepath+=$VIMRUNTIME
@@ -37,6 +38,7 @@ set foldcolumn=0 foldlevelstart=99 foldmethod=indent
 set grepprg=internal
 set incsearch hlsearch
 set keywordprg=:help
+set laststatus=2 statusline&
 set matchpairs+=<:>
 set mouse&
 set nocursorline nocursorcolumn
@@ -48,6 +50,7 @@ set scrolloff=0 nonumber norelativenumber
 set sessionoptions=buffers,curdir,tabpages
 set shellslash
 set shortmess& shortmess+=I
+set showtabline=0 tabline&
 set tags=./tags;
 set visualbell noerrorbells t_vb=
 set wildignore&
@@ -81,10 +84,6 @@ if has('clpum')
 endif
 
 if has('tabsidebar')
-    set laststatus=2
-    set statusline=%#TabLineFill#
-    set showtabline=0
-    set tabline=%#TabLineFill#
     set showtabsidebar=2
     set tabsidebarcolumns=20
     set tabsidebarwrap
@@ -137,10 +136,8 @@ endif
 
 vnoremap <silent>p           "_dP
 
-nnoremap <silent>*           :<C-u>set hlsearch \| let @/ = printf('\<%s\>', expand('<cword>'))<cr>
-
-noremap <silent><C-u>        15k
-noremap <silent><C-d>        15j
+noremap <silent><C-u>        15kzz
+noremap <silent><C-d>        15jzz
 
 inoremap <silent><tab>       <C-v><tab>
 
@@ -163,24 +160,6 @@ if has('win32')
             command! -bar -nargs=* VimBuildTerm    :execute printf('terminal cmd /C "%s" %s', expand('~/vimbatchfiles/vim-5-build-vim.bat'), <q-args>)
             command! -bar -nargs=* VimTest         :execute printf('terminal cmd /C "%s" %s', expand('~/vimbatchfiles/vim-7-test.bat'), <q-args>)
         endif
-        function! TerminalOpenEvent() abort
-            let curr_terminal = bufnr('%')
-            let job = job_info(term_getjob(curr_terminal))
-            if fnamemodify(get(job.cmd, 0, ''), ':t') == 'cmd.exe'
-                call term_sendkeys(curr_terminal,  join([
-                    \ 'prompt $e[32m[$P]$_$e[30;m$$',
-                    \ 'doskey ls=dir /B $*',
-                    \ 'doskey pwd=cd',
-                    \ 'doskey rm=del /Q $*',
-                    \ 'doskey mv=move /Y $*',
-                    \ 'doskey cp=copy /Y $*',
-                    \ 'cls', ''], "\r"))
-            endif
-        endfunction
-        augroup term-vimrc
-            autocmd!
-            autocmd TerminalOpen * :call TerminalOpenEvent()
-        augroup END
         tnoremap <silent><C-p>       <up>
         tnoremap <silent><C-n>       <down>
         tnoremap <silent><C-b>       <left>
@@ -190,6 +169,25 @@ if has('win32')
         tnoremap <silent><C-u>       <esc>
     endif
 endif
+
+function! TerminalOpenEvent() abort
+    let curr_terminal = bufnr('%')
+    let job = job_info(term_getjob(curr_terminal))
+    let keys = join(has('win32')
+            \ ? [
+            \ 'prompt $e[32m$$$e[30;m',
+            \ 'cls', '']
+            \ : [
+            \ 'export PS1=\\e[32m$\\e[37m',
+            \ 'clear', '']
+            \ , "\r")
+    call term_sendkeys(curr_terminal, keys)
+endfunction
+
+augroup term-vimrc
+    autocmd!
+    autocmd TerminalOpen * :call TerminalOpenEvent()
+augroup END
 
 if filereadable(expand('~/.vimrc.local'))
     source ~/.vimrc.local
