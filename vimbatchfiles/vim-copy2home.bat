@@ -1,6 +1,6 @@
 @echo on
 setlocal enabledelayedexpansion
-call %~dp0vim-0-setup.bat
+call %~dp0vim-setup.bat
 pushd %VIMDIR%
     pushd .\src
         if "%USERPROFILE%" NEQ "" (

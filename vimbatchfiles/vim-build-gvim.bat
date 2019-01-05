@@ -1,6 +1,6 @@
 @echo off
 setlocal enabledelayedexpansion
-call %~dp0vim-0-setup.bat yes
+call %~dp0vim-setup.bat yes
 pushd %VIMDIR%
     pushd .\src
     	copy /y config.mk.dist auto\config.mk
