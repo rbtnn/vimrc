@@ -17,9 +17,9 @@ set runtimepath=
 set runtimepath+=$VIMPLUGINS/gruvbox
 set runtimepath+=$VIMPLUGINS/vim-diffy
 set runtimepath+=$VIMPLUGINS/vim-gloaded
-set runtimepath+=$VIMPLUGINS/vim-runtest
 set runtimepath+=$VIMPLUGINS/vim-qfreplace
 set runtimepath+=$VIMPLUGINS/vim-readingvimrc
+set runtimepath+=$VIMPLUGINS/vim-runtest
 set runtimepath+=$VIMRUNTIME
 
 syntax on
@@ -57,10 +57,12 @@ set wildignore&
 set wildmenu wildmode&
 
 " BALLOON
-function! MyBalloonExpr() abort
-    return printf('Cursor is at line %d, column %d on word "%s"', v:beval_lnum, v:beval_col, v:beval_text)
-endfunction
-set ballooneval balloondelay& balloonexpr=MyBalloonExpr()
+if 0
+    function! MyBalloonExpr() abort
+        return printf('Cursor is at line %d, column %d on word "%s"', v:beval_lnum, v:beval_col, v:beval_text)
+    endfunction
+    set ballooneval balloondelay& balloonexpr=MyBalloonExpr()
+endif
 
 " SWAP FILES
 set noswapfile
@@ -92,21 +94,25 @@ if has('tabsidebar')
         try
             if g:actual_curtabpage == tabpagenr()
                 let t = 'TabSideBarSel'
-            elseif g:actual_curtabpage % 2 == 0
-                let t = 'TabSideBarEven'
             else
-                let t = 'TabSideBarOdd'
+                let t = 'TabSideBar'
             endif
-            let lines = [printf('%%#%s#Tab page %d', t, g:actual_curtabpage)]
+            let lines = ['']
+            let s = printf('TABPAGE %d', g:actual_curtabpage)
+            let rest = &tabsidebarcolumns - len(s) - 2
+            let lines += [printf('%%#%s#%s|%s|%s', t,
+                    \ repeat('=', rest / 2),
+                    \ s,
+                    \ repeat('=', rest / 2 + (rest % 2)))]
             for x in getwininfo()
                 if x.tabnr == g:actual_curtabpage
-                    let s = '[No Name]'
+                    let s = '(No Name)'
                     if x.terminal
-                        let s = '[Terminal]'
+                        let s = '(Terminal)'
                     elseif x.quickfix
-                        let s = '[QuickFix]'
+                        let s = '(QuickFix)'
                     elseif x.loclist
-                        let s = '[LocList]'
+                        let s = '(LocList)'
                     elseif filereadable(bufname(x.bufnr))
                         let modi = getbufvar(x.bufnr, '&modified')
                         let read = getbufvar(x.bufnr, '&readonly')
@@ -119,7 +125,7 @@ if has('tabsidebar')
                         endif
                     endif
                     let iscurr = (winnr() == x.winnr) && (g:actual_curtabpage == tabpagenr())
-                    let lines += [printf('%s %s', (iscurr ? '>' : ' '), s)]
+                    let lines += [printf('%s %s', (iscurr ? nr2char(0x25B6) : ' '), s)]
                 endif
             endfor
             return join(lines, "\n")
@@ -136,8 +142,8 @@ endif
 
 vnoremap <silent>p           "_dP
 
-noremap <silent><C-u>        15kzz
-noremap <silent><C-d>        15jzz
+noremap <silent><C-u>        15k
+noremap <silent><C-d>        15j
 
 inoremap <silent><tab>       <C-v><tab>
 
@@ -169,25 +175,6 @@ if has('win32')
         tnoremap <silent><C-u>       <esc>
     endif
 endif
-
-function! TerminalOpenEvent() abort
-    let curr_terminal = bufnr('%')
-    let job = job_info(term_getjob(curr_terminal))
-    let keys = join(has('win32')
-            \ ? [
-            \ 'prompt $e[32m$$$e[30;m',
-            \ 'cls', '']
-            \ : [
-            \ 'export PS1=\\e[32m$\\e[37m',
-            \ 'clear', '']
-            \ , "\r")
-    call term_sendkeys(curr_terminal, keys)
-endfunction
-
-augroup term-vimrc
-    autocmd!
-    autocmd TerminalOpen * :call TerminalOpenEvent()
-augroup END
 
 if filereadable(expand('~/.vimrc.local'))
     source ~/.vimrc.local
