@@ -27,6 +27,7 @@ endfunction
 function! s:handler_diffy_exec(cmd, toplevel, output)
     let lines = []
     let max = 0
+    call map(a:output, { i,x -> sillyiconv#iconv_one_nothrow(x) })
     for line in a:output
         let xs = split(line, '|')
         if 2 == len(xs)
@@ -61,6 +62,7 @@ function! s:handler_diffy_exec(cmd, toplevel, output)
                 \ '#   q key:      Close this window',
                 \ '#',
                 \ ] + lines
+        "call map(lines, { i,x -> sillyiconv#iconv_one_nothrow(x) })
         call s:new_window(lines)
         setlocal filetype=diffy
         let &l:statusline = printf('[diffy] %s', join(a:cmd))
@@ -174,10 +176,10 @@ function! s:get_path_and_lnum(toplevel) abort
 endfunction
 
 function! s:job_new(cmd, cwd, callback) abort
-    let expanded_cwd = expand(a:cwd)
+    let expanded_cwd = expand(sillyiconv#iconv_one_nothrow(a:cwd))
     let job = job_start(a:cmd, {
         \ 'close_cb' : function('s:handler_close_cb', [(a:callback)]),
-        \ 'cwd' : expand(a:cwd),
+        \ 'cwd' : expanded_cwd,
         \ 'in_io' : 'pipe',
         \ 'out_io' : 'pipe',
         \ 'err_io' : 'out',
@@ -225,7 +227,7 @@ function! s:handler_close_cb(callback, channel) abort
 endfunction
 
 function! s:handler_new_on_toplevel(callback, cmd, output) abort
-    let toplevel = substitute(get(a:output, 0, ''), "\n", '', 'g')
+    let toplevel = sillyiconv#iconv_one_nothrow(substitute(get(a:output, 0, ''), "\n", '', 'g'))
     if empty(toplevel) || (toplevel =~# '^fatal:')
         call s:error('fatal: Not a git repository (or any of the parent directories): .git')
     else

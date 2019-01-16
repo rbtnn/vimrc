@@ -1,5 +1,4 @@
 
-set encoding=utf-8
 if exists('&makeencoding')
     set makeencoding=char
 endif
@@ -125,7 +124,7 @@ if has('tabsidebar')
                         endif
                     endif
                     let iscurr = (winnr() == x.winnr) && (g:actual_curtabpage == tabpagenr())
-                    let lines += [printf('%s %s', (iscurr ? nr2char(0x25B6) : ' '), s)]
+                    let lines += [printf('%s %s', (iscurr ? '>' : ' '), s)]
                 endif
             endfor
             return join(lines, "\n")
@@ -135,9 +134,12 @@ if has('tabsidebar')
     endfunction
 endif
 
-if 0 <= index(getcompletion('*', 'color'), 'gruvbox')
-    set background=dark
-    colorscheme gruvbox
+if has('vim_starting')
+    if 0 <= index(getcompletion('*', 'color'), 'gruvbox')
+        let g:gruvbox_italic = 0
+        set background=dark
+        colorscheme gruvbox
+    endif
 endif
 
 vnoremap <silent>p           "_dP
@@ -154,6 +156,7 @@ command! -bar -nargs=0 SessionLoad   :source     $VIMTEMP/session.vim
 command! -bar -nargs=0 SessionSave   :mksession! $VIMTEMP/session.vim
 
 if has('win32')
+    command! -nargs=0 Explorer   :!start explorer .
     if has('gui_running')
         command! -bar -nargs=0 FullScreenToggle   :call libcallnr('gvimfullscreen.dll', 'ToggleFullScreen', 0)
         command!      -nargs=1 SetAlpha           :call libcallnr('vimtweak.dll', 'SetAlpha', <args>)
