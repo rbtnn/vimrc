@@ -13,7 +13,7 @@ let g:vim_indent_cont = &g:shiftwidth
 let g:mapleader = ' '
 
 set runtimepath=
-set runtimepath+=$VIMPLUGINS/gruvbox
+set runtimepath+=$VIMPLUGINS/vim-color-spring-night
 set runtimepath+=$VIMPLUGINS/vim-diffy
 set runtimepath+=$VIMPLUGINS/vim-gloaded
 set runtimepath+=$VIMPLUGINS/vim-qfreplace
@@ -45,6 +45,7 @@ set noignorecase
 set nowrap list listchars=trail:.,tab:>-
 set nowrapscan
 set pumheight=10 completeopt=menu
+set ruler
 set scrolloff=0 nonumber norelativenumber
 set sessionoptions=buffers,curdir,tabpages
 set shellslash
@@ -53,14 +54,6 @@ set tags=./tags;
 set visualbell noerrorbells t_vb=
 set wildignore&
 set wildmenu wildmode&
-
-" BALLOON
-if 0
-    function! MyBalloonExpr() abort
-        return printf('Cursor is at line %d, column %d on word "%s"', v:beval_lnum, v:beval_col, v:beval_text)
-    endfunction
-    set ballooneval balloondelay& balloonexpr=MyBalloonExpr()
-endif
 
 " SWAP FILES
 set noswapfile
@@ -84,11 +77,7 @@ if has('clpum')
 endif
 
 if has('vim_starting')
-    if 0 <= index(getcompletion('*', 'color'), 'gruvbox')
-        let g:gruvbox_italic = 0
-        set background=dark
-        colorscheme gruvbox
-    endif
+    colorscheme spring-night
 endif
 
 vnoremap <silent>p           "_dP
