@@ -40,7 +40,7 @@ function! tabenhancer#tabline() abort
             endif
         endif
         let padding = repeat(' ', (&columns - len(s)) / 2 - tsbcolumns)
-        return printf('%%#TabLine#%s%s', padding, s)
+        return printf('%%#Underlined#%s%s', padding, s)
     catch
         return string(v:exception)
     endtry
@@ -55,11 +55,7 @@ endfunction
 
 function! tabenhancer#tabsidebar() abort
     try
-        if g:actual_curtabpage == tabpagenr()
-            let t = 'TabSideBarSel'
-        else
-            let t = 'TabSideBar'
-        endif
+        let t = (g:actual_curtabpage == tabpagenr()) ? 'TabSideBarSel' : 'TabSideBar'
         let lines = ['']
         let s = printf('[TABPAGE %d]', g:actual_curtabpage)
         let lines += [printf('%%#%s#%s', t, s)]

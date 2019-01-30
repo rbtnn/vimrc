@@ -77,6 +77,7 @@ if has('clpum')
 endif
 
 if has('vim_starting')
+    let g:spring_night_kill_italic = 1
     colorscheme spring-night
 endif
 
