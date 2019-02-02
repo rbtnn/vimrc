@@ -13,13 +13,11 @@ let g:vim_indent_cont = &g:shiftwidth
 let g:mapleader = ' '
 
 set runtimepath=
-set runtimepath+=$VIMPLUGINS/vim-color-spring-night
-set runtimepath+=$VIMPLUGINS/vim-diffy
-set runtimepath+=$VIMPLUGINS/vim-gloaded
-set runtimepath+=$VIMPLUGINS/vim-msbuild
-set runtimepath+=$VIMPLUGINS/vim-qfreplace
-set runtimepath+=$VIMPLUGINS/vim-readingvimrc
-set runtimepath+=$VIMPLUGINS/vim-tabenhancer
+for s:path in split(globpath($VIMPLUGINS, '*'), "\n")
+    if isdirectory(s:path)
+        execute ('set runtimepath+=' . s:path)
+    endif
+endfor
 set runtimepath+=$VIMRUNTIME
 
 syntax on
@@ -98,9 +96,6 @@ inoremap <silent><tab>       <C-v><tab>
 nnoremap <nowait><C-j>       :<C-u>cnext<cr>
 nnoremap <nowait><C-k>       :<C-u>cprevious<cr>
 
-command! -bar -nargs=0 SessionLoad   :source     $VIMTEMP/session.vim
-command! -bar -nargs=0 SessionSave   :mksession! $VIMTEMP/session.vim
-
 if has('win32')
     command! -nargs=0 Explorer   :!start explorer .
     if has('gui_running')
@@ -119,9 +114,10 @@ if has('win32')
     endif
 endif
 
-augroup delmanpager
+augroup vimrc
     autocmd!
-    autocmd VimEnter * :delcommand MANPAGER
+    autocmd VimEnter *    :delcommand MANPAGER
+    autocmd FileType help :if &buftype == 'help' | setlocal conceallevel=0 | endif
 augroup END
 
 if filereadable(expand('~/.vimrc.local'))
