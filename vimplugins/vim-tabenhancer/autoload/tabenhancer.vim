@@ -61,6 +61,7 @@ function! tabenhancer#tabsidebar() abort
         let lines += [printf('%%#%s#%s', t, s)]
         for x in getwininfo()
             if x.tabnr == g:actual_curtabpage
+                let iscurr = (winnr() == x.winnr) && (g:actual_curtabpage == tabpagenr())
                 let s = '(No Name)'
                 if x.terminal
                     let s = '(Terminal)'
@@ -68,6 +69,8 @@ function! tabenhancer#tabsidebar() abort
                     let s = '(QuickFix)'
                 elseif x.loclist
                     let s = '(LocList)'
+                elseif iscurr && !empty(getcmdwintype())
+                    let s = '(CmdLineWindow)'
                 elseif filereadable(bufname(x.bufnr))
                     let modi = getbufvar(x.bufnr, '&modified')
                     let read = getbufvar(x.bufnr, '&readonly')
@@ -79,7 +82,6 @@ function! tabenhancer#tabsidebar() abort
                         let s = printf('[%s]', ft)
                     endif
                 endif
-                let iscurr = (winnr() == x.winnr) && (g:actual_curtabpage == tabpagenr())
                 let lines += [printf('  %s %s', (iscurr ? '*' : ' '), s)]
             endif
         endfor
