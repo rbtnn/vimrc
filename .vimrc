@@ -16,6 +16,7 @@ set runtimepath=
 set runtimepath+=$VIMPLUGINS/vim-color-spring-night
 set runtimepath+=$VIMPLUGINS/vim-diffy
 set runtimepath+=$VIMPLUGINS/vim-gloaded
+set runtimepath+=$VIMPLUGINS/vim-msbuild
 set runtimepath+=$VIMPLUGINS/vim-qfreplace
 set runtimepath+=$VIMPLUGINS/vim-readingvimrc
 set runtimepath+=$VIMPLUGINS/vim-tabenhancer
@@ -77,6 +78,12 @@ if has('clpum')
 endif
 
 if has('vim_starting')
+    augroup override-colorscheme
+        autocmd!
+        autocmd ColorScheme * :highlight link TabSideBar     Pmenu
+        autocmd ColorScheme * :highlight link TabSideBarSel  PmenuSel
+        autocmd ColorScheme * :highlight link TabSideBarFill Pmenu
+    augroup END
     let g:spring_night_kill_italic = 1
     colorscheme spring-night
 endif
