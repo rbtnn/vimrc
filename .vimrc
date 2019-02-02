@@ -16,6 +16,10 @@ set runtimepath=
 for s:path in split(globpath($VIMPLUGINS, '*'), "\n")
     if isdirectory(s:path)
         execute ('set runtimepath+=' . s:path)
+        let s:docpath = printf('%s/doc', s:path)
+        if isdirectory(s:docpath)
+            silent! execute ('helptags ' . s:docpath)
+        endif
     endif
 endfor
 set runtimepath+=$VIMRUNTIME
@@ -114,10 +118,28 @@ if has('win32')
     endif
 endif
 
+function s:quickrun_show_expected_config(type) abort
+    let type = empty(a:type) ? &filetype : a:type
+    source $VIMPLUGINS/vim-quickrun/autoload/quickrun.vim
+    let xs = split(execute('scriptnames'), "\n")
+    let id = str2nr(get(filter(xs, { i, x -> x =~# 'autoload/quickrun.vim$' }), 0, ''))
+    let dict = function(printf("\<SNR>%d_build_config", id))({ 'type' : type })
+    for key in keys(dict)
+        echo printf("%s: %s", key, string(dict[key]))
+    endfor
+endfunction
+
+function s:vimenter() abort
+    delcommand MANPAGER
+    if exists('g:loaded_quickrun')
+        command! -nargs=? QuickrunShowExpectedConfig :call <SID>quickrun_show_expected_config(<q-args>)
+    endif
+endfunction
+
 augroup vimrc
     autocmd!
-    autocmd VimEnter *    :delcommand MANPAGER
-    autocmd FileType help :if &buftype == 'help' | setlocal conceallevel=0 | endif
+    autocmd VimEnter *    :call <SID>vimenter()
+    autocmd FileType help :if &buftype != 'help' | setlocal conceallevel=0 | endif
 augroup END
 
 if filereadable(expand('~/.vimrc.local'))
