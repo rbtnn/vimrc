@@ -4,8 +4,8 @@ let s:cnt = 0
 
 function! diffy#exec(target, q_bang, q_args) abort
     let ok = 0
-    if &filetype != 'diffy'
-        let args = s:trim(a:q_args)
+    if (&filetype != 'diffy') && executable('git')
+        let args = trim(a:q_args)
         let cmd = ['git', 'diff', '--stat-width=800', '--stat']
         if a:q_bang == '!'
             if args =~# '^[0-9a-f]\{7,\}$'
@@ -35,7 +35,7 @@ function! s:handler_diffy_exec(cmd, toplevel, output)
         let xs = split(line, '|')
         if 2 == len(xs)
             if xs[1] !~ 'Bin'
-                let w = strdisplaywidth(s:trim(xs[0]))
+                let w = strdisplaywidth(trim(xs[0]))
                 if max < w
                     let max = w
                 endif
@@ -49,7 +49,7 @@ function! s:handler_diffy_exec(cmd, toplevel, output)
         if 2 == len(xs)
             if xs[1] !~ 'Bin'
                 let lines += [printf('%s | %s',
-                        \ s:padding_right_space(s:trim(xs[0]), max), xs[1])]
+                        \ s:padding_right_space(trim(xs[0]), max), xs[1])]
             endif
         endif
     endfor
@@ -108,8 +108,8 @@ function! s:close_handler_diff(cmd, toplevel, output)
         setlocal filetype=diff
         let &l:statusline = printf('[diffy] %s', join(a:cmd))
         execute printf('nnoremap <silent><buffer><nowait><cr>    :<C-u>call diffy#git_diff_jump(%s)<cr>', string(a:toplevel))
-        execute printf('nnoremap <silent><buffer><nowait>[       :<C-u>call diffy#git_diff_prev(%s)<cr>zz', string(a:toplevel))
-        execute printf('nnoremap <silent><buffer><nowait>]       :<C-u>call diffy#git_diff_next(%s)<cr>zz', string(a:toplevel))
+        execute printf('nnoremap <silent><buffer><nowait>[       :<C-u>call diffy#git_diff_prev(%s)<cr>', string(a:toplevel))
+        execute printf('nnoremap <silent><buffer><nowait>]       :<C-u>call diffy#git_diff_next(%s)<cr>', string(a:toplevel))
     else
         call s:error('No modified!')
     endif
@@ -149,7 +149,9 @@ function! diffy#git_diff_prev(toplevel) abort
         let lnum = line('.')
         while 1
             if 0 < search('^[+-]', 'b')
-                if lnum - 1 == line('.')
+                if getline('.') =~# '^\(+++\|---\)'
+                    let lnum = line('.')
+                elseif lnum - 1 == line('.')
                     let lnum = line('.')
                 else
                     let found = 1
@@ -174,7 +176,9 @@ function! diffy#git_diff_next(toplevel) abort
         let lnum = line('.')
         while 1
             if 0 < search('^[+-]')
-                if lnum + 1 == line('.')
+                if getline('.') =~# '^\(+++\|---\)'
+                    let lnum = line('.')
+                elseif lnum + 1 == line('.')
                     let lnum = line('.')
                 else
                     let found = 1
@@ -304,10 +308,6 @@ endfunction
 
 function! s:padding_right_space(text, width)
     return a:text . repeat(' ', a:width - strdisplaywidth(a:text))
-endfunction
-
-function! s:trim(str) abort
-    return matchstr(a:str, '^\s*\zs.\{-\}\ze\s*$')
 endfunction
 
 function! s:echo(msg) abort
