@@ -76,13 +76,13 @@ function! s:handler_diffy_exec(cmd, toplevel, output)
                 \ '#   q key:      Close this window',
                 \ '#',
                 \ ] + lines
-        call s:new_window(lines)
+        call jobrunner#new_window(lines)
         setlocal filetype=diffy
         let &l:statusline = printf('[diffy] %s', join(a:cmd))
         execute printf("nnoremap <silent><buffer><nowait>d       :<C-u>call diffy#git_diff(%s, getline('.'), %s)<cr>", string(a:toplevel), string(a:cmd))
         execute printf("nnoremap <silent><buffer><nowait><cr>    :<C-u>call diffy#git_open(%s, getline('.'))<cr>", string(a:toplevel))
     else
-        call s:error('No modified file!')
+        call jobrunner#error('No modified file!')
     endif
 endfunction
 
@@ -102,7 +102,7 @@ function! s:close_handler_diff(cmd, toplevel, output)
                 \ '#',
                 \ ] + lines
         call map(lines, { i,x -> sillyiconv#iconv_one_nothrow(x) })
-        call s:new_window(lines)
+        call jobrunner#new_window(lines)
         wincmd H
         redraw!
         setlocal filetype=diff
@@ -111,7 +111,7 @@ function! s:close_handler_diff(cmd, toplevel, output)
         execute printf('nnoremap <silent><buffer><nowait>[       :<C-u>call diffy#git_diff_prev(%s)<cr>', string(a:toplevel))
         execute printf('nnoremap <silent><buffer><nowait>]       :<C-u>call diffy#git_diff_next(%s)<cr>', string(a:toplevel))
     else
-        call s:error('No modified!')
+        call jobrunner#error('No modified!')
     endif
 endfunction
 
@@ -120,7 +120,7 @@ function! diffy#git_open(toplevel, line) abort
     if filereadable(path)
         call s:open_file(path, -1)
     else
-        call s:error('Can not jump this!')
+        call jobrunner#error('Can not jump this!')
     endif
 endfunction
 
@@ -138,7 +138,7 @@ function! diffy#git_diff(toplevel, line, cmd) abort
             \ function('s:close_handler_diff', [diffcmd])
             \ )
     else
-        call s:error('Can not jump this!')
+        call jobrunner#error('Can not jump this!')
     endif
 endfunction
 
@@ -165,7 +165,7 @@ function! diffy#git_diff_prev(toplevel) abort
             call setpos('.', pos)
         endif
     else
-        call s:error('filetype is not diff!')
+        call jobrunner#error('filetype is not diff!')
     endif
 endfunction
 
@@ -192,7 +192,7 @@ function! diffy#git_diff_next(toplevel) abort
             call setpos('.', pos)
         endif
     else
-        call s:error('filetype is not diff!')
+        call jobrunner#error('filetype is not diff!')
     endif
 endfunction
 
@@ -203,10 +203,10 @@ function! diffy#git_diff_jump(toplevel) abort
             let [fullpath, lnum] = xs
             call s:open_file(fullpath, lnum)
         else
-            call s:error('Can not jump this!')
+            call jobrunner#error('Can not jump this!')
         endif
     else
-        call s:error('filetype is not diff!')
+        call jobrunner#error('filetype is not diff!')
     endif
 endfunction
 
@@ -246,94 +246,26 @@ function! s:get_path_and_lnum(toplevel) abort
     return xs
 endfunction
 
-function! s:job_new(cmd, cwd, callback) abort
-    let expanded_cwd = expand(sillyiconv#iconv_one_nothrow(a:cwd))
-    let job = job_start(a:cmd, {
-        \ 'close_cb' : function('s:handler_close_cb', [(a:callback)]),
-        \ 'cwd' : expanded_cwd,
-        \ 'in_io' : 'pipe',
-        \ 'out_io' : 'pipe',
-        \ 'err_io' : 'out',
-        \ })
-    let s:jobs += [{
-        \   'timestamp' : strftime('%c'),
-        \   'cmd' : join(a:cmd),
-        \   'cwd' : expanded_cwd,
-        \   'job' : job,
-        \ }]
-    call timer_start(1000, function('s:job_outcb'), { 'repeat' : -1, })
-    return job
-endfunction
-
-function! s:job_outcb(timer) abort
-    let nojob = 1
-    for x in s:jobs
-        if job_status(x.job) == 'run'
-            call s:echo(printf('(%s) %s', x.job, repeat('.', s:cnt)))
-            let s:cnt = (s:cnt + 1) % 5
-            let nojob = 0
-            break
-        endif
-    endfor
-    if nojob
-        call timer_stop(a:timer)
-    endif
-endfunction
-
 function! s:job_new_on_toplevel(cmd, target, callback) abort
     if executable('git')
-        call s:job_new(['git', 'rev-parse', '--show-toplevel'], a:target,
+        call jobrunner#new(['git', 'rev-parse', '--show-toplevel'], a:target,
             \ function('s:handler_new_on_toplevel', [(a:callback), (a:cmd)]))
     else
-        call s:error('Can not execute git!')
+        call jobrunner#error('Can not execute git!')
     endif
-endfunction
-
-function! s:handler_close_cb(callback, channel) abort
-    let lines = []
-    while ch_status(a:channel, {'part': 'out'}) == 'buffered'
-        let lines += [ch_read(a:channel)]
-    endwhile
-    call a:callback(lines)
 endfunction
 
 function! s:handler_new_on_toplevel(callback, cmd, output) abort
     let toplevel = sillyiconv#iconv_one_nothrow(substitute(get(a:output, 0, ''), "\n", '', 'g'))
     if empty(toplevel) || (toplevel =~# '^fatal:')
-        call s:error('fatal: Not a git repository (or any of the parent directories): .git')
+        call jobrunner#error('fatal: Not a git repository (or any of the parent directories): .git')
     else
-        call s:job_new(a:cmd, toplevel, function(a:callback, [toplevel]))
+        call jobrunner#new(a:cmd, toplevel, function(a:callback, [toplevel]))
     endif
 endfunction
 
 function! s:padding_right_space(text, width)
     return a:text . repeat(' ', a:width - strdisplaywidth(a:text))
-endfunction
-
-function! s:echo(msg) abort
-    echohl ModeMsg
-    echo printf('%s', a:msg)
-    echohl None
-endfunction
-
-function! s:error(msg) abort
-    echohl ErrorMsg
-    echomsg printf('%s', a:msg)
-    echohl None
-endfunction
-
-function! s:new_window(lines) abort
-    new
-    let pos = getpos('.')
-    let lines = a:lines
-    setlocal noreadonly modifiable
-    silent % delete _
-    silent put=lines
-    silent 1 delete _
-    setlocal readonly nomodifiable
-    setlocal buftype=nofile nolist nocursorline
-    call setpos('.', pos)
-    nnoremap <silent><buffer>q       :<C-u>execute ((winnr('$') == 1) ? 'bdelete' : 'quit')<cr>
 endfunction
 
 function! s:open_file(path, lnum) abort
