@@ -20,7 +20,7 @@ function! readingvimrc#open_list() abort
                 let next_is_url = 0
             endif
         endfor
-        call s:new_window(lines)
+        call jobrunner#new_window(lines)
         execute printf("nnoremap <silent><buffer><nowait><cr>    :<C-u>call readingvimrc#open_url(getline('.'))<cr>")
     catch
     endtry
@@ -29,21 +29,8 @@ endfunction
 function! readingvimrc#open_url(line) abort
     let url = substitute(substitute(a:line, 'github.com', 'raw.githubusercontent.com', 'g'), 'blob/', '', 'g')
     let lines = split(get(s:Http.get(url, {}, {}), 'content', ''), "\n")
-    call s:new_window(lines)
+    call jobrunner#new_window(lines)
     setfiletype vim
     setlocal number
 endfunction
 
-function! s:new_window(lines) abort
-    new
-    let pos = getpos('.')
-    let lines = a:lines
-    setlocal noreadonly modifiable
-    silent % delete _
-    silent put=lines
-    silent 1 delete _
-    setlocal readonly nomodifiable
-    setlocal buftype=nofile nolist nocursorline
-    call setpos('.', pos)
-    nnoremap <silent><buffer>q       :<C-u>execute ((winnr('$') == 1) ? 'bdelete' : 'quit')<cr>
-endfunction

@@ -113,9 +113,10 @@ if has('win32')
     endif
 endif
 
-augroup vimrc
+augroup delete-commands
     autocmd!
-    autocmd VimEnter *    :delcommand MANPAGER
+    autocmd VimEnter *    :silent! delcommand MANPAGER
+    autocmd VimEnter *    :silent! delcommand PaperColor
 augroup END
 
 if filereadable(expand('~/.vimrc.local'))
