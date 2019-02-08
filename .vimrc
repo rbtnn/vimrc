@@ -58,7 +58,7 @@ set tags=./tags;
 set visualbell noerrorbells t_vb=
 set wildignore&
 set wildmenu wildmode&
-set wrap showbreak=+++
+set nowrap
 
 " SWAP FILES
 set noswapfile
@@ -82,14 +82,7 @@ if has('clpum')
 endif
 
 if has('vim_starting')
-    augroup override-colorscheme
-        autocmd!
-        autocmd ColorScheme * :highlight link TabSideBar     Pmenu
-        autocmd ColorScheme * :highlight link TabSideBarSel  PmenuSel
-        autocmd ColorScheme * :highlight link TabSideBarFill Pmenu
-    augroup END
-    let g:spring_night_kill_italic = 1
-    colorscheme spring-night
+    colorscheme PaperColor
 endif
 
 vnoremap <silent>p           "_dP
