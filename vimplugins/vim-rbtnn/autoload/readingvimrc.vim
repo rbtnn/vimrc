@@ -20,8 +20,13 @@ function! readingvimrc#open_list() abort
                 let next_is_url = 0
             endif
         endfor
-        call jobrunner#new_window(lines)
-        execute printf("nnoremap <silent><buffer><nowait><cr>    :<C-u>call readingvimrc#open_url(getline('.'))<cr>")
+        if 0 == len(lines)
+        elseif 1 == len(lines)
+            call readingvimrc#open_url(lines[0])
+        else
+            call jobrunner#new_window(lines)
+            execute printf("nnoremap <silent><buffer><nowait><cr>    :<C-u>call readingvimrc#open_url(getline('.'))<cr>")
+        endif
     catch
     endtry
 endfunction
