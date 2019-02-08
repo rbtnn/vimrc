@@ -235,3 +235,13 @@ function! sillyiconv#system(cmd)
     return join(sillyiconv#iconv(split(system(a:cmd), "\n")), "\n")
 endfunction
 
+function! sillyiconv#qficonv()
+    let xs = getqflist()
+    for x in xs
+        if has_key(x, 'text')
+            let x['text'] = sillyiconv#iconv_one_nothrow(x['text'])
+        endif
+    endfor
+    call setqflist(xs)
+endfunction
+

@@ -32,7 +32,7 @@ function! tabenhancer#tabline() abort
         let weeks = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][strftime('%w')]
         let date = strftime('%Y/%m/%d')
         let time = strftime('%H:%M:%S')
-        let s = printf('[%s] %s(%s) %s', tabenhancer#vim_version(), date, weeks, time)
+        let s = printf('[%s][%s(%s) %s][%s][%s][%s]', tabenhancer#vim_version(), date, weeks, time, &fileencoding, &fileformat, &filetype)
         let tsbcolumns = 0
         if has('tabsidebar')
             if (2 == &showtabsidebar) || ((1 == &showtabsidebar) && (1 < tabpagenr('$')))

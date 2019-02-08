@@ -1,4 +1,5 @@
 
+set encoding=utf-8
 if exists('&makeencoding')
     set makeencoding=char
 endif
@@ -37,15 +38,15 @@ set expandtab softtabstop=-1 shiftwidth=4 tabstop=4
 set fileencodings=utf-8,cp932,euc-jp,default,latin
 set fileformats=unix,dos,mac
 set foldcolumn=0 foldlevelstart=99 foldmethod=indent
-set grepprg=git\ grep\ -I\ -n\ --full-name\ --no-color
+set grepprg=git\ grep\ -I\ -n\ --no-color
 set incsearch hlsearch
 set keywordprg=:help
 set laststatus=2 statusline&
+set list listchars=trail:.,tab:>-
 set matchpairs+=<:>
 set mouse=a
 set nocursorline nocursorcolumn
 set noignorecase
-set nowrap list listchars=trail:.,tab:>-
 set nowrapscan
 set pumheight=10 completeopt=menu
 set ruler
@@ -57,6 +58,7 @@ set tags=./tags;
 set visualbell noerrorbells t_vb=
 set wildignore&
 set wildmenu wildmode&
+set wrap showbreak=+++
 
 " SWAP FILES
 set noswapfile
