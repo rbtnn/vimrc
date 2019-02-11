@@ -47,6 +47,7 @@ set matchpairs+=<:>
 set mouse=a
 set nocursorline nocursorcolumn
 set noignorecase
+set nowrap
 set nowrapscan
 set pumheight=10 completeopt=menu
 set ruler
@@ -55,10 +56,10 @@ set sessionoptions=buffers,curdir,tabpages
 set shellslash
 set shortmess& shortmess+=I
 set tags=./tags;
+set termwintype=winpty
 set visualbell noerrorbells t_vb=
 set wildignore&
 set wildmenu wildmode&
-set nowrap
 
 set path=.,~,$VIMPLUGINS/**
 if isdirectory(expand('~/Desktop/vim/src'))
@@ -87,6 +88,7 @@ if has('clpum')
 endif
 
 if has('vim_starting')
+    set background=light
     colorscheme PaperColor
 endif
 
