@@ -60,6 +60,11 @@ set wildignore&
 set wildmenu wildmode&
 set nowrap
 
+set path=.,~,$VIMPLUGINS/**
+if isdirectory(expand('~/Desktop/vim/src'))
+    set path+=~/Desktop/vim/src
+endif
+
 " SWAP FILES
 set noswapfile
 
@@ -87,8 +92,8 @@ endif
 
 vnoremap <silent>p           "_dP
 
-noremap <silent><C-u>        5k
-noremap <silent><C-d>        5j
+noremap  <silent><C-u>       5k
+noremap  <silent><C-d>       5j
 
 inoremap <silent><tab>       <C-v><tab>
 

@@ -1,7 +1,7 @@
 
 let s:vim_version = ''
 
-function! tabenhancer#init() abort
+function tabenhancer#init() abort
     if has('timers') && exists(':redrawtabline')
         set showtabline=2
         set tabline=%!tabenhancer#tabline()
@@ -17,7 +17,7 @@ function! tabenhancer#init() abort
     endif
 endfunction
 
-function! tabenhancer#vim_version() abort
+function tabenhancer#vim_version() abort
     if empty(s:vim_version)
         let lines = split(execute('version'), "\n")
         let patches = substitute(get(lines, 2, ''), 'Included patches: 1-', '', '')
@@ -26,7 +26,7 @@ function! tabenhancer#vim_version() abort
     return s:vim_version
 endfunction
 
-function! tabenhancer#tabline() abort
+function tabenhancer#tabline() abort
     try
         let weeks = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][strftime('%w')]
         let date = strftime('%Y/%m/%d')
@@ -45,18 +45,18 @@ function! tabenhancer#tabline() abort
     endtry
 endfunction
 
-function! tabenhancer#tabline_handler(timer) abort
+function tabenhancer#tabline_handler(timer) abort
     " Not redraw during prompting.
     if mode() !~# 'r'
         redrawtabline
     endif
 endfunction
 
-function! tabenhancer#tabsidebar() abort
+function tabenhancer#tabsidebar() abort
     try
         let t = (g:actual_curtabpage == tabpagenr()) ? 'TabSideBarSel' : 'TabSideBar'
         let lines = ['']
-        let s = printf('[TABPAGE %d]', g:actual_curtabpage)
+        let s = printf('-TABPAGE %d-', g:actual_curtabpage)
         let lines += [printf('%%#%s#%s', t, s)]
         for x in getwininfo()
             if x.tabnr == g:actual_curtabpage
@@ -81,7 +81,11 @@ function! tabenhancer#tabsidebar() abort
                         let s = printf('[%s]', ft)
                     endif
                 endif
-                let lines += [printf('  %s %s', (iscurr ? '*' : ' '), s)]
+                if &encoding == 'utf-8'
+                    let lines += [printf('  %s %s', (iscurr ? '▶' : '  '), s)]
+                else
+                    let lines += [printf('  %s %s', (iscurr ? '*' : ' '), s)]
+                endif
             endif
         endfor
         return join(lines, "\n")

@@ -1,5 +1,5 @@
 
-function! msbuild#exec(q_args) abort
+function msbuild#exec(q_args) abort
     let path = fnamemodify(findfile(get(g:, 'msbuild_projectfile', 'msbuild.xml'), ';.'), ':p')
     if filereadable(path)
         let rootdir = fnamemodify(path, ':h')
@@ -21,7 +21,7 @@ function! msbuild#exec(q_args) abort
     endif
 endfunction
 
-function! s:close_handler_msbuild(rootdir, cmd, output)
+function s:close_handler_msbuild(rootdir, cmd, output)
     let lines = a:output
     call map(lines, { i,x -> sillyiconv#iconv_one_nothrow(x) })
     let xs = []
@@ -56,23 +56,20 @@ function! s:close_handler_msbuild(rootdir, cmd, output)
     call setqflist(xs)
     call setqflist([], 'r', { 'title': printf('(%s) %s', a:rootdir, join(a:cmd, ' ')), })
     if 0 < errcnt
+        copen
         call jobrunner#error('Build failure.')
     else
-        let cannot_write = 0
-        let not_exists = 0
+        let err = 0
         for line in lines
-            if line =~# 'CSC : error CS0016:'
-                let cannot_write = 1
+            if line =~# '\(CSC\|MSBUILD\) : error \(CS\|MSB\)\d\+:'
+                let err = 1
                 call jobrunner#error(line)
-                break
-            endif
-            if line =~# 'MSBUILD : error MSB1009:'
-                let not_exists = 1
-                call jobrunner#error(line)
+                copen
                 break
             endif
         endfor
-        if (!not_exists) && (!cannot_write)
+        if !err
+            cclose
             call jobrunner#echo('Build succeeded.')
         endif
     endif

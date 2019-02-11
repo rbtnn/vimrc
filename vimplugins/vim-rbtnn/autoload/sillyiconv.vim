@@ -4,7 +4,7 @@ scriptencoding utf-8
 let s:V = vital#of('rbtnn')
 let s:Bitwise = s:V.import('Bitwise')
 
-function! s:char2binary(c)
+function s:char2binary(c)
     " echo s:char2binary('c')
     " [0,1,1,0 ,0,0,1,1]
     let bits = [0,0,0,0 ,0,0,0,0]
@@ -19,7 +19,7 @@ function! s:char2binary(c)
     return bits
 endfunction
 
-function! s:count_1_prefixed(bits)
+function s:count_1_prefixed(bits)
     " echo s:count_1_prefixed([1,1,0,0 ,0,0,1,1])
     " 2
     let c = 0
@@ -33,7 +33,7 @@ function! s:count_1_prefixed(bits)
     return c
 endfunction
 
-function! sillyiconv#utf_8(input)
+function sillyiconv#utf_8(input)
     " http://tools.ietf.org/html/rfc3629
 
     let cs = a:input
@@ -69,7 +69,7 @@ function! sillyiconv#utf_8(input)
     return 1
 endfunction
 
-function! sillyiconv#euc_jp(input)
+function sillyiconv#euc_jp(input)
     " http://charset.7jp.net/euc.html
 
     let cs = a:input
@@ -98,7 +98,7 @@ function! sillyiconv#euc_jp(input)
     return 1
 endfunction
 
-function! sillyiconv#shift_jis(input)
+function sillyiconv#shift_jis(input)
     " http://charset.7jp.net/sjis.html
 
     let cs = a:input
@@ -132,7 +132,7 @@ function! sillyiconv#shift_jis(input)
     return 1
 endfunction
 
-function! sillyiconv#iso_2022_jp(input)
+function sillyiconv#iso_2022_jp(input)
     " http://charset.7jp.net/jis.html
     " <mode>
     "   MODE_A : "ASCIIの開始"
@@ -195,7 +195,7 @@ function! sillyiconv#iso_2022_jp(input)
     return 1
 endfunction
 
-function! sillyiconv#of(input)
+function sillyiconv#of(input)
     if sillyiconv#iso_2022_jp(a:input)
         return "iso-2022-jp"
     elseif sillyiconv#utf_8(a:input)
@@ -209,7 +209,7 @@ function! sillyiconv#of(input)
     endif
 endfunction
 
-function! sillyiconv#iconv_one_nothrow(val)
+function sillyiconv#iconv_one_nothrow(val)
     let val = a:val
     try
         let val = sillyiconv#iconv_one(val)
@@ -218,11 +218,11 @@ function! sillyiconv#iconv_one_nothrow(val)
     return val
 endfunction
 
-function! sillyiconv#iconv_one(val)
+function sillyiconv#iconv_one(val)
     return get(sillyiconv#iconv([(a:val)]), 0, '')
 endfunction
 
-function! sillyiconv#iconv(lines, ...)
+function sillyiconv#iconv(lines, ...)
     let to_encode = a:0 > 0 ? a:1 : &encoding
     let encoded_lines = map(copy(a:lines), 'iconv(v:val, sillyiconv#of(v:val), to_encode)')
     let lines_str = join(encoded_lines, "\n")
@@ -231,11 +231,11 @@ function! sillyiconv#iconv(lines, ...)
     return split(lines_str, "\r")
 endfunction
 
-function! sillyiconv#system(cmd)
+function sillyiconv#system(cmd)
     return join(sillyiconv#iconv(split(system(a:cmd), "\n")), "\n")
 endfunction
 
-function! sillyiconv#qficonv()
+function sillyiconv#qficonv()
     let xs = getqflist()
     for x in xs
         if has_key(x, 'text')

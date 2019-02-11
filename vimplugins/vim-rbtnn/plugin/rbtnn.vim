@@ -5,8 +5,16 @@ call tabenhancer#init()
 
 command! -nargs=0        ReadingVimrc  :call readingvimrc#open_list()
 command! -nargs=? -bang  Diffy         :call diffy#exec(fnamemodify(expand('%'), ':h'), <q-bang>, <q-args>)
-command! -nargs=?        MSBuild       :call msbuild#exec(<q-bang>)
-command! -nargs=0        QfIconv       :call sillyiconv#qficonv()
+command! -nargs=? -bang  JobKill       :call jobrunner#killall()
+
+augroup rbtnn
+    autocmd!
+    autocmd WinEnter *
+            \ : if &buftype == 'quickfix'
+            \ |   command! -buffer -nargs=0        QfIconv       :call sillyiconv#qficonv()
+            \ | endif
+    autocmd FileType cs :command! -buffer -nargs=?        MSBuild       :call msbuild#exec(<q-bang>)
+augroup END
 
 let g:loaded_2html_plugin      = 1 "$VIMRUNTIME/plugin/tohtml.vim
 let g:loaded_getscript         = 1 "$VIMRUNTIME/autoload/getscript.vim

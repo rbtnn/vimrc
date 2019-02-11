@@ -4,7 +4,7 @@ let s:Http = s:V.import('Web.HTTP')
 
 let s:next_url = 'https://raw.githubusercontent.com/vim-jp/reading-vimrc/gh-pages/_data/next.yml'
 
-function! readingvimrc#open_list() abort
+function readingvimrc#open_list() abort
     try
         let lines = []
         let next_is_url = 0
@@ -31,7 +31,7 @@ function! readingvimrc#open_list() abort
     endtry
 endfunction
 
-function! readingvimrc#open_url(line) abort
+function readingvimrc#open_url(line) abort
     let url = substitute(substitute(a:line, 'github.com', 'raw.githubusercontent.com', 'g'), 'blob/', '', 'g')
     let lines = split(get(s:Http.get(url, {}, {}), 'content', ''), "\n")
     call jobrunner#new_window(lines)

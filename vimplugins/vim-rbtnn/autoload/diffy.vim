@@ -2,7 +2,7 @@
 let s:jobs = []
 let s:cnt = 0
 
-function! diffy#exec(target, q_bang, q_args) abort
+function diffy#exec(target, q_bang, q_args) abort
     let ok = 0
     if (&filetype != 'diffy') && executable('git')
         let args = trim(a:q_args)
@@ -24,7 +24,7 @@ function! diffy#exec(target, q_bang, q_args) abort
     endif
 endfunction
 
-function! s:handler_diffy_exec(cmd, toplevel, output)
+function s:handler_diffy_exec(cmd, toplevel, output)
     let lines = []
     let max = 0
 
@@ -86,7 +86,7 @@ function! s:handler_diffy_exec(cmd, toplevel, output)
     endif
 endfunction
 
-function! s:close_handler_diff(cmd, toplevel, output)
+function s:close_handler_diff(cmd, toplevel, output)
     let lines = a:output
     if !empty(lines)
         let lines = [
@@ -115,7 +115,7 @@ function! s:close_handler_diff(cmd, toplevel, output)
     endif
 endfunction
 
-function! diffy#git_open(toplevel, line) abort
+function diffy#git_open(toplevel, line) abort
     let path = diffy#get_path(a:toplevel, a:line)
     if filereadable(path)
         call s:open_file(path, -1)
@@ -124,7 +124,7 @@ function! diffy#git_open(toplevel, line) abort
     endif
 endfunction
 
-function! diffy#git_diff(toplevel, line, cmd) abort
+function diffy#git_diff(toplevel, line, cmd) abort
     let path = diffy#get_path(a:toplevel, a:line)
     if filereadable(path)
         let args = ''
@@ -142,7 +142,7 @@ function! diffy#git_diff(toplevel, line, cmd) abort
     endif
 endfunction
 
-function! diffy#git_diff_prev(toplevel) abort
+function diffy#git_diff_prev(toplevel) abort
     if &l:filetype == 'diff'
         let pos = getpos('.')
         let found = 0
@@ -169,7 +169,7 @@ function! diffy#git_diff_prev(toplevel) abort
     endif
 endfunction
 
-function! diffy#git_diff_next(toplevel) abort
+function diffy#git_diff_next(toplevel) abort
     if &l:filetype == 'diff'
         let pos = getpos('.')
         let found = 0
@@ -196,7 +196,7 @@ function! diffy#git_diff_next(toplevel) abort
     endif
 endfunction
 
-function! diffy#git_diff_jump(toplevel) abort
+function diffy#git_diff_jump(toplevel) abort
     if &l:filetype == 'diff'
         let xs = s:get_path_and_lnum(a:toplevel)
         if !empty(xs)
@@ -210,7 +210,7 @@ function! diffy#git_diff_jump(toplevel) abort
     endif
 endfunction
 
-function! diffy#get_path(toplevel, line) abort
+function diffy#get_path(toplevel, line) abort
     let m = matchlist(a:line, '^\s*\(.\{-\}\)\s*|.*$')
     if !empty(m)
         return fnamemodify(a:toplevel . '/' . m[1], ':p')
@@ -219,7 +219,7 @@ function! diffy#get_path(toplevel, line) abort
     endif
 endfunction
 
-function! s:diffcmd(fullpath, args) abort
+function s:diffcmd(fullpath, args) abort
     let cmd = ['git', 'diff', '--no-color']
     if !empty(a:args)
         let cmd += split(a:args, '\s\+')
@@ -228,7 +228,7 @@ function! s:diffcmd(fullpath, args) abort
     return cmd
 endfunction
 
-function! s:get_path_and_lnum(toplevel) abort
+function s:get_path_and_lnum(toplevel) abort
     let xs = []
     if getline('.') =~# '^[ +]'
         let lnum = search('^@@', 'bnW')
@@ -246,7 +246,7 @@ function! s:get_path_and_lnum(toplevel) abort
     return xs
 endfunction
 
-function! s:job_new_on_toplevel(cmd, target, callback) abort
+function s:job_new_on_toplevel(cmd, target, callback) abort
     if executable('git')
         call jobrunner#new(['git', 'rev-parse', '--show-toplevel'], a:target,
             \ function('s:handler_new_on_toplevel', [(a:callback), (a:cmd)]))
@@ -255,7 +255,7 @@ function! s:job_new_on_toplevel(cmd, target, callback) abort
     endif
 endfunction
 
-function! s:handler_new_on_toplevel(callback, cmd, output) abort
+function s:handler_new_on_toplevel(callback, cmd, output) abort
     let toplevel = sillyiconv#iconv_one_nothrow(substitute(get(a:output, 0, ''), "\n", '', 'g'))
     if empty(toplevel) || (toplevel =~# '^fatal:')
         call jobrunner#error('fatal: Not a git repository (or any of the parent directories): .git')
@@ -264,11 +264,11 @@ function! s:handler_new_on_toplevel(callback, cmd, output) abort
     endif
 endfunction
 
-function! s:padding_right_space(text, width)
+function s:padding_right_space(text, width)
     return a:text . repeat(' ', a:width - strdisplaywidth(a:text))
 endfunction
 
-function! s:open_file(path, lnum) abort
+function s:open_file(path, lnum) abort
     if filereadable(a:path)
         let fullpath = substitute(fnamemodify(a:path, ':p'), '\', '/', 'g')
         let b = 0
