@@ -56,7 +56,11 @@ function tabenhancer#tabsidebar() abort
     try
         let t = (g:actual_curtabpage == tabpagenr()) ? 'TabSideBarSel' : 'TabSideBar'
         let lines = ['']
-        let s = printf('-TABPAGE %d-', g:actual_curtabpage)
+        if &encoding == 'utf-8'
+            let s = printf('〓 TABPAGE %d 〓', g:actual_curtabpage)
+        else
+            let s = printf('-TABPAGE %d-', g:actual_curtabpage)
+        endif
         let lines += [printf('%%#%s#%s', t, s)]
         for x in getwininfo()
             if x.tabnr == g:actual_curtabpage

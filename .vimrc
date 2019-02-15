@@ -88,6 +88,12 @@ if has('clpum')
 endif
 
 if has('vim_starting')
+    augroup override-colorscheme
+        autocmd!
+        autocmd ColorScheme *    :highlight TabLine     guifg=#777777 guibg=#005f87
+        autocmd ColorScheme *    :highlight TabLineSel  guifg=#eeeeee guibg=#0087af
+        autocmd ColorScheme *    :highlight TabLineFill guifg=#eeeeee guibg=#005f87
+    augroup END
     set background=light
     colorscheme PaperColor
 endif
@@ -99,11 +105,10 @@ noremap  <silent><C-d>       5j
 
 inoremap <silent><tab>       <C-v><tab>
 
-nnoremap <nowait><C-j>       :<C-u>cnext<cr>
-nnoremap <nowait><C-k>       :<C-u>cprevious<cr>
+nnoremap <nowait><C-j>         :<C-u>cnext<cr>zz
+nnoremap <nowait><C-k>         :<C-u>cprevious<cr>zz
 
 if has('win32')
-    command! -nargs=0 Explorer   :!start explorer .
     if has('gui_running')
         command! -bar -nargs=0 FullScreenToggle   :call libcallnr('gvimfullscreen.dll', 'ToggleFullScreen', 0)
         command!      -nargs=1 SetAlpha           :call libcallnr('vimtweak.dll', 'SetAlpha', <args>)
