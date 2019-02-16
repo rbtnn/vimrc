@@ -90,9 +90,9 @@ endif
 if has('vim_starting')
     augroup override-colorscheme
         autocmd!
-        autocmd ColorScheme *    :highlight TabLine     guifg=#777777 guibg=#005f87
-        autocmd ColorScheme *    :highlight TabLineSel  guifg=#eeeeee guibg=#0087af
-        autocmd ColorScheme *    :highlight TabLineFill guifg=#eeeeee guibg=#005f87
+        autocmd ColorScheme *    :highlight TabLine     ctermfg=245 ctermbg=24 guifg=#8a8a8a guibg=#005f87
+        autocmd ColorScheme *    :highlight TabLineSel  ctermfg=255 ctermbg=31 guifg=#eeeeee guibg=#0087af
+        autocmd ColorScheme *    :highlight TabLineFill ctermfg=255 ctermbg=24 guifg=#eeeeee guibg=#005f87
     augroup END
     set background=light
     colorscheme PaperColor
@@ -104,6 +104,23 @@ noremap  <silent><C-u>       5k
 noremap  <silent><C-d>       5j
 
 inoremap <silent><tab>       <C-v><tab>
+
+function s:run_vimscript_on_srcvim() abort
+    let vim = 'vim'
+    let src = expand('%')
+    if filereadable(expand('~/Desktop/vim/src/vim'))
+        let vim = expand('~/Desktop/vim/src/vim')
+    endif
+    if executable(vim) && filereadable(src)
+        let cmd = [ vim, '-X', '-N', '-u', 'NONE', '-i', 'NONE', '-V1', '-e', '-s', '-S', src, '+qall!', ]
+        call jobrunner#new(cmd, getcwd(), function('jobrunner#new_window'))
+    endif
+endfunction
+
+augroup run-vimscript
+    autocmd!
+    autocmd FileType vim    :nnoremap <buffer><nowait><space>       :<C-u>call <SID>run_vimscript_on_srcvim()<cr>
+augroup END
 
 nnoremap <nowait><C-j>         :<C-u>cnext<cr>zz
 nnoremap <nowait><C-k>         :<C-u>cprevious<cr>zz
