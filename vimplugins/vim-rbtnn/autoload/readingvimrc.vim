@@ -26,6 +26,7 @@ function readingvimrc#open_list() abort
         else
             call jobrunner#new_window(lines)
             execute printf("nnoremap <silent><buffer><nowait><cr>    :<C-u>call readingvimrc#open_url(getline('.'))<cr>")
+            let &l:statusline = '(readingvimrc)'
         endif
     catch
     endtry
@@ -37,5 +38,6 @@ function readingvimrc#open_url(line) abort
     call jobrunner#new_window(lines)
     setfiletype vim
     setlocal number
+    let &l:statusline = split(a:line, '/')[-1]
 endfunction
 

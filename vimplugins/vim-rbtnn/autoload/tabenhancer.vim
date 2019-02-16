@@ -80,8 +80,11 @@ function tabenhancer#tabsidebar() abort
                     let name = fnamemodify(bufname(x.bufnr), ':t')
                     let s = printf('%s%s%s', (read ? '[R]' : ''), (modi ? '[+]' : ''), name)
                 else
+                    let sline = getwinvar(x.winnr, '&statusline')
                     let ft = getbufvar(x.bufnr, '&filetype')
-                    if !empty(ft)
+                    if !empty(sline)
+                        let s = sline
+                    elseif !empty(ft)
                         let s = printf('[%s]', ft)
                     endif
                 endif
