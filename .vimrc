@@ -1,5 +1,4 @@
 
-set encoding=utf-8
 if exists('&makeencoding')
     set makeencoding=char
 endif
@@ -38,9 +37,6 @@ set expandtab softtabstop=-1 shiftwidth=4 tabstop=4
 set fileencodings=utf-8,cp932,euc-jp,default,latin
 set fileformats=unix,dos,mac
 set foldcolumn=0 foldlevelstart=99 foldmethod=indent
-"set grepprg=git\ grep\ -I\ -n\ --no-color
-set grepformat=%f:%l:%c:%m
-set grepprg=srchxc
 set incsearch hlsearch
 set keywordprg=:help
 set laststatus=2 statusline&
@@ -49,6 +45,7 @@ set matchpairs+=<:>
 set mouse=a
 set nocursorline nocursorcolumn
 set noignorecase
+set noshowmode
 set nowrap
 set nowrapscan
 set pumheight=10 completeopt=menu
@@ -63,9 +60,9 @@ set visualbell noerrorbells t_vb=
 set wildignore&
 set wildmenu wildmode&
 
-set path=.,~,$VIMPLUGINS/**
-if isdirectory(expand('~/Desktop/vim/src'))
-    set path+=~/Desktop/vim/src
+if executable('srchxc')
+    set grepformat=%f:%l:%c:\ %m
+    set grepprg=srchxc
 endif
 
 " SWAP FILES
@@ -90,11 +87,15 @@ if has('clpum')
 endif
 
 if has('vim_starting')
+    " https://jonasjacek.github.io/colors/
     augroup override-colorscheme
         autocmd!
-        autocmd ColorScheme *    :highlight TabLine     ctermfg=245 ctermbg=24 guifg=#8a8a8a guibg=#005f87
-        autocmd ColorScheme *    :highlight TabLineSel  ctermfg=255 ctermbg=31 guifg=#eeeeee guibg=#0087af
-        autocmd ColorScheme *    :highlight TabLineFill ctermfg=255 ctermbg=24 guifg=#eeeeee guibg=#005f87
+        autocmd InsertEnter *                :highlight TabLine     ctermfg=245 ctermbg=52 guifg=#8a8a8a guibg=#5f0000
+        autocmd InsertEnter *                :highlight TabLineSel  ctermfg=255 ctermbg=88 guifg=#eeeeee guibg=#870000
+        autocmd InsertEnter *                :highlight TabLineFill ctermfg=255 ctermbg=52 guifg=#eeeeee guibg=#5f0000
+        autocmd ColorScheme,InsertLeave *    :highlight TabLine     ctermfg=245 ctermbg=24 guifg=#8a8a8a guibg=#005f87
+        autocmd ColorScheme,InsertLeave *    :highlight TabLineSel  ctermfg=255 ctermbg=31 guifg=#eeeeee guibg=#0087af
+        autocmd ColorScheme,InsertLeave *    :highlight TabLineFill ctermfg=255 ctermbg=24 guifg=#eeeeee guibg=#005f87
     augroup END
     set background=light
     colorscheme PaperColor
@@ -106,23 +107,6 @@ noremap  <silent><C-u>       5k
 noremap  <silent><C-d>       5j
 
 inoremap <silent><tab>       <C-v><tab>
-
-function s:run_vimscript_on_srcvim() abort
-    let vim = 'vim'
-    let src = expand('%')
-    if filereadable(expand('~/Desktop/vim/src/vim'))
-        let vim = expand('~/Desktop/vim/src/vim')
-    endif
-    if executable(vim) && filereadable(src)
-        let cmd = [ vim, '-X', '-N', '-u', 'NONE', '-i', 'NONE', '-V1', '-e', '-s', '-S', src, '+qall!', ]
-        call jobrunner#new(cmd, getcwd(), function('jobrunner#new_window'))
-    endif
-endfunction
-
-augroup run-vimscript
-    autocmd!
-    autocmd FileType vim    :nnoremap <buffer><nowait><space>       :<C-u>call <SID>run_vimscript_on_srcvim()<cr>
-augroup END
 
 nnoremap <nowait><C-j>         :<C-u>cnext<cr>zz
 nnoremap <nowait><C-k>         :<C-u>cprevious<cr>zz
