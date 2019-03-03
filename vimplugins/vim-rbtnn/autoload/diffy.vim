@@ -63,7 +63,7 @@ function s:handler_diffy_exec(cmd, toplevel, output)
     endfor
 
     if 1 == len(lines)
-        call diffy#git_diff(a:toplevel, lines[0], a:cmd)
+        call diffy#git_diff(a:toplevel, lines[0], a:cmd, [])
     elseif 0 < len(lines)
         let lines = [
                 \ '#',
@@ -79,14 +79,14 @@ function s:handler_diffy_exec(cmd, toplevel, output)
         call jobrunner#new_window(lines)
         setlocal filetype=diffy
         let &l:statusline = printf('[diffy] %s', join(a:cmd))
-        execute printf("nnoremap <silent><buffer><nowait>d       :<C-u>call diffy#git_diff(%s, getline('.'), %s)<cr>", string(a:toplevel), string(a:cmd))
+        execute printf("nnoremap <silent><buffer><nowait>d       :<C-u>call diffy#git_diff(%s, getline('.'), %s, [])<cr>", string(a:toplevel), string(a:cmd))
         execute printf("nnoremap <silent><buffer><nowait><cr>    :<C-u>call diffy#git_open(%s, getline('.'))<cr>", string(a:toplevel))
     else
         call jobrunner#error('No modified file!')
     endif
 endfunction
 
-function s:close_handler_diff(cmd, toplevel, output)
+function s:close_handler_diff(cmd, path, pos, toplevel, output)
     let lines = a:output
     if !empty(lines)
         let lines = [
@@ -98,6 +98,7 @@ function s:close_handler_diff(cmd, toplevel, output)
                 \ '#   return key: Open the file at the cursor line',
                 \ '#   [ key:      Go to a previous diff-section',
                 \ '#   ] key:      Go to a next diff-section',
+                \ '#   R key:      Revert the line if modified',
                 \ '#   q key:      Close this window',
                 \ '#',
                 \ ] + lines
@@ -107,9 +108,13 @@ function s:close_handler_diff(cmd, toplevel, output)
         redraw!
         setlocal filetype=diff
         let &l:statusline = printf('[diffy] %s', join(a:cmd))
+        execute printf("nnoremap <silent><buffer><nowait>R       :<C-u>call diffy#revert_line(%s, %s, %s)<cr>", string(a:toplevel), string(a:path), string(a:cmd))
         execute printf('nnoremap <silent><buffer><nowait><cr>    :<C-u>call diffy#git_diff_jump(%s)<cr>', string(a:toplevel))
         execute printf('nnoremap <silent><buffer><nowait>[       :<C-u>call diffy#git_diff_prev(%s)<cr>', string(a:toplevel))
         execute printf('nnoremap <silent><buffer><nowait>]       :<C-u>call diffy#git_diff_next(%s)<cr>', string(a:toplevel))
+        if !empty(a:pos)
+            call setpos('.', a:pos)
+        endif
     else
         call jobrunner#error('No modified!')
     endif
@@ -124,8 +129,34 @@ function diffy#git_open(toplevel, line) abort
     endif
 endfunction
 
-function diffy#git_diff(toplevel, line, cmd) abort
-    let path = diffy#get_path(a:toplevel, a:line)
+function diffy#revert_line(toplevel, path, cmd) abort
+    let xs = s:get_path_and_lnum(a:toplevel)
+    if !empty(xs)
+        let [fullpath, lnum] = xs
+        let line = getline('.')
+        let pos = getpos('.')
+        if line =~# '^[-+]'
+            execute printf('new +%d %s', lnum, fullpath)
+            if line =~# '^-'
+                call appendbufline(bufname('%'), lnum, line[1:])
+            elseif line =~# '^+'
+                call deletebufline(bufname('%'), lnum)
+            endif
+            write
+            close
+            close
+            call diffy#git_diff(a:toplevel, a:path, a:cmd, pos)
+        endif
+    else
+        call jobrunner#error('Can not jump this!')
+    endif
+endfunction
+
+function diffy#git_diff(toplevel, path_or_line, cmd, pos) abort
+    let path = a:path_or_line
+    if !filereadable(path)
+        let path = diffy#get_path(a:toplevel, a:path_or_line)
+    endif
     if filereadable(path)
         let args = ''
         let idx = index(a:cmd, '--stat')
@@ -135,8 +166,8 @@ function diffy#git_diff(toplevel, line, cmd) abort
         let target = fnamemodify(path, ':h')
         let diffcmd = s:diffcmd(path, args)
         call s:job_new_on_toplevel(diffcmd, target,
-            \ function('s:close_handler_diff', [diffcmd])
-            \ )
+                \ function('s:close_handler_diff', [diffcmd, path, a:pos])
+                \ )
     else
         call jobrunner#error('Can not jump this!')
     endif
@@ -170,43 +201,35 @@ function diffy#git_diff_prev(toplevel) abort
 endfunction
 
 function diffy#git_diff_next(toplevel) abort
-    if &l:filetype == 'diff'
-        let pos = getpos('.')
-        let found = 0
-        let lnum = line('.')
-        while 1
-            if 0 < search('^[+-]')
-                if getline('.') =~# '^\(+++\|---\)'
-                    let lnum = line('.')
-                elseif lnum + 1 == line('.')
-                    let lnum = line('.')
-                else
-                    let found = 1
-                    break
-                endif
+    let pos = getpos('.')
+    let found = 0
+    let lnum = line('.')
+    while 1
+        if 0 < search('^[+-]')
+            if getline('.') =~# '^\(+++\|---\)'
+                let lnum = line('.')
+            elseif lnum + 1 == line('.')
+                let lnum = line('.')
             else
+                let found = 1
                 break
             endif
-        endwhile
-        if !found
-            call setpos('.', pos)
+        else
+            break
         endif
-    else
-        call jobrunner#error('filetype is not diff!')
+    endwhile
+    if !found
+        call setpos('.', pos)
     endif
 endfunction
 
 function diffy#git_diff_jump(toplevel) abort
-    if &l:filetype == 'diff'
-        let xs = s:get_path_and_lnum(a:toplevel)
-        if !empty(xs)
-            let [fullpath, lnum] = xs
-            call s:open_file(fullpath, lnum)
-        else
-            call jobrunner#error('Can not jump this!')
-        endif
+    let xs = s:get_path_and_lnum(a:toplevel)
+    if !empty(xs)
+        let [fullpath, lnum] = xs
+        call s:open_file(fullpath, lnum)
     else
-        call jobrunner#error('filetype is not diff!')
+        call jobrunner#error('Can not jump this!')
     endif
 endfunction
 
@@ -230,7 +253,7 @@ endfunction
 
 function s:get_path_and_lnum(toplevel) abort
     let xs = []
-    if getline('.') =~# '^[ +]'
+    if getline('.') =~# '^[ +-]'
         let lnum = search('^@@', 'bnW')
         let path = matchstr(getline(search('^+++ b/', 'bnW')), '^+++\s*b/\zs.*\ze$')
         let fullpath = fnamemodify(a:toplevel . '/' . path, ':p')
@@ -249,7 +272,7 @@ endfunction
 function s:job_new_on_toplevel(cmd, target, callback) abort
     if executable('git')
         call jobrunner#new(['git', 'rev-parse', '--show-toplevel'], a:target,
-            \ function('s:handler_new_on_toplevel', [(a:callback), (a:cmd)]))
+                \ function('s:handler_new_on_toplevel', [(a:callback), (a:cmd)]))
     else
         call jobrunner#error('Can not execute git!')
     endif

@@ -2,13 +2,14 @@
 let s:vim_version = ''
 
 function tabenhancer#init() abort
-    if has('timers') && exists(':redrawtabline')
-        set showtabline=2
-        set tabline=%!tabenhancer#tabline()
-        if !exists('s:tabenhancer_timer')
-            let s:tabenhancer_timer = timer_start(1000, 'tabenhancer#tabline_handler', { 'repeat' : -1, })
-        endif
-    endif
+    "if has('timers') && exists(':redrawtabline')
+    "    set showtabline=2
+    "    set tabline=%!tabenhancer#tabline()
+    "    if !exists('s:tabenhancer_timer')
+    "        let s:tabenhancer_timer = timer_start(1000, 'tabenhancer#tabline_handler', { 'repeat' : -1, })
+    "    endif
+    "endif
+    set showtabline=0
     if has('tabsidebar')
         set showtabsidebar=2
         set tabsidebarcolumns=20

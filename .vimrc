@@ -37,6 +37,7 @@ set expandtab softtabstop=-1 shiftwidth=4 tabstop=4
 set fileencodings=utf-8,cp932,euc-jp,default,latin
 set fileformats=unix,dos,mac
 set foldcolumn=0 foldlevelstart=99 foldmethod=indent
+set grepprg=internal
 set incsearch hlsearch
 set keywordprg=:help
 set laststatus=2 statusline&
@@ -59,11 +60,6 @@ set termwintype=winpty
 set visualbell noerrorbells t_vb=
 set wildignore&
 set wildmenu wildmode&
-
-if executable('srchxc')
-    set grepformat=%f:%l:%c:\ %m
-    set grepprg=srchxc
-endif
 
 " SWAP FILES
 set noswapfile
