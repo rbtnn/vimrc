@@ -9,7 +9,7 @@ function jobrunner#killall() abort
 endfunction
 
 function jobrunner#new(cmd, cwd, callback) abort
-    let expanded_cwd = expand(sillyiconv#iconv_one_nothrow(a:cwd))
+    let expanded_cwd = expand(a:cwd)
     let job = job_start(a:cmd, {
             \ 'close_cb' : function('s:handler_close_cb', [(a:callback)]),
             \ 'cwd' : expanded_cwd,

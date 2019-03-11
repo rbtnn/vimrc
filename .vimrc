@@ -6,23 +6,26 @@ scriptencoding utf-8
 
 set winaltkeys=yes guioptions=mM
 
-let $VIMPLUGINS = expand('~/vimplugins')
-let $VIMTEMP = expand('~/vimtemp')
-
 let g:vim_indent_cont = &g:shiftwidth
 let g:mapleader = ' '
 
-set runtimepath=
-for s:path in split(globpath($VIMPLUGINS, '*'), "\n")
-    if isdirectory(s:path)
-        execute ('set runtimepath+=' . s:path)
-        let s:docpath = printf('%s/doc', s:path)
-        if isdirectory(s:docpath)
-            silent! execute ('helptags ' . s:docpath)
-        endif
-    endif
-endfor
-set runtimepath+=$VIMRUNTIME
+let $DOTVIM = expand('~/.vim')
+let $VIMTEMP = expand('$DOTVIM/temp')
+
+set packpath=$DOTVIM/pack
+
+"set runtimepath=
+
+"for s:path in split(globpath($VIMPLUGINS, '*'), "\n")
+"    if isdirectory(s:path)
+"        execute ('set runtimepath+=' . s:path)
+"        let s:docpath = printf('%s/doc', s:path)
+"        if isdirectory(s:docpath)
+"            silent! execute ('helptags ' . s:docpath)
+"        endif
+"    endif
+"endfor
+"set runtimepath+=$VIMRUNTIME
 
 syntax on
 filetype plugin indent on

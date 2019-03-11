@@ -4,14 +4,8 @@ let g:loaded_rbtnn = 1
 call tabenhancer#init()
 
 command! -nargs=0        ReadingVimrc  :call readingvimrc#open_list()
-command! -nargs=? -bang  Diffy         :call diffy#exec(fnamemodify(expand('%'), ':h'), <q-bang>, <q-args>)
 command! -nargs=0        JobKill       :call jobrunner#killall()
-command! -nargs=0        QfIconv       :call sillyiconv#qficonv()
-
-augroup rbtnn
-    autocmd!
-    autocmd FileType cs :command! -buffer -nargs=?        MSBuild       :call msbuild#exec(<q-bang>)
-augroup END
+command! -nargs=?        MSBuild       :call msbuild#exec(<q-bang>)
 
 let g:loaded_2html_plugin      = 1 "$VIMRUNTIME/plugin/tohtml.vim
 let g:loaded_getscript         = 1 "$VIMRUNTIME/autoload/getscript.vim

@@ -1,4 +1,13 @@
 
+function s:iconv_one_nothrow(x) abort
+    let x = a:x
+    try
+        let x = diffy#sillyiconv#iconv_one_nothrow(x)
+    catch
+    endtry
+    return x
+endfunction
+
 function msbuild#exec(q_args) abort
     let path = fnamemodify(findfile(get(g:, 'msbuild_projectfile', 'msbuild.xml'), ';.'), ':p')
     if filereadable(path)
@@ -15,7 +24,7 @@ function msbuild#exec(q_args) abort
             let cmd += split(args, '\s\+')
         endif
         let cmd += [path]
-        call jobrunner#new(cmd, rootdir, function('s:close_handler_msbuild', [rootdir, cmd]))
+        call jobrunner#new(cmd, s:iconv_one_nothrow(rootdir), function('s:close_handler_msbuild', [rootdir, cmd]))
     else
         call jobrunner#error('Can not found msbuild.xml.')
     endif
@@ -23,7 +32,7 @@ endfunction
 
 function s:close_handler_msbuild(rootdir, cmd, output)
     let lines = a:output
-    call map(lines, { i,x -> sillyiconv#iconv_one_nothrow(x) })
+    call map(lines, { i,x -> s:iconv_one_nothrow(x) })
     let xs = []
     let errcnt = 0
     for line in lines
