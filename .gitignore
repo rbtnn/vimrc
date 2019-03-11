@@ -46,7 +46,6 @@ tags-jp
 .subversion/
 .sudo_as_admin_successful
 .themes/
-.vim/
 .viminfo
 .vimrc.*
 .xinputrc

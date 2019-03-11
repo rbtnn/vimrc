@@ -6,26 +6,36 @@ scriptencoding utf-8
 
 set winaltkeys=yes guioptions=mM
 
+let g:loaded_2html_plugin      = 1 "$VIMRUNTIME/plugin/tohtml.vim
+let g:loaded_getscript         = 1 "$VIMRUNTIME/autoload/getscript.vim
+let g:loaded_getscriptPlugin   = 1 "$VIMRUNTIME/plugin/getscriptPlugin.vim
+let g:loaded_gzip              = 1 "$VIMRUNTIME/plugin/gzip.vim
+let g:loaded_logipat           = 1 "$VIMRUNTIME/plugin/logiPat.vim
+let g:loaded_logiPat           = 1 "$VIMRUNTIME/plugin/logiPat.vim
+let g:loaded_matchparen        = 1 "$VIMRUNTIME/plugin/matchparen.vim
+let g:loaded_netrw             = 1 "$VIMRUNTIME/autoload/netrw.vim
+let g:loaded_netrwFileHandlers = 1 "$VIMRUNTIME/autoload/netrwFileHandlers.vim
+let g:loaded_netrwPlugin       = 1 "$VIMRUNTIME/plugin/netrwPlugin.vim
+let g:loaded_netrwSettings     = 1 "$VIMRUNTIME/autoload/netrwSettings.vim
+let g:loaded_rrhelper          = 1 "$VIMRUNTIME/plugin/rrhelper.vim
+let g:loaded_spellfile_plugin  = 1 "$VIMRUNTIME/plugin/spellfile.vim
+let g:loaded_sql_completion    = 1 "$VIMRUNTIME/autoload/sqlcomplete.vim
+let g:loaded_syntax_completion = 1 "$VIMRUNTIME/autoload/syntaxcomplete.vim
+let g:loaded_tar               = 1 "$VIMRUNTIME/autoload/tar.vim
+let g:loaded_tarPlugin         = 1 "$VIMRUNTIME/plugin/tarPlugin.vim
+let g:loaded_vimball           = 1 "$VIMRUNTIME/autoload/vimball.vim
+let g:loaded_vimballPlugin     = 1 "$VIMRUNTIME/plugin/vimballPlugin.vim
+let g:loaded_zip               = 1 "$VIMRUNTIME/autoload/zip.vim
+let g:loaded_zipPlugin         = 1 "$VIMRUNTIME/plugin/zipPlugin.vim
+let g:vimsyn_embed             = 1 "$VIMRUNTIME/syntax/vim.vim
+
 let g:vim_indent_cont = &g:shiftwidth
 let g:mapleader = ' '
 
 let $DOTVIM = expand('~/.vim')
 let $VIMTEMP = expand('$DOTVIM/temp')
 
-set packpath=$DOTVIM/pack
-
-"set runtimepath=
-
-"for s:path in split(globpath($VIMPLUGINS, '*'), "\n")
-"    if isdirectory(s:path)
-"        execute ('set runtimepath+=' . s:path)
-"        let s:docpath = printf('%s/doc', s:path)
-"        if isdirectory(s:docpath)
-"            silent! execute ('helptags ' . s:docpath)
-"        endif
-"    endif
-"endfor
-"set runtimepath+=$VIMRUNTIME
+set packpath=$DOTVIM
 
 syntax on
 filetype plugin indent on
@@ -85,21 +95,6 @@ if has('clpum')
     set clpumheight=10
 endif
 
-if has('vim_starting')
-    " https://jonasjacek.github.io/colors/
-    augroup override-colorscheme
-        autocmd!
-        autocmd InsertEnter *                :highlight TabLine     ctermfg=245 ctermbg=52 guifg=#8a8a8a guibg=#5f0000
-        autocmd InsertEnter *                :highlight TabLineSel  ctermfg=255 ctermbg=88 guifg=#eeeeee guibg=#870000
-        autocmd InsertEnter *                :highlight TabLineFill ctermfg=255 ctermbg=52 guifg=#eeeeee guibg=#5f0000
-        autocmd ColorScheme,InsertLeave *    :highlight TabLine     ctermfg=245 ctermbg=24 guifg=#8a8a8a guibg=#005f87
-        autocmd ColorScheme,InsertLeave *    :highlight TabLineSel  ctermfg=255 ctermbg=31 guifg=#eeeeee guibg=#0087af
-        autocmd ColorScheme,InsertLeave *    :highlight TabLineFill ctermfg=255 ctermbg=24 guifg=#eeeeee guibg=#005f87
-    augroup END
-    set background=light
-    colorscheme PaperColor
-endif
-
 vnoremap <silent>p           "_dP
 
 noremap  <silent><C-u>       5k
@@ -132,6 +127,22 @@ augroup delete-commands
     autocmd VimEnter *    :silent! delcommand MANPAGER
     autocmd VimEnter *    :silent! delcommand PaperColor
 augroup END
+
+" https://jonasjacek.github.io/colors/
+augroup override-colorscheme
+    autocmd!
+    autocmd InsertEnter *                :highlight TabLine     ctermfg=245 ctermbg=52 guifg=#8a8a8a guibg=#5f0000
+    autocmd InsertEnter *                :highlight TabLineSel  ctermfg=255 ctermbg=88 guifg=#eeeeee guibg=#870000
+    autocmd InsertEnter *                :highlight TabLineFill ctermfg=255 ctermbg=52 guifg=#eeeeee guibg=#5f0000
+    autocmd ColorScheme,InsertLeave *    :highlight TabLine     ctermfg=245 ctermbg=24 guifg=#8a8a8a guibg=#005f87
+    autocmd ColorScheme,InsertLeave *    :highlight TabLineSel  ctermfg=255 ctermbg=31 guifg=#eeeeee guibg=#0087af
+    autocmd ColorScheme,InsertLeave *    :highlight TabLineFill ctermfg=255 ctermbg=24 guifg=#eeeeee guibg=#005f87
+augroup END
+
+if has('vim_starting')
+    set background=light
+    colorscheme PaperColor
+endif
 
 if filereadable(expand('~/.vimrc.local'))
     source ~/.vimrc.local
