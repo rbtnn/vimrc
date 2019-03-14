@@ -45,7 +45,6 @@ set ambiwidth=double
 set autoread
 set clipboard=unnamed
 set display=lastline
-set equalalways
 set expandtab softtabstop=-1 shiftwidth=4 tabstop=4
 set fileencodings=utf-8,cp932,euc-jp,default,latin
 set fileformats=unix,dos,mac
@@ -69,7 +68,6 @@ set sessionoptions=buffers,curdir,tabpages
 set shellslash
 set shortmess& shortmess+=I
 set tags=./tags;
-set termwintype=winpty
 set visualbell noerrorbells t_vb=
 set wildignore&
 set wildmenu wildmode&
@@ -126,6 +124,12 @@ augroup delete-commands
     autocmd!
     autocmd VimEnter *    :silent! delcommand MANPAGER
     autocmd VimEnter *    :silent! delcommand PaperColor
+augroup END
+
+augroup vimscript
+    autocmd!
+    autocmd FileType vim    :command -bar -buffer VimscriptRun  :call vimscript#run()
+    autocmd FileType vim    :inoremap <buffer> fn<tab>  function! () abort<cr>endfunction<up><left>
 augroup END
 
 " https://jonasjacek.github.io/colors/
