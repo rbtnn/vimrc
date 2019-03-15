@@ -128,7 +128,7 @@ augroup END
 
 augroup vimscript
     autocmd!
-    autocmd FileType vim    :command -bar -buffer VimscriptRun  :call vimscript#run()
+    autocmd FileType vim    :command! -bar -buffer VimscriptRun  :call vimscript#run()
     autocmd FileType vim    :inoremap <buffer> fn<tab>  function! () abort<cr>endfunction<up><left>
 augroup END
 
