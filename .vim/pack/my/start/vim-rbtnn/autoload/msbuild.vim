@@ -1,4 +1,16 @@
 
+function s:echo(msg) abort
+    echohl ModeMsg
+    echo printf('%s', a:msg)
+    echohl None
+endfunction
+
+function s:error(msg) abort
+    echohl ErrorMsg
+    echomsg printf('%s', a:msg)
+    echohl None
+endfunction
+
 function s:iconv_one_nothrow(x) abort
     let x = a:x
     try
@@ -24,14 +36,20 @@ function msbuild#exec(q_args) abort
             let cmd += split(args, '\s\+')
         endif
         let cmd += [path]
-        call jobrunner#new(cmd, s:iconv_one_nothrow(rootdir), function('s:close_handler_msbuild', [rootdir, cmd]))
+        let out_path = tempname()
+        let job = job_start(cmd, {
+                \ 'close_cb' : function('s:close_handler_msbuild', [out_path, rootdir, cmd]),
+                \ 'cwd' : s:iconv_one_nothrow(rootdir),
+                \ 'out_io' : 'file',
+                \ 'out_name' : out_path,
+                \ })
     else
-        call jobrunner#error('Can not found msbuild.xml.')
+        call s:error('Can not found msbuild.xml.')
     endif
 endfunction
 
-function s:close_handler_msbuild(rootdir, cmd, output)
-    let lines = a:output
+function s:close_handler_msbuild(out_path, rootdir, cmd, channel)
+    let lines = readfile(a:out_path)
     call map(lines, { i,x -> s:iconv_one_nothrow(x) })
     let xs = []
     let errcnt = 0
@@ -66,21 +84,26 @@ function s:close_handler_msbuild(rootdir, cmd, output)
     call setqflist([], 'r', { 'title': printf('(%s) %s', a:rootdir, join(a:cmd, ' ')), })
     if 0 < errcnt
         copen
-        call jobrunner#error('Build failure.')
+        call s:error('Build failure.')
     else
         let err = 0
         for line in lines
             if line =~# '\(CSC\|MSBUILD\) : error \(CS\|MSB\)\d\+:'
                 let err = 1
-                call jobrunner#error(line)
+                call s:error(line)
                 copen
                 break
             endif
         endfor
         if !err
             cclose
-            call jobrunner#echo('Build succeeded.')
+            call s:echo('Build succeeded.')
         endif
     endif
+    for p in [(a:out_path)]
+        if filereadable(p)
+            call delete(p)
+        endif
+    endfor
 endfunction
 

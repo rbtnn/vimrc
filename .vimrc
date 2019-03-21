@@ -37,6 +37,8 @@ let $VIMTEMP = expand('$DOTVIM/temp')
 
 set packpath=$DOTVIM
 
+packadd vim-diffy
+
 syntax on
 filetype plugin indent on
 set secure
@@ -98,7 +100,7 @@ vnoremap <silent>p           "_dP
 noremap  <silent><C-u>       5k
 noremap  <silent><C-d>       5j
 
-nnoremap <nowait><space>     :<C-u>Repositories<cr>
+nnoremap <nowait><space>     :<C-u>call diffy#lsfiles()<cr>
 
 inoremap <silent><tab>       <C-v><tab>
 
