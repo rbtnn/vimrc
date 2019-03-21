@@ -98,10 +98,12 @@ vnoremap <silent>p           "_dP
 noremap  <silent><C-u>       5k
 noremap  <silent><C-d>       5j
 
+nnoremap <nowait><space>     :<C-u>Repositories<cr>
+
 inoremap <silent><tab>       <C-v><tab>
 
-nnoremap <nowait><C-j>         :<C-u>cnext<cr>zz
-nnoremap <nowait><C-k>         :<C-u>cprevious<cr>zz
+nnoremap <nowait><C-j>       :<C-u>cnext<cr>zz
+nnoremap <nowait><C-k>       :<C-u>cprevious<cr>zz
 
 if has('win32')
     if has('gui_running')
@@ -128,8 +130,7 @@ augroup END
 
 augroup vimscript
     autocmd!
-    autocmd FileType vim    :command! -bar -buffer VimscriptRun  :call vimscript#run()
-    autocmd FileType vim    :inoremap <buffer> fn<tab>  function! () abort<cr>endfunction<up><left>
+    autocmd FileType vim    :command! -bar -buffer   Run  :call vimscript#run()
 augroup END
 
 " https://jonasjacek.github.io/colors/
