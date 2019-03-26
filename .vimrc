@@ -55,7 +55,7 @@ set grepprg=internal
 set incsearch hlsearch
 set keywordprg=:help
 set laststatus=2 statusline&
-set list listchars=trail:.,tab:>-
+set list listchars=trail:.,tab:<->,eol:~
 set matchpairs+=<:>
 set mouse=a
 set nocursorline nocursorcolumn
@@ -73,6 +73,62 @@ set tags=./tags;
 set visualbell noerrorbells t_vb=
 set wildignore&
 set wildmenu wildmode&
+
+set showtabline=0
+if has('tabsidebar')
+    function Tabsidebar() abort
+        try
+            let t = (g:actual_curtabpage == tabpagenr()) ? 'TabSideBarSel' : 'TabSideBar'
+            let lines = ['']
+            if &encoding == 'utf-8'
+                let s = printf('縲・TABPAGE %d 縲・, g:actual_curtabpage)
+            else
+                let s = printf('-TABPAGE %d-', g:actual_curtabpage)
+            endif
+            let lines += [printf('%%#%s#%s', t, s)]
+            for x in getwininfo()
+                if x.tabnr == g:actual_curtabpage
+                    let iscurr = (winnr() == x.winnr) && (g:actual_curtabpage == tabpagenr())
+                    let s = '(No Name)'
+                    if x.terminal
+                        let s = '(Terminal)'
+                    elseif x.quickfix
+                        let s = '(QuickFix)'
+                    elseif x.loclist
+                        let s = '(LocList)'
+                    elseif iscurr && !empty(getcmdwintype())
+                        let s = '(CmdLineWindow)'
+                    elseif filereadable(bufname(x.bufnr))
+                        let modi = getbufvar(x.bufnr, '&modified')
+                        let read = getbufvar(x.bufnr, '&readonly')
+                        let name = fnamemodify(bufname(x.bufnr), ':t')
+                        let s = printf('%s%s%s', (read ? '[R]' : ''), (modi ? '[+]' : ''), name)
+                    else
+                        let sline = getwinvar(x.winnr, '&statusline')
+                        let ft = getbufvar(x.bufnr, '&filetype')
+                        if !empty(sline)
+                            let s = sline
+                        elseif !empty(ft)
+                            let s = printf('[%s]', ft)
+                        endif
+                    endif
+                    if &encoding == 'utf-8'
+                        let lines += [printf('  %s %s', (iscurr ? '笆ｶ' : '  '), s)]
+                    else
+                        let lines += [printf('  %s %s', (iscurr ? '*' : ' '), s)]
+                    endif
+                endif
+            endfor
+            return join(lines, "\n")
+        catch
+            return string(v:exception)
+        endtry
+    endfunction
+    set showtabsidebar=2
+    set tabsidebarcolumns=20
+    set notabsidebarwrap
+    set tabsidebar=%!Tabsidebar()
+endif
 
 " SWAP FILES
 set noswapfile
@@ -100,12 +156,18 @@ vnoremap <silent>p           "_dP
 noremap  <silent><C-u>       5k
 noremap  <silent><C-d>       5j
 
-nnoremap <nowait><space>     :<C-u>call diffy#lsfiles()<cr>
+noremap  <silent>j           gj
+noremap  <silent>k           gk
+
+nnoremap <nowait><space>     :<C-u>call diffy#lsfiles('')<cr>
+nnoremap <nowait><S-space>   :<C-u>call diffy#lsfiles('!')<cr>
 
 inoremap <silent><tab>       <C-v><tab>
 
 nnoremap <nowait><C-j>       :<C-u>cnext<cr>zz
 nnoremap <nowait><C-k>       :<C-u>cprevious<cr>zz
+
+command! -bar -nargs=0 LcdRootDir   :call diffy#cd2rootdir('lcd')
 
 if has('win32')
     if has('gui_running')
