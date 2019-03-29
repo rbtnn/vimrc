@@ -1,4 +1,5 @@
 
+set encoding=utf-8
 if exists('&makeencoding')
     set makeencoding=char
 endif
@@ -81,11 +82,10 @@ if has('tabsidebar')
             let t = (g:actual_curtabpage == tabpagenr()) ? 'TabSideBarSel' : 'TabSideBar'
             let lines = ['']
             if &encoding == 'utf-8'
-                let s = printf('縲・TABPAGE %d 縲・, g:actual_curtabpage)
+                let lines += [printf('%%#%s#〓TABPAGE %d〓', t, g:actual_curtabpage)]
             else
-                let s = printf('-TABPAGE %d-', g:actual_curtabpage)
+                let lines += [printf('%%#%s#-TABPAGE %d-', t, g:actual_curtabpage)]
             endif
-            let lines += [printf('%%#%s#%s', t, s)]
             for x in getwininfo()
                 if x.tabnr == g:actual_curtabpage
                     let iscurr = (winnr() == x.winnr) && (g:actual_curtabpage == tabpagenr())
@@ -113,7 +113,7 @@ if has('tabsidebar')
                         endif
                     endif
                     if &encoding == 'utf-8'
-                        let lines += [printf('  %s %s', (iscurr ? '笆ｶ' : '  '), s)]
+                        let lines += [printf('  %s %s', (iscurr ? '▶' : '  '), s)]
                     else
                         let lines += [printf('  %s %s', (iscurr ? '*' : ' '), s)]
                     endif
