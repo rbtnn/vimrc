@@ -5,6 +5,10 @@ if exists('&makeencoding')
 endif
 scriptencoding utf-8
 
+if ('utf-8' == &encoding) && has('vim_starting') && has('win32')
+    set renderoptions=type:directx,renmode:5
+endif 
+
 set winaltkeys=yes guioptions=mM
 
 let g:loaded_2html_plugin      = 1 "$VIMRUNTIME/plugin/tohtml.vim
@@ -56,7 +60,7 @@ set grepprg=internal
 set incsearch hlsearch
 set keywordprg=:help
 set laststatus=2 statusline&
-set list listchars=trail:.,tab:<->,eol:~
+set list listchars=trail:.,tab:<->
 set matchpairs+=<:>
 set mouse=a
 set nocursorline nocursorcolumn
@@ -65,7 +69,7 @@ set noshowmode
 set nowrap
 set nowrapscan
 set pumheight=10 completeopt=menu
-set ruler
+set ruler rulerformat=%{&fileformat}/%{&fileencoding}
 set scrolloff=0 nonumber norelativenumber
 set sessionoptions=buffers,curdir,tabpages
 set shellslash
@@ -77,7 +81,7 @@ set wildmenu wildmode&
 
 set showtabline=0
 if has('tabsidebar')
-    function Tabsidebar() abort
+    function! Tabsidebar() abort
         try
             let t = (g:actual_curtabpage == tabpagenr()) ? 'TabSideBarSel' : 'TabSideBar'
             let lines = ['']
@@ -152,6 +156,10 @@ if has('clpum')
 endif
 
 vnoremap <silent>p           "_dP
+
+for s:ch in ['w', 'b', 't', '<', '>', '[', ']', '"', "'"]
+    execute printf('nnoremap <silent>si%s    vi%s"_c<C-r>"<esc>gvo<esc>', s:ch, s:ch)
+endfor
 
 noremap  <silent><C-u>       5k
 noremap  <silent><C-d>       5j
