@@ -1,5 +1,7 @@
 
-scriptversion 2
+if 2 == exists(':scriptversion')
+    scriptversion 2
+endif
 
 set encoding=utf-8
 if exists('&makeencoding')
