@@ -1,4 +1,6 @@
 
+scriptversion 2
+
 function s:echo(msg) abort
     echohl ModeMsg
     echo printf('%s', a:msg)
@@ -62,21 +64,21 @@ function s:close_handler_msbuild(out_path, rootdir, cmd, channel)
                 let fullpath = fnamemodify(printf('%s/%s', a:rootdir, m[1]), ':p')
             endif
             if filereadable(fullpath)
-                let dict.filename = fullpath
+                let dict['filename'] = fullpath
             endif
         endif
         if has_key(dict, 'filename')
-            let dict.lnum = m[2]
-            let dict.col = m[3]
+            let dict['lnum'] = m[2]
+            let dict['col'] = m[3]
             if (m[4] == 'error')
-                let dict.type = 'E'
+                let dict['type'] = 'E'
                 let errcnt += 1
             elseif (m[4] == 'warning')
-                let dict.type = 'W'
+                let dict['type'] = 'W'
             endif
-            let dict.text = m[5]
+            let dict['text'] = m[5]
         else
-            let dict.text = line
+            let dict['text'] = line
         endif
         let xs += [dict]
     endfor

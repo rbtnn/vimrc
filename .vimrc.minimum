@@ -1,4 +1,6 @@
 
+scriptversion 2
+
 set encoding=utf-8
 if exists('&makeencoding')
     set makeencoding=char

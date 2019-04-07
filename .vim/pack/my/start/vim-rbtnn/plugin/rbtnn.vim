@@ -1,4 +1,6 @@
 
+scriptversion 2
+
 let g:loaded_rbtnn = 1
 
 command! -nargs=0        ReadingVimrc  :call readingvimrc#open_list()

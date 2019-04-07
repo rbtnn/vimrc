@@ -1,4 +1,6 @@
 
+scriptversion 2
+
 let s:V = vital#of('rbtnn')
 let s:Http = s:V.import('Web.HTTP')
 

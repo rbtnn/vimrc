@@ -1,4 +1,6 @@
 
+scriptversion 2
+
 let s:vim_version = ''
 
 function version#get() abort
