@@ -1,4 +1,6 @@
 
+scriptversion 2
+
 set encoding=utf-8
 if exists('&makeencoding')
     set makeencoding=char
@@ -7,6 +9,9 @@ scriptencoding utf-8
 
 if ('utf-8' == &encoding) && has('vim_starting') && has('win32')
     set renderoptions=type:directx,renmode:5
+    " https://github.com/tonsky/FiraCode
+    set guifont=Fira_Code:h12:cANSI:qDRAFT
+    set guifontwide=MS_Gothic:h12:cSHIFTJIS:qDRAFT
 endif 
 
 set winaltkeys=yes guioptions=mM
@@ -85,11 +90,7 @@ if has('tabsidebar')
         try
             let t = (g:actual_curtabpage == tabpagenr()) ? 'TabSideBarSel' : 'TabSideBar'
             let lines = ['']
-            if &encoding == 'utf-8'
-                let lines += [printf('%%#%s#〓TABPAGE %d〓', t, g:actual_curtabpage)]
-            else
-                let lines += [printf('%%#%s#-TABPAGE %d-', t, g:actual_curtabpage)]
-            endif
+            let lines += [printf('%%#%s#-TABPAGE %d-', t, g:actual_curtabpage)]
             for x in getwininfo()
                 if x.tabnr == g:actual_curtabpage
                     let iscurr = (winnr() == x.winnr) && (g:actual_curtabpage == tabpagenr())
@@ -116,11 +117,7 @@ if has('tabsidebar')
                             let s = printf('[%s]', ft)
                         endif
                     endif
-                    if &encoding == 'utf-8'
-                        let lines += [printf('  %s %s', (iscurr ? '▶' : '  '), s)]
-                    else
-                        let lines += [printf('  %s %s', (iscurr ? '*' : ' '), s)]
-                    endif
+                    let lines += [printf('  %s %s', (iscurr ? '*' : ' '), s)]
                 endif
             endfor
             return join(lines, "\n")

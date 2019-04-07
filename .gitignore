@@ -1,6 +1,4 @@
 
-tags
-tags-jp
 .CFUserTextEncoding
 .ICEauthority
 .Trash/
@@ -45,6 +43,7 @@ tags-jp
 .sh_history
 .subversion/
 .sudo_as_admin_successful
+.templateengine/
 .themes/
 .viminfo
 .vimrc.*
@@ -89,6 +88,8 @@ go/
 init.local.cmd
 ntuser.*
 python_games/
+tags
+tags-jp
 vim-on-windows/
 vimtemp/
 スタート メニュー/
