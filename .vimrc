@@ -164,9 +164,6 @@ noremap  <silent><C-d>       5j
 noremap  <silent>j           gj
 noremap  <silent>k           gk
 
-nnoremap <nowait><space>     :<C-u>call diffy#lsfiles('')<cr>
-nnoremap <nowait><S-space>   :<C-u>call diffy#lsfiles('!')<cr>
-
 inoremap <silent><tab>       <C-v><tab>
 
 nnoremap <nowait><C-j>       :<C-u>cnext<cr>zz
