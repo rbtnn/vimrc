@@ -5,3 +5,5 @@
 .nuget/
 bin/
 vterm.lib
+tags
+

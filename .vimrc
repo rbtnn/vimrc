@@ -10,8 +10,8 @@ scriptencoding utf-8
 if ('utf-8' == &encoding) && has('vim_starting') && has('win32')
     set renderoptions=type:directx,renmode:5
     " https://github.com/tonsky/FiraCode
-    set guifont=Fira_Code:h12:cANSI:qDRAFT
-    set guifontwide=MS_Gothic:h12:cSHIFTJIS:qDRAFT
+    set guifont=Fira_Code:h11:cANSI:qDRAFT
+    set guifontwide=MS_Gothic:h11:cSHIFTJIS:qDRAFT
 endif 
 
 set winaltkeys=yes guioptions=mM
@@ -65,7 +65,7 @@ set grepprg=internal
 set incsearch hlsearch
 set keywordprg=:help
 set laststatus=2 statusline&
-set list listchars=trail:.,tab:<->
+set nolist listchars=trail:.,tab:<->
 set matchpairs+=<:>
 set mouse=a
 set nocursorline nocursorcolumn
@@ -154,10 +154,6 @@ endif
 
 vnoremap <silent>p           "_dP
 
-for s:ch in ['w', 'b', 't', '<', '>', '[', ']', '"', "'"]
-    execute printf('nnoremap <silent>si%s    vi%s"_c<C-r>"<esc>gvo<esc>', s:ch, s:ch)
-endfor
-
 noremap  <silent><C-u>       5k
 noremap  <silent><C-d>       5j
 
@@ -202,15 +198,19 @@ augroup END
 " https://jonasjacek.github.io/colors/
 augroup override-colorscheme
     autocmd!
-    autocmd InsertEnter *                :highlight TabLine     ctermfg=245 ctermbg=52 guifg=#8a8a8a guibg=#5f0000
-    autocmd InsertEnter *                :highlight TabLineSel  ctermfg=255 ctermbg=88 guifg=#eeeeee guibg=#870000
-    autocmd InsertEnter *                :highlight TabLineFill ctermfg=255 ctermbg=52 guifg=#eeeeee guibg=#5f0000
-    autocmd ColorScheme,InsertLeave *    :highlight TabLine     ctermfg=245 ctermbg=24 guifg=#8a8a8a guibg=#005f87
-    autocmd ColorScheme,InsertLeave *    :highlight TabLineSel  ctermfg=255 ctermbg=31 guifg=#eeeeee guibg=#0087af
-    autocmd ColorScheme,InsertLeave *    :highlight TabLineFill ctermfg=255 ctermbg=24 guifg=#eeeeee guibg=#005f87
+    autocmd InsertEnter *                :highlight TabLine     guifg=#8a8a8a guibg=#5f0000
+    autocmd InsertEnter *                :highlight TabLineSel  guifg=#eeeeee guibg=#870000
+    autocmd InsertEnter *                :highlight TabLineFill guifg=#eeeeee guibg=#5f0000
+    autocmd ColorScheme,InsertLeave *    :highlight TabLine     guifg=#8a8a8a guibg=#005f87
+    autocmd ColorScheme,InsertLeave *    :highlight TabLineSel  guifg=#eeeeee guibg=#0087af
+    autocmd ColorScheme,InsertLeave *    :highlight TabLineFill guifg=#eeeeee guibg=#005f87
+    autocmd ColorScheme *                :highlight EndOfBuffer guifg=#eeeeee guibg=#eeeeee
+    autocmd ColorScheme *                :highlight NonText     guifg=#eeeeee guibg=#eeeeee
+    autocmd ColorScheme *                :highlight Comment     guifg=#cccccc guibg=#eeeeee
 augroup END
 
 if has('vim_starting')
+    set termguicolors
     set background=light
     colorscheme PaperColor
 endif
