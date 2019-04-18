@@ -22,96 +22,110 @@ function s:iconv_one_nothrow(x) abort
     return x
 endfunction
 
-function msbuild#exec(q_args) abort
-    if 'new' == a:q_args
-        let msbuild_lines = [
-                \ '<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="BuildMain">',
-                \ '',
-                \ '    <PropertyGroup>',
-                \ '        <MainAssemblyName>Main.exe</MainAssemblyName>',
-                \ '        <OutputPath>bin\</OutputPath>',
-                \ '    </PropertyGroup>',
-                \ '',
-                \ '    <ItemGroup>',
-                \ '        <CompileMain Include="src\*.cs" />',
-                \ '    </ItemGroup>',
-                \ '',
-                \ '    <Target Name="Configure">',
-                \ '        <MakeDir Directories="$(OutputPath)" Condition="!Exists(''$(OutputPath)'')" />',
-                \ '    </Target>',
-                \ '',
-                \ '    <Target Name="BuildMain" DependsOnTargets="Configure">',
-                \ '        <Csc Sources="@(CompileMain)" TargetType="exe"     OutputAssembly="$(OutputPath)$(MainAssemblyName)" />',
-                \ '    </Target>',
-                \ '',
-                \ '    <Target Name="Clean">',
-                \ '        <RemoveDir Directories="$(OutputPath)" />',
-                \ '    </Target>',
-                \ '',
-                \ '</Project>',
-                \ ]
-        let main_lines = [
-                \ 'using System;',
-                \ 'using System.Collections.Generic;',
-                \ 'using System.IO;',
-                \ 'using System.Linq;',
-                \ 'using System.Text.RegularExpressions;',
-                \ 'using System.Text;',
-                \ '',
-                \ 'public class Program',
-                \ '{',
-                \ '    public static void Main()',
-                \ '    {',
-                \ '        Console.WriteLine(@"hi");',
-                \ '    }',
-                \ '}',
-                \ ]
-        if !filereadable('msbuild.xml')
-            if !isdirectory('src')
-                if !filereadable('src/Main.cs')
-                    call writefile(msbuild_lines, 'msbuild.xml')
-                    call mkdir('src')
-                    call writefile(main_lines, 'src/Main.cs')
-                    new src/Main.cs
-                else
-                    call s:error('src/Main.cs Already exists.')
-                endif
-            else
-                call s:error('src Already exists.')
-            endif
+function msbuild#new(q_args) abort
+    let msbuild_lines = [
+            \ '<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="BuildMain">',
+            \ '',
+            \ '    <PropertyGroup>',
+            \ '        <MainAssemblyName>Main.exe</MainAssemblyName>',
+            \ '        <OutputPath>bin\</OutputPath>',
+            \ '    </PropertyGroup>',
+            \ '',
+            \ '    <ItemGroup>',
+            \ '        <CompileMain Include="src\*.cs" />',
+            \ '    </ItemGroup>',
+            \ '',
+            \ '    <Target Name="Configure">',
+            \ '        <MakeDir Directories="$(OutputPath)" Condition="!Exists(''$(OutputPath)'')" />',
+            \ '    </Target>',
+            \ '',
+            \ '    <Target Name="BuildMain" DependsOnTargets="Configure">',
+            \ '        <Csc Sources="@(CompileMain)" TargetType="exe"     OutputAssembly="$(OutputPath)$(MainAssemblyName)" />',
+            \ '    </Target>',
+            \ '',
+            \ '    <Target Name="Clean">',
+            \ '        <RemoveDir Directories="$(OutputPath)" />',
+            \ '    </Target>',
+            \ '',
+            \ '</Project>',
+            \ ]
+    let main_lines = [
+            \ 'using System;',
+            \ 'using System.Collections.Generic;',
+            \ 'using System.IO;',
+            \ 'using System.Linq;',
+            \ 'using System.Text.RegularExpressions;',
+            \ 'using System.Text;',
+            \ '',
+            \ 'public class Program',
+            \ '{',
+            \ '    public static void Main()',
+            \ '    {',
+            \ '        Console.WriteLine(@"hi");',
+            \ '    }',
+            \ '}',
+            \ ]
+    let projectname = a:q_args
+    if projectname !~# '^[a-zA-Z0-9-_.]\+$'
+        call s:error(projectname .. ' is an invalid name.')
+        return
+    endif
+    if isdirectory(projectname)
+        call s:error(projectname .. ' already exists.')
+        return
+    endif
+    call mkdir(projectname)
+    call writefile(msbuild_lines, projectname .. '/msbuild.xml')
+    call mkdir(projectname .. '/src')
+    call writefile(main_lines, projectname .. '/src/Main.cs')
+    execute printf('new %s/src/Main.cs', projectname)
+    execute printf('lcd %s', projectname)
+endfunction
+
+function msbuild#run(q_args) abort
+    let path = fnamemodify(findfile(get(g:, 'msbuild_projectfile', 'msbuild.xml'), ';.'), ':p')
+    if filereadable(path)
+        let rootdir = fnamemodify(path, ':h')
+        let exepath = glob(rootdir .. '/bin/*.exe')
+        if filereadable(exepath)
+            execute printf('terminal %s "%s"', (has('win32') ? '' : 'mono'), exepath)
         else
-            call s:error('msbuild.xml Already exists.')
+            call s:error('Could not find executable file.')
         endif
     else
-        let path = fnamemodify(findfile(get(g:, 'msbuild_projectfile', 'msbuild.xml'), ';.'), ':p')
-        if filereadable(path)
-            let rootdir = fnamemodify(path, ':h')
-            let args = trim(a:q_args)
-            let cmd = [ ( executable('msbuild')
-                    \   ? 'msbuild'
-                    \   : ( has('win32')
-                    \     ? 'C:\Windows\Microsoft.NET\Framework\v4.0.30319\msbuild.exe'
-                    \     : 'xbuild'
-                    \     )
-                    \   ), '/nologo']
-            if !empty(args)
-                let cmd += split(args, '\s\+')
-            endif
-            let cmd += [path]
-            let out_path = tempname()
-            let job = job_start(cmd, {
-                    \ 'close_cb' : function('s:close_handler_msbuild', [out_path, rootdir, cmd]),
-                    \ 'cwd' : s:iconv_one_nothrow(rootdir),
-                    \ 'out_io' : 'file',
-                    \ 'out_name' : out_path,
-                    \ })
-        else
-            call s:error('Can not found msbuild.xml.')
-        endif
+        call s:error('Could not find msbuild.xml.')
     endif
 endfunction
 
-function s:close_handler_msbuild(out_path, rootdir, cmd, channel)
+function msbuild#build(q_args) abort
+    let path = fnamemodify(findfile(get(g:, 'msbuild_projectfile', 'msbuild.xml'), ';.'), ':p')
+    if filereadable(path)
+        let rootdir = fnamemodify(path, ':h')
+        let args = trim(a:q_args)
+        let cmd = [ ( executable('msbuild')
+                \   ? 'msbuild'
+                \   : ( has('win32')
+                \     ? 'C:\Windows\Microsoft.NET\Framework\v4.0.30319\msbuild.exe'
+                \     : 'xbuild'
+                \     )
+                \   ), '/nologo']
+        if !empty(args)
+            let cmd += split(args, '\s\+')
+        endif
+        let cmd += [path]
+        let out_path = tempname()
+        let job = job_start(cmd, {
+                \ 'close_cb' : function('s:close_handler_msbuild_build', [out_path, rootdir, cmd]),
+                \ 'cwd' : s:iconv_one_nothrow(rootdir),
+                \ 'out_io' : 'file',
+                \ 'out_name' : out_path,
+                \ })
+    else
+        call s:error('Could not find msbuild.xml.')
+    endif
+endfunction
+
+function s:close_handler_msbuild_build(out_path, rootdir, cmd, channel)
     let lines = readfile(a:out_path)
     call map(lines, { i,x -> s:iconv_one_nothrow(x) })
     let xs = []

@@ -165,8 +165,6 @@ inoremap <silent><tab>       <C-v><tab>
 nnoremap <nowait><C-j>       :<C-u>cnext<cr>zz
 nnoremap <nowait><C-k>       :<C-u>cprevious<cr>zz
 
-command! -bar -nargs=0 LcdRootDir   :call diffy#cd2rootdir('lcd')
-
 if has('win32')
     if has('gui_running')
         command! -bar -nargs=0 FullScreenToggle   :call libcallnr('gvimfullscreen.dll', 'ToggleFullScreen', 0)
@@ -186,31 +184,33 @@ endif
 
 augroup delete-commands
     autocmd!
-    autocmd VimEnter *    :silent! delcommand MANPAGER
-    autocmd VimEnter *    :silent! delcommand PaperColor
+    autocmd VimEnter,BufEnter *    :silent! delcommand MANPAGER
+    autocmd VimEnter,BufEnter *    :silent! delcommand PaperColor
 augroup END
 
 augroup vimscript
     autocmd!
-    autocmd FileType vim    :command! -bar -buffer   Run  :call vimscript#run()
+    autocmd FileType vim    :command! -bar -buffer   VimscriptRun  :call vimscript#run()
 augroup END
 
 " https://jonasjacek.github.io/colors/
 augroup override-colorscheme
     autocmd!
-    autocmd InsertEnter *                :highlight TabLine     guifg=#8a8a8a guibg=#5f0000
-    autocmd InsertEnter *                :highlight TabLineSel  guifg=#eeeeee guibg=#870000
-    autocmd InsertEnter *                :highlight TabLineFill guifg=#eeeeee guibg=#5f0000
-    autocmd ColorScheme,InsertLeave *    :highlight TabLine     guifg=#8a8a8a guibg=#005f87
-    autocmd ColorScheme,InsertLeave *    :highlight TabLineSel  guifg=#eeeeee guibg=#0087af
-    autocmd ColorScheme,InsertLeave *    :highlight TabLineFill guifg=#eeeeee guibg=#005f87
-    autocmd ColorScheme *                :highlight EndOfBuffer guifg=#eeeeee guibg=#eeeeee
-    autocmd ColorScheme *                :highlight NonText     guifg=#eeeeee guibg=#eeeeee
-    autocmd ColorScheme *                :highlight Comment     guifg=#cccccc guibg=#eeeeee
+    autocmd InsertEnter *                :highlight TabLine     ctermfg=245 ctermbg=52  guifg=#8a8a8a guibg=#5f0000
+    autocmd InsertEnter *                :highlight TabLineSel  ctermfg=255 ctermbg=88  guifg=#eeeeee guibg=#870000
+    autocmd InsertEnter *                :highlight TabLineFill ctermfg=255 ctermbg=52  guifg=#eeeeee guibg=#5f0000
+    autocmd ColorScheme,InsertLeave *    :highlight TabLine     ctermfg=245 ctermbg=24  guifg=#8a8a8a guibg=#005f87
+    autocmd ColorScheme,InsertLeave *    :highlight TabLineSel  ctermfg=255 ctermbg=31  guifg=#eeeeee guibg=#0087af
+    autocmd ColorScheme,InsertLeave *    :highlight TabLineFill ctermfg=255 ctermbg=24  guifg=#eeeeee guibg=#005f87
+    autocmd ColorScheme *                :highlight EndOfBuffer ctermfg=255 ctermbg=255 guifg=#eeeeee guibg=#eeeeee
+    autocmd ColorScheme *                :highlight NonText     ctermfg=255 ctermbg=255 guifg=#eeeeee guibg=#eeeeee
+    autocmd ColorScheme *                :highlight Comment     ctermfg=250 ctermbg=255 guifg=#cccccc guibg=#eeeeee
 augroup END
 
 if has('vim_starting')
-    set termguicolors
+    if has('win32')
+        set termguicolors
+    endif
     set background=light
     colorscheme PaperColor
 endif

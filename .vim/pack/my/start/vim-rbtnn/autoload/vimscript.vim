@@ -5,7 +5,11 @@ function! vimscript#run() abort
     let in_path = tempname()
     let out_path = tempname()
     call writefile(getbufline('%', 1, '$'), in_path)
-    let cmd = ['vim', '-X', '-N', '-u', 'NONE', '-i', 'NONE', '-V1', '-e', '-s', '-S', in_path, '+qall!']
+    let vim = expand('~/Desktop/vim/src/vim')
+    if !filereadable(vim) && executable('vim')
+        let vim = 'vim'
+    endif
+    let cmd = [vim, '-X', '-N', '-u', 'NONE', '-i', 'NONE', '-V1', '-e', '-s', '-S', in_path, '+qall!']
     let job = job_start(cmd, {
         \ 'close_cb' : function('s:handler_close_cb', [in_path, out_path]),
         \ 'err_io' : 'file',
