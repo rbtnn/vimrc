@@ -1,5 +1,5 @@
 
-scriptversion 2
+scriptversion 3
 
 let s:vim_version = ''
 

@@ -1,5 +1,5 @@
 
-scriptversion 2
+scriptversion 3
 
 function s:echo(msg) abort
     echohl ModeMsg

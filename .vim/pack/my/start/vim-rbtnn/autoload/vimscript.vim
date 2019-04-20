@@ -1,5 +1,5 @@
 
-scriptversion 2
+scriptversion 3
 
 function! vimscript#run() abort
     let in_path = tempname()
