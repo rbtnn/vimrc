@@ -191,7 +191,7 @@ augroup END
 augroup vimscript
     autocmd!
     autocmd FileType vim    :command! -bar -buffer   VimscriptRun  :call vimscript#run()
-    autocmd Syntax vim      :syntax keyword vimCommand contained   scriptversion
+    autocmd Syntax *        :syntax keyword vimCommand contained   scriptversion
 augroup END
 
 if has('vim_starting')
