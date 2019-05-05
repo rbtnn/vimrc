@@ -1,13 +1,14 @@
 
 scriptversion 3
 
-function! vimscript#run() abort
+function! vimscript#run(type) abort
     let in_path = tempname()
     let out_path = tempname()
     call writefile(getbufline('%', 1, '$'), in_path)
-    let vim = expand('~/Desktop/vim/src/vim')
-    if !filereadable(vim) && executable('vim')
+    if a:type == 0
         let vim = 'vim'
+    else
+        let vim = expand('~/Desktop/vim/src/vim')
     endif
     let cmd = [vim, '-X', '-N', '-u', 'NONE', '-i', 'NONE', '-V1', '-e', '-s', '-S', in_path, '+qall!']
     let job = job_start(cmd, {
