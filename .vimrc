@@ -89,8 +89,10 @@ set wildmenu wildmode&
 
 set showtabline=0
 
+let s:flag = has('gui_running') || (!has('gui_running') && !has('win32'))
+
 if has('tabsidebar')
-    if has('gui_running')
+    if s:flag
         function! Tabsidebar() abort
             try
                 let t = (g:actual_curtabpage == tabpagenr()) ? 'TabSideBarSel' : 'TabSideBar'
@@ -215,7 +217,7 @@ augroup override-colorscheme
 augroup END
 
 if has('vim_starting')
-    if has('gui_running')
+    if s:flag
         set background=light
         colorscheme PaperColor
     else
