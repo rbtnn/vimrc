@@ -1,5 +1,9 @@
 
-scriptversion 3
+if has('vimscript-3')
+    scriptversion 3
+else
+    finish
+endif
 
 set encoding=utf-8
 if exists('&makeencoding')
@@ -9,7 +13,6 @@ scriptencoding utf-8
 
 if ('utf-8' == &encoding) && has('vim_starting') && has('win32')
     set renderoptions=type:directx,renmode:5
-    " https://github.com/tonsky/FiraCode
     set guifont=Ricty_Diminished:h11:cANSI:qDRAFT
     set guifontwide=MS_Gothic:h11:cSHIFTJIS:qDRAFT
 endif 
@@ -85,50 +88,53 @@ set wildignore&
 set wildmenu wildmode&
 
 set showtabline=0
+
 if has('tabsidebar')
-    function! Tabsidebar() abort
-        try
-            let t = (g:actual_curtabpage == tabpagenr()) ? 'TabSideBarSel' : 'TabSideBar'
-            let lines = ['']
-            let lines += [printf('%%#%s#-TABPAGE %d-', t, g:actual_curtabpage)]
-            for x in getwininfo()
-                if x.tabnr == g:actual_curtabpage
-                    let iscurr = (winnr() == x.winnr) && (g:actual_curtabpage == tabpagenr())
-                    let s = '(No Name)'
-                    if x.terminal
-                        let s = '(Terminal)'
-                    elseif x.quickfix
-                        let s = '(QuickFix)'
-                    elseif x.loclist
-                        let s = '(LocList)'
-                    elseif iscurr && !empty(getcmdwintype())
-                        let s = '(CmdLineWindow)'
-                    elseif filereadable(bufname(x.bufnr))
-                        let modi = getbufvar(x.bufnr, '&modified')
-                        let read = getbufvar(x.bufnr, '&readonly')
-                        let name = fnamemodify(bufname(x.bufnr), ':t')
-                        let s = printf('%s%s%s', (read ? '[R]' : ''), (modi ? '[+]' : ''), name)
-                    else
-                        let sline = getwinvar(x.winnr, '&statusline')
-                        let ft = getbufvar(x.bufnr, '&filetype')
-                        if !empty(sline)
-                            let s = sline
-                        elseif !empty(ft)
-                            let s = printf('[%s]', ft)
+    if has('gui_running')
+        function! Tabsidebar() abort
+            try
+                let t = (g:actual_curtabpage == tabpagenr()) ? 'TabSideBarSel' : 'TabSideBar'
+                let lines = ['']
+                let lines += [printf('%%#%s#-TABPAGE %d-', t, g:actual_curtabpage)]
+                for x in getwininfo()
+                    if x.tabnr == g:actual_curtabpage
+                        let iscurr = (winnr() == x.winnr) && (g:actual_curtabpage == tabpagenr())
+                        let s = '(No Name)'
+                        if x.terminal
+                            let s = '(Terminal)'
+                        elseif x.quickfix
+                            let s = '(QuickFix)'
+                        elseif x.loclist
+                            let s = '(LocList)'
+                        elseif iscurr && !empty(getcmdwintype())
+                            let s = '(CmdLineWindow)'
+                        elseif filereadable(bufname(x.bufnr))
+                            let modi = getbufvar(x.bufnr, '&modified')
+                            let read = getbufvar(x.bufnr, '&readonly')
+                            let name = fnamemodify(bufname(x.bufnr), ':t')
+                            let s = printf('%s%s%s', (read ? '[R]' : ''), (modi ? '[+]' : ''), name)
+                        else
+                            let sline = getwinvar(x.winnr, '&statusline')
+                            let ft = getbufvar(x.bufnr, '&filetype')
+                            if !empty(sline)
+                                let s = sline
+                            elseif !empty(ft)
+                                let s = printf('[%s]', ft)
+                            endif
                         endif
+                        let lines += [printf('  %s %s', (iscurr ? '*' : ' '), s)]
                     endif
-                    let lines += [printf('  %s %s', (iscurr ? '*' : ' '), s)]
-                endif
-            endfor
-            return join(lines, "\n")
-        catch
-            return string(v:exception)
-        endtry
-    endfunction
-    set showtabsidebar=2
-    set tabsidebarcolumns=20
-    set notabsidebarwrap
-    set tabsidebar=%!Tabsidebar()
+                endfor
+                return join(lines, "\n")
+            catch
+                return string(v:exception)
+            endtry
+        endfunction
+        set showtabsidebar=2
+        set tabsidebarcolumns=20
+        set notabsidebarwrap
+        set tabsidebar=%!Tabsidebar()
+    endif
 endif
 
 " SWAP FILES
@@ -209,11 +215,14 @@ augroup override-colorscheme
 augroup END
 
 if has('vim_starting')
-    if has('win32')
-        set termguicolors
+    if has('gui_running')
+        set background=light
+        colorscheme PaperColor
+    else
+        if has('win32')
+            set termguicolors
+        endif
     endif
-    set background=light
-    colorscheme PaperColor
 endif
 
 if filereadable(expand('~/.vimrc.local'))
