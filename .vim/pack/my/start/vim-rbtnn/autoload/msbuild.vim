@@ -1,5 +1,9 @@
 
-scriptversion 3
+if exists(':scriptversion')
+    scriptversion 3
+else
+    finish
+endif
 
 function s:echo(msg) abort
     echohl ModeMsg

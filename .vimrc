@@ -1,5 +1,5 @@
 
-if has('vimscript-3')
+if exists(':scriptversion')
     scriptversion 3
 else
     finish
@@ -12,7 +12,7 @@ endif
 scriptencoding utf-8
 
 if ('utf-8' == &encoding) && has('vim_starting') && has('win32')
-    set renderoptions=type:directx,renmode:5
+    " https://github.com/edihbrandon/RictyDiminished
     set guifont=Ricty_Diminished:h11:cANSI:qDRAFT
     set guifontwide=MS_Gothic:h11:cSHIFTJIS:qDRAFT
 endif 

@@ -1,5 +1,9 @@
 
-scriptversion 3
+if exists(':scriptversion')
+    scriptversion 3
+else
+    finish
+endif
 
 let g:loaded_rbtnn = 1
 

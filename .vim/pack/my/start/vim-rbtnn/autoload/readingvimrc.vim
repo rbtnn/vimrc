@@ -1,5 +1,9 @@
 
-scriptversion 3
+if exists(':scriptversion')
+    scriptversion 3
+else
+    finish
+endif
 
 let s:V = vital#of('rbtnn')
 let s:Http = s:V.import('Web.HTTP')
@@ -41,6 +45,7 @@ function readingvimrc#open_url(line) abort
     setfiletype vim
     setlocal number
     let &l:statusline = split(a:line, '/')[-1]
+    wincmd T
 endfunction
 
 function s:new_window(lines) abort
