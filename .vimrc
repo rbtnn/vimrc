@@ -11,10 +11,9 @@ if exists('&makeencoding')
 endif
 scriptencoding utf-8
 
-if ('utf-8' == &encoding) && has('vim_starting') && has('win32')
-    " https://github.com/edihbrandon/RictyDiminished
-    set guifont=Ricty_Diminished:h11:cANSI:qDRAFT
-    set guifontwide=MS_Gothic:h11:cSHIFTJIS:qDRAFT
+if has('vim_starting') && has('win32')
+    set guifont=MS_Gothic:h10:cSHIFTJIS:qDRAFT
+    set guifontwide=MS_Gothic:h10:cSHIFTJIS:qDRAFT
 endif 
 
 set winaltkeys=yes guioptions=mM
@@ -213,7 +212,7 @@ augroup override-colorscheme
     autocmd ColorScheme,InsertLeave *    :highlight TabLineFill ctermfg=255 ctermbg=24  guifg=#eeeeee guibg=#005f87
     autocmd ColorScheme *                :highlight EndOfBuffer ctermfg=255 ctermbg=255 guifg=#eeeeee guibg=#eeeeee
     autocmd ColorScheme *                :highlight NonText     ctermfg=255 ctermbg=255 guifg=#eeeeee guibg=#eeeeee
-    autocmd ColorScheme *                :highlight Comment     ctermfg=250 ctermbg=255 guifg=#cccccc guibg=#eeeeee
+    autocmd ColorScheme *                :highlight Comment     ctermfg=250 ctermbg=255 guifg=#aaaaaa guibg=#eeeeee
 augroup END
 
 if has('vim_starting')
