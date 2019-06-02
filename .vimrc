@@ -12,48 +12,25 @@ endif
 scriptencoding utf-8
 
 if has('vim_starting') && has('win32')
-    set guifont=MS_Gothic:h10:cSHIFTJIS:qDRAFT
-    set guifontwide=MS_Gothic:h10:cSHIFTJIS:qDRAFT
+    set guifont=MS_Gothic:h12:cSHIFTJIS:qDRAFT
 endif 
 
 set winaltkeys=yes guioptions=mM
 
-let g:loaded_2html_plugin      = 1 "$VIMRUNTIME/plugin/tohtml.vim
-let g:loaded_getscript         = 1 "$VIMRUNTIME/autoload/getscript.vim
-let g:loaded_getscriptPlugin   = 1 "$VIMRUNTIME/plugin/getscriptPlugin.vim
-let g:loaded_gzip              = 1 "$VIMRUNTIME/plugin/gzip.vim
-let g:loaded_logipat           = 1 "$VIMRUNTIME/plugin/logiPat.vim
-let g:loaded_logiPat           = 1 "$VIMRUNTIME/plugin/logiPat.vim
-let g:loaded_matchparen        = 1 "$VIMRUNTIME/plugin/matchparen.vim
-let g:loaded_netrw             = 1 "$VIMRUNTIME/autoload/netrw.vim
-let g:loaded_netrwFileHandlers = 1 "$VIMRUNTIME/autoload/netrwFileHandlers.vim
-let g:loaded_netrwPlugin       = 1 "$VIMRUNTIME/plugin/netrwPlugin.vim
-let g:loaded_netrwSettings     = 1 "$VIMRUNTIME/autoload/netrwSettings.vim
-let g:loaded_rrhelper          = 1 "$VIMRUNTIME/plugin/rrhelper.vim
-let g:loaded_spellfile_plugin  = 1 "$VIMRUNTIME/plugin/spellfile.vim
-let g:loaded_sql_completion    = 1 "$VIMRUNTIME/autoload/sqlcomplete.vim
-let g:loaded_syntax_completion = 1 "$VIMRUNTIME/autoload/syntaxcomplete.vim
-let g:loaded_tar               = 1 "$VIMRUNTIME/autoload/tar.vim
-let g:loaded_tarPlugin         = 1 "$VIMRUNTIME/plugin/tarPlugin.vim
-let g:loaded_vimball           = 1 "$VIMRUNTIME/autoload/vimball.vim
-let g:loaded_vimballPlugin     = 1 "$VIMRUNTIME/plugin/vimballPlugin.vim
-let g:loaded_zip               = 1 "$VIMRUNTIME/autoload/zip.vim
-let g:loaded_zipPlugin         = 1 "$VIMRUNTIME/plugin/zipPlugin.vim
-let g:vimsyn_embed             = 1 "$VIMRUNTIME/syntax/vim.vim
-
-let g:vim_indent_cont = &g:shiftwidth
-let g:mapleader = ' '
-
 let $DOTVIM = expand('~/.vim')
 let $VIMTEMP = expand('$DOTVIM/temp')
 
-set packpath=$DOTVIM
-
-packadd vim-diffy
+silent! source $DOTVIM/gloaded.vim
 
 syntax on
 filetype plugin indent on
 set secure
+
+set packpath=$DOTVIM
+packadd vim-diffy
+
+let g:vim_indent_cont = &g:shiftwidth
+let g:mapleader = ' '
 
 set ambiwidth=double
 set autoread
@@ -173,10 +150,6 @@ nnoremap <nowait><C-j>       :<C-u>cnext<cr>zz
 nnoremap <nowait><C-k>       :<C-u>cprevious<cr>zz
 
 if has('win32')
-    if has('gui_running')
-        command! -bar -nargs=0 FullScreenToggle   :call libcallnr('gvimfullscreen.dll', 'ToggleFullScreen', 0)
-        command!      -nargs=1 SetAlpha           :call libcallnr('vimtweak.dll', 'SetAlpha', <args>)
-    endif
     " https://github.com/rprichard/winpty/releases/
     if has('terminal')
         tnoremap <silent><C-p>       <up>
@@ -193,12 +166,6 @@ augroup delete-commands
     autocmd!
     autocmd VimEnter,BufEnter *    :silent! delcommand MANPAGER
     autocmd VimEnter,BufEnter *    :silent! delcommand PaperColor
-augroup END
-
-augroup vimscript
-    autocmd!
-    autocmd FileType vim    :command! -bar -buffer   VimscriptRun     :call vimscript#run(0)
-    autocmd FileType vim    :command! -bar -buffer   VimscriptRunDev  :call vimscript#run(1)
 augroup END
 
 " https://jonasjacek.github.io/colors/
