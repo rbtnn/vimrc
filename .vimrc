@@ -12,7 +12,7 @@ endif
 scriptencoding utf-8
 
 if has('vim_starting') && has('win32')
-    set guifont=MS_Gothic:h12:cSHIFTJIS:qDRAFT
+    set guifont=Cica:h14:cSHIFTJIS:qDRAFT
 endif 
 
 set winaltkeys=yes guioptions=mM
@@ -27,7 +27,9 @@ filetype plugin indent on
 set secure
 
 set packpath=$DOTVIM
+
 packadd vim-diffy
+packadd vim-popup_signature
 
 let g:vim_indent_cont = &g:shiftwidth
 let g:mapleader = ' '
@@ -138,8 +140,8 @@ endif
 
 vnoremap <silent>p           "_dP
 
-noremap  <silent><C-u>       5k
-noremap  <silent><C-d>       5j
+noremap  <silent><C-u>       15k
+noremap  <silent><C-d>       15j
 
 noremap  <silent>j           gj
 noremap  <silent>k           gk
@@ -165,27 +167,12 @@ endif
 augroup delete-commands
     autocmd!
     autocmd VimEnter,BufEnter *    :silent! delcommand MANPAGER
-    autocmd VimEnter,BufEnter *    :silent! delcommand PaperColor
-augroup END
-
-" https://jonasjacek.github.io/colors/
-augroup override-colorscheme
-    autocmd!
-    autocmd InsertEnter *                :highlight TabLine     ctermfg=245 ctermbg=52  guifg=#8a8a8a guibg=#5f0000
-    autocmd InsertEnter *                :highlight TabLineSel  ctermfg=255 ctermbg=88  guifg=#eeeeee guibg=#870000
-    autocmd InsertEnter *                :highlight TabLineFill ctermfg=255 ctermbg=52  guifg=#eeeeee guibg=#5f0000
-    autocmd ColorScheme,InsertLeave *    :highlight TabLine     ctermfg=245 ctermbg=24  guifg=#8a8a8a guibg=#005f87
-    autocmd ColorScheme,InsertLeave *    :highlight TabLineSel  ctermfg=255 ctermbg=31  guifg=#eeeeee guibg=#0087af
-    autocmd ColorScheme,InsertLeave *    :highlight TabLineFill ctermfg=255 ctermbg=24  guifg=#eeeeee guibg=#005f87
-    autocmd ColorScheme *                :highlight EndOfBuffer ctermfg=255 ctermbg=255 guifg=#eeeeee guibg=#eeeeee
-    autocmd ColorScheme *                :highlight NonText     ctermfg=255 ctermbg=255 guifg=#eeeeee guibg=#eeeeee
-    autocmd ColorScheme *                :highlight Comment     ctermfg=250 ctermbg=255 guifg=#aaaaaa guibg=#eeeeee
 augroup END
 
 if has('vim_starting')
     if s:flag
-        set background=light
-        colorscheme PaperColor
+        set background=dark
+        colorscheme iceberg
     else
         if has('win32')
             set termguicolors
