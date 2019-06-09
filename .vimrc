@@ -28,8 +28,8 @@ set secure
 
 set packpath=$DOTVIM
 
-packadd vim-diffy
-packadd vim-popup_signature
+silent! packadd vim-diffy
+silent! packadd vim-popup_signature
 
 let g:vim_indent_cont = &g:shiftwidth
 let g:mapleader = ' '
