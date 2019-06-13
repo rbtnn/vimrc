@@ -1,5 +1,5 @@
 
-if exists(':scriptversion')
+if has('vimscript-3')
     scriptversion 3
 else
     finish
@@ -67,56 +67,6 @@ set wildmenu wildmode&
 
 set showtabline=0
 
-let s:flag = has('gui_running') || (!has('gui_running') && !has('win32'))
-
-if has('tabsidebar')
-    if s:flag
-        function! Tabsidebar() abort
-            try
-                let t = (g:actual_curtabpage == tabpagenr()) ? 'TabSideBarSel' : 'TabSideBar'
-                let lines = ['']
-                let lines += [printf('%%#%s#-TABPAGE %d-', t, g:actual_curtabpage)]
-                for x in getwininfo()
-                    if x.tabnr == g:actual_curtabpage
-                        let iscurr = (winnr() == x.winnr) && (g:actual_curtabpage == tabpagenr())
-                        let s = '(No Name)'
-                        if x.terminal
-                            let s = '(Terminal)'
-                        elseif x.quickfix
-                            let s = '(QuickFix)'
-                        elseif x.loclist
-                            let s = '(LocList)'
-                        elseif iscurr && !empty(getcmdwintype())
-                            let s = '(CmdLineWindow)'
-                        elseif filereadable(bufname(x.bufnr))
-                            let modi = getbufvar(x.bufnr, '&modified')
-                            let read = getbufvar(x.bufnr, '&readonly')
-                            let name = fnamemodify(bufname(x.bufnr), ':t')
-                            let s = printf('%s%s%s', (read ? '[R]' : ''), (modi ? '[+]' : ''), name)
-                        else
-                            let sline = getwinvar(x.winnr, '&statusline')
-                            let ft = getbufvar(x.bufnr, '&filetype')
-                            if !empty(sline)
-                                let s = sline
-                            elseif !empty(ft)
-                                let s = printf('[%s]', ft)
-                            endif
-                        endif
-                        let lines += [printf('  %s %s', (iscurr ? '*' : ' '), s)]
-                    endif
-                endfor
-                return join(lines, "\n")
-            catch
-                return string(v:exception)
-            endtry
-        endfunction
-        set showtabsidebar=2
-        set tabsidebarcolumns=20
-        set notabsidebarwrap
-        set tabsidebar=%!Tabsidebar()
-    endif
-endif
-
 " SWAP FILES
 set noswapfile
 
@@ -169,15 +119,64 @@ augroup delete-commands
     autocmd VimEnter,BufEnter *    :silent! delcommand MANPAGER
 augroup END
 
+if has('tabsidebar')
+    function! Tabsidebar() abort
+        try
+            let t = (g:actual_curtabpage == tabpagenr()) ? 'TabSideBarSel' : 'TabSideBar'
+            if 1 == g:actual_curtabpage
+                let g:tabsidebar_count = get(g:, 'tabsidebar_count', 0) + 1
+                let lines = [printf('+%d+', g:tabsidebar_count)]
+            else
+                let lines = []
+            endif
+            let lines += [printf('%%#%s#-TABPAGE %d-', t, g:actual_curtabpage)]
+            for x in getwininfo()
+                if x.tabnr == g:actual_curtabpage
+                    let iscurr = (winnr() == x.winnr) && (g:actual_curtabpage == tabpagenr())
+                    let s = '(No Name)'
+                    if x.terminal
+                        let s = '(Terminal)'
+                    elseif x.quickfix
+                        let s = '(QuickFix)'
+                    elseif x.loclist
+                        let s = '(LocList)'
+                    elseif iscurr && !empty(getcmdwintype())
+                        let s = '(CmdLineWindow)'
+                    elseif filereadable(bufname(x.bufnr))
+                        let modi = getbufvar(x.bufnr, '&modified')
+                        let read = getbufvar(x.bufnr, '&readonly')
+                        let name = fnamemodify(bufname(x.bufnr), ':t')
+                        let s = printf('%s%s%s', (read ? '[R]' : ''), (modi ? '[+]' : ''), name)
+                    else
+                        let sline = getwinvar(x.winnr, '&statusline')
+                        let ft = getbufvar(x.bufnr, '&filetype')
+                        if !empty(sline)
+                            let s = sline
+                        elseif !empty(ft)
+                            let s = printf('[%s]', ft)
+                        endif
+                    endif
+                    let lines += [printf('  %s %s', (iscurr ? '*' : ' '), s)]
+                endif
+            endfor
+            return join(lines, "\n")
+        catch
+            return string(v:exception)
+        endtry
+    endfunction
+    set showtabsidebar=2
+    set tabsidebarcolumns=20
+    set notabsidebarwrap
+    set tabsidebar=%!Tabsidebar()
+endif
+
 if has('vim_starting')
-    if s:flag
-        set background=dark
-        colorscheme iceberg
-    else
-        if has('win32')
-            set termguicolors
-        endif
+    if has('win32')
+        set termguicolors
     endif
+    let g:gruvbox_italic = 0
+    set background=dark
+    colorscheme gruvbox
 endif
 
 if filereadable(expand('~/.vimrc.local'))
