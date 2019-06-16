@@ -1,5 +1,5 @@
 
-if exists(':scriptversion')
+if has('vimscript-3')
     scriptversion 3
 else
     finish

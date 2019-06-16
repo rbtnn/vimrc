@@ -34,7 +34,6 @@ silent! packadd vim-popup_signature
 let g:vim_indent_cont = &g:shiftwidth
 let g:mapleader = ' '
 
-set ambiwidth=double
 set autoread
 set clipboard=unnamed
 set display=lastline
@@ -46,26 +45,25 @@ set grepprg=internal
 set incsearch hlsearch
 set keywordprg=:help
 set laststatus=2 statusline&
-set nolist listchars=trail:.,tab:<->
+set list listchars=eol:~,tab:<->
 set matchpairs+=<:>
 set mouse=a
 set nocursorline nocursorcolumn
 set noignorecase
+set noruler
 set noshowmode
 set nowrap
 set nowrapscan
 set pumheight=10 completeopt=menu
-set ruler rulerformat=%{&fileformat}/%{&fileencoding}
 set scrolloff=0 nonumber norelativenumber
 set sessionoptions=buffers,curdir,tabpages
 set shellslash
 set shortmess& shortmess+=I shortmess-=S
+set showtabline=0
 set tags=./tags;
 set visualbell noerrorbells t_vb=
 set wildignore&
 set wildmenu wildmode&
-
-set showtabline=0
 
 " SWAP FILES
 set noswapfile
@@ -122,7 +120,7 @@ augroup END
 if has('tabsidebar')
     function! Tabsidebar() abort
         try
-            let t = (g:actual_curtabpage == tabpagenr()) ? 'TabSideBarSel' : 'TabSideBar'
+            const t = (g:actual_curtabpage == tabpagenr()) ? 'TabSideBarSel' : 'TabSideBar'
             if 1 == g:actual_curtabpage
                 let g:tabsidebar_count = get(g:, 'tabsidebar_count', 0) + 1
                 let lines = [printf('+%d+', g:tabsidebar_count)]
@@ -164,10 +162,19 @@ if has('tabsidebar')
             return string(v:exception)
         endtry
     endfunction
-    set showtabsidebar=2
-    set tabsidebarcolumns=20
-    set notabsidebarwrap
-    set tabsidebar=%!Tabsidebar()
+    augroup tabsidebar
+        autocmd!
+        autocmd VimEnter,VimResized *
+                \ :if 10 < &columns / 8
+                \ |  set showtabsidebar=2
+                \ |  set tabsidebaralign
+                \ |  set notabsidebarwrap
+                \ |  set tabsidebar=%!Tabsidebar()
+                \ |  let &tabsidebarcolumns = &columns / 8
+                \ |else
+                \ |  set showtabsidebar=0
+                \ |endif
+    augroup END
 endif
 
 if has('vim_starting')

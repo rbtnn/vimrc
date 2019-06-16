@@ -1,5 +1,5 @@
 
-if exists(':scriptversion')
+if has('vimscript-3')
     scriptversion 3
 else
     finish
@@ -24,6 +24,7 @@ function! s:setup() abort
     command! -nargs=1        MSBuildNew       :call msbuild#new(<q-args>)
     command! -nargs=?        MSBuildBuild     :call msbuild#build(<q-args>)
     command! -nargs=?        MSBuildRun       :call msbuild#run(<q-args>)
+    command! -nargs=1        HttpJsonPP       :call scratch#new(prettyprint#exec(json_decode(http#get_content(<q-args>)))) | setlocal filetype=json
     if has('win32')
         if has('gui_running')
             command! -bar -nargs=0 FullScreenToggle   :call libcallnr('gvimfullscreen.dll', 'ToggleFullScreen', 0)
