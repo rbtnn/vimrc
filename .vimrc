@@ -181,9 +181,12 @@ if has('vim_starting')
     if has('win32')
         set termguicolors
     endif
-    let g:gruvbox_italic = 0
-    set background=dark
-    colorscheme gruvbox
+    "set background=dark
+    "let g:gruvbox_italic = 0
+    "colorscheme gruvbox
+    set background=light
+    let g:colorscheme_primary_disable_italic = 1
+    colorscheme primary
 endif
 
 if filereadable(expand('~/.vimrc.local'))
