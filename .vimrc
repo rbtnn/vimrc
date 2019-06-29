@@ -42,7 +42,7 @@ set grepprg=internal
 set incsearch hlsearch
 set keywordprg=:help
 set laststatus=2 statusline&
-set list listchars=eol:~,tab:<->
+set list listchars=tab:<->
 set matchpairs+=<:>
 set mouse=a
 set nocursorline nocursorcolumn
@@ -93,8 +93,10 @@ noremap  <silent>k           gk
 
 inoremap <silent><tab>       <C-v><tab>
 
-nnoremap <nowait><C-j>       :<C-u>cnext<cr>zz
-nnoremap <nowait><C-k>       :<C-u>cprevious<cr>zz
+nnoremap <nowait><C-j>       :<C-u>cnext<cr>
+nnoremap <nowait><C-k>       :<C-u>cprevious<cr>
+
+nnoremap <nowait><space>     zz
 
 if has('win32')
     " https://github.com/rprichard/winpty/releases/
@@ -179,7 +181,7 @@ if has('vim_starting')
         set termguicolors
     endif
     set background=dark
-    colorscheme molokai
+    colorscheme apprentice
 endif
 
 if filereadable(expand('~/.vimrc.local'))
