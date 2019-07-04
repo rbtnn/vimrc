@@ -1,5 +1,4 @@
 
-.ls-files
 *.log
 .DS_Store
 .nuget/

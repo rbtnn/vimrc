@@ -11,16 +11,14 @@ if exists('&makeencoding')
 endif
 scriptencoding utf-8
 
-if has('vim_starting') && has('win32')
-    set guifont=Cica:h14:cSHIFTJIS:qDRAFT
-endif 
-
 set winaltkeys=yes guioptions=mM
 
 let $DOTVIM = expand('~/.vim')
 let $VIMTEMP = expand('$DOTVIM/temp')
 
 silent! source $DOTVIM/gloaded.vim
+silent! source $DOTVIM/tabsidebar.vim
+silent! source $DOTVIM/clpum.vim
 
 syntax on
 filetype plugin indent on
@@ -62,41 +60,21 @@ set visualbell noerrorbells t_vb=
 set wildignore&
 set wildmenu wildmode&
 
-" SWAP FILES
-set noswapfile
-
-" BACKUP FILES
+" swap nad backup files
 silent! call mkdir(expand('$VIMTEMP/backupfiles'), 'p')
-set backup
-set nowritebackup
-set backupdir=$VIMTEMP/backupfiles//
+set noswapfile backup nowritebackup backupdir=$VIMTEMP/backupfiles//
 
-" UNDO FILES
+" undo files
 if has('persistent_undo')
     silent! call mkdir(expand('$VIMTEMP/undofiles'), 'p')
     set undofile
     set undodir=$VIMTEMP/undofiles//
 endif
 
-if has('clpum')
-    set wildmode=popup
-    set clpumheight=10
-endif
-
-vnoremap <silent>p           "_dP
-
-noremap  <silent><C-u>       15k
-noremap  <silent><C-d>       15j
-
-noremap  <silent>j           gj
-noremap  <silent>k           gk
-
 inoremap <silent><tab>       <C-v><tab>
 
-nnoremap <nowait><C-j>       :<C-u>cnext<cr>
-nnoremap <nowait><C-k>       :<C-u>cprevious<cr>
-
-nnoremap <nowait><space>     zz
+nnoremap <nowait><C-j>       :<C-u>cnext<cr>zz
+nnoremap <nowait><C-k>       :<C-u>cprevious<cr>zz
 
 if has('win32')
     " https://github.com/rprichard/winpty/releases/
@@ -111,78 +89,25 @@ if has('win32')
     endif
 endif
 
-augroup delete-commands
-    autocmd!
-    autocmd VimEnter,BufEnter *    :silent! delcommand MANPAGER
-augroup END
-
-if has('tabsidebar')
-    function! Tabsidebar() abort
-        try
-            const t = (g:actual_curtabpage == tabpagenr()) ? 'TabSideBarSel' : 'TabSideBar'
-            if 1 == g:actual_curtabpage
-                let g:tabsidebar_count = get(g:, 'tabsidebar_count', 0) + 1
-                let lines = [printf('+%d+', g:tabsidebar_count)]
-            else
-                let lines = []
-            endif
-            let lines += [printf('%%#%s#-TABPAGE %d-', t, g:actual_curtabpage)]
-            for x in getwininfo()
-                if x.tabnr == g:actual_curtabpage
-                    let iscurr = (winnr() == x.winnr) && (g:actual_curtabpage == tabpagenr())
-                    let s = '(No Name)'
-                    if x.terminal
-                        let s = '(Terminal)'
-                    elseif x.quickfix
-                        let s = '(QuickFix)'
-                    elseif x.loclist
-                        let s = '(LocList)'
-                    elseif iscurr && !empty(getcmdwintype())
-                        let s = '(CmdLineWindow)'
-                    elseif filereadable(bufname(x.bufnr))
-                        let modi = getbufvar(x.bufnr, '&modified')
-                        let read = getbufvar(x.bufnr, '&readonly')
-                        let name = fnamemodify(bufname(x.bufnr), ':t')
-                        let s = printf('%s%s%s', (read ? '[R]' : ''), (modi ? '[+]' : ''), name)
-                    else
-                        let sline = getwinvar(x.winnr, '&statusline')
-                        let ft = getbufvar(x.bufnr, '&filetype')
-                        if !empty(sline)
-                            let s = sline
-                        elseif !empty(ft)
-                            let s = printf('[%s]', ft)
-                        endif
-                    endif
-                    let lines += [printf('  %s %s', (iscurr ? '*' : ' '), s)]
-                endif
-            endfor
-            return join(lines, "\n")
-        catch
-            return string(v:exception)
-        endtry
-    endfunction
-    augroup tabsidebar
-        autocmd!
-        autocmd VimEnter,VimResized *
-                \ :if 10 < &columns / 8
-                \ |  set showtabsidebar=2
-                \ |  set tabsidebaralign
-                \ |  set notabsidebarwrap
-                \ |  set tabsidebar=%!Tabsidebar()
-                \ |  let &tabsidebarcolumns = &columns / 8
-                \ |else
-                \ |  set showtabsidebar=0
-                \ |endif
-    augroup END
-endif
-
 if has('vim_starting')
     if has('win32')
         set termguicolors
+        set guifont=Cica:h14:cSHIFTJIS:qDRAFT
     endif
     set background=dark
     colorscheme apprentice
+
+    cd ~/Desktop
+    if filereadable(expand('%'))
+        cd %:h
+    endif
 endif
+
+augroup vimrc
+    autocmd!
+    autocmd VimEnter,BufEnter * :silent! delcommand MANPAGER
+    autocmd VimEnter,BufEnter * :highlight! Cursor guibg=#00dd00
+augroup END
 
 if filereadable(expand('~/.vimrc.local'))
     source ~/.vimrc.local
