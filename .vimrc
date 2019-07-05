@@ -25,6 +25,9 @@ filetype plugin indent on
 set secure
 
 set packpath=$DOTVIM
+" https://github.com/aonemd/kuroi.vim
+" https://github.com/rbtnn/vim-diffy
+" https://github.com/miiton/Cica
 
 let g:vim_indent_cont = &g:shiftwidth
 let g:mapleader = ' '
@@ -90,13 +93,6 @@ if has('win32')
 endif
 
 if has('vim_starting')
-    if has('win32')
-        set termguicolors
-        set guifont=Cica:h14:cSHIFTJIS:qDRAFT
-    endif
-    set background=dark
-    colorscheme apprentice
-
     cd ~/Desktop
     if filereadable(expand('%'))
         cd %:h
@@ -106,7 +102,6 @@ endif
 augroup vimrc
     autocmd!
     autocmd VimEnter,BufEnter * :silent! delcommand MANPAGER
-    autocmd VimEnter,BufEnter * :highlight! Cursor guibg=#00dd00
 augroup END
 
 if filereadable(expand('~/.vimrc.local'))
