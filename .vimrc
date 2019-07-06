@@ -70,8 +70,7 @@ set noswapfile backup nowritebackup backupdir=$VIMTEMP/backupfiles//
 " undo files
 if has('persistent_undo')
     silent! call mkdir(expand('$VIMTEMP/undofiles'), 'p')
-    set undofile
-    set undodir=$VIMTEMP/undofiles//
+    set undofile undodir=$VIMTEMP/undofiles//
 endif
 
 inoremap <silent><tab>       <C-v><tab>
@@ -79,24 +78,15 @@ inoremap <silent><tab>       <C-v><tab>
 nnoremap <nowait><C-j>       :<C-u>cnext<cr>zz
 nnoremap <nowait><C-k>       :<C-u>cprevious<cr>zz
 
-if has('win32')
-    " https://github.com/rprichard/winpty/releases/
-    if has('terminal')
-        tnoremap <silent><C-p>       <up>
-        tnoremap <silent><C-n>       <down>
-        tnoremap <silent><C-b>       <left>
-        tnoremap <silent><C-f>       <right>
-        tnoremap <silent><C-e>       <end>
-        tnoremap <silent><C-a>       <home>
-        tnoremap <silent><C-u>       <esc>
-    endif
-endif
-
-if has('vim_starting')
-    cd ~/Desktop
-    if filereadable(expand('%'))
-        cd %:h
-    endif
+" https://github.com/rprichard/winpty/releases/
+if has('win32') && has('terminal')
+    tnoremap <silent><C-p>       <up>
+    tnoremap <silent><C-n>       <down>
+    tnoremap <silent><C-b>       <left>
+    tnoremap <silent><C-f>       <right>
+    tnoremap <silent><C-e>       <end>
+    tnoremap <silent><C-a>       <home>
+    tnoremap <silent><C-u>       <esc>
 endif
 
 augroup vimrc
