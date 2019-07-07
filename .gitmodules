@@ -1,0 +1,9 @@
+[submodule ".vim/pack/my/start/kuroi.vim"]
+	path = .vim/pack/my/start/kuroi.vim
+	url = git@github.com:aonemd/kuroi.vim.git
+[submodule ".vim/pack/my/start/vim-diffy"]
+	path = .vim/pack/my/start/vim-diffy
+	url = git@github.com:rbtnn/vim-diffy.git
+[submodule ".vim/pack/my/start/vim-qfreplace"]
+	path = .vim/pack/my/start/vim-qfreplace
+	url = git@github.com:thinca/vim-qfreplace.git

@@ -25,9 +25,6 @@ filetype plugin indent on
 set secure
 
 set packpath=$DOTVIM
-" https://github.com/aonemd/kuroi.vim
-" https://github.com/rbtnn/vim-diffy
-" https://github.com/miiton/Cica
 
 let g:vim_indent_cont = &g:shiftwidth
 let g:mapleader = ' '
