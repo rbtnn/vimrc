@@ -3,6 +3,6 @@
 .DS_Store
 .nuget/
 bin/
-vterm.lib
 tags
+tags-ja
 
