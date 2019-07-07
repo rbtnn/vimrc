@@ -54,14 +54,14 @@ if has('tabsidebar')
         autocmd!
         autocmd VimEnter,VimResized *
                 \ :if 10 < &columns / 8
-                \ |  set showtabsidebar=2
+                \ |  set showtabsidebar=1
                 \ |  set tabsidebaralign
                 \ |  set notabsidebarwrap
                 \ |  set tabsidebar=%!Tabsidebar()
                 \ |  let &tabsidebarcolumns = &columns / 8
                 \ |else
-                    \ |  set showtabsidebar=0
-                    \ |endif
+                \ |  set showtabsidebar=0
+                \ |endif
     augroup END
 endif
 
