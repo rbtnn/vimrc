@@ -94,10 +94,9 @@ augroup vimrc
 augroup END
 
 let g:quickrun_config = get(g:, 'quickrun_config', {})
-let g:quickrun_config['_'] = get(g:quickrun_config, '_', {
-        \   'runner' : 'job',
-        \   'hook/output_encode/encoding' : &termencoding,
-        \ })
+let g:quickrun_config['_'] = get(g:quickrun_config, '_', { 'runner' : 'job', })
+" let g:quickrun_config['_']['hook/output_encode/encoding'] = &encoding
+" let g:quickrun_config['_']['hook/output_encode/encoding'] = &termencoding
 
 silent! colorscheme tender
 
