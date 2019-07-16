@@ -13,3 +13,6 @@
 [submodule ".vim/pack/my/start/vim-buffer"]
 	path = .vim/pack/my/start/vim-buffer
 	url = https://github.com/rbtnn/vim-buffer.git
+[submodule ".vim/pack/my/start/lightline.vim"]
+	path = .vim/pack/my/start/lightline.vim
+	url = https://github.com/itchyny/lightline.vim.git

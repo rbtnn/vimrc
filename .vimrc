@@ -77,12 +77,6 @@ nnoremap <silent><nowait><C-k>       :<C-u>cprevious<cr>zz
 nnoremap <silent><nowait><leader>f   :<C-u>Buffer<cr>
 nnoremap <silent><nowait><leader>d   :<C-u>Diffy -w<cr>
 
-let g:quickrun_config = get(g:, 'quickrun_config', {})
-let g:quickrun_config['_'] = get(g:quickrun_config, '_', {
-    \   'runner' : 'job',
-    \   'hook/output_encode/encoding' : &termencoding,
-    \ })
-
 " https://github.com/rprichard/winpty/releases/
 if has('win32') && has('terminal')
     tnoremap <silent><C-p>       <up>
@@ -97,8 +91,15 @@ endif
 augroup vimrc
     autocmd!
     autocmd VimEnter,BufEnter * :silent! delcommand MANPAGER
-    autocmd VimEnter          * :silent! colorscheme tender
 augroup END
+
+let g:quickrun_config = get(g:, 'quickrun_config', {})
+let g:quickrun_config['_'] = get(g:quickrun_config, '_', {
+        \   'runner' : 'job',
+        \   'hook/output_encode/encoding' : &termencoding,
+        \ })
+
+silent! colorscheme tender
 
 if filereadable(expand('~/.vimrc.local'))
     source ~/.vimrc.local

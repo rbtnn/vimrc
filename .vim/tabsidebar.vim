@@ -19,6 +19,7 @@ if has('tabsidebar')
             for x in getwininfo()
                 if x.tabnr == g:actual_curtabpage
                     let iscurr = (winnr() == x.winnr) && (g:actual_curtabpage == tabpagenr())
+                    let name = bufname(x.bufnr)
                     let s = '(No Name)'
                     if x.terminal
                         let s = '(Terminal)'
@@ -28,19 +29,13 @@ if has('tabsidebar')
                         let s = '(LocList)'
                     elseif iscurr && !empty(getcmdwintype())
                         let s = '(CmdLineWindow)'
-                    elseif filereadable(bufname(x.bufnr))
+                    elseif filereadable(name)
                         let modi = getbufvar(x.bufnr, '&modified')
                         let read = getbufvar(x.bufnr, '&readonly')
-                        let name = fnamemodify(bufname(x.bufnr), ':t')
+                        let name = fnamemodify(name, ':t')
                         let s = printf('%s%s%s', (read ? '[R]' : ''), (modi ? '[+]' : ''), name)
-                    else
-                        let sline = getwinvar(x.winnr, '&statusline')
-                        let ft = getbufvar(x.bufnr, '&filetype')
-                        if !empty(sline)
-                            let s = sline
-                        elseif !empty(ft)
-                            let s = printf('[%s]', ft)
-                        endif
+                    elseif !empty(name)
+                        let s = name
                     endif
                     let lines += [printf('  %s %s', (iscurr ? '*' : ' '), s)]
                 endif
@@ -53,12 +48,12 @@ if has('tabsidebar')
     augroup tabsidebar
         autocmd!
         autocmd VimEnter,VimResized *
-                \ :if 10 < &columns / 8
+                \ :if 10 < &columns / 6
                 \ |  set showtabsidebar=1
                 \ |  set tabsidebaralign
                 \ |  set notabsidebarwrap
                 \ |  set tabsidebar=%!Tabsidebar()
-                \ |  let &tabsidebarcolumns = &columns / 8
+                \ |  let &tabsidebarcolumns = &columns / 6
                 \ |else
                 \ |  set showtabsidebar=0
                 \ |endif
