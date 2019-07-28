@@ -11,7 +11,7 @@ if has('tabsidebar')
             const t = (g:actual_curtabpage == tabpagenr()) ? 'TabSideBarSel' : 'TabSideBar'
             if 1 == g:actual_curtabpage
                 let g:tabsidebar_count = get(g:, 'tabsidebar_count', 0) + 1
-                let lines = [printf('+%d+', g:tabsidebar_count)]
+                let lines = [printf('(%d)', g:tabsidebar_count % 10)]
             else
                 let lines = []
             endif
@@ -49,8 +49,8 @@ if has('tabsidebar')
         autocmd!
         autocmd VimEnter,VimResized *
                 \ :if 10 < &columns / 6
-                \ |  set showtabsidebar=1
-                \ |  set tabsidebaralign
+                \ |  set showtabsidebar=2
+                \ |  set notabsidebaralign
                 \ |  set notabsidebarwrap
                 \ |  set tabsidebar=%!Tabsidebar()
                 \ |  let &tabsidebarcolumns = &columns / 6

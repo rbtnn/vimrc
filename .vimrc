@@ -16,14 +16,6 @@ set winaltkeys=yes guioptions=mM
 let $DOTVIM = expand('~/.vim')
 let $VIMTEMP = expand('$DOTVIM/temp')
 
-silent! source $DOTVIM/gloaded.vim
-silent! source $DOTVIM/tabsidebar.vim
-silent! source $DOTVIM/clpum.vim
-
-syntax on
-filetype plugin indent on
-set secure
-
 set packpath=$DOTVIM
 
 let g:vim_indent_cont = &g:shiftwidth
@@ -60,6 +52,10 @@ set tags=./tags;
 set visualbell noerrorbells t_vb=
 set wildignore&
 set wildmenu wildmode&
+
+silent! source $DOTVIM/gloaded.vim
+silent! source $DOTVIM/tabsidebar.vim
+silent! source $DOTVIM/clpum.vim
 
 " swap nad backup files
 silent! call mkdir(expand('$VIMTEMP/backupfiles'), 'p')
@@ -100,6 +96,10 @@ let g:quickrun_config['_'] = get(g:quickrun_config, '_', { 'runner' : 'job', })
 
 let g:diffy_popup_highlight = 'TabLineFill'
 let g:buffer_popup_highlight = 'TabLineFill'
+
+syntax on
+filetype plugin indent on
+set secure
 
 silent! colorscheme tender
 

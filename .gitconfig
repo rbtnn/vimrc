@@ -25,6 +25,7 @@
     lg=log --pretty=oneline --graph --abbrev-commit
     po=push -u origin
     st=status
+    subpull=submodule foreach git pull origin master
 
 [color]
     diff = true
