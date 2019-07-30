@@ -44,7 +44,7 @@ set nowrapscan
 set pumheight=10 completeopt=menu
 set scrolloff=0 nonumber norelativenumber
 set sessionoptions=buffers,curdir,tabpages
-set shellslash
+set noshellslash completeslash=slash
 set shortmess& shortmess+=I shortmess-=S
 set showmode
 set showtabline=0
