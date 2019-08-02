@@ -33,7 +33,7 @@ set grepprg=internal
 set incsearch hlsearch
 set keywordprg=:help
 set laststatus=2 statusline&
-set list listchars=tab:<->
+set list listchars=tab:\ \ \|
 set matchpairs+=<:>
 set mouse=a
 set nocursorline nocursorcolumn
@@ -94,14 +94,14 @@ let g:quickrun_config['_'] = get(g:quickrun_config, '_', { 'runner' : 'job', })
 " let g:quickrun_config['_']['hook/output_encode/encoding'] = &encoding
 " let g:quickrun_config['_']['hook/output_encode/encoding'] = &termencoding
 
-let g:diffy_popup_highlight = 'TabLineFill'
-let g:buffer_popup_highlight = 'TabLineFill'
+let g:diffy_popup_highlight = 'Comment'
+let g:buffer_popup_highlight = 'Comment'
 
 syntax on
 filetype plugin indent on
 set secure
 
-silent! colorscheme tender
+silent! colorscheme rdark
 
 if filereadable(expand('~/.vimrc.local'))
     source ~/.vimrc.local
