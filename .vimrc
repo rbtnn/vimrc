@@ -71,7 +71,8 @@ inoremap <silent><nowait><tab>       <C-v><tab>
 nnoremap <silent><nowait><C-j>       :<C-u>cnext<cr>zz
 nnoremap <silent><nowait><C-k>       :<C-u>cprevious<cr>zz
 nnoremap <silent><nowait><leader>f   :<C-u>Buffer<cr>
-nnoremap <silent><nowait><leader>d   :<C-u>Diffy -w<cr>
+nnoremap <silent><nowait><leader>d   :<C-u>DiffyCurrBuf -w<cr>
+nnoremap <silent><nowait><leader>s   :<C-u>DiffyStat -w<cr>
 
 " https://github.com/rprichard/winpty/releases/
 if has('win32') && has('terminal')

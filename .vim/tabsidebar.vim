@@ -34,8 +34,15 @@ if has('tabsidebar')
                         let read = getbufvar(x.bufnr, '&readonly')
                         let name = fnamemodify(name, ':t')
                         let s = printf('%s%s%s', (read ? '[R]' : ''), (modi ? '[+]' : ''), name)
-                    elseif !empty(name)
-                        let s = name
+                    else
+                        if empty(name)
+                            let type = getbufvar(x.bufnr, '&filetype')
+                            if 'diff' == type
+                                let s = '(Diff)'
+                            endif
+                        else
+                            let s = name
+                        endif
                     endif
                     let lines += [printf('  %s %s', (iscurr ? '*' : ' '), s)]
                 endif
@@ -48,12 +55,12 @@ if has('tabsidebar')
     augroup tabsidebar
         autocmd!
         autocmd VimEnter,VimResized *
-                \ :if 10 < &columns / 6
+                \ :if 10 < &columns / 8
                 \ |  set showtabsidebar=2
                 \ |  set notabsidebaralign
                 \ |  set notabsidebarwrap
                 \ |  set tabsidebar=%!Tabsidebar()
-                \ |  let &tabsidebarcolumns = &columns / 6
+                \ |  let &tabsidebarcolumns = &columns / 8
                 \ |else
                 \ |  set showtabsidebar=0
                 \ |endif
