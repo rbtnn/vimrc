@@ -9,12 +9,13 @@ if has('tabsidebar')
     function! Tabsidebar() abort
         try
             const t = (g:actual_curtabpage == tabpagenr()) ? 'TabSideBarSel' : 'TabSideBar'
-            if 1 == g:actual_curtabpage
-                let g:tabsidebar_count = get(g:, 'tabsidebar_count', 0) + 1
-                let lines = [printf('(%d)', g:tabsidebar_count % 10)]
-            else
-                let lines = []
-            endif
+            "if 1 == g:actual_curtabpage
+            "    let g:tabsidebar_count = get(g:, 'tabsidebar_count', 0) + 1
+            "    let lines = [printf('(%d)', g:tabsidebar_count % 10)]
+            "else
+            "    let lines = []
+            "endif
+            let lines = []
             let lines += [printf('%%#%s#-TABPAGE %d-', t, g:actual_curtabpage)]
             for x in getwininfo()
                 if x.tabnr == g:actual_curtabpage

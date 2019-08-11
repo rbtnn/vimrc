@@ -102,10 +102,19 @@ syntax on
 filetype plugin indent on
 set secure
 
-silent! colorscheme rdark
-
 if filereadable(expand('~/.vimrc.local'))
     source ~/.vimrc.local
 endif
+
+packloadall!
+
+augroup vimrc-colorscheme
+    autocmd!
+    autocmd ColorScheme * :highlight TabSideBarSel  ctermfg=235 ctermbg=148 guifg=#262626 guibg=#585858
+    autocmd ColorScheme * :highlight TabSideBar     ctermfg=235 ctermbg=236 guifg=#262626 guibg=#303030
+    autocmd ColorScheme * :highlight TabSideBarFill ctermfg=235 ctermbg=236 guifg=#262626 guibg=#303030
+augroup END
+
+silent! colorscheme onedark
 
 nohlsearch
