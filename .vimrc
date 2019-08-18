@@ -24,6 +24,7 @@ let g:mapleader = 's'
 set autoread
 set background=dark 
 set clipboard=unnamed
+set colorcolumn=80
 set display=lastline
 set expandtab softtabstop=-1 shiftwidth=4 tabstop=4
 set fileencodings=utf-8,cp932,euc-jp,default,latin
@@ -39,12 +40,12 @@ set mouse=a
 set nocursorline nocursorcolumn
 set noignorecase
 set noruler
+set noshellslash completeslash=slash
 set nowrap
 set nowrapscan
 set pumheight=10 completeopt=menu
 set scrolloff=0 nonumber norelativenumber
 set sessionoptions=buffers,curdir,tabpages
-set noshellslash completeslash=slash
 set shortmess& shortmess+=I shortmess-=S
 set showmode
 set showtabline=0
@@ -85,18 +86,10 @@ if has('win32') && has('terminal')
     tnoremap <silent><C-u>       <esc>
 endif
 
-augroup vimrc
-    autocmd!
-    autocmd VimEnter,BufEnter * :silent! delcommand MANPAGER
-augroup END
-
 let g:quickrun_config = get(g:, 'quickrun_config', {})
 let g:quickrun_config['_'] = get(g:quickrun_config, '_', { 'runner' : 'job', })
 " let g:quickrun_config['_']['hook/output_encode/encoding'] = &encoding
 " let g:quickrun_config['_']['hook/output_encode/encoding'] = &termencoding
-
-let g:diffy_popup_highlight = 'Comment'
-let g:buffer_popup_highlight = 'Comment'
 
 syntax on
 filetype plugin indent on
@@ -108,11 +101,12 @@ endif
 
 packloadall!
 
-augroup vimrc-colorscheme
+augroup vimrc
     autocmd!
-    autocmd ColorScheme * :highlight TabSideBarSel  ctermfg=235 ctermbg=148 guifg=#262626 guibg=#585858
-    autocmd ColorScheme * :highlight TabSideBar     ctermfg=235 ctermbg=236 guifg=#262626 guibg=#303030
-    autocmd ColorScheme * :highlight TabSideBarFill ctermfg=235 ctermbg=236 guifg=#262626 guibg=#303030
+    autocmd VimEnter,BufEnter * :silent! delcommand MANPAGER
+    autocmd ColorScheme       * :highlight TabSideBarSel  ctermfg=235 ctermbg=148 guifg=#262626 guibg=#585858
+    autocmd ColorScheme       * :highlight TabSideBar     ctermfg=235 ctermbg=236 guifg=#262626 guibg=#303030
+    autocmd ColorScheme       * :highlight TabSideBarFill ctermfg=235 ctermbg=236 guifg=#262626 guibg=#303030
 augroup END
 
 silent! colorscheme onedark

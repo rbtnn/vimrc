@@ -3,6 +3,7 @@
 .ICEauthority
 .Trash/
 .Xauthority
+.anaconda/
 .asoundrc
 .bash_history
 .bash_logout
@@ -13,6 +14,8 @@
 .cache/
 .cargo/
 .compiz/
+.conda/
+.condarc
 .config/
 .dart/
 .dbus/
@@ -25,6 +28,7 @@
 .gitconfig.local
 .gstreamer-0.10/
 .gtkrc-2.0
+.keras/
 .lldb/
 .local/
 .matplotlib/
