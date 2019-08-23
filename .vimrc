@@ -107,6 +107,7 @@ augroup vimrc
     autocmd ColorScheme       * :highlight TabSideBarSel  ctermfg=235 ctermbg=148 guifg=#262626 guibg=#585858
     autocmd ColorScheme       * :highlight TabSideBar     ctermfg=235 ctermbg=236 guifg=#262626 guibg=#303030
     autocmd ColorScheme       * :highlight TabSideBarFill ctermfg=235 ctermbg=236 guifg=#262626 guibg=#303030
+    autocmd FileType        xml :setlocal completeslash&
 augroup END
 
 silent! colorscheme onedark
