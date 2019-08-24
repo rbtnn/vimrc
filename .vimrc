@@ -17,12 +17,12 @@ let $DOTVIM = expand('~/.vim')
 let $VIMTEMP = expand('$DOTVIM/temp')
 
 set packpath=$DOTVIM
+set runtimepath+=$DOTVIM
 
 let g:vim_indent_cont = &g:shiftwidth
 let g:mapleader = 's'
 
 set autoread
-set background=dark 
 set clipboard=unnamed
 set colorcolumn=80
 set display=lastline
@@ -39,11 +39,11 @@ set matchpairs+=<:>
 set mouse=a
 set nocursorline nocursorcolumn
 set noignorecase
-set noruler
 set noshellslash completeslash=slash
 set nowrap
 set nowrapscan
 set pumheight=10 completeopt=menu
+set ruler rulerformat&
 set scrolloff=0 nonumber norelativenumber
 set sessionoptions=buffers,curdir,tabpages
 set shortmess& shortmess+=I shortmess-=S
@@ -58,7 +58,7 @@ silent! source $DOTVIM/gloaded.vim
 silent! source $DOTVIM/tabsidebar.vim
 silent! source $DOTVIM/clpum.vim
 
-" swap nad backup files
+" swap and backup files
 silent! call mkdir(expand('$VIMTEMP/backupfiles'), 'p')
 set noswapfile backup nowritebackup backupdir=$VIMTEMP/backupfiles//
 
@@ -104,12 +104,9 @@ packloadall!
 augroup vimrc
     autocmd!
     autocmd VimEnter,BufEnter * :silent! delcommand MANPAGER
-    autocmd ColorScheme       * :highlight TabSideBarSel  ctermfg=235 ctermbg=148 guifg=#262626 guibg=#585858
-    autocmd ColorScheme       * :highlight TabSideBar     ctermfg=235 ctermbg=236 guifg=#262626 guibg=#303030
-    autocmd ColorScheme       * :highlight TabSideBarFill ctermfg=235 ctermbg=236 guifg=#262626 guibg=#303030
     autocmd FileType        xml :setlocal completeslash&
 augroup END
 
-silent! colorscheme onedark
+silent! colorscheme normal
 
 nohlsearch
