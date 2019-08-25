@@ -1,5 +1,5 @@
 
-if !(has('win32') && has('gui_running'))
+if !((has('win32') && has('gui_running')) || (has('termguicolors') && getbufvar(bufnr('%'), '&termguicolors', 0)))
     finish
 endif
 

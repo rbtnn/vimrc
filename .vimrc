@@ -50,6 +50,7 @@ set shortmess& shortmess+=I shortmess-=S
 set showmode
 set showtabline=0
 set tags=./tags;
+set termguicolors
 set visualbell noerrorbells t_vb=
 set wildignore&
 set wildmenu wildmode&
