@@ -104,10 +104,12 @@ packloadall!
 
 augroup vimrc
     autocmd!
-    autocmd VimEnter,BufEnter * :silent! delcommand MANPAGER
-    autocmd FileType        xml :setlocal completeslash&
+    autocmd VimEnter,BufEnter  * :silent! delcommand MANPAGER
+    autocmd FileType         xml :setlocal completeslash&
+    autocmd FileType frm,bas,cls :setfiletype vb
+    autocmd Syntax            vb :syntax keyword vbKeyword ReadOnly Protected Imports Module
 augroup END
 
-silent! colorscheme normal
+silent! colorscheme snow
 
 nohlsearch
