@@ -1,5 +1,15 @@
 
-if !((has('win32') && has('gui_running')) || (has('termguicolors') && getbufvar(bufnr('%'), '&termguicolors', 0)))
+let s:flag = v:false
+
+if has('win32') && has('gui_running')
+    let s:flag = v:true
+elseif has('termguicolors')
+    if &termguicolors
+        let s:flag = v:true
+    endif
+endif
+
+if !s:flag
     finish
 endif
 
@@ -14,12 +24,10 @@ let g:colors_name = substitute(fnamemodify(expand('<sfile>'), ':t'), '.vim', '',
 highlight Normal             gui=NONE           guifg=#000000 guibg=#fcfcfc
 highlight EndOfBuffer        gui=NONE           guifg=#eeeeee guibg=#fcfcfc
 
-highlight WildMenu           gui=NONE           guifg=#000000 guibg=#aaaa00
-highlight TabLineSel         gui=NONE           guifg=#000000 guibg=#aaaa00
+highlight WildMenu           gui=NONE           guifg=#ffffff guibg=#323639
+highlight TabLineSel         gui=NONE           guifg=#ffffff guibg=#323639
 highlight TabLine            gui=NONE           guifg=#666666 guibg=#323639
 highlight TabLineFill        gui=NONE           guifg=#666666 guibg=#323639
-highlight LineNr             gui=NONE           guifg=#666666 guibg=#323639
-highlight CursorLineNr       gui=NONE           guifg=#aaaaaa guibg=#323639
 highlight StatusLine         gui=NONE           guifg=#aaaaaa guibg=#323639
 highlight StatusLineTerm     gui=NONE           guifg=#aaaaaa guibg=#323639
 highlight StatusLineNC       gui=NONE           guifg=#666666 guibg=#323639
@@ -31,10 +39,16 @@ highlight CursorLine         gui=NONE           guifg=NONE    guibg=#f7f7f7
 highlight CursorColumn       gui=NONE           guifg=NONE    guibg=#f7f7f7
 
 highlight Pmenu              gui=NONE           guifg=#aaaaaa guibg=#eeeeee
-highlight PmenuSel           gui=underline      guifg=NONE    guibg=#eeeeee
+highlight PmenuSel           gui=UNDERLINE      guifg=NONE    guibg=#eeeeee
 highlight PmenuSbar          gui=NONE           guifg=NONE    guibg=#f1f1f1
 highlight PmenuThumb         gui=NONE           guifg=NONE    guibg=#c1c1c1
 
+highlight Folded             gui=UNDERLINE      guifg=#333333 guibg=NONE
+highlight FoldColumn         gui=NONE           guifg=#777777 guibg=#e7e7e7
+highlight LineNr             gui=NONE           guifg=#aaaaaa guibg=#e7e7e7
+highlight CursorLineNr       gui=NONE           guifg=#666666 guibg=#e7e7e7
+
+highlight QuickFixLine       gui=NONE           guifg=#666666 guibg=#cccc22
 highlight Search             gui=NONE           guifg=#666666 guibg=#cccc22
 highlight IncSearch          gui=NONE           guifg=#666666 guibg=#cccc22
 highlight Cursor             gui=NONE           guifg=#ffffff guibg=#323639
@@ -44,7 +58,7 @@ highlight Comment            gui=NONE           guifg=#cccccc guibg=NONE
 highlight SpecialKey         gui=NONE           guifg=#ddaadd guibg=NONE
 highlight NonText            gui=NONE           guifg=#cccccc guibg=NONE
 
-highlight Folded             gui=underline      guifg=#333333 guibg=NONE
+highlight Directory          gui=NONE           guifg=#333333 guibg=NONE
 highlight Title              gui=NONE           guifg=#333333 guibg=NONE
 highlight Keyword            gui=NONE           guifg=#333333 guibg=NONE
 highlight Type               gui=NONE           guifg=#333333 guibg=NONE

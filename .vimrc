@@ -110,6 +110,6 @@ augroup vimrc
     autocmd Syntax            vb :syntax keyword vbKeyword ReadOnly Protected Imports Module
 augroup END
 
-silent! colorscheme snow
+silent! colorscheme watercolor
 
 nohlsearch
