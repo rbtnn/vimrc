@@ -24,7 +24,7 @@ let g:mapleader = 's'
 
 set autoread
 set clipboard=unnamed
-set colorcolumn=80
+set colorcolumn&
 set display=lastline
 set expandtab softtabstop=-1 shiftwidth=4 tabstop=4
 set fileencodings=utf-8,cp932,euc-jp,default,latin
@@ -55,6 +55,10 @@ set visualbell noerrorbells t_vb=
 set wildignore&
 set wildmenu wildmode&
 
+if executable('jvgrep')
+    set grepprg=jvgrep\ --enc\ sjis,utf-8\ -n
+endif
+
 silent! source $DOTVIM/gloaded.vim
 silent! source $DOTVIM/tabsidebar.vim
 silent! source $DOTVIM/clpum.vim
@@ -72,9 +76,8 @@ endif
 inoremap <silent><nowait><tab>       <C-v><tab>
 nnoremap <silent><nowait><C-j>       :<C-u>cnext<cr>zz
 nnoremap <silent><nowait><C-k>       :<C-u>cprevious<cr>zz
-nnoremap <silent><nowait><leader>f   :<C-u>Buffer<cr>
-nnoremap <silent><nowait><leader>d   :<C-u>DiffyCurrBuf -w<cr>
 nnoremap <silent><nowait><leader>s   :<C-u>DiffyStat -w<cr>
+nnoremap <silent><nowait><leader>t   :<C-u>terminal<cr>
 
 " https://github.com/rprichard/winpty/releases/
 if has('win32') && has('terminal')
@@ -106,10 +109,8 @@ augroup vimrc
     autocmd!
     autocmd VimEnter,BufEnter  * :silent! delcommand MANPAGER
     autocmd FileType         xml :setlocal completeslash&
-    autocmd FileType frm,bas,cls :setfiletype vb
-    autocmd Syntax            vb :syntax keyword vbKeyword ReadOnly Protected Imports Module
 augroup END
 
-silent! colorscheme watercolor
+silent! colorscheme mycolor
 
 nohlsearch
