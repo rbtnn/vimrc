@@ -7,3 +7,9 @@
 [submodule ".vim/pack/my/start/vim-quickrun"]
 	path = .vim/pack/my/start/vim-quickrun
 	url = https://github.com/thinca/vim-quickrun.git
+[submodule ".vim/pack/my/start/vim-parenmatch"]
+	path = .vim/pack/my/start/vim-parenmatch
+	url = https://github.com/itchyny/vim-parenmatch.git
+[submodule ".vim/pack/my/start/vim-lavender"]
+	path = .vim/pack/my/start/vim-lavender
+	url = https://github.com/rbtnn/vim-lavender.git

@@ -111,6 +111,6 @@ augroup vimrc
     autocmd FileType         xml :setlocal completeslash&
 augroup END
 
-silent! colorscheme mycolor
+silent! colorscheme lavender
 
 nohlsearch
