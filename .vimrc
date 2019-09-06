@@ -56,7 +56,7 @@ set wildignore&
 set wildmenu wildmode&
 
 if executable('jvgrep')
-    set grepprg=jvgrep\ --enc\ sjis,utf-8\ -n
+    set grepprg=jvgrep\ --enc\ sjis,utf-8\ -n\ --no-color\ -I
 endif
 
 silent! source $DOTVIM/gloaded.vim
@@ -74,10 +74,11 @@ if has('persistent_undo')
 endif
 
 inoremap <silent><nowait><tab>       <C-v><tab>
-nnoremap <silent><nowait><C-j>       :<C-u>cnext<cr>zz
-nnoremap <silent><nowait><C-k>       :<C-u>cprevious<cr>zz
-nnoremap <silent><nowait><leader>s   :<C-u>DiffyStat -w<cr>
-nnoremap <silent><nowait><leader>t   :<C-u>terminal<cr>
+nnoremap <silent><nowait><C-j>       :<C-u>tabnext<cr>
+nnoremap <silent><nowait><C-k>       :<C-u>tabprevious<cr>
+tnoremap <silent><nowait><C-j>       <C-w>:<C-u>tabnext<cr>
+tnoremap <silent><nowait><C-k>       <C-w>:<C-u>tabprevious<cr>
+nnoremap <silent><nowait><leader>s   :<C-u>Diffy -w<cr>
 
 " https://github.com/rprichard/winpty/releases/
 if has('win32') && has('terminal')
