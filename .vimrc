@@ -1,6 +1,6 @@
 
-if has('vimscript-3')
-    scriptversion 3
+if has('vimscript-4')
+    scriptversion 4
 else
     finish
 endif
@@ -55,9 +55,9 @@ set visualbell noerrorbells t_vb=
 set wildignore&
 set wildmenu wildmode&
 
-if executable('jvgrep')
-    set grepprg=jvgrep\ --enc\ sjis,utf-8\ -n\ --no-color\ -I
-endif
+"if executable('jvgrep')
+"    set grepprg=jvgrep\ --enc\ sjis,utf-8\ -n\ --no-color\ -I
+"endif
 
 silent! source $DOTVIM/gloaded.vim
 silent! source $DOTVIM/tabsidebar.vim
@@ -74,10 +74,8 @@ if has('persistent_undo')
 endif
 
 inoremap <silent><nowait><tab>       <C-v><tab>
-nnoremap <silent><nowait><C-j>       :<C-u>tabnext<cr>
-nnoremap <silent><nowait><C-k>       :<C-u>tabprevious<cr>
-tnoremap <silent><nowait><C-j>       <C-w>:<C-u>tabnext<cr>
-tnoremap <silent><nowait><C-k>       <C-w>:<C-u>tabprevious<cr>
+nnoremap <silent><nowait><C-j>       :<C-u>cnext<cr>zz
+nnoremap <silent><nowait><C-k>       :<C-u>cprevious<cr>zz
 nnoremap <silent><nowait><leader>s   :<C-u>Diffy -w<cr>
 
 " https://github.com/rprichard/winpty/releases/
@@ -92,7 +90,10 @@ if has('win32') && has('terminal')
 endif
 
 let g:quickrun_config = get(g:, 'quickrun_config', {})
-let g:quickrun_config['_'] = get(g:quickrun_config, '_', { 'runner' : 'job', })
+let g:quickrun_config['_'] = {
+        \   'runner' : 'terminal',
+        \   'runner/terminal/into' : 1,
+        \ }
 " let g:quickrun_config['_']['hook/output_encode/encoding'] = &encoding
 " let g:quickrun_config['_']['hook/output_encode/encoding'] = &termencoding
 
