@@ -12,7 +12,7 @@
 [core]
     autocrlf = false
     quotepath = false
-    editor = vim
+    editor = vim -u NONE --noplugin
     excludesfile = ~/.gitignore.global
 
 [alias]
