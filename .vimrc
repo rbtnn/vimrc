@@ -23,6 +23,7 @@ let g:vim_indent_cont = &g:shiftwidth
 let g:mapleader = 's'
 
 set autoread
+set background=dark
 set clipboard=unnamed
 set colorcolumn&
 set display=lastline
@@ -91,9 +92,12 @@ endif
 
 let g:quickrun_config = get(g:, 'quickrun_config', {})
 let g:quickrun_config['_'] = {
-        \   'runner' : 'terminal',
-        \   'runner/terminal/into' : 1,
-        \ }
+    \   'runner' : 'terminal',
+    \   'runner/terminal/into' : 1,
+    \ }
+let g:quickrun_config['rust'] = {
+    \   'exec' : 'cargo run',
+    \ }
 " let g:quickrun_config['_']['hook/output_encode/encoding'] = &encoding
 " let g:quickrun_config['_']['hook/output_encode/encoding'] = &termencoding
 
@@ -113,6 +117,7 @@ augroup vimrc
     autocmd FileType         xml :setlocal completeslash&
 augroup END
 
+let g:labender_devmode = v:true
 silent! colorscheme lavender
 
 nohlsearch
