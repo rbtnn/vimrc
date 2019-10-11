@@ -56,13 +56,10 @@ set visualbell noerrorbells t_vb=
 set wildignore&
 set wildmenu wildmode&
 
-"if executable('jvgrep')
-"    set grepprg=jvgrep\ --enc\ sjis,utf-8\ -n\ --no-color\ -I
-"endif
-
 silent! source $DOTVIM/gloaded.vim
 silent! source $DOTVIM/tabsidebar.vim
 silent! source $DOTVIM/clpum.vim
+silent! source $DOTVIM/etc.vim
 
 " swap and backup files
 silent! call mkdir(expand('$VIMTEMP/backupfiles'), 'p')
@@ -117,7 +114,6 @@ augroup vimrc
     autocmd FileType         xml :setlocal completeslash&
 augroup END
 
-let g:labender_devmode = v:true
-silent! colorscheme lavender
+silent! colorscheme xxx
 
 nohlsearch
