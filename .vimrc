@@ -44,7 +44,7 @@ set noshellslash completeslash=slash
 set nowrap
 set nowrapscan
 set pumheight=10 completeopt=menu
-set ruler rulerformat&
+set ruler rulerformat=%{&fenc}/%{&ff}/%{&ft}
 set scrolloff=0 nonumber norelativenumber
 set sessionoptions=buffers,curdir,tabpages
 set shortmess& shortmess+=I shortmess-=S
