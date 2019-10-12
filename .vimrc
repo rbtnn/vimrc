@@ -27,7 +27,7 @@ set background=dark
 set clipboard=unnamed
 set colorcolumn&
 set display=lastline
-set expandtab softtabstop=-1 shiftwidth=4 tabstop=4
+set expandtab shiftround softtabstop=-1 shiftwidth=4 tabstop=4
 set fileencodings=utf-8,cp932,euc-jp,default,latin
 set fileformats=unix,dos,mac
 set foldcolumn=0 foldlevelstart=99 foldmethod=indent
@@ -75,6 +75,8 @@ inoremap <silent><nowait><tab>       <C-v><tab>
 nnoremap <silent><nowait><C-j>       :<C-u>cnext<cr>zz
 nnoremap <silent><nowait><C-k>       :<C-u>cprevious<cr>zz
 nnoremap <silent><nowait><leader>s   :<C-u>Diffy -w<cr>
+nnoremap <silent><nowait>q           :<C-u>CloseScratch<cr>
+nnoremap <silent><nowait><space>     <nop>
 
 " https://github.com/rprichard/winpty/releases/
 if has('win32') && has('terminal')
@@ -92,9 +94,6 @@ let g:quickrun_config['_'] = {
     \   'runner' : 'terminal',
     \   'runner/terminal/into' : 1,
     \ }
-let g:quickrun_config['rust'] = {
-    \   'exec' : 'cargo run',
-    \ }
 " let g:quickrun_config['_']['hook/output_encode/encoding'] = &encoding
 " let g:quickrun_config['_']['hook/output_encode/encoding'] = &termencoding
 
@@ -111,7 +110,7 @@ packloadall!
 augroup vimrc
     autocmd!
     autocmd VimEnter,BufEnter  * :silent! delcommand MANPAGER
-    autocmd FileType         xml :setlocal completeslash&
+    autocmd FileType        rust :nnoremap <buffer><silent><nowait><space> :<C-u>terminal cargo run<cr>
 augroup END
 
 silent! colorscheme xxx

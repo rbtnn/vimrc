@@ -21,8 +21,16 @@ endif
 
 let g:colors_name = substitute(fnamemodify(expand('<sfile>'), ':t'), '.vim', '', '')
 
-highlight Normal             gui=NONE           guifg=#e0e0e0 guibg=#0c0c0c
-highlight EndOfBuffer        gui=NONE           guifg=#111111 guibg=#0d0d0d
+highlight Normal             gui=NONE           guifg=#e0e0e0 guibg=#100a10
+highlight EndOfBuffer        gui=NONE           guifg=#201a20 guibg=#100a10
+
+highlight Pmenu              gui=NONE           guifg=#555555 guibg=#201a20
+highlight PmenuSel           gui=UNDERLINE      guifg=NONE    guibg=#201a20
+highlight PmenuSbar          gui=NONE           guifg=NONE    guibg=#1a151a
+highlight PmenuThumb         gui=NONE           guifg=NONE    guibg=#000000
+
+highlight ErrorMsg           gui=NONE           guifg=#ff0000 guibg=NONE
+highlight WarningMsg         gui=NONE           guifg=#ffff00 guibg=NONE
 
 highlight WildMenu           gui=NONE           guifg=#ffffff guibg=#1a1a1a
 highlight TabLineSel         gui=NONE           guifg=#ffffff guibg=#1a1a1a
@@ -37,11 +45,6 @@ highlight VertSplit          gui=NONE           guifg=#1a1a1a guibg=#1a1a1a
 highlight ColorColumn        gui=NONE           guifg=NONE    guibg=#f7f7f7
 highlight CursorLine         gui=NONE           guifg=NONE    guibg=#f7f7f7
 highlight CursorColumn       gui=NONE           guifg=NONE    guibg=#f7f7f7
-
-highlight Pmenu              gui=NONE           guifg=#555555 guibg=#232323
-highlight PmenuSel           gui=UNDERLINE      guifg=NONE    guibg=#232323
-highlight PmenuSbar          gui=NONE           guifg=NONE    guibg=#0e0e0e
-highlight PmenuThumb         gui=NONE           guifg=NONE    guibg=#3e3e3e
 
 highlight Folded             gui=UNDERLINE      guifg=#555555 guibg=NONE
 highlight FoldColumn         gui=NONE           guifg=#777777 guibg=#181818
