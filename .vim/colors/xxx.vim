@@ -32,15 +32,15 @@ highlight PmenuThumb         gui=NONE           guifg=NONE    guibg=#000000
 highlight ErrorMsg           gui=NONE           guifg=#ff0000 guibg=NONE
 highlight WarningMsg         gui=NONE           guifg=#ffff00 guibg=NONE
 
-highlight WildMenu           gui=NONE           guifg=#ffffff guibg=#1a1a1a
-highlight TabLineSel         gui=NONE           guifg=#ffffff guibg=#1a1a1a
-highlight TabLine            gui=NONE           guifg=#666666 guibg=#1a1a1a
-highlight TabLineFill        gui=NONE           guifg=#666666 guibg=#1a1a1a
-highlight StatusLine         gui=NONE           guifg=#999999 guibg=#1a1a1a
-highlight StatusLineTerm     gui=NONE           guifg=#999999 guibg=#1a1a1a
-highlight StatusLineNC       gui=NONE           guifg=#555555 guibg=#1a1a1a
-highlight StatusLineTermNC   gui=NONE           guifg=#555555 guibg=#1a1a1a
-highlight VertSplit          gui=NONE           guifg=#1a1a1a guibg=#1a1a1a
+highlight WildMenu           gui=NONE           guifg=#ffffff guibg=#3a3a3a
+highlight TabLineSel         gui=NONE           guifg=#ffffff guibg=#3a3a3a
+highlight TabLine            gui=NONE           guifg=#666666 guibg=#3a3a3a
+highlight TabLineFill        gui=NONE           guifg=#666666 guibg=#3a3a3a
+highlight StatusLine         gui=NONE           guifg=#999999 guibg=#3a3a3a
+highlight StatusLineTerm     gui=NONE           guifg=#999999 guibg=#3a3a3a
+highlight StatusLineNC       gui=NONE           guifg=#555555 guibg=#3a3a3a
+highlight StatusLineTermNC   gui=NONE           guifg=#555555 guibg=#3a3a3a
+highlight VertSplit          gui=NONE           guifg=#3a3a3a guibg=#3a3a3a
 
 highlight ColorColumn        gui=NONE           guifg=NONE    guibg=#f7f7f7
 highlight CursorLine         gui=NONE           guifg=NONE    guibg=#f7f7f7
@@ -57,8 +57,8 @@ highlight IncSearch          gui=NONE           guifg=#000000 guibg=#777711
 highlight Cursor             gui=NONE           guifg=#000000 guibg=#ffffff
 highlight Visual             gui=NONE           guifg=NONE    guibg=#113311
 
-highlight Comment            gui=NONE           guifg=#555555 guibg=NONE
-highlight SpecialKey         gui=NONE           guifg=#552255 guibg=NONE
+highlight Comment            gui=NONE           guifg=#888888 guibg=NONE
+highlight SpecialKey         gui=NONE           guifg=#aa44aa guibg=NONE
 highlight NonText            gui=NONE           guifg=#cccccc guibg=NONE
 
 highlight Directory          gui=NONE           guifg=#b6b628 guibg=NONE
@@ -81,8 +81,8 @@ highlight      DiffText      gui=BOLD,UNDERLINE guifg=#993399 guibg=NONE
 
 if has('tabsidebar')
     highlight TabSideBarSel  gui=NONE           guifg=#999999 guibg=#232323
-    highlight TabSideBar     gui=NONE           guifg=#555555 guibg=#1a1a1a
-    highlight TabSideBarFill gui=NONE           guifg=#999999 guibg=#1a1a1a
+    highlight TabSideBar     gui=NONE           guifg=#555555 guibg=#3a3a3a
+    highlight TabSideBarFill gui=NONE           guifg=#999999 guibg=#3a3a3a
 endif
 
 if v:false
