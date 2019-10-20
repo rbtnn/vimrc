@@ -52,14 +52,17 @@ set showmode
 set showtabline=0
 set tags=./tags;
 set termguicolors
+set title titlestring=Vim%{v:versionlong}(%{getpid()})
 set visualbell noerrorbells t_vb=
 set wildignore&
 set wildmenu wildmode&
 
-silent! source $DOTVIM/gloaded.vim
-silent! source $DOTVIM/tabsidebar.vim
-silent! source $DOTVIM/clpum.vim
-silent! source $DOTVIM/etc.vim
+source $DOTVIM/gloaded.vim
+source $DOTVIM/tabsidebar.vim
+source $DOTVIM/clpum.vim
+source $DOTVIM/rust.vim
+source $DOTVIM/quickrun.vim
+source $DOTVIM/etc.vim
 
 " swap and backup files
 silent! call mkdir(expand('$VIMTEMP/backupfiles'), 'p')
@@ -72,11 +75,35 @@ if has('persistent_undo')
 endif
 
 inoremap <silent><nowait><tab>       <C-v><tab>
+
+nnoremap <silent><nowait><leader>    <nop>
 nnoremap <silent><nowait><C-j>       :<C-u>cnext<cr>zz
 nnoremap <silent><nowait><C-k>       :<C-u>cprevious<cr>zz
-nnoremap <silent><nowait><leader>s   :<C-u>Diffy -w<cr>
-nnoremap <silent><nowait>q           :<C-u>CloseScratch<cr>
-nnoremap <silent><nowait><space>     <nop>
+nnoremap <silent><nowait>q           :<C-u>call close_scratch#exec('')<cr>
+nnoremap <silent><nowait><space>     :<C-u>call <SID>select_most_useful_commands()<cr>
+
+let g:most_useful_commands
+    \ = ['terminal']
+    \ + ['tabnew']
+    \ + ['Diffy -w']
+    \ + ['edit $MYVIMRC']
+    \ + ['edit ~/.vim/colors/xxx.vim']
+    \ + (has('win32') ? ['terminal ++close explorer .'] : [])
+
+function! s:select_most_useful_commands() abort
+    call popup_clear()
+    call popup_menu(g:most_useful_commands, {
+            \ 'callback' : function('s:select_most_useful_commands_callback'),
+            \ })
+endfunction
+
+function! s:select_most_useful_commands_callback(id, result) abort
+    if (0 <= a:result - 1) && (a:result - 1 < len(g:most_useful_commands))
+        execute g:most_useful_commands[(a:result - 1)]
+    endif
+endfunction
+
+let g:close_scratch_define_commands = 0
 
 " https://github.com/rprichard/winpty/releases/
 if has('win32') && has('terminal')
@@ -88,14 +115,6 @@ if has('win32') && has('terminal')
     tnoremap <silent><C-a>       <home>
     tnoremap <silent><C-u>       <esc>
 endif
-
-let g:quickrun_config = get(g:, 'quickrun_config', {})
-let g:quickrun_config['_'] = {
-    \   'runner' : 'terminal',
-    \   'runner/terminal/into' : 1,
-    \ }
-" let g:quickrun_config['_']['hook/output_encode/encoding'] = &encoding
-" let g:quickrun_config['_']['hook/output_encode/encoding'] = &termencoding
 
 syntax on
 filetype plugin indent on
@@ -110,7 +129,6 @@ packloadall!
 augroup vimrc
     autocmd!
     autocmd VimEnter,BufEnter  * :silent! delcommand MANPAGER
-    autocmd FileType        rust :nnoremap <buffer><silent><nowait><space> :<C-u>terminal cargo run<cr>
 augroup END
 
 silent! colorscheme xxx

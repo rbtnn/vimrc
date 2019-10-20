@@ -1,4 +1,9 @@
 
+if has('vimscript-4')
+    scriptversion 4
+else
+    finish
+endif
 scriptencoding utf-8
 
 function! s:bufenter() abort
