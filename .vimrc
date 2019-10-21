@@ -55,7 +55,7 @@ set wildmenu wildmode&
 
 let g:close_scratch_define_commands = 0
 let g:vim_indent_cont = &g:shiftwidth
-let g:mapleader = 's'
+let g:mapleader = '\'
 
 source $DOTVIM/gloaded.vim
 source $DOTVIM/tabsidebar.vim
@@ -76,31 +76,12 @@ endif
 
 inoremap <silent><nowait><tab>       <C-v><tab>
 
-nnoremap <silent><nowait><leader>    <nop>
 nnoremap <silent><nowait><C-j>       :<C-u>cnext<cr>zz
 nnoremap <silent><nowait><C-k>       :<C-u>cprevious<cr>zz
-nnoremap <silent><nowait>x           :<C-u>call close_scratch#exec('')<cr>
-nnoremap <silent><nowait><space>     :<C-u>SingletonTerminal<cr>
+nnoremap <silent><nowait>s           :<C-u>call close_scratch#exec('')<cr>
+nnoremap <silent><nowait><space>     :<C-u>call clever_f#reset()<cr>
 
-command! -bar -nargs=0 QfConv                 :call diffy#sillyiconv#qficonv()
-command! -bar -nargs=0 SingletonTerminal      :call <SID>singleton_terminal()
-
-function! s:singleton_terminal() abort
-    let found = v:false
-    for info in getwininfo()
-        if info.tabnr == tabpagenr()
-            for bnr in term_list()
-                if (info.bufnr == bnr) && (term_getstatus(bnr) != 'finished')
-                    execute printf('%dwincmd w', info.winnr)
-                    let found = v:true
-                endif
-            endfor
-        endif
-    endfor
-    if !found
-        terminal
-    endif
-endfunction
+command! -bar -nargs=0 QfConv        :call diffy#sillyiconv#qficonv()
 
 " https://github.com/rprichard/winpty/releases/
 if has('win32') && has('terminal')
