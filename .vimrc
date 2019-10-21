@@ -6,9 +6,7 @@ else
 endif
 
 set encoding=utf-8
-if exists('&makeencoding')
-    set makeencoding=char
-endif
+set makeencoding=char
 scriptencoding utf-8
 
 set winaltkeys=yes guioptions=mM
@@ -18,9 +16,6 @@ let $VIMTEMP = expand('$DOTVIM/temp')
 
 set packpath=$DOTVIM
 set runtimepath+=$DOTVIM
-
-let g:vim_indent_cont = &g:shiftwidth
-let g:mapleader = 's'
 
 set autoread
 set background=dark
@@ -57,6 +52,10 @@ set visualbell noerrorbells t_vb=
 set wildignore&
 set wildmenu wildmode&
 
+let g:close_scratch_define_commands = 0
+let g:vim_indent_cont = &g:shiftwidth
+let g:mapleader = 's'
+
 source $DOTVIM/gloaded.vim
 source $DOTVIM/tabsidebar.vim
 source $DOTVIM/clpum.vim
@@ -80,30 +79,24 @@ nnoremap <silent><nowait><leader>    <nop>
 nnoremap <silent><nowait><C-j>       :<C-u>cnext<cr>zz
 nnoremap <silent><nowait><C-k>       :<C-u>cprevious<cr>zz
 nnoremap <silent><nowait>q           :<C-u>call close_scratch#exec('')<cr>
-nnoremap <silent><nowait><space>     :<C-u>call <SID>select_most_useful_commands()<cr>
+nnoremap <silent><nowait><space>     :<C-u>call <SID>terminal()<cr>
 
-let g:most_useful_commands
-    \ = ['terminal']
-    \ + ['tabnew']
-    \ + ['Diffy -w']
-    \ + ['edit $MYVIMRC']
-    \ + ['edit ~/.vim/colors/xxx.vim']
-    \ + (has('win32') ? ['terminal ++close explorer .'] : [])
-
-function! s:select_most_useful_commands() abort
-    call popup_clear()
-    call popup_menu(g:most_useful_commands, {
-            \ 'callback' : function('s:select_most_useful_commands_callback'),
-            \ })
-endfunction
-
-function! s:select_most_useful_commands_callback(id, result) abort
-    if (0 <= a:result - 1) && (a:result - 1 < len(g:most_useful_commands))
-        execute g:most_useful_commands[(a:result - 1)]
+function! s:terminal() abort
+    let found = v:false
+    for info in getwininfo()
+        if info.tabnr == tabpagenr()
+            for t in term_list()
+                if info.bufnr == t
+                    execute printf('%dwincmd w', info.winnr)
+                    let found = v:true
+                endif
+            endfor
+        endif
+    endfor
+    if !found
+        terminal
     endif
 endfunction
-
-let g:close_scratch_define_commands = 0
 
 " https://github.com/rprichard/winpty/releases/
 if has('win32') && has('terminal')
