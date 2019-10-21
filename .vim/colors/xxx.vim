@@ -25,7 +25,7 @@ highlight Normal             gui=NONE           guifg=#e0e0e0 guibg=#100a10
 highlight EndOfBuffer        gui=NONE           guifg=#201a20 guibg=#100a10
 
 highlight Pmenu              gui=NONE           guifg=#555555 guibg=#201a20
-highlight PmenuSel           gui=UNDERLINE      guifg=NONE    guibg=#201a20
+highlight PmenuSel           gui=UNDERLINE      guifg=#cccc22 guibg=#201a20
 highlight PmenuSbar          gui=NONE           guifg=NONE    guibg=#1a151a
 highlight PmenuThumb         gui=NONE           guifg=NONE    guibg=#000000
 
@@ -80,7 +80,7 @@ highlight      DiffChange    gui=BOLD           guifg=#993399 guibg=NONE
 highlight      DiffText      gui=BOLD,UNDERLINE guifg=#993399 guibg=NONE
 
 if has('tabsidebar')
-    highlight TabSideBarSel  gui=NONE           guifg=#999999 guibg=#232323
+    highlight TabSideBarSel  gui=NONE           guifg=#cccccc guibg=#232323
     highlight TabSideBar     gui=NONE           guifg=#555555 guibg=#3a3a3a
     highlight TabSideBarFill gui=NONE           guifg=#999999 guibg=#3a3a3a
 endif

@@ -38,6 +38,7 @@ set noignorecase
 set noshellslash completeslash=slash
 set nowrap
 set nowrapscan
+set nrformats=
 set pumheight=10 completeopt=menu
 set ruler rulerformat=%{&fenc}/%{&ff}/%{&ft}
 set scrolloff=0 nonumber norelativenumber
@@ -78,15 +79,18 @@ inoremap <silent><nowait><tab>       <C-v><tab>
 nnoremap <silent><nowait><leader>    <nop>
 nnoremap <silent><nowait><C-j>       :<C-u>cnext<cr>zz
 nnoremap <silent><nowait><C-k>       :<C-u>cprevious<cr>zz
-nnoremap <silent><nowait>q           :<C-u>call close_scratch#exec('')<cr>
-nnoremap <silent><nowait><space>     :<C-u>call <SID>terminal()<cr>
+nnoremap <silent><nowait>x           :<C-u>call close_scratch#exec('')<cr>
+nnoremap <silent><nowait><space>     :<C-u>SingletonTerminal<cr>
 
-function! s:terminal() abort
+command! -bar -nargs=0 QfConv                 :call diffy#sillyiconv#qficonv()
+command! -bar -nargs=0 SingletonTerminal      :call <SID>singleton_terminal()
+
+function! s:singleton_terminal() abort
     let found = v:false
     for info in getwininfo()
         if info.tabnr == tabpagenr()
-            for t in term_list()
-                if info.bufnr == t
+            for bnr in term_list()
+                if (info.bufnr == bnr) && (term_getstatus(bnr) != 'finished')
                     execute printf('%dwincmd w', info.winnr)
                     let found = v:true
                 endif

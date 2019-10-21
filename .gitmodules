@@ -13,3 +13,6 @@
 [submodule ".vim/pack/my/opt/vim-coloredit"]
 	path = .vim/pack/my/opt/vim-coloredit
 	url = https://github.com/rbtnn/vim-coloredit.git
+[submodule ".vim/pack/my/start/vim-ripgrep"]
+	path = .vim/pack/my/start/vim-ripgrep
+	url = https://github.com/jremmen/vim-ripgrep.git
