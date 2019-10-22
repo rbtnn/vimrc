@@ -53,7 +53,6 @@ set visualbell noerrorbells t_vb=
 set wildignore&
 set wildmenu wildmode&
 
-let g:close_scratch_define_commands = 0
 let g:vim_indent_cont = &g:shiftwidth
 let g:mapleader = '\'
 
@@ -78,8 +77,9 @@ inoremap <silent><nowait><tab>       <C-v><tab>
 
 nnoremap <silent><nowait><C-j>       :<C-u>cnext<cr>zz
 nnoremap <silent><nowait><C-k>       :<C-u>cprevious<cr>zz
-nnoremap <silent><nowait>s           :<C-u>call close_scratch#exec('')<cr>
 nnoremap <silent><nowait><space>     :<C-u>call clever_f#reset()<cr>
+
+nnoremap <silent><nowait>s           "_
 
 command! -bar -nargs=0 QfConv        :call diffy#sillyiconv#qficonv()
 
