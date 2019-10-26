@@ -55,6 +55,7 @@ highlight QuickFixLine       gui=NONE           guifg=#666666 guibg=#cccc22
 highlight Search             gui=NONE           guifg=#000000 guibg=#777711
 highlight IncSearch          gui=NONE           guifg=#000000 guibg=#777711
 highlight Cursor             gui=NONE           guifg=#000000 guibg=#ffffff
+highlight CursorIM           gui=NONE           guifg=#000000 guibg=#aa0000
 highlight Visual             gui=NONE           guifg=NONE    guibg=#113311
 
 highlight Comment            gui=NONE           guifg=#888888 guibg=NONE

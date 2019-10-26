@@ -9,7 +9,8 @@ set encoding=utf-8
 set makeencoding=char
 scriptencoding utf-8
 
-set winaltkeys=yes guioptions=mM
+set langmenu=en_gb.latin1
+set winaltkeys=yes guioptions=m
 
 let $DOTVIM = expand('~/.vim')
 let $VIMTEMP = expand('$DOTVIM/temp')
@@ -48,7 +49,7 @@ set showmode
 set showtabline=0
 set tags=./tags;
 set termguicolors
-set title titlestring=Vim%{v:versionlong}(%{getpid()})
+set title titlestring=Vim[%{getpid()}]\ %f
 set visualbell noerrorbells t_vb=
 set wildignore&
 set wildmenu wildmode&
@@ -73,11 +74,9 @@ if has('persistent_undo')
     set undofile undodir=$VIMTEMP/undofiles//
 endif
 
-inoremap <silent><nowait><tab>       <C-v><tab>
-
 nnoremap <silent><nowait><C-j>       :<C-u>cnext<cr>zz
 nnoremap <silent><nowait><C-k>       :<C-u>cprevious<cr>zz
-nnoremap <silent><nowait><space>     :<C-u>call clever_f#reset()<cr>
+nnoremap <silent><nowait><space>     :<C-u>JumpToLine<cr>
 
 nnoremap <silent><nowait>s           "_
 
