@@ -11,11 +11,8 @@
 	path = .vim/pack/my/opt/vim-coloredit
 	url = https://github.com/rbtnn/vim-coloredit.git
 [submodule ".vim/pack/my/start/vim-ripgrep"]
-	path = .vim/pack/my/start/vim-ripgrep
+	path = .vim/pack/my/opt/vim-ripgrep
 	url = https://github.com/jremmen/vim-ripgrep.git
-[submodule ".vim/pack/my/start/clever-f.vim"]
-	path = .vim/pack/my/start/clever-f.vim
-	url = https://github.com/rhysd/clever-f.vim.git
 [submodule ".vim/pack/my/start/vim-jumptoline"]
 	path = .vim/pack/my/start/vim-jumptoline
 	url = https://github.com/rbtnn/vim-jumptoline.git

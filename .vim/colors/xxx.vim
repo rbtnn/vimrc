@@ -21,42 +21,45 @@ endif
 
 let g:colors_name = substitute(fnamemodify(expand('<sfile>'), ':t'), '.vim', '', '')
 
-highlight Normal             gui=NONE           guifg=#e0e0e0 guibg=#100a10
-highlight EndOfBuffer        gui=NONE           guifg=#201a20 guibg=#100a10
+highlight Normal             gui=NONE           guifg=#e0e0e0 guibg=#15202b
+highlight EndOfBuffer        gui=NONE           guifg=#25303b guibg=#15202b
 
-highlight Pmenu              gui=NONE           guifg=#555555 guibg=#201a20
-highlight PmenuSel           gui=UNDERLINE      guifg=#cccc22 guibg=#201a20
+highlight Pmenu              gui=NONE           guifg=#555555 guibg=#05101b
+highlight PmenuSel           gui=UNDERLINE      guifg=#ffffff guibg=#05101b
 highlight PmenuSbar          gui=NONE           guifg=NONE    guibg=#1a151a
 highlight PmenuThumb         gui=NONE           guifg=NONE    guibg=#000000
 
 highlight ErrorMsg           gui=NONE           guifg=#ff0000 guibg=NONE
 highlight WarningMsg         gui=NONE           guifg=#ffff00 guibg=NONE
 
-highlight WildMenu           gui=NONE           guifg=#ffffff guibg=#3a3a3a
-highlight TabLineSel         gui=NONE           guifg=#ffffff guibg=#3a3a3a
-highlight TabLine            gui=NONE           guifg=#666666 guibg=#3a3a3a
-highlight TabLineFill        gui=NONE           guifg=#666666 guibg=#3a3a3a
-highlight StatusLine         gui=NONE           guifg=#999999 guibg=#3a3a3a
-highlight StatusLineTerm     gui=NONE           guifg=#999999 guibg=#3a3a3a
-highlight StatusLineNC       gui=NONE           guifg=#555555 guibg=#3a3a3a
-highlight StatusLineTermNC   gui=NONE           guifg=#555555 guibg=#3a3a3a
-highlight VertSplit          gui=NONE           guifg=#3a3a3a guibg=#3a3a3a
+highlight TabLineSel         gui=NONE           guifg=#ffffff guibg=#05101b
+highlight TabLine            gui=NONE           guifg=#666666 guibg=#05101b
+highlight TabLineFill        gui=NONE           guifg=#666666 guibg=#05101b
 
-highlight ColorColumn        gui=NONE           guifg=NONE    guibg=#f7f7f7
-highlight CursorLine         gui=NONE           guifg=NONE    guibg=#f7f7f7
-highlight CursorColumn       gui=NONE           guifg=NONE    guibg=#f7f7f7
+highlight WildMenu           gui=NONE           guifg=#ffffff guibg=#1c2732
+highlight StatusLine         gui=NONE           guifg=#999999 guibg=#1c2732
+highlight StatusLineTerm     gui=NONE           guifg=#999999 guibg=#1c2732
+highlight StatusLineNC       gui=NONE           guifg=#555555 guibg=#1c2732
+highlight StatusLineTermNC   gui=NONE           guifg=#555555 guibg=#1c2732
+highlight VertSplit          gui=NONE           guifg=#1c2732 guibg=#1c2732
+
+highlight ColorColumn        gui=NONE           guifg=NONE    guibg=#25303b
+highlight CursorColumn       gui=NONE           guifg=NONE    guibg=#25303b
+highlight CursorLine         gui=NONE           guifg=NONE    guibg=#25303b
+highlight Visual             gui=NONE           guifg=NONE    guibg=#25303b
 
 highlight Folded             gui=UNDERLINE      guifg=#555555 guibg=NONE
-highlight FoldColumn         gui=NONE           guifg=#777777 guibg=#181818
+highlight FoldColumn         gui=NONE           guifg=#1c2732 guibg=#1c2732
 highlight LineNr             gui=NONE           guifg=#555555 guibg=#181818
 highlight CursorLineNr       gui=NONE           guifg=#666666 guibg=#181818
 
-highlight QuickFixLine       gui=NONE           guifg=#666666 guibg=#cccc22
-highlight Search             gui=NONE           guifg=#000000 guibg=#777711
-highlight IncSearch          gui=NONE           guifg=#000000 guibg=#777711
+highlight MatchParen         gui=UNDERLINE,BOLD guifg=NONE    guibg=NONE
+highlight QuickFixLine       gui=UNDERLINE,BOLD guifg=NONE    guibg=NONE
+highlight Search             gui=UNDERLINE,BOLD guifg=NONE    guibg=NONE
+highlight IncSearch          gui=UNDERLINE,BOLD guifg=#ffffff guibg=NONE
+
 highlight Cursor             gui=NONE           guifg=#000000 guibg=#ffffff
 highlight CursorIM           gui=NONE           guifg=#000000 guibg=#aa0000
-highlight Visual             gui=NONE           guifg=NONE    guibg=#113311
 
 highlight Comment            gui=NONE           guifg=#888888 guibg=NONE
 highlight SpecialKey         gui=NONE           guifg=#aa44aa guibg=NONE
@@ -73,17 +76,16 @@ highlight PreProc            gui=NONE           guifg=#44cccc guibg=NONE
 highlight String             gui=NONE           guifg=#55bb55 guibg=NONE
 highlight Constant           gui=NONE           guifg=#8888d9 guibg=NONE
 
-highlight MatchParen         gui=UNDERLINE      guifg=NONE    guibg=NONE
-
 highlight link Identifier    DiffAdd
 highlight link Special       DiffDelete
 highlight      DiffChange    gui=BOLD           guifg=#993399 guibg=NONE
 highlight      DiffText      gui=BOLD,UNDERLINE guifg=#993399 guibg=NONE
 
 if has('tabsidebar')
-    highlight TabSideBarSel  gui=NONE           guifg=#cccccc guibg=#232323
-    highlight TabSideBar     gui=NONE           guifg=#555555 guibg=#3a3a3a
-    highlight TabSideBarFill gui=NONE           guifg=#999999 guibg=#3a3a3a
+    highlight TabSideBarTitle gui=NONE           guifg=#008888 guibg=#141f2a
+    highlight TabSideBarSel   gui=NONE           guifg=#ffffff guibg=#141f2a
+    highlight TabSideBar      gui=NONE           guifg=#555555 guibg=#141f2a
+    highlight TabSideBarFill  gui=NONE           guifg=#141f2a guibg=#141f2a
 endif
 
 if v:false

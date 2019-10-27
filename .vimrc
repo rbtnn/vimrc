@@ -18,6 +18,7 @@ let $VIMTEMP = expand('$DOTVIM/temp')
 set packpath=$DOTVIM
 set runtimepath+=$DOTVIM
 
+set ambiwidth=double
 set autoread
 set background=dark
 set clipboard=unnamed
@@ -26,7 +27,7 @@ set display=lastline
 set expandtab shiftround softtabstop=-1 shiftwidth=4 tabstop=4
 set fileencodings=utf-8,cp932,euc-jp,default,latin
 set fileformats=unix,dos,mac
-set foldcolumn=0 foldlevelstart=99 foldmethod=indent
+set foldcolumn=1 foldlevelstart=99 foldmethod=indent
 set grepprg=internal
 set incsearch hlsearch
 set keywordprg=:help
@@ -49,7 +50,7 @@ set showmode
 set showtabline=0
 set tags=./tags;
 set termguicolors
-set title titlestring=Vim[%{getpid()}]\ %f
+set title titlestring=%{bufname()}\ (L%l)\ -\ %{v:progname}[%{getpid()}]
 set visualbell noerrorbells t_vb=
 set wildignore&
 set wildmenu wildmode&
