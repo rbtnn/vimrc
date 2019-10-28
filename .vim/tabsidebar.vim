@@ -10,7 +10,7 @@ if has('tabsidebar')
     function! Tabsidebar() abort
         try
             let lines = []
-            let lines += [printf('%%#%s#-TabPage %d-', 'TabSideBarTitle', g:actual_curtabpage)]
+            let lines += [printf('%%#%s#TabPage %d', 'TabSideBarTitle', g:actual_curtabpage)]
             for x in getwininfo()
                 if x.tabnr == g:actual_curtabpage
                     let iscurr = (winnr() == x.winnr) && (g:actual_curtabpage == tabpagenr())
@@ -39,7 +39,7 @@ if has('tabsidebar')
                             let s = name
                         endif
                     endif
-                    let lines += [printf(' %%#%s#%s%s', (iscurr ? 'TabSideBarSel' : 'TabSideBar'), (iscurr ? '▶' : '  '), s)]
+                    let lines += [printf('%%#%s# %s%s', (iscurr ? 'TabSideBarSel' : 'TabSideBar'), (iscurr ? '▶' : '  '), s)]
                 endif
             endfor
             return join(lines, "\n")
@@ -50,12 +50,12 @@ if has('tabsidebar')
     augroup tabsidebar
         autocmd!
         autocmd VimEnter,VimResized *
-                \ :if 10 < &columns / 8
+                \ :let &tabsidebarcolumns = 24
+                \ |if &tabsidebarcolumns * 4 < &columns
                 \ |  set showtabsidebar=2
                 \ |  set notabsidebaralign
                 \ |  set notabsidebarwrap
                 \ |  set tabsidebar=%!Tabsidebar()
-                \ |  let &tabsidebarcolumns = &columns / 8
                 \ |else
                 \ |  set showtabsidebar=0
                 \ |endif
