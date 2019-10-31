@@ -35,5 +35,5 @@ syntax match   ukeComma   ',' contained
 
 highlight link ukeID       Identifier
 highlight link ukeID_RE    Special
-highlight link ukeComma    SpecialKey
+highlight link ukeComma    NonText
 

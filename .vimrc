@@ -32,13 +32,11 @@ set grepprg=internal
 set incsearch hlsearch
 set keywordprg=:help
 set laststatus=2 statusline&
-set list listchars=tab:\ \ \|
 set matchpairs+=<:>
 set mouse=a
 set nocursorline nocursorcolumn
 set noignorecase
 set noshellslash completeslash=slash
-set nowrap
 set nowrapscan
 set nrformats=
 set pumheight=10 completeopt=menu
@@ -54,6 +52,7 @@ set title titlestring=%{bufname()}\ (L%l)\ -\ %{v:progname}[%{getpid()}]
 set visualbell noerrorbells t_vb=
 set wildignore&
 set wildmenu wildmode&
+set list wrap breakindent showbreak=++++ listchars=tab:\ \ \|
 
 let g:vim_indent_cont = &g:shiftwidth
 let g:mapleader = '\'
@@ -82,6 +81,9 @@ nnoremap <silent><nowait><space>     :<C-u>JumpToLine<cr>
 nnoremap <silent><nowait>s           "_
 
 command! -bar -nargs=0 QfConv        :call diffy#sillyiconv#qficonv()
+
+command! -bar -nargs=0 SessionSave   :mksession! $VIMTEMP/session.vim
+command! -bar -nargs=0 SessionLoad   :source $VIMTEMP/session.vim
 
 " https://github.com/rprichard/winpty/releases/
 if has('win32') && has('terminal')

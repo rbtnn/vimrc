@@ -50,15 +50,17 @@ if has('tabsidebar')
     augroup tabsidebar
         autocmd!
         autocmd VimEnter,VimResized *
-                \ :let &tabsidebarcolumns = 24
-                \ |if &tabsidebarcolumns * 4 < &columns
-                \ |  set showtabsidebar=2
-                \ |  set notabsidebaralign
-                \ |  set notabsidebarwrap
-                \ |  set tabsidebar=%!Tabsidebar()
-                \ |else
-                \ |  set showtabsidebar=0
-                \ |endif
+            \ :let &tabsidebarcolumns = 24
+            \ |if v:servername == 'MINIMAP'
+            \ |  set showtabsidebar=0
+            \ |elseif &tabsidebarcolumns * 4 < &columns
+            \ |  set showtabsidebar=2
+            \ |  set notabsidebaralign
+            \ |  set notabsidebarwrap
+            \ |  set tabsidebar=%!Tabsidebar()
+            \ |else
+            \ |  set showtabsidebar=0
+            \ |endif
     augroup END
 endif
 
