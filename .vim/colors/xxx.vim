@@ -52,13 +52,15 @@ highlight Visual             gui=NONE           guifg=NONE    guibg=#45505b
 highlight Folded             gui=UNDERLINE      guifg=#555555 guibg=NONE
 highlight FoldColumn         gui=NONE           guifg=#20313c guibg=#20313c
 
-highlight              LineNr        gui=NONE           guifg=#555555 guibg=#181818
-highlight              CursorLineNr  gui=NONE           guifg=#666666 guibg=#181818
-highlight default link LineNrAbove   LineNr
-highlight default link LineNrBelow   LineNr
+highlight      LineNr        gui=NONE           guifg=#555555 guibg=#181818
+highlight      CursorLineNr  gui=NONE           guifg=#666666 guibg=#181818
+highlight link LineNrAbove   LineNr
+highlight link LineNrBelow   LineNr
 
-highlight              MatchParen    gui=UNDERLINE,BOLD guifg=#ffff00 guibg=NONE
-highlight default link ParenMatch    MatchParen
+highlight      MatchParen    gui=UNDERLINE,BOLD guifg=#ffff00 guibg=NONE
+
+let g:parenmatch_highlight = 0
+highlight link ParenMatch    MatchParen
 
 highlight QuickFixLine       gui=UNDERLINE,BOLD guifg=NONE    guibg=NONE
 highlight Search             gui=UNDERLINE,BOLD guifg=#ffff00 guibg=NONE
@@ -78,14 +80,14 @@ highlight Title              gui=NONE           guifg=#b6b628 guibg=NONE
 highlight Keyword            gui=NONE           guifg=#b6b628 guibg=NONE
 highlight Type               gui=NONE           guifg=#b6b628 guibg=NONE
 highlight Identifier         gui=NONE           guifg=#55bb55 guibg=NONE
-highlight Special            gui=NONE           guifg=#8888d9 guibg=NONE
+highlight Special            gui=NONE           guifg=#8c8cff guibg=NONE
 highlight Statement          gui=NONE           guifg=#cc44cc guibg=NONE
 highlight PreProc            gui=NONE           guifg=#44cccc guibg=NONE
 highlight String             gui=NONE           guifg=#55bb55 guibg=NONE
-highlight Constant           gui=NONE           guifg=#8888d9 guibg=NONE
+highlight Constant           gui=NONE           guifg=#8c8cff guibg=NONE
 
-highlight default link Identifier    DiffAdd
-highlight default link Special       DiffDelete
+highlight link Identifier    DiffAdd
+highlight link Special       DiffDelete
 highlight              DiffChange    gui=BOLD           guifg=#993399 guibg=NONE
 highlight              DiffText      gui=BOLD,UNDERLINE guifg=#993399 guibg=NONE
 

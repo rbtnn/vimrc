@@ -22,6 +22,7 @@ set ambiwidth=double
 set autoread
 set background=dark
 set clipboard=unnamed
+set cmdheight=3
 set colorcolumn&
 set display=lastline
 set expandtab shiftround softtabstop=-1 shiftwidth=4 tabstop=4
@@ -32,6 +33,7 @@ set grepprg=internal
 set incsearch hlsearch
 set keywordprg=:help
 set laststatus=2 statusline&
+set list wrap breakindent showbreak=++++ listchars=tab:<->
 set matchpairs+=<:>
 set mouse=a
 set nocursorline nocursorcolumn
@@ -52,7 +54,6 @@ set title titlestring=%{bufname()}\ (L%l)\ -\ %{v:progname}[%{getpid()}]
 set visualbell noerrorbells t_vb=
 set wildignore&
 set wildmenu wildmode&
-set list wrap breakindent showbreak=++++ listchars=tab:\ \ \|
 
 let g:vim_indent_cont = &g:shiftwidth
 let g:mapleader = '\'
@@ -77,6 +78,7 @@ endif
 nnoremap <silent><nowait><C-j>       :<C-u>cnext<cr>zz
 nnoremap <silent><nowait><C-k>       :<C-u>cprevious<cr>zz
 nnoremap <silent><nowait><space>     :<C-u>JumpToLine<cr>
+nnoremap <silent><nowait><C-f>       :<C-u>MRU<cr>
 
 nnoremap <silent><nowait>s           "_
 

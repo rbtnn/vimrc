@@ -13,3 +13,6 @@
 [submodule ".vim/pack/my/start/vim-jumptoline"]
 	path = .vim/pack/my/start/vim-jumptoline
 	url = https://github.com/rbtnn/vim-jumptoline.git
+[submodule ".vim/pack/my/start/vim-mru"]
+	path = .vim/pack/my/start/vim-mru
+	url = https://github.com/rbtnn/vim-mru.git
