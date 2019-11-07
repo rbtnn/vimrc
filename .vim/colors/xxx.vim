@@ -21,12 +21,12 @@ endif
 
 let g:colors_name = substitute(fnamemodify(expand('<sfile>'), ':t'), '.vim', '', '')
 
-highlight Normal             gui=NONE           guifg=#e0e0e0 guibg=#2f3a45
+highlight Normal             gui=NONE           guifg=#e0e0e0 guibg=#304b56
 highlight EndOfBuffer        gui=NONE           guifg=#1a2530 guibg=#1a2530
 
-highlight Pmenu              gui=NONE           guifg=#555555 guibg=#0a1520
-highlight PmenuSel           gui=UNDERLINE      guifg=#e0e0e0 guibg=#0a1520
-highlight PmenuSbar          gui=NONE           guifg=NONE    guibg=#0a1520
+highlight Pmenu              gui=NONE           guifg=#555555 guibg=#1a2530
+highlight PmenuSel           gui=UNDERLINE      guifg=#e0e0e0 guibg=#1a2530
+highlight PmenuSbar          gui=NONE           guifg=NONE    guibg=#1a2530
 highlight PmenuThumb         gui=NONE           guifg=NONE    guibg=#eeeeee
 
 highlight TabLine            gui=NONE           guifg=#666666 guibg=#080924
@@ -70,10 +70,10 @@ highlight Cursor             gui=NONE           guifg=#000000 guibg=#e0e0e0
 highlight CursorIM           gui=NONE           guifg=#000000 guibg=#aa0000
 
 highlight Comment            gui=NONE           guifg=#888888 guibg=NONE
-highlight SpecialKey         gui=NONE           guifg=#005533 guibg=NONE
-highlight NonText            gui=NONE           guifg=#005533 guibg=NONE
-highlight Conceal            gui=NONE           guifg=#005533 guibg=NONE
-highlight Ignore             gui=NONE           guifg=#005533 guibg=NONE
+highlight SpecialKey         gui=NONE           guifg=#aa6666 guibg=NONE
+highlight NonText            gui=NONE           guifg=#aa6666 guibg=NONE
+highlight Conceal            gui=NONE           guifg=#aa6666 guibg=NONE
+highlight Ignore             gui=NONE           guifg=#aa6666 guibg=NONE
 
 highlight Directory          gui=NONE           guifg=#b6b628 guibg=NONE
 highlight Title              gui=NONE           guifg=#b6b628 guibg=NONE

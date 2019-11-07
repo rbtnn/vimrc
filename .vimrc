@@ -33,7 +33,7 @@ set grepprg=internal
 set incsearch hlsearch
 set keywordprg=:help
 set laststatus=2 statusline&
-set list wrap breakindent showbreak=++++ listchars=tab:<->
+set nolist wrap breakindent showbreak=\\ listchars=tab:<->
 set matchpairs+=<:>
 set mouse=a
 set nocursorline nocursorcolumn
@@ -50,7 +50,7 @@ set showmode
 set showtabline=0
 set tags=./tags;
 set termguicolors
-set title titlestring=%{bufname()}\ (L%l)\ -\ %{v:progname}[%{getpid()}]
+set title titlestring=%{bufname()}(%l,%c)\ -\ %{v:progname}[%{getpid()}]
 set visualbell noerrorbells t_vb=
 set wildignore&
 set wildmenu wildmode&
