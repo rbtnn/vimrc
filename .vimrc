@@ -80,8 +80,6 @@ nnoremap <silent><nowait><C-k>       :<C-u>cprevious<cr>zz
 nnoremap <silent><nowait><space>     :<C-u>JumpToLine<cr>
 nnoremap <silent><nowait><C-f>       :<C-u>MRU<cr>
 
-nnoremap <silent><nowait>s           "_
-
 command! -bar -nargs=0 QfConv        :call diffy#sillyiconv#qficonv()
 
 command! -bar -nargs=0 SessionSave   :mksession! $VIMTEMP/session.vim

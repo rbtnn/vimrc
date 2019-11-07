@@ -26,6 +26,9 @@
     po=push -u origin
     st=status
     subpull=submodule foreach git pull origin master
+    subst=submodule status
+    subinit=submodule init
+    subup=submodule update
 
 [color]
     diff = true
