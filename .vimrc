@@ -15,7 +15,6 @@ set winaltkeys=yes guioptions=m
 let $DOTVIM = expand('~/.vim')
 let $VIMTEMP = expand('$DOTVIM/temp')
 
-set packpath=$DOTVIM
 set runtimepath+=$DOTVIM
 
 set ambiwidth=double
@@ -96,6 +95,15 @@ if has('win32') && has('terminal')
     tnoremap <silent><C-u>       <esc>
 endif
 
+call plug#begin('$VIMTEMP/plugged')
+Plug 'itchyny/vim-parenmatch'
+Plug 'thinca/vim-qfreplace'
+Plug 'rbtnn/vim-coloredit'
+Plug 'rbtnn/vim-diffy'
+Plug 'rbtnn/vim-jumptoline'
+Plug 'rbtnn/vim-mru'
+call plug#end()
+
 syntax on
 filetype plugin indent on
 set secure
@@ -103,8 +111,6 @@ set secure
 if filereadable(expand('~/.vimrc.local'))
     source ~/.vimrc.local
 endif
-
-packloadall!
 
 augroup vimrc
     autocmd!
