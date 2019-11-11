@@ -95,6 +95,8 @@ if has('win32') && has('terminal')
     tnoremap <silent><C-u>       <esc>
 endif
 
+let g:plug_window = 'tabnew'
+
 call plug#begin('$VIMTEMP/plugged')
 Plug 'itchyny/vim-parenmatch'
 Plug 'thinca/vim-qfreplace'
