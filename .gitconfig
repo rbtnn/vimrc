@@ -7,7 +7,7 @@
   email = naru123456789@gmail.com
 
 [http]
-    sslVerify = false
+	sslverify = false
 
 [core]
     autocrlf = false
