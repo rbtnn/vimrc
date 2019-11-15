@@ -32,7 +32,7 @@ set grepprg=internal
 set incsearch hlsearch
 set keywordprg=:help
 set laststatus=2 statusline&
-set nolist wrap breakindent showbreak=\\ listchars=tab:<->
+set nolist nowrap breakindent showbreak=\\ listchars=tab:<->
 set matchpairs+=<:>
 set mouse=a
 set nocursorline nocursorcolumn
