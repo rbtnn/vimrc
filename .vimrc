@@ -79,7 +79,13 @@ nnoremap <silent><nowait><C-k>       :<C-u>cprevious<cr>zz
 nnoremap <silent><nowait><space>     :<C-u>JumpToLine<cr>
 nnoremap <silent><nowait><C-f>       :<C-u>MRU<cr>
 
+map      <silent><nowait>s           <Plug>(operator-replace)
+
 command! -bar -nargs=0 QfConv        :call diffy#sillyiconv#qficonv()
+
+if has('win32')
+    command! -bar -nargs=0 Explorer  :!start explorer .
+endif
 
 command! -bar -nargs=0 SessionSave   :mksession! $VIMTEMP/session.vim
 command! -bar -nargs=0 SessionLoad   :source $VIMTEMP/session.vim
@@ -95,15 +101,17 @@ if has('win32') && has('terminal')
     tnoremap <silent><C-u>       <esc>
 endif
 
-let g:plug_window = 'tabnew'
-
 call plug#begin('$VIMTEMP/plugged')
 Plug 'itchyny/vim-parenmatch'
-Plug 'thinca/vim-qfreplace'
+Plug 'kana/vim-operator-replace'
+Plug 'kana/vim-operator-user'
+Plug 'kana/vim-textobj-user'
 Plug 'rbtnn/vim-coloredit'
 Plug 'rbtnn/vim-diffy'
 Plug 'rbtnn/vim-jumptoline'
 Plug 'rbtnn/vim-mru'
+Plug 'sgur/vim-textobj-parameter'
+Plug 'thinca/vim-qfreplace'
 call plug#end()
 
 syntax on

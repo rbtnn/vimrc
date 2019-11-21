@@ -10,7 +10,9 @@ if has('tabsidebar')
     function! Tabsidebar() abort
         try
             let lines = []
-            let lines += [printf('%%#%s#TabPage %d', 'TabSideBarTitle', g:actual_curtabpage)]
+            let lines += [printf('%%#%s#TabPage %d',
+                \ ((g:actual_curtabpage == tabpagenr()) ? 'TabSideBarTitleSel' : 'TabSideBarTitle'),
+                \ g:actual_curtabpage)]
             for x in getwininfo()
                 if x.tabnr == g:actual_curtabpage
                     let iscurr = (winnr() == x.winnr) && (g:actual_curtabpage == tabpagenr())

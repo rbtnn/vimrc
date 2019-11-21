@@ -47,7 +47,7 @@ highlight VertSplit          gui=NONE           guifg=#080924 guibg=#080924
 highlight ColorColumn        gui=NONE           guifg=NONE    guibg=#25303b
 highlight CursorColumn       gui=NONE           guifg=NONE    guibg=#25303b
 highlight CursorLine         gui=NONE           guifg=NONE    guibg=#25303b
-highlight Visual             gui=NONE           guifg=NONE    guibg=#55606b
+highlight Visual             gui=NONE           guifg=NONE    guibg=#75808b
 
 highlight Folded             gui=UNDERLINE      guifg=#555555 guibg=NONE
 highlight FoldColumn         gui=NONE           guifg=#20313c guibg=#20313c
@@ -92,10 +92,11 @@ highlight              DiffChange    gui=BOLD           guifg=#993399 guibg=NONE
 highlight              DiffText      gui=BOLD,UNDERLINE guifg=#993399 guibg=NONE
 
 if has('tabsidebar')
-    highlight TabSideBarTitle gui=BOLD      guifg=#e0e0e0 guibg=#007777
-    highlight TabSideBarSel   gui=NONE      guifg=#e0e0e0 guibg=#080924
-    highlight TabSideBar      gui=NONE      guifg=#888888 guibg=#080924
-    highlight TabSideBarFill  gui=NONE      guifg=#080924 guibg=#080924
+    highlight TabSideBarTitle    gui=NONE      guifg=#a0a0a0 guibg=#004444
+    highlight TabSideBarTitleSel gui=BOLD      guifg=#e0e0e0 guibg=#007777
+    highlight TabSideBarSel      gui=NONE      guifg=#e0e0e0 guibg=#080924
+    highlight TabSideBar         gui=NONE      guifg=#888888 guibg=#080924
+    highlight TabSideBarFill     gui=NONE      guifg=#080924 guibg=#080924
 endif
 
 if v:false
