@@ -46,7 +46,7 @@ set scrolloff=0 nonumber norelativenumber
 set sessionoptions=buffers,curdir,tabpages
 set shortmess& shortmess+=I shortmess-=S
 set showmode
-set showtabline=0
+set showtabline=2 tabline=%#TabLine#[CurrentWorkingDirectory]\ %{getcwd(-1,tabpagenr())}
 set tags=./tags;
 set termguicolors
 set title titlestring=%{bufname()}(%l,%c)\ -\ %{v:progname}[%{getpid()}]
@@ -84,7 +84,7 @@ map      <silent><nowait>s           <Plug>(operator-replace)
 command! -bar -nargs=0 QfConv        :call diffy#sillyiconv#qficonv()
 
 if has('win32')
-    command! -bar -nargs=0 Explorer  :!start explorer .
+    command! -complete=file -nargs=* Explorer  :silent! execute printf('!start explorer %s', (empty(<q-args>) ? '.' : <q-args>))
 endif
 
 command! -bar -nargs=0 SessionSave   :mksession! $VIMTEMP/session.vim

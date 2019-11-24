@@ -21,28 +21,28 @@ endif
 
 let g:colors_name = substitute(fnamemodify(expand('<sfile>'), ':t'), '.vim', '', '')
 
-highlight Normal             gui=NONE           guifg=#e0e0e0 guibg=#304b56
-highlight EndOfBuffer        gui=NONE           guifg=#304b56 guibg=#304b56
+highlight Normal             gui=NONE           guifg=#e0e0e0 guibg=#203b46
+highlight EndOfBuffer        gui=NONE           guifg=#304b56 guibg=#203b46
 
 highlight Pmenu              gui=NONE           guifg=#555555 guibg=#1a2530
 highlight PmenuSel           gui=UNDERLINE      guifg=#e0e0e0 guibg=#1a2530
 highlight PmenuSbar          gui=NONE           guifg=NONE    guibg=#1a2530
 highlight PmenuThumb         gui=NONE           guifg=NONE    guibg=#eeeeee
 
-highlight TabLine            gui=NONE           guifg=#666666 guibg=#080924
-highlight TabLineSel         gui=UNDERLINE      guifg=#e0e0e0 guibg=#080924
-highlight TabLineFill        gui=NONE           guifg=#666666 guibg=#080924
+highlight TabLine            gui=NONE           guifg=#e0e0e0 guibg=#000000
+highlight TabLineSel         gui=UNDERLINE      guifg=#e0e0e0 guibg=#000000
+highlight TabLineFill        gui=NONE           guifg=#e0e0e0 guibg=#000000
+
+highlight StatusLine         gui=NONE           guifg=#e0e0e0 guibg=#000000
+highlight StatusLineTerm     gui=NONE           guifg=#e0e0e0 guibg=#000000
+highlight StatusLineNC       gui=NONE           guifg=#555555 guibg=#000000
+highlight StatusLineTermNC   gui=NONE           guifg=#555555 guibg=#000000
+highlight VertSplit          gui=NONE           guifg=#080924 guibg=#000000
 
 highlight WildMenu           gui=UNDERLINE      guifg=#e0e0e0 guibg=#080924
 
 highlight ErrorMsg           gui=NONE           guifg=#ff0000 guibg=NONE
 highlight WarningMsg         gui=NONE           guifg=#ffff00 guibg=NONE
-
-highlight StatusLine         gui=NONE           guifg=#999999 guibg=#080924
-highlight StatusLineTerm     gui=NONE           guifg=#999999 guibg=#080924
-highlight StatusLineNC       gui=NONE           guifg=#555555 guibg=#080924
-highlight StatusLineTermNC   gui=NONE           guifg=#555555 guibg=#080924
-highlight VertSplit          gui=NONE           guifg=#080924 guibg=#080924
 
 highlight ColorColumn        gui=NONE           guifg=NONE    guibg=#25303b
 highlight CursorColumn       gui=NONE           guifg=NONE    guibg=#25303b
