@@ -16,7 +16,7 @@ function! s:bufenter() abort
     endif
     if &filetype == 'vb'
         syntax keyword vbKeyword ReadOnly Protected Imports Module Try Catch Overrides Overridable Throw Partial
-        syntax keyword vbKeyword Shared Class Finally Using Continue Of Inherits Default Region Structure
+        syntax keyword vbKeyword Shared Class Finally Using Continue Of Inherits Default Region Structure AndAlso OrElse
     endif
 endfunction
 

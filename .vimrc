@@ -46,7 +46,7 @@ set scrolloff=0 nonumber norelativenumber
 set sessionoptions=buffers,curdir,tabpages
 set shortmess& shortmess+=I shortmess-=S
 set showmode
-set showtabline=2 tabline=%#TabLine#[CurrentWorkingDirectory]\ %{getcwd(-1,tabpagenr())}
+set showtabline=0 tabline&
 set tags=./tags;
 set termguicolors
 set title titlestring=%{bufname()}(%l,%c)\ -\ %{v:progname}[%{getpid()}]
@@ -102,7 +102,6 @@ if has('win32') && has('terminal')
 endif
 
 call plug#begin('$VIMTEMP/plugged')
-Plug 'itchyny/vim-parenmatch'
 Plug 'kana/vim-operator-replace'
 Plug 'kana/vim-operator-user'
 Plug 'kana/vim-textobj-user'
@@ -111,6 +110,7 @@ Plug 'rbtnn/vim-diffy'
 Plug 'rbtnn/vim-jumptoline'
 Plug 'rbtnn/vim-mru'
 Plug 'sgur/vim-textobj-parameter'
+Plug 'thinca/vim-prettyprint'
 Plug 'thinca/vim-qfreplace'
 call plug#end()
 

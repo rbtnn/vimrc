@@ -29,15 +29,15 @@ highlight PmenuSel           gui=UNDERLINE      guifg=#e0e0e0 guibg=#1a2530
 highlight PmenuSbar          gui=NONE           guifg=NONE    guibg=#1a2530
 highlight PmenuThumb         gui=NONE           guifg=NONE    guibg=#eeeeee
 
-highlight TabLine            gui=NONE           guifg=#e0e0e0 guibg=#000000
-highlight TabLineSel         gui=UNDERLINE      guifg=#e0e0e0 guibg=#000000
-highlight TabLineFill        gui=NONE           guifg=#e0e0e0 guibg=#000000
+highlight TabLine            gui=NONE           guifg=#565666 guibg=#000000
+highlight TabLineSel         gui=UNDERLINE      guifg=#565666 guibg=#000000
+highlight TabLineFill        gui=NONE           guifg=#565666 guibg=#000000
 
-highlight StatusLine         gui=NONE           guifg=#e0e0e0 guibg=#000000
-highlight StatusLineTerm     gui=NONE           guifg=#e0e0e0 guibg=#000000
-highlight StatusLineNC       gui=NONE           guifg=#555555 guibg=#000000
-highlight StatusLineTermNC   gui=NONE           guifg=#555555 guibg=#000000
-highlight VertSplit          gui=NONE           guifg=#080924 guibg=#000000
+highlight StatusLine         gui=NONE           guifg=#565666 guibg=#000000
+highlight StatusLineTerm     gui=NONE           guifg=#565666 guibg=#000000
+highlight StatusLineNC       gui=NONE           guifg=#555565 guibg=#000000
+highlight StatusLineTermNC   gui=NONE           guifg=#555565 guibg=#000000
+highlight VertSplit          gui=NONE           guifg=#000000 guibg=#000000
 
 highlight WildMenu           gui=UNDERLINE      guifg=#e0e0e0 guibg=#080924
 
@@ -92,11 +92,11 @@ highlight              DiffChange    gui=BOLD           guifg=#993399 guibg=NONE
 highlight              DiffText      gui=BOLD,UNDERLINE guifg=#993399 guibg=NONE
 
 if has('tabsidebar')
-    highlight TabSideBarTitle    gui=NONE      guifg=#a0a0a0 guibg=#004444
-    highlight TabSideBarTitleSel gui=BOLD      guifg=#e0e0e0 guibg=#007777
-    highlight TabSideBarSel      gui=NONE      guifg=#e0e0e0 guibg=#080924
-    highlight TabSideBar         gui=NONE      guifg=#888888 guibg=#080924
-    highlight TabSideBarFill     gui=NONE      guifg=#080924 guibg=#080924
+    highlight TabSideBarTitleSel gui=BOLD           guifg=#e0e0e0 guibg=#007777
+    highlight TabSideBarTitle    gui=NONE           guifg=#a0a0a0 guibg=#004444
+    highlight TabSideBarSel      gui=NONE           guifg=#e0e0e0 guibg=#40415c
+    highlight TabSideBar         gui=NONE           guifg=#888888 guibg=#40415c
+    highlight TabSideBarFill     gui=NONE           guifg=#000000 guibg=#000000
 endif
 
 if v:false
