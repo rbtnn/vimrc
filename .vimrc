@@ -32,7 +32,7 @@ set grepprg=internal
 set incsearch hlsearch
 set keywordprg=:help
 set laststatus=2 statusline&
-set nolist nowrap breakindent showbreak=\\ listchars=tab:<->
+set list nowrap breakindent showbreak=\\ listchars=tab:<->
 set matchpairs+=<:>
 set mouse=a
 set nocursorline nocursorcolumn
@@ -109,6 +109,7 @@ Plug 'rbtnn/vim-coloredit'
 Plug 'rbtnn/vim-diffy'
 Plug 'rbtnn/vim-jumptoline'
 Plug 'rbtnn/vim-mru'
+Plug 'rbtnn/vim-tagfunc-for-vimscript'
 Plug 'sgur/vim-textobj-parameter'
 Plug 'thinca/vim-prettyprint'
 Plug 'thinca/vim-qfreplace'
