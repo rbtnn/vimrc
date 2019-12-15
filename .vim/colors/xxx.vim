@@ -24,9 +24,9 @@ let g:colors_name = substitute(fnamemodify(expand('<sfile>'), ':t'), '.vim', '',
 highlight Normal             gui=NONE           guifg=#e0e0e0 guibg=#203b46
 highlight EndOfBuffer        gui=NONE           guifg=#304b56 guibg=#203b46
 
-highlight Pmenu              gui=NONE           guifg=#555555 guibg=#1a2530
-highlight PmenuSel           gui=UNDERLINE      guifg=#e0e0e0 guibg=#1a2530
-highlight PmenuSbar          gui=NONE           guifg=NONE    guibg=#1a2530
+highlight Pmenu              gui=NONE           guifg=#555555 guibg=#122127
+highlight PmenuSel           gui=UNDERLINE      guifg=#e0e0e0 guibg=#122127
+highlight PmenuSbar          gui=NONE           guifg=NONE    guibg=#122127
 highlight PmenuThumb         gui=NONE           guifg=NONE    guibg=#eeeeee
 
 highlight TabLine            gui=NONE           guifg=#565666 guibg=#000000
@@ -52,15 +52,12 @@ highlight Visual             gui=NONE           guifg=NONE    guibg=#75808b
 highlight Folded             gui=UNDERLINE      guifg=#555555 guibg=NONE
 highlight FoldColumn         gui=NONE           guifg=#20313c guibg=#20313c
 
-highlight      LineNr        gui=NONE           guifg=#555555 guibg=#181818
+highlight      LineNr        gui=NONE           guifg=#565666 guibg=#000000
 highlight      CursorLineNr  gui=NONE           guifg=#666666 guibg=#181818
 highlight link LineNrAbove   LineNr
 highlight link LineNrBelow   LineNr
 
 highlight      MatchParen    gui=UNDERLINE,BOLD guifg=#ffff00 guibg=NONE
-
-let g:parenmatch_highlight = 0
-highlight link ParenMatch    MatchParen
 
 highlight QuickFixLine       gui=UNDERLINE,BOLD guifg=NONE    guibg=NONE
 highlight Search             gui=UNDERLINE,BOLD guifg=#ffff00 guibg=NONE

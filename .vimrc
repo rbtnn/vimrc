@@ -21,8 +21,6 @@ set ambiwidth=double
 set autoread
 set background=dark
 set clipboard=unnamed
-set cmdheight=3
-set colorcolumn&
 set display=lastline
 set expandtab shiftround softtabstop=-1 shiftwidth=4 tabstop=4
 set fileencodings=utf-8,cp932,euc-jp,default,latin
@@ -32,7 +30,7 @@ set grepprg=internal
 set incsearch hlsearch
 set keywordprg=:help
 set laststatus=2 statusline&
-set list nowrap breakindent showbreak=\\ listchars=tab:<->
+set list nowrap breakindent& showbreak& listchars=tab:<->
 set matchpairs+=<:>
 set mouse=a
 set nocursorline nocursorcolumn
@@ -49,9 +47,9 @@ set showmode
 set showtabline=0 tabline&
 set tags=./tags;
 set termguicolors
-set title titlestring=%{bufname()}(%l,%c)\ -\ %{v:progname}[%{getpid()}]
+set title titlestring=%{bufname()}\ -\ %{v:progname}[%{getpid()}]
 set visualbell noerrorbells t_vb=
-set wildignore&
+set wildignore=*.pdb,*.obj,*.dll,*.exe,*.dump
 set wildmenu wildmode&
 
 let g:vim_indent_cont = &g:shiftwidth
@@ -84,7 +82,7 @@ map      <silent><nowait>s           <Plug>(operator-replace)
 command! -bar -nargs=0 QfConv        :call diffy#sillyiconv#qficonv()
 
 if has('win32')
-    command! -complete=file -nargs=* Explorer  :silent! execute printf('!start explorer %s', (empty(<q-args>) ? '.' : <q-args>))
+    command! -complete=file -nargs=* WinExplorer  :silent! execute printf('!start explorer %s', (empty(<q-args>) ? '.' : <q-args>))
 endif
 
 command! -bar -nargs=0 SessionSave   :mksession! $VIMTEMP/session.vim

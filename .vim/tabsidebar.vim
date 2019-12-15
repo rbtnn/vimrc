@@ -41,7 +41,7 @@ if has('tabsidebar')
                             let s = name
                         endif
                     endif
-                    let lines += [printf('%%#%s# %s%s', (iscurr ? 'TabSideBarSel' : 'TabSideBar'), (iscurr ? '▶' : '  '), s)]
+                    let lines += [printf('%%#%s# %s %s', (iscurr ? 'TabSideBarSel' : 'TabSideBar'), (iscurr ? '*' : ' '), s)]
                 endif
             endfor
             return join(lines, "\n")
