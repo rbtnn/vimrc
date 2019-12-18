@@ -55,6 +55,8 @@ set wildmenu wildmode&
 let g:vim_indent_cont = &g:shiftwidth
 let g:mapleader = '\'
 
+let g:vimbuild_cwd = '~/Desktop/vim/src'
+
 source $DOTVIM/gloaded.vim
 source $DOTVIM/tabsidebar.vim
 source $DOTVIM/clpum.vim
@@ -108,6 +110,7 @@ Plug 'rbtnn/vim-diffy'
 Plug 'rbtnn/vim-jumptoline'
 Plug 'rbtnn/vim-mru'
 Plug 'rbtnn/vim-tagfunc-for-vimscript'
+Plug 'rbtnn/vim-vimbuild'
 Plug 'sgur/vim-textobj-parameter'
 Plug 'thinca/vim-prettyprint'
 Plug 'thinca/vim-qfreplace'
@@ -124,6 +127,7 @@ endif
 augroup vimrc
     autocmd!
     autocmd VimEnter,BufEnter  * :silent! delcommand MANPAGER
+    autocmd VimEnter,BufEnter  * :silent! delcommand VimFoldh
 augroup END
 
 silent! colorscheme xxx
