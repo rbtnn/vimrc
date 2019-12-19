@@ -5,7 +5,11 @@ else
     finish
 endif
 
-set encoding=utf-8
+if has('win32')
+    set encoding=cp932
+else
+    set encoding=utf-8
+endif
 set makeencoding=char
 scriptencoding utf-8
 
@@ -56,6 +60,7 @@ let g:vim_indent_cont = &g:shiftwidth
 let g:mapleader = '\'
 
 let g:vimbuild_cwd = '~/Desktop/vim/src'
+let g:vimbuild_buildargs = 'COLOR_EMOJI=yes OLE=yes DYNAMIC_IME=yes IME=yes GIME=yes DEBUG=no ICONV=yes'
 
 source $DOTVIM/gloaded.vim
 source $DOTVIM/tabsidebar.vim
