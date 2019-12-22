@@ -16,10 +16,11 @@ scriptencoding utf-8
 set langmenu=en_gb.latin1
 set winaltkeys=yes guioptions=m
 
-let $DOTVIM = expand('~/.vim')
-let $VIMTEMP = expand('$DOTVIM/temp')
+let $VIMRC_ROOT = expand('<sfile>:h') 
+let $VIMRC_DOTVIM = expand('$VIMRC_ROOT/.vim')
+let $VIMRC_TEMP = expand('$VIMRC_DOTVIM/temp')
 
-set runtimepath+=$DOTVIM
+set runtimepath+=$VIMRC_DOTVIM
 
 set ambiwidth=double
 set autoread
@@ -53,30 +54,30 @@ set tags=./tags;
 set termguicolors
 set title titlestring=%{bufname()}\ -\ %{v:progname}[%{getpid()}]
 set visualbell noerrorbells t_vb=
-set wildignore=*.pdb,*.obj,*.dll,*.exe,*.dump
+set wildignore=*.pdb,*.obj,*.dll,*.exe
 set wildmenu wildmode&
 
 let g:vim_indent_cont = &g:shiftwidth
 let g:mapleader = '\'
 
-let g:vimbuild_cwd = '~/Desktop/vim/src'
+let g:vimbuild_cwd = '$VIMRC_ROOT/Desktop/vim/src'
 let g:vimbuild_buildargs = 'COLOR_EMOJI=yes OLE=yes DYNAMIC_IME=yes IME=yes GIME=yes DEBUG=no ICONV=yes'
 
-source $DOTVIM/gloaded.vim
-source $DOTVIM/tabsidebar.vim
-source $DOTVIM/clpum.vim
-source $DOTVIM/rust.vim
-source $DOTVIM/quickrun.vim
-source $DOTVIM/etc.vim
+source $VIMRC_DOTVIM/gloaded.vim
+source $VIMRC_DOTVIM/tabsidebar.vim
+source $VIMRC_DOTVIM/clpum.vim
+source $VIMRC_DOTVIM/rust.vim
+source $VIMRC_DOTVIM/quickrun.vim
+source $VIMRC_DOTVIM/etc.vim
 
 " swap and backup files
-silent! call mkdir(expand('$VIMTEMP/backupfiles'), 'p')
-set noswapfile backup nowritebackup backupdir=$VIMTEMP/backupfiles//
+silent! call mkdir(expand('$VIMRC_TEMP/backupfiles'), 'p')
+set noswapfile backup nowritebackup backupdir=$VIMRC_TEMP/backupfiles//
 
 " undo files
 if has('persistent_undo')
-    silent! call mkdir(expand('$VIMTEMP/undofiles'), 'p')
-    set undofile undodir=$VIMTEMP/undofiles//
+    silent! call mkdir(expand('$VIMRC_TEMP/undofiles'), 'p')
+    set undofile undodir=$VIMRC_TEMP/undofiles//
 endif
 
 nnoremap <silent><nowait><C-j>       :<C-u>cnext<cr>zz
@@ -90,8 +91,8 @@ endif
 
 command! -bar -nargs=0 QfConv        :call diffy#sillyiconv#qficonv()
 command! -bar -nargs=0 Terminal      :call term_start(&shell, #{ cwd: fnamemodify(resolve(expand('%')), ':p:h') })
-command! -bar -nargs=0 SessionSave   :mksession! $VIMTEMP/session.vim
-command! -bar -nargs=0 SessionLoad   :source $VIMTEMP/session.vim
+command! -bar -nargs=0 SessionSave   :mksession! $VIMRC_TEMP/session.vim
+command! -bar -nargs=0 SessionLoad   :source $VIMRC_TEMP/session.vim
 
 " https://github.com/rprichard/winpty/releases/
 if has('win32') && has('terminal')
@@ -104,15 +105,17 @@ if has('win32') && has('terminal')
     tnoremap <silent><C-u>       <esc>
 endif
 
-call plug#begin('$VIMTEMP/plugged')
-Plug 'rbtnn/vim-coloredit'
-Plug 'rbtnn/vim-diffy'
-Plug 'rbtnn/vim-jumptoline'
-Plug 'rbtnn/vim-mru'
-Plug 'rbtnn/vim-tagfunc-for-vimscript'
-Plug 'rbtnn/vim-vimbuild'
-Plug 'thinca/vim-qfreplace'
-call plug#end()
+if filereadable(expand('$VIMRC_DOTVIM/autoload/plug.vim'))
+    call plug#begin('$VIMRC_TEMP/plugged')
+    Plug 'rbtnn/vim-coloredit'
+    Plug 'rbtnn/vim-diffy'
+    Plug 'rbtnn/vim-jumptoline'
+    Plug 'rbtnn/vim-mru'
+    Plug 'rbtnn/vim-tagfunc-for-vimscript'
+    Plug 'rbtnn/vim-vimbuild'
+    Plug 'thinca/vim-qfreplace'
+    call plug#end()
+endif
 
 syntax on
 filetype plugin indent on
