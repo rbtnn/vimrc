@@ -22,7 +22,10 @@ endif
 let g:colors_name = substitute(fnamemodify(expand('<sfile>'), ':t'), '.vim', '', '')
 
 highlight Normal             gui=NONE           guifg=#e0e0e0 guibg=#203b46
-highlight EndOfBuffer        gui=NONE           guifg=#304b56 guibg=#203b46
+
+highlight EndOfBuffer        gui=NONE           guifg=#325f77 guibg=NONE
+highlight Comment            gui=NONE           guifg=#325f77 guibg=NONE
+highlight SpecialKey         gui=NONE           guifg=#325f77 guibg=NONE
 
 highlight Pmenu              gui=NONE           guifg=#555555 guibg=#122127
 highlight PmenuSel           gui=UNDERLINE      guifg=#e0e0e0 guibg=#122127
@@ -66,8 +69,6 @@ highlight IncSearch          gui=UNDERLINE,BOLD guifg=#ffff00 guibg=NONE
 highlight Cursor             gui=NONE           guifg=#000000 guibg=#e0e0e0
 highlight CursorIM           gui=NONE           guifg=#000000 guibg=#aa0000
 
-highlight Comment            gui=NONE           guifg=#888888 guibg=NONE
-highlight SpecialKey         gui=NONE           guifg=#aa6666 guibg=NONE
 highlight NonText            gui=NONE           guifg=#aa6666 guibg=NONE
 highlight Conceal            gui=NONE           guifg=#aa6666 guibg=NONE
 highlight Ignore             gui=NONE           guifg=#aa6666 guibg=NONE
@@ -78,8 +79,8 @@ highlight Keyword            gui=NONE           guifg=#b6b628 guibg=NONE
 highlight Type               gui=NONE           guifg=#b6b628 guibg=NONE
 highlight Identifier         gui=NONE           guifg=#55bb55 guibg=NONE
 highlight Special            gui=NONE           guifg=#8c8cff guibg=NONE
+highlight PreProc            gui=NONE           guifg=#4787a9 guibg=NONE
 highlight Statement          gui=NONE           guifg=#cc44cc guibg=NONE
-highlight PreProc            gui=NONE           guifg=#44cccc guibg=NONE
 highlight String             gui=NONE           guifg=#55bb55 guibg=NONE
 highlight Constant           gui=NONE           guifg=#8c8cff guibg=NONE
 
@@ -96,7 +97,7 @@ if has('tabsidebar')
     highlight TabSideBarFill     gui=NONE           guifg=#000000 guibg=#000000
 endif
 
-if v:false
+if v:true
     function! StatusLine() abort
         let syn_id = synID(line('.'), col('.'), 1)
         let trans_id = syn_id->synIDtrans()

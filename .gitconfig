@@ -42,4 +42,6 @@
 [credential]
     helper = wincred
 
-;  vim: set ft=gitconfig ff=unix :
+[fetch]
+    prune = true
+
