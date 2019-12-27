@@ -32,14 +32,14 @@ set fileencodings=utf-8,cp932,euc-jp,default,latin
 set fileformats=unix,dos,mac
 set foldcolumn=0 foldlevelstart=99 foldmethod=indent
 set grepprg=internal
+set ignorecase nosmartcase
 set incsearch hlsearch
 set keywordprg=:help
 set laststatus=2 statusline&
-set list nowrap breakindent& showbreak& listchars=tab:<->
+set list nowrap breakindent& showbreak& listchars=tab:<->,trail:-
 set matchpairs+=<:>
 set mouse=a
 set nocursorline nocursorcolumn
-set noignorecase
 set noshellslash completeslash=slash
 set nowrapscan
 set nrformats=
@@ -54,8 +54,11 @@ set tags=./tags;
 set termguicolors
 set title titlestring=%{bufname()}\ -\ %{v:progname}[%{getpid()}]
 set visualbell noerrorbells t_vb=
-set wildignore=*.pdb,*.obj,*.dll,*.exe
 set wildmenu wildmode&
+
+set wildignore=*.pdb,*.obj,*.dll,*.exe,*.idb,*.ncb,*.ilk,*.plg,*.bsc,*.sbr,*.opt,*.config
+set wildignore+=*.pdf,*.mp3,*.doc,*.docx,*.xls,*.xlsx,*.idx,*.jpg,*.png,*.zip
+set wildignore+=*.resX,*.lib,*.resources,*.ico,*.suo,*.cache,*.user,*.myapp,*.dat,*.dat01
 
 let g:vim_indent_cont = &g:shiftwidth
 let g:mapleader = '\'
