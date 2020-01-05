@@ -88,12 +88,13 @@ nnoremap <silent><nowait><C-k>       :<C-u>cprevious<cr>zz
 nnoremap <silent><nowait><space>     :<C-u>JumpToLine<cr>
 nnoremap <silent><nowait><C-f>       :<C-u>MRU<cr>
 
+nnoremap <silent><nowait>s           "_
+
 if has('win32')
     command! -complete=file -nargs=* WinExplorer  :silent! execute printf('!start explorer %s', (empty(<q-args>) ? '.' : <q-args>))
 endif
 
 command! -bar -nargs=0 QfConv        :call diffy#sillyiconv#qficonv()
-command! -bar -nargs=0 Terminal      :call term_start(&shell, #{ cwd: fnamemodify(resolve(expand('%')), ':p:h') })
 command! -bar -nargs=0 SessionSave   :mksession! $VIMRC_TEMP/session.vim
 command! -bar -nargs=0 SessionLoad   :source $VIMRC_TEMP/session.vim
 
