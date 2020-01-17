@@ -5,16 +5,15 @@ else
     finish
 endif
 
-if has('win32')
-    set encoding=cp932
-else
-    set encoding=utf-8
-endif
+set encoding=utf-8
 set makeencoding=char
 scriptencoding utf-8
 
 set langmenu=en_gb.latin1
 set winaltkeys=yes guioptions=m
+
+" for less on windows
+let $LESSCHARSET = 'utf-8'
 
 let $VIMRC_ROOT = expand('<sfile>:h') 
 let $VIMRC_DOTVIM = expand('$VIMRC_ROOT/.vim')
@@ -57,7 +56,7 @@ set visualbell noerrorbells t_vb=
 set wildmenu wildmode&
 
 set wildignore=*.pdb,*.obj,*.dll,*.exe,*.idb,*.ncb,*.ilk,*.plg,*.bsc,*.sbr,*.opt,*.config
-set wildignore+=*.pdf,*.mp3,*.doc,*.docx,*.xls,*.xlsx,*.idx,*.jpg,*.png,*.zip
+set wildignore+=*.pdf,*.mp3,*.doc,*.docx,*.xls,*.xlsx,*.idx,*.jpg,*.png,*.zip,*.MMF
 set wildignore+=*.resX,*.lib,*.resources,*.ico,*.suo,*.cache,*.user,*.myapp,*.dat,*.dat01
 
 let g:vim_indent_cont = &g:shiftwidth

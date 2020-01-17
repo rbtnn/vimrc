@@ -3,11 +3,11 @@
     path = ~/.gitconfig.local
 
 [user]
-  name = rbtnn
-  email = naru123456789@gmail.com
+    name = rbtnn
+    email = naru123456789@gmail.com
 
 [http]
-	sslverify = false
+    sslverify = false
 
 [core]
     autocrlf = false
@@ -44,4 +44,10 @@
 
 [fetch]
     prune = true
+
+# set LESSCHARSET=utf-8
+#[core]
+#    pager = iconv -f cp932 -t utf-8 | less
+#[interactive]
+#    diffFilter = iconv -f cp932 -t utf-8
 
