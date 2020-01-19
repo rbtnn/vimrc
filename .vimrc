@@ -44,14 +44,14 @@ set nowrapscan
 set nrformats=
 set pumheight=10 completeopt=menu
 set ruler rulerformat=%{&fenc}/%{&ff}/%{&ft}
-set scrolloff=0 nonumber norelativenumber
+set scrolloff=0 number norelativenumber
 set sessionoptions=buffers,curdir,tabpages
-set shortmess& shortmess+=I shortmess-=S
+set shortmess& shortmess-=S
 set showmode
 set showtabline=0 tabline&
 set tags=./tags;
 set termguicolors
-set title titlestring=%{bufname()}\ -\ %{v:progname}[%{getpid()}]
+set title titlestring=%{v:progname}[%{getpid()}]
 set visualbell noerrorbells t_vb=
 set wildmenu wildmode&
 
