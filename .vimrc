@@ -32,7 +32,7 @@ set list nowrap breakindent& showbreak& listchars=tab:<->,trail:-
 set matchpairs+=<:>
 set mouse=a
 set nocursorline nocursorcolumn
-set noshellslash completeslash=slash
+set noshellslash
 set nowrapscan
 set nrformats=
 set pumheight=10 completeopt=menu
@@ -47,6 +47,10 @@ set termguicolors
 set title titlestring=%{v:progname}[%{getpid()}]
 set visualbell noerrorbells t_vb=
 set wildmenu wildmode&
+
+if exists('+completeslash')
+    set completeslash=slash
+endif
 
 set wildignore=*.pdb,*.obj,*.dll,*.exe,*.idb,*.ncb,*.ilk,*.plg,*.bsc,*.sbr,*.opt,*.config
 set wildignore+=*.pdf,*.mp3,*.doc,*.docx,*.xls,*.xlsx,*.idx,*.jpg,*.png,*.zip,*.MMF
@@ -70,6 +74,8 @@ if has('persistent_undo')
     silent! call mkdir(expand('$VIMRC_TEMP/undofiles'), 'p')
     set undofile undodir=$VIMRC_TEMP/undofiles//
 endif
+
+inoremap <silent><tab>               <C-v><tab>
 
 nnoremap <silent><nowait><C-j>       :<C-u>cnext<cr>zz
 nnoremap <silent><nowait><C-k>       :<C-u>cprevious<cr>zz

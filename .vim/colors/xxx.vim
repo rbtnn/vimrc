@@ -23,9 +23,9 @@ let g:colors_name = substitute(fnamemodify(expand('<sfile>'), ':t'), '.vim', '',
 
 highlight Normal             gui=NONE           guifg=#e0e0e0 guibg=#203b46
 
-highlight EndOfBuffer        gui=NONE           guifg=#325f77 guibg=NONE
-highlight Comment            gui=NONE           guifg=#325f77 guibg=NONE
-highlight SpecialKey         gui=NONE           guifg=#325f77 guibg=NONE
+highlight EndOfBuffer        gui=NONE           guifg=#547898 guibg=NONE
+highlight Comment            gui=NONE           guifg=#547898 guibg=NONE
+highlight SpecialKey         gui=NONE           guifg=#3a536a guibg=NONE
 
 highlight Pmenu              gui=NONE           guifg=#555555 guibg=#122127
 highlight PmenuSel           gui=UNDERLINE      guifg=#e0e0e0 guibg=#122127
@@ -62,7 +62,7 @@ highlight link LineNrBelow   LineNr
 
 highlight      MatchParen    gui=UNDERLINE,BOLD guifg=#ffff00 guibg=NONE
 
-highlight QuickFixLine       gui=UNDERLINE,BOLD guifg=NONE    guibg=NONE
+highlight QuickFixLine       gui=NONE           guifg=NONE    guibg=NONE
 highlight Search             gui=UNDERLINE,BOLD guifg=#ffff00 guibg=NONE
 highlight IncSearch          gui=UNDERLINE,BOLD guifg=#ffff00 guibg=NONE
 
