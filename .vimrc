@@ -102,6 +102,7 @@ if filereadable(expand('$VIMRC_DOTVIM/autoload/plug.vim'))
     Plug 'rbtnn/vim-coloredit'
     Plug 'rbtnn/vim-diffy'
     Plug 'rbtnn/vim-jumptoline'
+    Plug 'rbtnn/vim-mrw'
     Plug 'rbtnn/vim-tagfunc-for-vimscript'
     Plug 'rbtnn/vim-vimbuild'
     Plug 'thinca/vim-qfreplace'
@@ -110,6 +111,7 @@ if filereadable(expand('$VIMRC_DOTVIM/autoload/plug.vim'))
     source $VIMRC_DOTVIM/asterisk.vim
     source $VIMRC_DOTVIM/diffy.vim
     source $VIMRC_DOTVIM/jumptoline.vim
+    source $VIMRC_DOTVIM/mrw.vim
     source $VIMRC_DOTVIM/vimbuild.vim
 endif
 
