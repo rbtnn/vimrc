@@ -47,16 +47,20 @@ highlight WildMenu           gui=UNDERLINE      guifg=#e0e0e0 guibg=#080924
 highlight ErrorMsg           gui=NONE           guifg=#ff0000 guibg=NONE
 highlight WarningMsg         gui=NONE           guifg=#ffff00 guibg=NONE
 
-highlight ColorColumn        gui=NONE           guifg=NONE    guibg=#25303b
-highlight CursorColumn       gui=NONE           guifg=NONE    guibg=#25303b
-highlight CursorLine         gui=NONE           guifg=NONE    guibg=#25303b
-highlight Visual             gui=NONE           guifg=NONE    guibg=#75808b
-
 highlight Folded             gui=UNDERLINE      guifg=#555555 guibg=NONE
 highlight FoldColumn         gui=NONE           guifg=#20313c guibg=#20313c
 
-highlight      LineNr        gui=NONE           guifg=#565666 guibg=#000000
+highlight      LineNr        gui=NONE           guifg=#565666 guibg=#25303b
+highlight      SignColumn    gui=NONE           guifg=#565666 guibg=#25303b
+
 highlight      CursorLineNr  gui=NONE           guifg=#666666 guibg=#181818
+highlight      CursorLine    gui=NONE           guifg=NONE    guibg=#181818
+highlight      CursorColumn  gui=NONE           guifg=NONE    guibg=#181818
+
+highlight Visual             gui=NONE           guifg=NONE    guibg=#181818
+
+highlight ColorColumn        gui=NONE           guifg=NONE    guibg=#25303b
+
 highlight link LineNrAbove   LineNr
 highlight link LineNrBelow   LineNr
 
@@ -84,10 +88,11 @@ highlight Statement          gui=NONE           guifg=#cc44cc guibg=NONE
 highlight String             gui=NONE           guifg=#55bb55 guibg=NONE
 highlight Constant           gui=NONE           guifg=#8c8cff guibg=NONE
 
-highlight link Identifier    DiffAdd
-highlight link Special       DiffDelete
-highlight              DiffChange    gui=BOLD           guifg=#993399 guibg=NONE
-highlight              DiffText      gui=BOLD,UNDERLINE guifg=#993399 guibg=NONE
+highlight link Identifier  DiffAdd
+highlight link Special     DiffDelete
+
+highlight                  DiffChange    gui=BOLD           guifg=#993399 guibg=NONE
+highlight                  DiffText      gui=BOLD,UNDERLINE guifg=#993399 guibg=NONE
 
 if has('tabsidebar')
     highlight TabSideBarTitleSel gui=BOLD           guifg=#e0e0e0 guibg=#007777

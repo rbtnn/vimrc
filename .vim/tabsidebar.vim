@@ -15,31 +15,33 @@ function! Tabsidebar() abort
             if x.tabnr == g:actual_curtabpage
                 let iscurr = (winnr() == x.winnr) && (g:actual_curtabpage == tabpagenr())
                 let name = bufname(x.bufnr)
-                let s = '(No Name)'
+                let s = '[No Name]'
                 if x.terminal
-                    let s = '(Terminal)'
+                    let s = '-Terminal-'
                 elseif x.quickfix
-                    let s = '(QuickFix)'
+                    let s = '-QuickFix-'
                 elseif x.loclist
-                    let s = '(LocList)'
+                    let s = '-LocList-'
                 elseif iscurr && !empty(getcmdwintype())
-                    let s = '(CmdLineWindow)'
+                    let s = '-CmdLineWindow-'
+                elseif 'fern' == getbufvar(x.bufnr, '&filetype')
+                    let s = '-Fern-'
+                elseif 'diff' == getbufvar(x.bufnr, '&filetype')
+                    let s = '-Diff-'
                 elseif filereadable(name)
                     let modi = getbufvar(x.bufnr, '&modified')
                     let read = getbufvar(x.bufnr, '&readonly')
                     let name = fnamemodify(name, ':t')
                     let s = printf('%s%s%s', (read ? '[R]' : ''), (modi ? '[+]' : ''), name)
                 else
-                    if empty(name)
-                        let type = getbufvar(x.bufnr, '&filetype')
-                        if 'diff' == type
-                            let s = '(Diff)'
-                        endif
-                    else
+                    if !empty(name)
                         let s = name
                     endif
                 endif
-                let lines += [printf('%%#%s# %s %s', (iscurr ? 'TabSideBarSel' : 'TabSideBar'), (iscurr ? '*' : ' '), s)]
+                let icon = iscurr ? '*' : ' '
+                let lines += [printf('%%#%s# %s %s',
+                    \ (iscurr ? 'TabSideBarSel' : 'TabSideBar'),
+                    \ icon, s)]
             endif
         endfor
         return join(lines, "\n")
@@ -51,16 +53,16 @@ endfunction
 augroup tabsidebar
     autocmd!
     autocmd VimEnter,VimResized *
-        \ :let &tabsidebarcolumns = 16
+        \ :let &tabsidebarcolumns = 24
         \ |if v:servername == 'MINIMAP'
-        \ |  set showtabsidebar=0
-        \ |elseif &tabsidebarcolumns * 4 < &columns
-        \ |  set showtabsidebar=2
-        \ |  set notabsidebaralign
-        \ |  set notabsidebarwrap
-        \ |  set tabsidebar=%!Tabsidebar()
-        \ |else
-        \ |  set showtabsidebar=0
-        \ |endif
+            \ |  set showtabsidebar=0
+            \ |elseif &tabsidebarcolumns * 4 < &columns
+                \ |  set showtabsidebar=2
+                \ |  set notabsidebaralign
+                \ |  set notabsidebarwrap
+                \ |  set tabsidebar=%!Tabsidebar()
+                \ |else
+                    \ |  set showtabsidebar=0
+                    \ |endif
 augroup END
 

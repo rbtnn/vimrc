@@ -99,17 +99,21 @@ endif
 if filereadable(expand('$VIMRC_DOTVIM/autoload/plug.vim'))
     call plug#begin('$VIMRC_TEMP/plugged')
     Plug 'haya14busa/vim-asterisk'
+    Plug 'lambdalisue/fern-renderer-devicons.vim'
+    Plug 'lambdalisue/fern.vim'
     Plug 'rbtnn/vim-coloredit'
     Plug 'rbtnn/vim-diffy'
     Plug 'rbtnn/vim-jumptoline'
     Plug 'rbtnn/vim-mrw'
     Plug 'rbtnn/vim-tagfunc-for-vimscript'
     Plug 'rbtnn/vim-vimbuild'
+    Plug 'ryanoasis/vim-devicons'
     Plug 'thinca/vim-qfreplace'
     call plug#end()
 
     source $VIMRC_DOTVIM/asterisk.vim
     source $VIMRC_DOTVIM/diffy.vim
+    source $VIMRC_DOTVIM/fern.vim
     source $VIMRC_DOTVIM/jumptoline.vim
     source $VIMRC_DOTVIM/mrw.vim
     source $VIMRC_DOTVIM/vimbuild.vim
