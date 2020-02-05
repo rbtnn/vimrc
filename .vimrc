@@ -94,6 +94,23 @@ if has('win32')
     tnoremap <silent><C-e>       <end>
     tnoremap <silent><C-a>       <home>
     tnoremap <silent><C-u>       <esc>
+
+    function! TermInPopupwin() abort
+        let [w, h] = [&columns / 3 * 2, &lines / 3 * 2]
+        let bid = term_start(['cmd'], #{
+            \ term_cols: w,
+            \ term_rows: h,
+            \ hidden: 1,
+            \ term_finish: 'close',
+            \})
+        call popup_create(bid, #{
+            \ minwidth: w,
+            \ minheight: h,
+            \ padding: [],
+            \ })
+    endfunction
+
+    command! -bar -nargs=0 TermInPopupwin   :call TermInPopupwin()
 endif
 
 if filereadable(expand('$VIMRC_DOTVIM/autoload/plug.vim'))
