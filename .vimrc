@@ -53,7 +53,7 @@ if exists('+completeslash')
 endif
 
 set wildignore=*.pdb,*.obj,*.dll,*.exe,*.idb,*.ncb,*.ilk,*.plg,*.bsc,*.sbr,*.opt,*.config
-set wildignore+=*.pdf,*.mp3,*.doc,*.docx,*.xls,*.xlsx,*.idx,*.jpg,*.png,*.zip,*.MMF
+set wildignore+=*.pdf,*.mp3,*.doc,*.docx,*.xls,*.xlsx,*.idx,*.jpg,*.png,*.zip,*.MMF,*.gif
 set wildignore+=*.resX,*.lib,*.resources,*.ico,*.suo,*.cache,*.user,*.myapp,*.dat,*.dat01
 
 setglobal incsearch hlsearch
@@ -110,7 +110,7 @@ if has('win32')
             \ })
     endfunction
 
-    command! -bar -nargs=0 TermInPopupwin   :call TermInPopupwin()
+    "command! -bar -nargs=0 TermInPopupwin   :call TermInPopupwin()
 endif
 
 if filereadable(expand('$VIMRC_DOTVIM/autoload/plug.vim'))

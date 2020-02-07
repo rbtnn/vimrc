@@ -21,11 +21,11 @@ endif
 
 let g:colors_name = substitute(fnamemodify(expand('<sfile>'), ':t'), '.vim', '', '')
 
-highlight Normal             gui=NONE           guifg=#e0e0e0 guibg=#203b46
+highlight Normal             gui=NONE           guifg=#e0e0e0 guibg=#14242a
 
-highlight EndOfBuffer        gui=NONE           guifg=#547898 guibg=NONE
+highlight EndOfBuffer        gui=NONE           guifg=#33495d guibg=NONE
 highlight Comment            gui=NONE           guifg=#547898 guibg=NONE
-highlight SpecialKey         gui=NONE           guifg=#3a536a guibg=NONE
+highlight SpecialKey         gui=NONE           guifg=#243443 guibg=NONE
 
 highlight Pmenu              gui=NONE           guifg=#555555 guibg=#122127
 highlight PmenuSel           gui=UNDERLINE      guifg=#e0e0e0 guibg=#122127
@@ -57,7 +57,7 @@ highlight      CursorLineNr  gui=NONE           guifg=#666666 guibg=#181818
 highlight      CursorLine    gui=NONE           guifg=NONE    guibg=#181818
 highlight      CursorColumn  gui=NONE           guifg=NONE    guibg=#181818
 
-highlight Visual             gui=NONE           guifg=NONE    guibg=#181818
+highlight Visual             gui=NONE           guifg=NONE    guibg=#509b82
 
 highlight ColorColumn        gui=NONE           guifg=NONE    guibg=#25303b
 
