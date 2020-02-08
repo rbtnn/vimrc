@@ -75,10 +75,18 @@ if has('persistent_undo')
     set undofile undodir=$VIMRC_TEMP/undofiles//
 endif
 
-inoremap <silent><tab>               <C-v><tab>
+inoremap <silent><tab>             <C-v><tab>
 
-nnoremap <silent><nowait><C-j>       :<C-u>cnext<cr>zz
-nnoremap <silent><nowait><C-k>       :<C-u>cprevious<cr>zz
+nnoremap <silent><nowait><C-n>     :<C-u>cnext<cr>zz
+nnoremap <silent><nowait><C-p>     :<C-u>cprevious<cr>zz
+nnoremap <silent><nowait><C-j>     :<C-u>JumpToLine<cr>
+nnoremap <silent><nowait><C-f>     :<C-u>MRW<cr>
+
+map      <silent><nowait>*         <Plug>(asterisk-z*)
+map      <silent><nowait>g*        <Plug>(asterisk-gz*)
+
+let g:vimbuild_cwd = '$VIMRC_ROOT/Desktop/vim/src'
+let g:vimbuild_buildargs = 'COLOR_EMOJI=yes OLE=yes DYNAMIC_IME=yes IME=yes GIME=yes DEBUG=no ICONV=yes'
 
 command! -bar -nargs=0 SessionSave   :mksession! $VIMRC_TEMP/session.vim
 command! -bar -nargs=0 SessionLoad   :source $VIMRC_TEMP/session.vim
@@ -99,24 +107,15 @@ endif
 if filereadable(expand('$VIMRC_DOTVIM/autoload/plug.vim'))
     call plug#begin('$VIMRC_TEMP/plugged')
     Plug 'haya14busa/vim-asterisk'
-    Plug 'lambdalisue/fern-renderer-devicons.vim'
-    Plug 'lambdalisue/fern.vim'
     Plug 'rbtnn/vim-coloredit'
     Plug 'rbtnn/vim-diffy'
     Plug 'rbtnn/vim-jumptoline'
     Plug 'rbtnn/vim-mrw'
     Plug 'rbtnn/vim-tagfunc-for-vimscript'
-    Plug 'rbtnn/vim-vimbuild'
-    Plug 'ryanoasis/vim-devicons'
+    Plug 'rbtnn/vim-uke'
+    Plug 'rbtnn/vim-vimscript_lasterror'
     Plug 'thinca/vim-qfreplace'
     call plug#end()
-
-    source $VIMRC_DOTVIM/asterisk.vim
-    source $VIMRC_DOTVIM/diffy.vim
-    source $VIMRC_DOTVIM/fern.vim
-    source $VIMRC_DOTVIM/jumptoline.vim
-    source $VIMRC_DOTVIM/mrw.vim
-    source $VIMRC_DOTVIM/vimbuild.vim
 endif
 
 syntax on
