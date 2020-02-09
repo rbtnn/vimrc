@@ -63,7 +63,7 @@ let g:mapleader = '\'
 
 source $VIMRC_DOTVIM/gloaded.vim
 source $VIMRC_DOTVIM/tabsidebar.vim
-source $VIMRC_DOTVIM/etc.vim
+source $VIMRC_DOTVIM/vb.vim
 
 " swap and backup files
 silent! call mkdir(expand('$VIMRC_TEMP/backupfiles'), 'p')
@@ -92,7 +92,11 @@ command! -bar -nargs=0 SessionSave   :mksession! $VIMRC_TEMP/session.vim
 command! -bar -nargs=0 SessionLoad   :source $VIMRC_TEMP/session.vim
 
 if has('win32')
-    command! -complete=file -nargs=* WinExplorer  :silent! execute printf('!start explorer %s', (empty(<q-args>) ? '.' : <q-args>))
+    function! s:start(progpath, args) abort
+        silent! execute printf('!start %s %s', a:progpath, a:args)
+    endfunction
+    command! -complete=file -nargs=* WinExplorer  :call <SID>start('explorer', (empty(<q-args>) ? '.' : <q-args>))
+    command! -complete=file -nargs=* NewVim       :call <SID>start(v:progpath, <q-args>)
 
     " https://github.com/rprichard/winpty/releases/
     tnoremap <silent><C-p>       <up>
@@ -112,9 +116,11 @@ if filereadable(expand('$VIMRC_DOTVIM/autoload/plug.vim'))
     Plug 'rbtnn/vim-jumptoline'
     Plug 'rbtnn/vim-mrw'
     Plug 'rbtnn/vim-tagfunc-for-vimscript'
-    Plug 'rbtnn/vim-uke'
     Plug 'rbtnn/vim-vimscript_lasterror'
     Plug 'thinca/vim-qfreplace'
+    if isdirectory(expand('$VIMRC_TEMP/plugged/vim-uke'))
+        Plug 'rbtnn/vim-uke', { 'frozen': 1, }
+    endif
     call plug#end()
 endif
 

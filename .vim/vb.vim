@@ -8,7 +8,7 @@ function! s:bufenter() abort
     endif
 endfunction
 
-augroup vimrc_etc
+augroup vimrc_vb
     autocmd!
     autocmd BufEnter * :call <SID>bufenter()
 augroup END
