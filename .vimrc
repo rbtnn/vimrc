@@ -11,7 +11,6 @@ let $LESSCHARSET = 'utf-8'
 
 let $VIMRC_ROOT = expand('<sfile>:h') 
 let $VIMRC_DOTVIM = expand('$VIMRC_ROOT/.vim')
-let $VIMRC_TEMP = expand('$VIMRC_DOTVIM/temp')
 
 set runtimepath+=$VIMRC_DOTVIM
 
@@ -25,13 +24,13 @@ set fileencodings=utf-8,cp932,euc-jp,default,latin
 set fileformats=unix,dos,mac
 set foldcolumn=0 foldlevelstart=99 foldmethod=indent
 set grepprg=internal
-set ignorecase nosmartcase
 set keywordprg=:help
 set laststatus=2 statusline&
 set list nowrap breakindent& showbreak& listchars=tab:<->,trail:-
 set matchpairs+=<:>
 set mouse=a
 set nocursorline nocursorcolumn
+set noignorecase nosmartcase
 set noshellslash
 set nowrapscan
 set nrformats=
@@ -66,13 +65,13 @@ source $VIMRC_DOTVIM/tabsidebar.vim
 source $VIMRC_DOTVIM/vb.vim
 
 " swap and backup files
-silent! call mkdir(expand('$VIMRC_TEMP/backupfiles'), 'p')
-set noswapfile backup nowritebackup backupdir=$VIMRC_TEMP/backupfiles//
+silent! call mkdir(expand('$VIMRC_DOTVIM/backupfiles'), 'p')
+set noswapfile backup nowritebackup backupdir=$VIMRC_DOTVIM/backupfiles//
 
 " undo files
 if has('persistent_undo')
-    silent! call mkdir(expand('$VIMRC_TEMP/undofiles'), 'p')
-    set undofile undodir=$VIMRC_TEMP/undofiles//
+    silent! call mkdir(expand('$VIMRC_DOTVIM/undofiles'), 'p')
+    set undofile undodir=$VIMRC_DOTVIM/undofiles//
 endif
 
 inoremap <silent><tab>             <C-v><tab>
@@ -88,8 +87,8 @@ map      <silent><nowait>g*        <Plug>(asterisk-gz*)
 let g:vimbuild_cwd = '$VIMRC_ROOT/Desktop/vim/src'
 let g:vimbuild_buildargs = 'COLOR_EMOJI=yes OLE=yes DYNAMIC_IME=yes IME=yes GIME=yes DEBUG=no ICONV=yes'
 
-command! -bar -nargs=0 SessionSave   :mksession! $VIMRC_TEMP/session.vim
-command! -bar -nargs=0 SessionLoad   :source $VIMRC_TEMP/session.vim
+command! -bar -nargs=0 SessionSave   :mksession! $VIMRC_DOTVIM/session.vim
+command! -bar -nargs=0 SessionLoad   :source $VIMRC_DOTVIM/session.vim
 
 if has('win32')
     function! s:start(progpath, args) abort
@@ -109,7 +108,7 @@ if has('win32')
 endif
 
 if filereadable(expand('$VIMRC_DOTVIM/autoload/plug.vim'))
-    call plug#begin('$VIMRC_TEMP/plugged')
+    call plug#begin('$VIMRC_DOTVIM/plugged')
     Plug 'haya14busa/vim-asterisk'
     Plug 'rbtnn/vim-coloredit'
     Plug 'rbtnn/vim-diffy'
@@ -118,7 +117,7 @@ if filereadable(expand('$VIMRC_DOTVIM/autoload/plug.vim'))
     Plug 'rbtnn/vim-tagfunc-for-vimscript'
     Plug 'rbtnn/vim-vimscript_lasterror'
     Plug 'thinca/vim-qfreplace'
-    if isdirectory(expand('$VIMRC_TEMP/plugged/vim-uke'))
+    if isdirectory(expand('$VIMRC_DOTVIM/plugged/vim-uke'))
         Plug 'rbtnn/vim-uke', { 'frozen': 1, }
     endif
     call plug#end()

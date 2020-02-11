@@ -1,2 +1,5 @@
 
-temp/
+backupfiles/
+plugged/
+session.vim
+undofiles/

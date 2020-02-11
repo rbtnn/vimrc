@@ -68,8 +68,8 @@ highlight link LineNrBelow   LineNr
 highlight      MatchParen    gui=UNDERLINE,BOLD guifg=#ffff00 guibg=NONE
 
 highlight QuickFixLine       gui=NONE           guifg=NONE    guibg=NONE
-highlight Search             gui=BOLD           guifg=NONE    guibg=#2a4b57
-highlight IncSearch          gui=BOLD           guifg=NONE    guibg=#2a4b57
+highlight Search             gui=BOLD           guifg=NONE    guibg=#366f6c
+highlight IncSearch          gui=BOLD           guifg=NONE    guibg=#366f6c
 
 highlight Cursor             gui=NONE           guifg=#000000 guibg=#ffffff
 highlight CursorIM           gui=NONE           guifg=#000000 guibg=#aa0000
@@ -100,7 +100,7 @@ if has('tabsidebar')
     highlight      TabSideBarFill     gui=NONE           guifg=#0f1b1f guibg=#172a31
 endif
 
-if v:true
+if v:false
     function! StatusLine() abort
         let syn_id = synID(line('.'), col('.'), 1)
         let trans_id = syn_id->synIDtrans()
