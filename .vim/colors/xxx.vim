@@ -58,8 +58,6 @@ highlight      CursorLineNr  gui=NONE           guifg=#666666 guibg=#181818
 highlight      CursorLine    gui=NONE           guifg=NONE    guibg=#181818
 highlight      CursorColumn  gui=NONE           guifg=NONE    guibg=#181818
 
-highlight Visual             gui=NONE           guifg=NONE    guibg=#1d333b
-
 highlight ColorColumn        gui=NONE           guifg=NONE    guibg=#25303b
 
 highlight link LineNrAbove   LineNr
@@ -68,8 +66,11 @@ highlight link LineNrBelow   LineNr
 highlight      MatchParen    gui=UNDERLINE,BOLD guifg=#ffff00 guibg=NONE
 
 highlight QuickFixLine       gui=NONE           guifg=NONE    guibg=NONE
+
 highlight Search             gui=BOLD           guifg=NONE    guibg=#366f6c
 highlight IncSearch          gui=BOLD           guifg=NONE    guibg=#366f6c
+
+highlight Visual             gui=NONE           guifg=NONE    guibg=#366f6c
 
 highlight Cursor             gui=NONE           guifg=#000000 guibg=#ffffff
 highlight CursorIM           gui=NONE           guifg=#000000 guibg=#aa0000

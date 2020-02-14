@@ -60,7 +60,9 @@ setglobal incsearch hlsearch
 let g:vim_indent_cont = &g:shiftwidth
 let g:mapleader = '\'
 
-source $VIMRC_DOTVIM/gloaded.vim
+if filereadable('$VIMRC_DOTVIM/plugged')
+    source $VIMRC_DOTVIM/gloaded.vim
+endif
 source $VIMRC_DOTVIM/tabsidebar.vim
 source $VIMRC_DOTVIM/vb.vim
 
@@ -84,8 +86,8 @@ nnoremap <silent><nowait><C-f>     :<C-u>MRW<cr>
 map      <silent><nowait>*         <Plug>(asterisk-z*)
 map      <silent><nowait>g*        <Plug>(asterisk-gz*)
 
-let g:vimbuild_cwd = '$VIMRC_ROOT/Desktop/vim/src'
-let g:vimbuild_buildargs = 'COLOR_EMOJI=yes OLE=yes DYNAMIC_IME=yes IME=yes GIME=yes DEBUG=no ICONV=yes'
+"let g:vimbuild_cwd = '$VIMRC_ROOT/Desktop/vim/src'
+"let g:vimbuild_buildargs = 'COLOR_EMOJI=yes OLE=yes DYNAMIC_IME=yes IME=yes GIME=yes DEBUG=no ICONV=yes'
 
 command! -bar -nargs=0 SessionSave   :mksession! $VIMRC_DOTVIM/session.vim
 command! -bar -nargs=0 SessionLoad   :source $VIMRC_DOTVIM/session.vim
@@ -112,11 +114,13 @@ if filereadable(expand('$VIMRC_DOTVIM/autoload/plug.vim'))
     Plug 'haya14busa/vim-asterisk'
     Plug 'rbtnn/vim-coloredit'
     Plug 'rbtnn/vim-diffy'
+    Plug 'rbtnn/vim-gloaded'
     Plug 'rbtnn/vim-jumptoline'
     Plug 'rbtnn/vim-mrw'
     Plug 'rbtnn/vim-tagfunc-for-vimscript'
     Plug 'rbtnn/vim-vimscript_lasterror'
     Plug 'thinca/vim-qfreplace'
+    Plug 'tyru/capture.vim'
     if isdirectory(expand('$VIMRC_DOTVIM/plugged/vim-uke'))
         Plug 'rbtnn/vim-uke', { 'frozen': 1, }
     endif
@@ -133,8 +137,17 @@ endif
 
 augroup vimrc
     autocmd!
-    autocmd VimEnter,BufEnter  * :silent! delcommand MANPAGER
-    autocmd VimEnter,BufEnter  * :silent! delcommand VimFoldh
+    for s:cmdname in [
+        \ 'MANPAGER',
+        \ 'VimFoldh',
+        \ 'PlugDiff',
+        \ 'PlugSnapshot',
+        \ 'PlugStatus',
+        \ 'PlugUpgrade',
+        \ ]
+        execute printf('autocmd CmdlineEnter * :silent! delcommand %s', s:cmdname)
+    endfor
 augroup END
 
 silent! colorscheme xxx
+

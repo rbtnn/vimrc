@@ -48,19 +48,22 @@ function! Tabsidebar() abort
     endtry
 endfunction
 
+function! TabsidebarSetting() abort
+    let &tabsidebarcolumns = 24
+    if v:servername == 'MINIMAP'
+        set showtabsidebar=0
+    elseif &tabsidebarcolumns * 4 < &columns
+        set showtabsidebar=2
+        set notabsidebarwrap
+        set notabsidebaralign
+        set tabsidebar=%!Tabsidebar()
+    else
+        set showtabsidebar=0
+    endif
+endfunction
+
 augroup tabsidebar
     autocmd!
-    autocmd VimEnter,VimResized *
-        \ :let &tabsidebarcolumns = 24
-        \ |if v:servername == 'MINIMAP'
-            \ |  set showtabsidebar=0
-            \ |elseif &tabsidebarcolumns * 4 < &columns
-                \ |  set showtabsidebar=2
-                \ |  set notabsidebaralign
-                \ |  set notabsidebarwrap
-                \ |  set tabsidebar=%!Tabsidebar()
-                \ |else
-                    \ |  set showtabsidebar=0
-                    \ |endif
+    autocmd VimEnter,VimResized * :call TabsidebarSetting()
 augroup END
 
