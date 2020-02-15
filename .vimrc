@@ -60,9 +60,6 @@ setglobal incsearch hlsearch
 let g:vim_indent_cont = &g:shiftwidth
 let g:mapleader = '\'
 
-if filereadable('$VIMRC_DOTVIM/plugged')
-    source $VIMRC_DOTVIM/gloaded.vim
-endif
 source $VIMRC_DOTVIM/tabsidebar.vim
 source $VIMRC_DOTVIM/vb.vim
 
@@ -80,14 +77,6 @@ inoremap <silent><tab>             <C-v><tab>
 
 nnoremap <silent><nowait><C-n>     :<C-u>cnext<cr>zz
 nnoremap <silent><nowait><C-p>     :<C-u>cprevious<cr>zz
-nnoremap <silent><nowait><C-j>     :<C-u>JumpToLine<cr>
-nnoremap <silent><nowait><C-f>     :<C-u>MRW<cr>
-
-map      <silent><nowait>*         <Plug>(asterisk-z*)
-map      <silent><nowait>g*        <Plug>(asterisk-gz*)
-
-"let g:vimbuild_cwd = '$VIMRC_ROOT/Desktop/vim/src'
-"let g:vimbuild_buildargs = 'COLOR_EMOJI=yes OLE=yes DYNAMIC_IME=yes IME=yes GIME=yes DEBUG=no ICONV=yes'
 
 command! -bar -nargs=0 SessionSave   :mksession! $VIMRC_DOTVIM/session.vim
 command! -bar -nargs=0 SessionLoad   :source $VIMRC_DOTVIM/session.vim
@@ -117,7 +106,8 @@ if filereadable(expand('$VIMRC_DOTVIM/autoload/plug.vim'))
     Plug 'rbtnn/vim-gloaded'
     Plug 'rbtnn/vim-jumptoline'
     Plug 'rbtnn/vim-mrw'
-    Plug 'rbtnn/vim-tagfunc-for-vimscript'
+    Plug 'rbtnn/vim-snipexp'
+    Plug 'rbtnn/vim-tagfunc_for_vimscript'
     Plug 'rbtnn/vim-vimscript_lasterror'
     Plug 'thinca/vim-qfreplace'
     Plug 'tyru/capture.vim'
@@ -125,6 +115,33 @@ if filereadable(expand('$VIMRC_DOTVIM/autoload/plug.vim'))
         Plug 'rbtnn/vim-uke', { 'frozen': 1, }
     endif
     call plug#end()
+
+    if isdirectory(expand('$VIMRC_DOTVIM/plugged/vim-gloaded'))
+        source $VIMRC_DOTVIM/plugged/vim-gloaded/plugin/gloaded.vim
+    endif
+
+    if isdirectory(expand('$VIMRC_DOTVIM/plugged/vim-jumptoline'))
+        nnoremap <silent><nowait><C-j>     :<C-u>JumpToLine<cr>
+    endif
+
+    if isdirectory(expand('$VIMRC_DOTVIM/plugged/vim-mrw'))
+        nnoremap <silent><nowait><C-f>     :<C-u>MRW<cr>
+    endif
+
+    if isdirectory(expand('$VIMRC_DOTVIM/plugged/vim-asterisk'))
+        map      <silent><nowait>*         <Plug>(asterisk-z*)
+        map      <silent><nowait>g*        <Plug>(asterisk-gz*)
+    endif
+
+    if isdirectory(expand('$VIMRC_DOTVIM/plugged/vim-snipexp'))
+        inoremap <nowait><expr><C-f>   snipexp#expand()
+    endif
+
+    if isdirectory(expand('$VIMRC_DOTVIM/plugged/vim-vimbuild'))
+        let g:vimbuild_cwd = '$VIMRC_ROOT/Desktop/vim/src'
+        let g:vimbuild_buildargs = 'COLOR_EMOJI=yes OLE=yes DYNAMIC_IME=yes IME=yes GIME=yes DEBUG=no ICONV=yes'
+    endif
+
 endif
 
 syntax on
