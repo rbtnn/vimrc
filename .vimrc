@@ -12,8 +12,6 @@ let $LESSCHARSET = 'utf-8'
 let $VIMRC_ROOT = expand('<sfile>:h') 
 let $VIMRC_DOTVIM = expand('$VIMRC_ROOT/.vim')
 
-set runtimepath+=$VIMRC_DOTVIM
-
 set ambiwidth=double
 set autoread
 set background=dark
@@ -54,6 +52,7 @@ endif
 set wildignore=*.pdb,*.obj,*.dll,*.exe,*.idb,*.ncb,*.ilk,*.plg,*.bsc,*.sbr,*.opt,*.config
 set wildignore+=*.pdf,*.mp3,*.doc,*.docx,*.xls,*.xlsx,*.idx,*.jpg,*.png,*.zip,*.MMF,*.gif
 set wildignore+=*.resX,*.lib,*.resources,*.ico,*.suo,*.cache,*.user,*.myapp,*.dat,*.dat01
+set wildignore+=*.vbe
 
 setglobal incsearch hlsearch
 
@@ -75,8 +74,8 @@ endif
 
 inoremap <silent><tab>             <C-v><tab>
 
-nnoremap <silent><nowait><C-n>     :<C-u>cnext<cr>zz
-nnoremap <silent><nowait><C-p>     :<C-u>cprevious<cr>zz
+nnoremap <silent><nowait><C-j>     :<C-u>cnext<cr>zz
+nnoremap <silent><nowait><C-k>     :<C-u>cprevious<cr>zz
 
 command! -bar -nargs=0 SessionSave   :mksession! $VIMRC_DOTVIM/session.vim
 command! -bar -nargs=0 SessionLoad   :source $VIMRC_DOTVIM/session.vim
@@ -98,50 +97,35 @@ if has('win32')
     tnoremap <silent><C-u>       <esc>
 endif
 
-if filereadable(expand('$VIMRC_DOTVIM/autoload/plug.vim'))
-    call plug#begin('$VIMRC_DOTVIM/plugged')
-    Plug 'haya14busa/vim-asterisk'
-    Plug 'rbtnn/vim-coloredit'
-    Plug 'rbtnn/vim-diffy'
-    Plug 'rbtnn/vim-gloaded'
-    Plug 'rbtnn/vim-jumptoline'
-    Plug 'rbtnn/vim-mrw'
-    Plug 'rbtnn/vim-snipexp'
-    Plug 'rbtnn/vim-tagfunc_for_vimscript'
-    Plug 'rbtnn/vim-vimscript_lasterror'
-    Plug 'thinca/vim-qfreplace'
-    Plug 'tyru/capture.vim'
-    if isdirectory(expand('$VIMRC_DOTVIM/plugged/vim-uke'))
-        Plug 'rbtnn/vim-uke', { 'frozen': 1, }
-    endif
-    call plug#end()
+set runtimepath+=$VIMRC_DOTVIM
+runtime! plugin/gloaded.vim
 
-    if isdirectory(expand('$VIMRC_DOTVIM/plugged/vim-gloaded'))
-        source $VIMRC_DOTVIM/plugged/vim-gloaded/plugin/gloaded.vim
-    endif
-
-    if isdirectory(expand('$VIMRC_DOTVIM/plugged/vim-jumptoline'))
-        nnoremap <silent><nowait><C-j>     :<C-u>JumpToLine<cr>
-    endif
-
-    if isdirectory(expand('$VIMRC_DOTVIM/plugged/vim-mrw'))
-        nnoremap <silent><nowait><C-f>     :<C-u>MRW<cr>
-    endif
-
-    if isdirectory(expand('$VIMRC_DOTVIM/plugged/vim-asterisk'))
-        map      <silent><nowait>*         <Plug>(asterisk-z*)
-        map      <silent><nowait>g*        <Plug>(asterisk-gz*)
-    endif
-
-    if isdirectory(expand('$VIMRC_DOTVIM/plugged/vim-snipexp'))
-        inoremap <nowait><expr><C-f>   snipexp#expand()
-    endif
-
-    if isdirectory(expand('$VIMRC_DOTVIM/plugged/vim-vimbuild'))
-        let g:vimbuild_cwd = '$VIMRC_ROOT/Desktop/vim/src'
-        let g:vimbuild_buildargs = 'COLOR_EMOJI=yes OLE=yes DYNAMIC_IME=yes IME=yes GIME=yes DEBUG=no ICONV=yes'
-    endif
-
+set packpath=$VIMRUNTIME,$VIMRC_DOTVIM
+packadd minpac
+if exists('*minpac#init')
+    call minpac#init()
+    call minpac#add('haya14busa/vim-asterisk')
+    call minpac#add('k-takata/minpac', {'type': 'opt'})
+    call minpac#add('rbtnn/vim-coloredit')
+    call minpac#add('rbtnn/vim-diffy')
+    call minpac#add('rbtnn/vim-jumptoline')
+    call minpac#add('rbtnn/vim-mrw')
+    call minpac#add('rbtnn/vim-snipexp')
+    call minpac#add('rbtnn/vim-tagfunc_for_vimscript')
+    call minpac#add('rbtnn/vim-uke', {'frozen': 1})
+    call minpac#add('rbtnn/vim-vimscript_lasterror')
+    call minpac#add('thinca/vim-qfreplace')
+    call minpac#add('tyru/capture.vim')
+    command! PackUpdate packadd minpac | source $MYVIMRC | call minpac#update('', {'do': 'call minpac#status()'})
+    command! PackClean  packadd minpac | source $MYVIMRC | call minpac#clean()
+    command! PackStatus packadd minpac | source $MYVIMRC | call minpac#status()
+    nnoremap <silent><nowait><space>   :<C-u>JumpToLine<cr>
+    nnoremap <silent><nowait><C-f>     :<C-u>MRW<cr>
+    map      <silent><nowait>*         <Plug>(asterisk-z*)
+    map      <silent><nowait>g*        <Plug>(asterisk-gz*)
+    inoremap <nowait><expr><C-f>       snipexp#expand()
+    let g:vimbuild_cwd = '$VIMRC_ROOT/Desktop/vim/src'
+    let g:vimbuild_buildargs = 'COLOR_EMOJI=yes OLE=yes DYNAMIC_IME=yes IME=yes GIME=yes DEBUG=no ICONV=yes'
 endif
 
 syntax on
@@ -154,14 +138,7 @@ endif
 
 augroup vimrc
     autocmd!
-    for s:cmdname in [
-        \ 'MANPAGER',
-        \ 'VimFoldh',
-        \ 'PlugDiff',
-        \ 'PlugSnapshot',
-        \ 'PlugStatus',
-        \ 'PlugUpgrade',
-        \ ]
+    for s:cmdname in [ 'MANPAGER', 'VimFoldh', ]
         execute printf('autocmd CmdlineEnter * :silent! delcommand %s', s:cmdname)
     endfor
 augroup END
