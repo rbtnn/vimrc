@@ -101,11 +101,12 @@ set runtimepath+=$VIMRC_DOTVIM
 runtime! plugin/gloaded.vim
 
 set packpath=$VIMRUNTIME,$VIMRC_DOTVIM
-packadd minpac
+silent! packadd minpac
+
 if exists('*minpac#init')
     call minpac#init()
     call minpac#add('haya14busa/vim-asterisk')
-    call minpac#add('k-takata/minpac', {'type': 'opt'})
+    call minpac#add('k-takata/minpac', {'type': 'opt', 'branch': 'devel'})
     call minpac#add('rbtnn/vim-coloredit')
     call minpac#add('rbtnn/vim-diffy')
     call minpac#add('rbtnn/vim-jumptoline')
