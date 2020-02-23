@@ -60,7 +60,7 @@ let g:vim_indent_cont = &g:shiftwidth
 let g:mapleader = '\'
 
 source $VIMRC_DOTVIM/tabsidebar.vim
-source $VIMRC_DOTVIM/rust.vim
+source $VIMRC_DOTVIM/quickrun.vim
 source $VIMRC_DOTVIM/vb.vim
 
 " swap and backup files
@@ -74,9 +74,6 @@ if has('persistent_undo')
 endif
 
 inoremap <silent><tab>             <C-v><tab>
-
-nnoremap <silent><nowait><C-j>     :<C-u>cnext<cr>zz
-nnoremap <silent><nowait><C-k>     :<C-u>cprevious<cr>zz
 
 command! -bar -nargs=0 SessionSave   :mksession! $VIMRC_DOTVIM/session.vim
 command! -bar -nargs=0 SessionLoad   :source $VIMRC_DOTVIM/session.vim
@@ -118,18 +115,31 @@ if exists('*minpac#init')
     call minpac#add('rbtnn/vim-uke', { 'frozen' : 1 })
     call minpac#add('rbtnn/vim-vimscript_lasterror')
     call minpac#add('thinca/vim-qfreplace')
+    call minpac#add('thinca/vim-quickrun')
     call minpac#add('tyru/capture.vim')
     command! PackUpdate packadd minpac | source $MYVIMRC | call minpac#update()
     command! PackClean  packadd minpac | source $MYVIMRC | call minpac#clean()
     command! PackStatus packadd minpac | source $MYVIMRC | call minpac#status()
     nnoremap <silent><nowait><space>   :<C-u>JumpToLine<cr>
-    nnoremap <silent><nowait><C-m>     :<C-u>MRW<cr>
+    nnoremap <silent><nowait><C-j>     :<C-u>MRW<cr>
     nnoremap <silent><nowait><C-f>     :<C-u>Diffy! -w<cr>
+    nnoremap <silent><nowait><C-n>     :<C-u>cnext<cr>zz
+    nnoremap <silent><nowait><C-p>     :<C-u>cprevious<cr>zz
     map      <silent><nowait>*         <Plug>(asterisk-z*)
     map      <silent><nowait>g*        <Plug>(asterisk-gz*)
     inoremap <nowait><expr><C-f>       snipexp#expand()
     let g:vimbuild_cwd = '$VIMRC_ROOT/Desktop/vim/src'
     let g:vimbuild_buildargs = 'COLOR_EMOJI=yes OLE=yes DYNAMIC_IME=yes IME=yes GIME=yes DEBUG=no ICONV=yes'
+    set showtabline=2
+    for s:pair in [
+        \ ['<space>', 'JumpToLine'],
+        \ ['<C-j>', 'MRW'],
+        \ ['<C-f>', 'Diffy! -w'],
+        \ ['<C-n>', 'cnext'],
+        \ ['<C-p>', 'cprevious'],
+        \ ]
+        let &tabline ..= printf(' %%#Title#%s%%#TabLine#:%s', s:pair[0], s:pair[1])
+    endfor
 endif
 
 syntax on

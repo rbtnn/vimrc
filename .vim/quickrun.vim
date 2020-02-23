@@ -1,9 +1,4 @@
 
-if has('vimscript-4')
-    scriptversion 4
-else
-    finish
-endif
 scriptencoding utf-8
 
 let g:quickrun_config = get(g:, 'quickrun_config', {})
