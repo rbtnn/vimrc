@@ -60,6 +60,7 @@ let g:vim_indent_cont = &g:shiftwidth
 let g:mapleader = '\'
 
 source $VIMRC_DOTVIM/tabsidebar.vim
+source $VIMRC_DOTVIM/rust.vim
 source $VIMRC_DOTVIM/vb.vim
 
 " swap and backup files
@@ -86,6 +87,7 @@ if has('win32')
     endfunction
     command! -complete=file -nargs=* WinExplorer  :call <SID>start('explorer', (empty(<q-args>) ? '.' : <q-args>))
     command! -complete=file -nargs=* NewVim       :call <SID>start(v:progpath, <q-args>)
+    command! -complete=file -nargs=* NewVimNoPlug :call <SID>start(v:progpath, '-u NONE -N')
 
     " https://github.com/rprichard/winpty/releases/
     tnoremap <silent><C-p>       <up>
@@ -117,11 +119,12 @@ if exists('*minpac#init')
     call minpac#add('rbtnn/vim-vimscript_lasterror')
     call minpac#add('thinca/vim-qfreplace')
     call minpac#add('tyru/capture.vim')
-    command! PackUpdate packadd minpac | source $MYVIMRC | call minpac#update('', {'do': 'call minpac#status()'})
+    command! PackUpdate packadd minpac | source $MYVIMRC | call minpac#update()
     command! PackClean  packadd minpac | source $MYVIMRC | call minpac#clean()
     command! PackStatus packadd minpac | source $MYVIMRC | call minpac#status()
     nnoremap <silent><nowait><space>   :<C-u>JumpToLine<cr>
-    nnoremap <silent><nowait><C-f>     :<C-u>MRW<cr>
+    nnoremap <silent><nowait><C-m>     :<C-u>MRW<cr>
+    nnoremap <silent><nowait><C-f>     :<C-u>Diffy! -w<cr>
     map      <silent><nowait>*         <Plug>(asterisk-z*)
     map      <silent><nowait>g*        <Plug>(asterisk-gz*)
     inoremap <nowait><expr><C-f>       snipexp#expand()
