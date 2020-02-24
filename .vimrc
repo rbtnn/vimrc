@@ -60,7 +60,6 @@ let g:vim_indent_cont = &g:shiftwidth
 let g:mapleader = '\'
 
 source $VIMRC_DOTVIM/tabsidebar.vim
-source $VIMRC_DOTVIM/quickrun.vim
 source $VIMRC_DOTVIM/vb.vim
 
 " swap and backup files
@@ -106,6 +105,7 @@ if exists('*minpac#init')
     call minpac#init({ 'dir' : $VIMRC_DOTVIM })
     call minpac#add('haya14busa/vim-asterisk')
     call minpac#add('k-takata/minpac', { 'type' : 'opt', 'branch' : 'devel' })
+    call minpac#add('rbtnn/restart.vim')
     call minpac#add('rbtnn/vim-coloredit')
     call minpac#add('rbtnn/vim-diffy')
     call minpac#add('rbtnn/vim-jumptoline')
@@ -115,8 +115,6 @@ if exists('*minpac#init')
     call minpac#add('rbtnn/vim-uke', { 'frozen' : 1 })
     call minpac#add('rbtnn/vim-vimscript_lasterror')
     call minpac#add('thinca/vim-qfreplace')
-    call minpac#add('thinca/vim-quickrun')
-    call minpac#add('tyru/capture.vim')
     command! PackUpdate packadd minpac | source $MYVIMRC | call minpac#update()
     command! PackClean  packadd minpac | source $MYVIMRC | call minpac#clean()
     command! PackStatus packadd minpac | source $MYVIMRC | call minpac#status()
@@ -128,17 +126,18 @@ if exists('*minpac#init')
     map      <silent><nowait>*         <Plug>(asterisk-z*)
     map      <silent><nowait>g*        <Plug>(asterisk-gz*)
     inoremap <nowait><expr><C-f>       snipexp#expand()
+    let g:restart_sessionoptions = 'winpos,resize'
     let g:vimbuild_cwd = '$VIMRC_ROOT/Desktop/vim/src'
     let g:vimbuild_buildargs = 'COLOR_EMOJI=yes OLE=yes DYNAMIC_IME=yes IME=yes GIME=yes DEBUG=no ICONV=yes'
     set showtabline=2
     for s:pair in [
         \ ['<space>', 'JumpToLine'],
-        \ ['<C-j>', 'MRW'],
         \ ['<C-f>', 'Diffy! -w'],
+        \ ['<C-j>', 'MRW'],
         \ ['<C-n>', 'cnext'],
         \ ['<C-p>', 'cprevious'],
         \ ]
-        let &tabline ..= printf(' %%#Title#%s%%#TabLine#:%s', s:pair[0], s:pair[1])
+        let &tabline ..= printf('%%#PmenuSel#%s%%#Pmenu#:%s ', s:pair[0], s:pair[1])
     endfor
 endif
 
