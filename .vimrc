@@ -109,30 +109,34 @@ if exists('*minpac#init')
     call minpac#add('rbtnn/vim-diffy')
     call minpac#add('rbtnn/vim-jumptoline')
     call minpac#add('rbtnn/vim-mrw')
+    call minpac#add('rbtnn/vim-popupwin')
     call minpac#add('rbtnn/vim-snipexp')
     call minpac#add('rbtnn/vim-tagfunc_for_vimscript')
     call minpac#add('rbtnn/vim-uke', { 'frozen' : 1 })
     call minpac#add('rbtnn/vim-vimscript_lasterror')
     call minpac#add('thinca/vim-qfreplace')
     call minpac#add('tyru/restart.vim')
+    call minpac#add('vim-jp/vital.vim')
     command! PackUpdate packadd minpac | source $MYVIMRC | call minpac#update()
     command! PackClean  packadd minpac | source $MYVIMRC | call minpac#clean()
     command! PackStatus packadd minpac | source $MYVIMRC | call minpac#status()
     nnoremap <silent><nowait><space>   :<C-u>JumpToLine<cr>
     nnoremap <silent><nowait><C-j>     :<C-u>MRW<cr>
-    nnoremap <silent><nowait><C-f>     :<C-u>Diffy! -w<cr>
+    nnoremap <silent><nowait><C-f>     :<C-u>Diffy!<cr>
     nnoremap <silent><nowait><C-n>     :<C-u>cnext<cr>zz
     nnoremap <silent><nowait><C-p>     :<C-u>cprevious<cr>zz
     map      <silent><nowait>*         <Plug>(asterisk-z*)
     map      <silent><nowait>g*        <Plug>(asterisk-gz*)
     inoremap <nowait><expr><C-f>       snipexp#expand()
+    let g:diffy_default_args_git = '-w'
+    let g:diffy_default_args_svn = '-x -w'
     let g:restart_sessionoptions = 'winpos,resize'
     let g:vimbuild_cwd = '$VIMRC_ROOT/Desktop/vim/src'
     let g:vimbuild_buildargs = 'COLOR_EMOJI=yes OLE=yes DYNAMIC_IME=yes IME=yes GIME=yes DEBUG=no ICONV=yes'
     set showtabline=2
     for s:pair in [
         \ ['<space>', 'JumpToLine'],
-        \ ['<C-f>', 'Diffy! -w'],
+        \ ['<C-f>', 'Diffy!'],
         \ ['<C-j>', 'MRW'],
         \ ['<C-n>', 'cnext'],
         \ ['<C-p>', 'cprevious'],

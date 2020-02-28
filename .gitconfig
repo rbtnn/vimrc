@@ -9,6 +9,10 @@
 [http]
     sslverify = false
 
+[url "git@github.com:"]
+    pushInsteadOf = git://github.com/
+    pushInsteadOf = https://github.com/
+
 [core]
     autocrlf = false
     quotepath = false
