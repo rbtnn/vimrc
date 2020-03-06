@@ -24,7 +24,7 @@ set foldcolumn=0 foldlevelstart=99 foldmethod=indent
 set grepprg=internal
 set keywordprg=:help
 set laststatus=2 statusline&
-set list nowrap breakindent& showbreak& listchars=tab:<->,trail:-
+set list nowrap breakindent& showbreak& listchars=tab:\ \ \|,trail:-
 set matchpairs+=<:>
 set mouse=a
 set nocursorline nocursorcolumn
@@ -83,7 +83,6 @@ if has('win32')
     endfunction
     command! -complete=file -nargs=* WinExplorer  :call <SID>start('explorer', (empty(<q-args>) ? '.' : <q-args>))
     command! -complete=file -nargs=* NewVim       :call <SID>start(v:progpath, <q-args>)
-    command! -complete=file -nargs=* NewVimNoPlug :call <SID>start(v:progpath, '-u NONE -N')
 
     " https://github.com/rprichard/winpty/releases/
     tnoremap <silent><C-p>       <up>
@@ -109,14 +108,11 @@ if exists('*minpac#init')
     call minpac#add('rbtnn/vim-diffy')
     call minpac#add('rbtnn/vim-jumptoline')
     call minpac#add('rbtnn/vim-mrw')
-    call minpac#add('rbtnn/vim-popupwin')
     call minpac#add('rbtnn/vim-snipexp')
     call minpac#add('rbtnn/vim-tagfunc_for_vimscript')
-    call minpac#add('rbtnn/vim-uke', { 'frozen' : 1 })
     call minpac#add('rbtnn/vim-vimscript_lasterror')
     call minpac#add('thinca/vim-qfreplace')
     call minpac#add('tyru/restart.vim')
-    call minpac#add('vim-jp/vital.vim')
     command! PackUpdate packadd minpac | source $MYVIMRC | call minpac#update()
     command! PackClean  packadd minpac | source $MYVIMRC | call minpac#clean()
     command! PackStatus packadd minpac | source $MYVIMRC | call minpac#status()
