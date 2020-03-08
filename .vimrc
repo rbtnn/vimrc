@@ -128,16 +128,14 @@ if exists('*minpac#init')
     let g:diffy_default_args_git = '-w'
     let g:diffy_default_args_svn = '-x -w'
     let g:restart_sessionoptions = 'winpos,resize'
-    let g:vimbuild_cwd = '$VIMRC_ROOT/Desktop/vim/src'
-    let g:vimbuild_buildargs = 'COLOR_EMOJI=yes OLE=yes DYNAMIC_IME=yes IME=yes GIME=yes DEBUG=no ICONV=yes'
     set showtabline=2
     for s:pair in [
-        \ ['<space>', 'JumpToLine'],
-        \ ['<C-f>', 'Diffy!'],
-        \ ['<C-j>', 'MRW'],
-        \ ['<C-n>', 'cnext'],
-        \ ['<C-p>', 'cprevious'],
-        \ ]
+            \ ['<space>', 'JumpToLine'],
+            \ ['<C-f>', 'Diffy!'],
+            \ ['<C-j>', 'MRW'],
+            \ ['<C-n>', 'cnext'],
+            \ ['<C-p>', 'cprevious'],
+            \ ]
         let &tabline ..= printf('%%#PmenuSel#%s%%#Pmenu#:%s ', s:pair[0], s:pair[1])
     endfor
 endif
