@@ -16,18 +16,18 @@ set ambiwidth=double
 set autoread
 set background=dark
 set clipboard=unnamed
+set cursorline nocursorcolumn
 set display=lastline
 set expandtab shiftround softtabstop=-1 shiftwidth=4 tabstop=4
 set fileencodings=utf-8,cp932,euc-jp,default,latin
 set fileformats=unix,dos,mac
-set foldcolumn=0 foldlevelstart=99 foldmethod=indent
 set grepprg=internal
 set keywordprg=:help
 set laststatus=2 statusline&
 set list nowrap breakindent& showbreak& listchars=tab:\ \ \|,trail:-
 set matchpairs+=<:>
 set mouse=a
-set nocursorline nocursorcolumn
+set nofoldenable foldcolumn& foldlevelstart& foldmethod&
 set noignorecase nosmartcase
 set noshellslash
 set nowrapscan
@@ -74,8 +74,13 @@ endif
 
 inoremap <silent><tab>             <C-v><tab>
 
-command! -bar -nargs=0 SessionSave   :mksession! $VIMRC_DOTVIM/session.vim
-command! -bar -nargs=0 SessionLoad   :source $VIMRC_DOTVIM/session.vim
+command! -bar -nargs=0 SessionSave       :mksession! $VIMRC_DOTVIM/session.vim
+command! -bar -nargs=0 SessionLoad       :source $VIMRC_DOTVIM/session.vim
+
+command! -bar -nargs=0 AllWindowsTheSame
+    \ : call map(range(1, winnr('$')), { i,x -> setwinvar(x, '&winfixheight', 0) && setwinvar(x, '&winfixwidth', 0) })
+    \ | set equalalways
+    \ | wincmd =
 
 if has('win32')
     function! s:start(progpath, args) abort
@@ -104,11 +109,12 @@ if exists('*minpac#init')
     call minpac#init({ 'dir' : $VIMRC_DOTVIM })
     call minpac#add('haya14busa/vim-asterisk')
     call minpac#add('k-takata/minpac', { 'type' : 'opt', 'branch' : 'devel' })
+    call minpac#add('kana/vim-operator-replace')
+    call minpac#add('kana/vim-operator-user')
     call minpac#add('rbtnn/vim-coloredit')
     call minpac#add('rbtnn/vim-diffy')
     call minpac#add('rbtnn/vim-jumptoline')
     call minpac#add('rbtnn/vim-mrw')
-    call minpac#add('rbtnn/vim-snipexp')
     call minpac#add('rbtnn/vim-vimscript_formatter')
     call minpac#add('rbtnn/vim-vimscript_lasterror')
     call minpac#add('rbtnn/vim-vimscript_tagfunc')
@@ -116,22 +122,21 @@ if exists('*minpac#init')
     call minpac#add('tyru/restart.vim')
     command! PackUpdate packadd minpac | source $MYVIMRC | call minpac#update()
     command! PackClean  packadd minpac | source $MYVIMRC | call minpac#clean()
-    command! PackStatus packadd minpac | source $MYVIMRC | call minpac#status()
     nnoremap <silent><nowait><space>   :<C-u>JumpToLine<cr>
     nnoremap <silent><nowait><C-j>     :<C-u>MRW<cr>
-    nnoremap <silent><nowait><C-f>     :<C-u>Diffy!<cr>
+    nnoremap <silent><nowait><C-f>     :<C-u>Diffy<cr>
     nnoremap <silent><nowait><C-n>     :<C-u>cnext<cr>zz
     nnoremap <silent><nowait><C-p>     :<C-u>cprevious<cr>zz
     map      <silent><nowait>*         <Plug>(asterisk-z*)
     map      <silent><nowait>g*        <Plug>(asterisk-gz*)
-    inoremap <nowait><expr><C-f>       snipexp#expand()
+    nmap     <silent><nowait>s         <Plug>(operator-replace)
     let g:diffy_default_args_git = '-w'
     let g:diffy_default_args_svn = '-x -w'
     let g:restart_sessionoptions = 'winpos,resize'
     set showtabline=2
     for s:pair in [
             \ ['<space>', 'JumpToLine'],
-            \ ['<C-f>', 'Diffy!'],
+            \ ['<C-f>', 'Diffy'],
             \ ['<C-j>', 'MRW'],
             \ ['<C-n>', 'cnext'],
             \ ['<C-p>', 'cprevious'],
@@ -140,19 +145,20 @@ if exists('*minpac#init')
     endfor
 endif
 
-syntax on
-filetype plugin indent on
-set secure
-
 if filereadable(expand('~/.vimrc.local'))
     source ~/.vimrc.local
 endif
+
+syntax on
+filetype plugin indent on
+set secure
 
 augroup vimrc
     autocmd!
     for s:cmdname in [ 'MANPAGER', 'VimFoldh', ]
         execute printf('autocmd CmdlineEnter * :silent! delcommand %s', s:cmdname)
     endfor
+    autocmd! WinEnter * :AllWindowsTheSame
 augroup END
 
 silent! colorscheme xxx
