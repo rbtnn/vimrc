@@ -4,7 +4,7 @@ set makeencoding=char
 scriptencoding utf-8
 
 set langmenu=en_gb.latin1
-set winaltkeys=yes guioptions=m
+set winaltkeys=yes guioptions=mM
 
 " for less.exe on windows
 let $LESSCHARSET = 'utf-8'
@@ -60,6 +60,7 @@ let g:vim_indent_cont = &g:shiftwidth
 let g:mapleader = '\'
 
 source $VIMRC_DOTVIM/tabsidebar.vim
+source $VIMRC_DOTVIM/rust.vim
 source $VIMRC_DOTVIM/vb.vim
 
 " swap and backup files
@@ -133,16 +134,6 @@ if exists('*minpac#init')
     let g:diffy_default_args_git = '-w'
     let g:diffy_default_args_svn = '-x -w'
     let g:restart_sessionoptions = 'winpos,resize'
-    set showtabline=2
-    for s:pair in [
-            \ ['<space>', 'JumpToLine'],
-            \ ['<C-f>', 'Diffy'],
-            \ ['<C-j>', 'MRW'],
-            \ ['<C-n>', 'cnext'],
-            \ ['<C-p>', 'cprevious'],
-            \ ]
-        let &tabline ..= printf('%%#PmenuSel#%s%%#Pmenu#:%s ', s:pair[0], s:pair[1])
-    endfor
 endif
 
 if filereadable(expand('~/.vimrc.local'))
