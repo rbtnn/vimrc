@@ -149,7 +149,9 @@ augroup vimrc
     for s:cmdname in [ 'MANPAGER', 'VimFoldh', ]
         execute printf('autocmd CmdlineEnter * :silent! delcommand %s', s:cmdname)
     endfor
-    autocmd! WinEnter * :AllWindowsTheSame
+    autocmd WinEnter        *    :AllWindowsTheSame
+    autocmd TerminalWinOpen *    :nnoremap <buffer><nowait>q   :<C-u>quit!<cr>
+    autocmd FileType        help :nnoremap <buffer><nowait>q   :<C-u>quit!<cr>
 augroup END
 
 silent! colorscheme xxx
