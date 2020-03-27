@@ -73,8 +73,6 @@ if has('persistent_undo')
     set undofile undodir=$VIMRC_DOTVIM/undofiles//
 endif
 
-inoremap <silent><tab>             <C-v><tab>
-
 command! -bar -nargs=0 SessionSave       :mksession! $VIMRC_DOTVIM/session.vim
 command! -bar -nargs=0 SessionLoad       :source $VIMRC_DOTVIM/session.vim
 
@@ -136,6 +134,16 @@ if exists('*minpac#init')
     let g:restart_sessionoptions = 'winpos,resize'
 endif
 
+augroup vimrc
+    autocmd!
+    for s:cmdname in [ 'MANPAGER', 'VimFoldh', ]
+        execute printf('autocmd CmdlineEnter * :silent! delcommand %s', s:cmdname)
+    endfor
+    autocmd VimEnter,WinEnter *    :AllWindowsTheSame
+    autocmd TerminalWinOpen   *    :nnoremap <buffer><nowait>q   :<C-u>quit!<cr>
+    autocmd FileType          help :nnoremap <buffer><nowait>q   :<C-u>quit!<cr>
+augroup END
+
 if filereadable(expand('~/.vimrc.local'))
     source ~/.vimrc.local
 endif
@@ -143,16 +151,6 @@ endif
 syntax on
 filetype plugin indent on
 set secure
-
-augroup vimrc
-    autocmd!
-    for s:cmdname in [ 'MANPAGER', 'VimFoldh', ]
-        execute printf('autocmd CmdlineEnter * :silent! delcommand %s', s:cmdname)
-    endfor
-    autocmd WinEnter        *    :AllWindowsTheSame
-    autocmd TerminalWinOpen *    :nnoremap <buffer><nowait>q   :<C-u>quit!<cr>
-    autocmd FileType        help :nnoremap <buffer><nowait>q   :<C-u>quit!<cr>
-augroup END
 
 silent! colorscheme xxx
 
