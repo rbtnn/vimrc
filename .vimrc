@@ -9,7 +9,7 @@ set winaltkeys=yes guioptions=mM
 " for less.exe on windows
 let $LESSCHARSET = 'utf-8'
 
-let $VIMRC_ROOT = expand('<sfile>:h') 
+let $VIMRC_ROOT = expand('<sfile>:h')
 let $VIMRC_DOTVIM = expand('$VIMRC_ROOT/.vim')
 
 set ambiwidth=double
@@ -76,6 +76,8 @@ endif
 command! -bar -nargs=0 SessionSave       :mksession! $VIMRC_DOTVIM/session.vim
 command! -bar -nargs=0 SessionLoad       :source $VIMRC_DOTVIM/session.vim
 
+command! -bar -nargs=0 TermKillAll       :call map(term_list(), { i,x -> job_stop(term_getjob(x)) })
+
 command! -bar -nargs=0 AllWindowsTheSame
     \ : call map(range(1, winnr('$')), { i,x -> setwinvar(x, '&winfixheight', 0) && setwinvar(x, '&winfixwidth', 0) })
     \ | set equalalways
@@ -106,6 +108,7 @@ silent! packadd minpac
 
 if exists('*minpac#init')
     call minpac#init({ 'dir' : $VIMRC_DOTVIM })
+    call minpac#add('cormacrelf/vim-colors-github')
     call minpac#add('haya14busa/vim-asterisk')
     call minpac#add('k-takata/minpac', { 'type' : 'opt', 'branch' : 'devel' })
     call minpac#add('kana/vim-operator-replace')
@@ -152,5 +155,5 @@ syntax on
 filetype plugin indent on
 set secure
 
-silent! colorscheme xxx
+silent! colorscheme github
 
