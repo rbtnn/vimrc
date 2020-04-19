@@ -108,7 +108,7 @@ silent! packadd minpac
 
 if exists('*minpac#init')
     call minpac#init({ 'dir' : $VIMRC_DOTVIM })
-    call minpac#add('cormacrelf/vim-colors-github')
+    call minpac#add('bluz71/vim-nightfly-guicolors')
     call minpac#add('haya14busa/vim-asterisk')
     call minpac#add('k-takata/minpac', { 'type' : 'opt', 'branch' : 'devel' })
     call minpac#add('kana/vim-operator-replace')
@@ -135,6 +135,7 @@ if exists('*minpac#init')
     let g:diffy_default_args_git = '-w'
     let g:diffy_default_args_svn = '-x -w'
     let g:restart_sessionoptions = 'winpos,resize'
+    let g:nightflyItalics = 0
 endif
 
 augroup vimrc
@@ -155,5 +156,5 @@ syntax on
 filetype plugin indent on
 set secure
 
-silent! colorscheme github
+silent! colorscheme nightfly
 
