@@ -146,6 +146,8 @@ augroup vimrc
     autocmd VimEnter,WinEnter *    :AllWindowsTheSame
     autocmd TerminalWinOpen   *    :nnoremap <buffer><nowait>q   :<C-u>quit!<cr>
     autocmd FileType          help :nnoremap <buffer><nowait>q   :<C-u>quit!<cr>
+    autocmd ColorScheme       *    :highlight SpecialKey guifg=#032645
+    autocmd ColorScheme       *    :highlight Comment    guifg=#053867
 augroup END
 
 if filereadable(expand('~/.vimrc.local'))
