@@ -24,7 +24,7 @@ set fileformats=unix,dos,mac
 set grepprg=internal
 set keywordprg=:help
 set laststatus=2 statusline&
-set list nowrap breakindent& showbreak& listchars=tab:\ \ \|,trail:-
+set list nowrap breakindent& showbreak& listchars=tab:\ \ \|,trail:-,eol:↲
 set matchpairs+=<:>
 set mouse=a
 set nofoldenable foldcolumn& foldlevelstart& foldmethod&
@@ -75,21 +75,10 @@ endif
 
 command! -bar -nargs=0 SessionSave       :mksession! $VIMRC_DOTVIM/session.vim
 command! -bar -nargs=0 SessionLoad       :source $VIMRC_DOTVIM/session.vim
-
 command! -bar -nargs=0 TermKillAll       :call map(term_list(), { i,x -> job_stop(term_getjob(x)) })
-
-command! -bar -nargs=0 AllWindowsTheSame
-    \ : call map(range(1, winnr('$')), { i,x -> setwinvar(x, '&winfixheight', 0) && setwinvar(x, '&winfixwidth', 0) })
-    \ | set equalalways
-    \ | wincmd =
+command! -bar -nargs=0 GitLsFiles        :terminal git ls-files
 
 if has('win32')
-    function! s:start(progpath, args) abort
-        silent! execute printf('!start %s %s', a:progpath, a:args)
-    endfunction
-    command! -complete=file -nargs=* WinExplorer  :call <SID>start('explorer', (empty(<q-args>) ? '.' : <q-args>))
-    command! -complete=file -nargs=* NewVim       :call <SID>start(v:progpath, <q-args>)
-
     " https://github.com/rprichard/winpty/releases/
     tnoremap <silent><C-p>       <up>
     tnoremap <silent><C-n>       <down>
@@ -108,24 +97,16 @@ silent! packadd minpac
 
 if exists('*minpac#init')
     call minpac#init({ 'dir' : $VIMRC_DOTVIM })
-    call minpac#add('bluz71/vim-nightfly-guicolors')
+    call minpac#add('bluz71/vim-moonfly-colors')
     call minpac#add('haya14busa/vim-asterisk')
     call minpac#add('k-takata/minpac', { 'type' : 'opt', 'branch' : 'devel' })
     call minpac#add('kana/vim-operator-replace')
     call minpac#add('kana/vim-operator-user')
-    call minpac#add('rbtnn/vim-coloredit')
     call minpac#add('rbtnn/vim-diffy')
     call minpac#add('rbtnn/vim-jumptoline')
-    call minpac#add('rbtnn/vim-mrw')
-    call minpac#add('rbtnn/vim-vimscript_formatter')
-    call minpac#add('rbtnn/vim-vimscript_lasterror')
-    call minpac#add('rbtnn/vim-vimscript_tagfunc')
     call minpac#add('thinca/vim-qfreplace')
     call minpac#add('tyru/restart.vim')
-    command! PackUpdate packadd minpac | source $MYVIMRC | call minpac#update()
-    command! PackClean  packadd minpac | source $MYVIMRC | call minpac#clean()
     nnoremap <silent><nowait><space>   :<C-u>JumpToLine<cr>
-    nnoremap <silent><nowait><C-j>     :<C-u>MRW<cr>
     nnoremap <silent><nowait><C-f>     :<C-u>Diffy<cr>
     nnoremap <silent><nowait><C-n>     :<C-u>cnext<cr>zz
     nnoremap <silent><nowait><C-p>     :<C-u>cprevious<cr>zz
@@ -135,7 +116,7 @@ if exists('*minpac#init')
     let g:diffy_default_args_git = '-w'
     let g:diffy_default_args_svn = '-x -w'
     let g:restart_sessionoptions = 'winpos,resize'
-    let g:nightflyItalics = 0
+    let g:moonflyItalics = 0
 endif
 
 augroup vimrc
@@ -143,11 +124,9 @@ augroup vimrc
     for s:cmdname in [ 'MANPAGER', 'VimFoldh', ]
         execute printf('autocmd CmdlineEnter * :silent! delcommand %s', s:cmdname)
     endfor
-    autocmd VimEnter,WinEnter *    :AllWindowsTheSame
     autocmd TerminalWinOpen   *    :nnoremap <buffer><nowait>q   :<C-u>quit!<cr>
     autocmd FileType          help :nnoremap <buffer><nowait>q   :<C-u>quit!<cr>
-    autocmd ColorScheme       *    :highlight SpecialKey guifg=#032645
-    autocmd ColorScheme       *    :highlight Comment    guifg=#053867
+    autocmd ColorScheme       *    :highlight Comment guifg=#434343
 augroup END
 
 if filereadable(expand('~/.vimrc.local'))
@@ -158,5 +137,5 @@ syntax on
 filetype plugin indent on
 set secure
 
-silent! colorscheme nightfly
+silent! colorscheme moonfly
 
