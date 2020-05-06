@@ -73,11 +73,6 @@ if has('persistent_undo')
     set undofile undodir=$VIMRC_DOTVIM/undofiles//
 endif
 
-command! -bar -nargs=0 SessionSave       :mksession! $VIMRC_DOTVIM/session.vim
-command! -bar -nargs=0 SessionLoad       :source $VIMRC_DOTVIM/session.vim
-command! -bar -nargs=0 TermKillAll       :call map(term_list(), { i,x -> job_stop(term_getjob(x)) })
-command! -bar -nargs=0 GitLsFiles        :terminal git ls-files
-
 if has('win32')
     " https://github.com/rprichard/winpty/releases/
     tnoremap <silent><C-p>       <up>
@@ -106,8 +101,9 @@ if exists('*minpac#init')
     call minpac#add('rbtnn/vim-jumptoline')
     call minpac#add('thinca/vim-qfreplace')
     call minpac#add('tyru/restart.vim')
+
     nnoremap <silent><nowait><space>   :<C-u>JumpToLine<cr>
-    nnoremap <silent><nowait><C-f>     :<C-u>Diffy<cr>
+    nnoremap <silent><nowait><C-f>     :<C-u>Diffy!<cr>
     nnoremap <silent><nowait><C-n>     :<C-u>cnext<cr>zz
     nnoremap <silent><nowait><C-p>     :<C-u>cprevious<cr>zz
     map      <silent><nowait>*         <Plug>(asterisk-z*)
@@ -124,13 +120,20 @@ augroup vimrc
     for s:cmdname in [ 'MANPAGER', 'VimFoldh', ]
         execute printf('autocmd CmdlineEnter * :silent! delcommand %s', s:cmdname)
     endfor
-    autocmd TerminalWinOpen   *    :nnoremap <buffer><nowait>q   :<C-u>quit!<cr>
-    autocmd FileType          help :nnoremap <buffer><nowait>q   :<C-u>quit!<cr>
-    autocmd ColorScheme       *    :highlight Comment guifg=#434343
+    autocmd TerminalWinOpen   *       :nnoremap <buffer><nowait>q   :<C-u>quit!<cr>
+    autocmd FileType          help,qf :nnoremap <buffer><nowait>q   :<C-u>quit!<cr>
+    autocmd ColorScheme       *       :highlight Comment guifg=#434343
+    autocmd ColorScheme       *       :highlight Error   guibg=#8cc85f
 augroup END
 
 if filereadable(expand('~/.vimrc.local'))
     source ~/.vimrc.local
+endif
+
+if get(g:, 'vimrc_extra', v:false)
+    command! -bar -nargs=0 SessionSave       :mksession! $VIMRC_DOTVIM/session.vim
+    command! -bar -nargs=0 SessionLoad       :source $VIMRC_DOTVIM/session.vim
+    command! -bar -nargs=0 TermKillAll       :call map(term_list(), { i,x -> job_stop(term_getjob(x)) })
 endif
 
 syntax on
