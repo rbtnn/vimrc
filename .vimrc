@@ -92,7 +92,7 @@ silent! packadd minpac
 
 if exists('*minpac#init')
     call minpac#init({ 'dir' : $VIMRC_DOTVIM })
-    call minpac#add('bluz71/vim-moonfly-colors')
+    call minpac#add('cocopon/iceberg.vim')
     call minpac#add('haya14busa/vim-asterisk')
     call minpac#add('k-takata/minpac', { 'type' : 'opt', 'branch' : 'devel' })
     call minpac#add('kana/vim-operator-replace')
@@ -112,7 +112,6 @@ if exists('*minpac#init')
     let g:diffy_default_args_git = '-w'
     let g:diffy_default_args_svn = '-x -w'
     let g:restart_sessionoptions = 'winpos,resize'
-    let g:moonflyItalics = 0
 endif
 
 augroup vimrc
@@ -122,15 +121,14 @@ augroup vimrc
     endfor
     autocmd TerminalWinOpen   *       :nnoremap <buffer><nowait>q   :<C-u>quit!<cr>
     autocmd FileType          help,qf :nnoremap <buffer><nowait>q   :<C-u>quit!<cr>
-    autocmd ColorScheme       *       :highlight Comment guifg=#434343
-    autocmd ColorScheme       *       :highlight Error   guibg=#8cc85f
+    autocmd ColorScheme       *       :highlight! link  Error PmenuSel
 augroup END
 
 if filereadable(expand('~/.vimrc.local'))
     source ~/.vimrc.local
 endif
 
-if get(g:, 'vimrc_extra', v:false)
+if get(g:, 'vimrc_extra', v:true)
     command! -bar -nargs=0 SessionSave       :mksession! $VIMRC_DOTVIM/session.vim
     command! -bar -nargs=0 SessionLoad       :source $VIMRC_DOTVIM/session.vim
     command! -bar -nargs=0 TermKillAll       :call map(term_list(), { i,x -> job_stop(term_getjob(x)) })
@@ -140,5 +138,5 @@ syntax on
 filetype plugin indent on
 set secure
 
-silent! colorscheme moonfly
+silent! colorscheme iceberg
 
