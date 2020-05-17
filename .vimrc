@@ -39,6 +39,7 @@ set sessionoptions=buffers,curdir,tabpages
 set shortmess& shortmess-=S
 set showmode
 set showtabline=0 tabline&
+set signcolumn=yes
 set tags=./tags;
 set termguicolors
 set title titlestring=%{v:progname}[%{getpid()}]
@@ -60,7 +61,6 @@ let g:vim_indent_cont = &g:shiftwidth
 let g:mapleader = '\'
 
 source $VIMRC_DOTVIM/tabsidebar.vim
-source $VIMRC_DOTVIM/rust.vim
 source $VIMRC_DOTVIM/vb.vim
 
 " swap and backup files
@@ -99,11 +99,13 @@ if exists('*minpac#init')
     call minpac#add('kana/vim-operator-user')
     call minpac#add('rbtnn/vim-diffy')
     call minpac#add('rbtnn/vim-jumptoline')
+    call minpac#add('rbtnn/vim-lsfiles')
     call minpac#add('thinca/vim-qfreplace')
     call minpac#add('tyru/restart.vim')
 
     nnoremap <silent><nowait><space>   :<C-u>JumpToLine<cr>
-    nnoremap <silent><nowait><C-f>     :<C-u>Diffy!<cr>
+    nnoremap <silent><nowait><C-f>     :<C-u>LsFiles<cr>
+    nnoremap <silent><nowait><C-j>     :<C-u>Diffy!<cr>
     nnoremap <silent><nowait><C-n>     :<C-u>cnext<cr>zz
     nnoremap <silent><nowait><C-p>     :<C-u>cprevious<cr>zz
     map      <silent><nowait>*         <Plug>(asterisk-z*)
@@ -121,6 +123,8 @@ augroup vimrc
     endfor
     autocmd TerminalWinOpen   *       :nnoremap <buffer><nowait>q   :<C-u>quit!<cr>
     autocmd FileType          help,qf :nnoremap <buffer><nowait>q   :<C-u>quit!<cr>
+    autocmd FileType          rust    :nnoremap <buffer><nowait>R   :<C-u>terminal cargo run<cr>
+    autocmd FileType          cs      :nnoremap <buffer><nowait>R   :<C-u>terminal msbuild /nologo msbuild.xml<cr>
     autocmd ColorScheme       *       :highlight! link  Error PmenuSel
 augroup END
 
@@ -129,9 +133,9 @@ if filereadable(expand('~/.vimrc.local'))
 endif
 
 if get(g:, 'vimrc_extra', v:true)
-    command! -bar -nargs=0 SessionSave       :mksession! $VIMRC_DOTVIM/session.vim
-    command! -bar -nargs=0 SessionLoad       :source $VIMRC_DOTVIM/session.vim
-    command! -bar -nargs=0 TermKillAll       :call map(term_list(), { i,x -> job_stop(term_getjob(x)) })
+    command! -bar -nargs=0     SessionSave   :mksession! $VIMRC_DOTVIM/session.vim
+    command! -bar -nargs=0     SessionLoad   :source $VIMRC_DOTVIM/session.vim
+    command! -bar -nargs=0     TermKillAll   :call map(term_list(), { i,x -> job_stop(term_getjob(x)) })
 endif
 
 syntax on
