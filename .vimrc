@@ -6,9 +6,6 @@ scriptencoding utf-8
 set langmenu=en_gb.latin1
 set winaltkeys=yes guioptions=mM
 
-" for less.exe on windows
-let $LESSCHARSET = 'utf-8'
-
 let $VIMRC_ROOT = expand('<sfile>:h')
 let $VIMRC_DOTVIM = expand('$VIMRC_ROOT/.vim')
 
@@ -39,16 +36,11 @@ set sessionoptions=buffers,curdir,tabpages
 set shortmess& shortmess-=S
 set showmode
 set showtabline=0 tabline&
-set signcolumn=yes
 set tags=./tags;
 set termguicolors
 set title titlestring=%{v:progname}[%{getpid()}]
 set visualbell noerrorbells t_vb=
 set wildmenu wildmode&
-
-if exists('+completeslash')
-    set completeslash=slash
-endif
 
 set wildignore=*.pdb,*.obj,*.dll,*.exe,*.idb,*.ncb,*.ilk,*.plg,*.bsc,*.sbr,*.opt,*.config
 set wildignore+=*.pdf,*.mp3,*.doc,*.docx,*.xls,*.xlsx,*.idx,*.jpg,*.png,*.zip,*.MMF,*.gif
@@ -125,7 +117,7 @@ augroup vimrc
     autocmd FileType          help,qf :nnoremap <buffer><nowait>q   :<C-u>quit!<cr>
     autocmd FileType          rust    :nnoremap <buffer><nowait>R   :<C-u>terminal cargo run<cr>
     autocmd FileType          cs      :nnoremap <buffer><nowait>R   :<C-u>terminal msbuild /nologo msbuild.xml<cr>
-    autocmd ColorScheme       *       :highlight! link  Error PmenuSel
+    autocmd ColorScheme       *       :highlight! Error guibg=#ff0000
 augroup END
 
 if filereadable(expand('~/.vimrc.local'))
