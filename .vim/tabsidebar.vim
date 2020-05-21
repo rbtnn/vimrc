@@ -8,7 +8,7 @@ endif
 function! Tabsidebar() abort
     try
         let lines = []
-        let lines += [printf('%%#%s#TabPage %d', 'TabSideBar', g:actual_curtabpage)]
+        let lines += [printf('%%#TabSideBar#TabPage %d', g:actual_curtabpage)]
         for x in getwininfo()
             if x.tabnr == g:actual_curtabpage
                 let iscurr = (winnr() == x.winnr) && (g:actual_curtabpage == tabpagenr())
@@ -22,8 +22,6 @@ function! Tabsidebar() abort
                     let s = '-LocList-'
                 elseif iscurr && !empty(getcmdwintype())
                     let s = '-CmdLineWindow-'
-                elseif 'fern' == getbufvar(x.bufnr, '&filetype')
-                    let s = '-Fern-'
                 elseif 'diff' == getbufvar(x.bufnr, '&filetype')
                     let s = '-Diff-'
                 elseif filereadable(name)
@@ -36,10 +34,8 @@ function! Tabsidebar() abort
                         let s = name
                     endif
                 endif
-                let icon = iscurr ? '*' : ' '
-                let lines += [printf('%%#%s# %s %s',
-                    \ (iscurr ? 'TabSideBarSel' : 'TabSideBar'),
-                    \ icon, s)]
+                let icon = iscurr ? '▶' : '  '
+                let lines += [printf('%%#TabSideBar# %s %s', icon, s)]
             endif
         endfor
         return join(lines, "\n")
@@ -49,10 +45,8 @@ function! Tabsidebar() abort
 endfunction
 
 function! TabsidebarSetting() abort
-    let &tabsidebarcolumns = 24
-    if v:servername == 'MINIMAP'
-        set showtabsidebar=0
-    elseif &tabsidebarcolumns * 4 < &columns
+    let &tabsidebarcolumns = 30
+    if &tabsidebarcolumns * 4 < &columns
         set showtabsidebar=2
         set notabsidebarwrap
         set notabsidebaralign

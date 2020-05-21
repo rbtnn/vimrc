@@ -84,11 +84,11 @@ silent! packadd minpac
 
 if exists('*minpac#init')
     call minpac#init({ 'dir' : $VIMRC_DOTVIM })
-    call minpac#add('cocopon/iceberg.vim')
     call minpac#add('haya14busa/vim-asterisk')
     call minpac#add('k-takata/minpac', { 'type' : 'opt', 'branch' : 'devel' })
     call minpac#add('kana/vim-operator-replace')
     call minpac#add('kana/vim-operator-user')
+    call minpac#add('nanotech/jellybeans.vim')
     call minpac#add('rbtnn/vim-diffy')
     call minpac#add('rbtnn/vim-jumptoline')
     call minpac#add('rbtnn/vim-lsfiles')
@@ -106,6 +106,7 @@ if exists('*minpac#init')
     let g:diffy_default_args_git = '-w'
     let g:diffy_default_args_svn = '-x -w'
     let g:restart_sessionoptions = 'winpos,resize'
+    let g:jellybeans_use_gui_italics = 0
 endif
 
 augroup vimrc
@@ -117,7 +118,6 @@ augroup vimrc
     autocmd FileType          help,qf :nnoremap <buffer><nowait>q   :<C-u>quit!<cr>
     autocmd FileType          rust    :nnoremap <buffer><nowait>R   :<C-u>terminal cargo run<cr>
     autocmd FileType          cs      :nnoremap <buffer><nowait>R   :<C-u>terminal msbuild /nologo msbuild.xml<cr>
-    autocmd ColorScheme       *       :highlight! Error guibg=#ff0000
 augroup END
 
 if filereadable(expand('~/.vimrc.local'))
@@ -134,5 +134,5 @@ syntax on
 filetype plugin indent on
 set secure
 
-silent! colorscheme iceberg
+silent! colorscheme jellybeans
 
