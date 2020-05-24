@@ -15,24 +15,22 @@ function! Tabsidebar() abort
                 let name = bufname(x.bufnr)
                 let s = '[No Name]'
                 if x.terminal
-                    let s = '-Terminal-'
+                    let s = printf('[Terminal](%s)', term_getstatus(x.bufnr))
                 elseif x.quickfix
-                    let s = '-QuickFix-'
+                    let s = '[QuickFix]'
                 elseif x.loclist
-                    let s = '-LocList-'
+                    let s = '[LocList]'
                 elseif iscurr && !empty(getcmdwintype())
-                    let s = '-CmdLineWindow-'
+                    let s = '[CmdLineWindow]'
                 elseif 'diff' == getbufvar(x.bufnr, '&filetype')
-                    let s = '-Diff-'
-                elseif filereadable(name)
+                    let s = '[Diff]'
+                elseif !empty(name)
                     let modi = getbufvar(x.bufnr, '&modified')
                     let read = getbufvar(x.bufnr, '&readonly')
-                    let name = fnamemodify(name, ':t')
-                    let s = printf('%s%s%s', (read ? '[R]' : ''), (modi ? '[+]' : ''), name)
-                else
-                    if !empty(name)
-                        let s = name
+                    if filereadable(name)
+                        let name = fnamemodify(name, ':t')
                     endif
+                    let s = printf('%s%s%s', (read ? '[R]' : ''), (modi ? '[+]' : ''), name)
                 endif
                 let icon = iscurr ? '▶' : '  '
                 let lines += [printf('%%#TabSideBar# %s %s', icon, s)]

@@ -11,7 +11,6 @@ let $VIMRC_DOTVIM = expand('$VIMRC_ROOT/.vim')
 
 set ambiwidth=double
 set autoread
-set background=dark
 set clipboard=unnamed
 set cursorline nocursorcolumn
 set display=lastline
@@ -27,6 +26,7 @@ set mouse=a
 set nofoldenable foldcolumn& foldlevelstart& foldmethod&
 set noignorecase nosmartcase
 set noshellslash
+set noshowmode
 set nowrapscan
 set nrformats=
 set pumheight=10 completeopt=menu
@@ -34,7 +34,6 @@ set ruler rulerformat=%{&fenc}/%{&ff}/%{&ft}
 set scrolloff=0 nonumber norelativenumber
 set sessionoptions=buffers,curdir,tabpages
 set shortmess& shortmess-=S
-set showmode
 set showtabline=0 tabline&
 set tags=./tags;
 set termguicolors
@@ -85,6 +84,7 @@ silent! packadd minpac
 if exists('*minpac#init')
     call minpac#init({ 'dir' : $VIMRC_DOTVIM })
     call minpac#add('haya14busa/vim-asterisk')
+    call minpac#add('itchyny/lightline.vim')
     call minpac#add('k-takata/minpac', { 'type' : 'opt', 'branch' : 'devel' })
     call minpac#add('kana/vim-operator-replace')
     call minpac#add('kana/vim-operator-user')
@@ -116,9 +116,21 @@ augroup vimrc
     endfor
     autocmd TerminalWinOpen   *       :nnoremap <buffer><nowait>q   :<C-u>quit!<cr>
     autocmd FileType          help,qf :nnoremap <buffer><nowait>q   :<C-u>quit!<cr>
-    autocmd FileType          rust    :nnoremap <buffer><nowait>R   :<C-u>terminal cargo run<cr>
-    autocmd FileType          cs      :nnoremap <buffer><nowait>R   :<C-u>terminal msbuild /nologo msbuild.xml<cr>
 augroup END
+
+if has('win32')
+    function! VimTerminal(q_args) abort
+        let s = printf(':winsize %d %d | winpos %d %d', &columns, &lines, getwinposx(), getwinposy())
+        call job_start([exepath(v:progpath), '-c', s, '-c', printf('terminal ++curwin %s', a:q_args)])
+    endfunction
+    augroup vim-terminal
+        autocmd!
+        autocmd FileType  *       :nnoremap <buffer><nowait>R   <nop>
+        autocmd FileType  rust    :nnoremap <buffer><nowait>R   :<C-u>call VimTerminal('cargo run')<cr>
+        autocmd FileType  cs      :nnoremap <buffer><nowait>R   :<C-u>call VimTerminal('msbuild /nologo msbuild.xml')<cr>
+        autocmd FileType  python  :nnoremap <buffer><nowait>R   :<C-u>call VimTerminal('python3 ' .. expand('%'))<cr>
+    augroup END
+endif
 
 if filereadable(expand('~/.vimrc.local'))
     source ~/.vimrc.local
@@ -134,5 +146,8 @@ syntax on
 filetype plugin indent on
 set secure
 
-silent! colorscheme jellybeans
+if has_key(minpac#getpluglist(), 'jellybeans.vim')
+    set background=dark
+    silent! colorscheme jellybeans
+endif
 
