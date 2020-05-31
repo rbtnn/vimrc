@@ -20,7 +20,7 @@ try
     set grepprg=internal
     set keywordprg=:help
     set laststatus=2 statusline&
-    set list nowrap breakindent& showbreak& listchars=tab:\ \ \|,trail:-,eol:↲
+    set list nowrap breakindent& showbreak& listchars=tab:\ \ \|,trail:-
     set matchpairs+=<:>
     set mouse=a
     set nofoldenable foldcolumn& foldlevelstart& foldmethod&
@@ -88,7 +88,6 @@ try
         call minpac#add('k-takata/minpac', { 'type' : 'opt', 'branch' : 'devel' })
         call minpac#add('kana/vim-operator-replace')
         call minpac#add('kana/vim-operator-user')
-        call minpac#add('lambdalisue/fern.vim')
         call minpac#add('nanotech/jellybeans.vim')
         call minpac#add('rbtnn/vim-diffy')
         call minpac#add('rbtnn/vim-jumptoline')
@@ -98,10 +97,8 @@ try
         call minpac#add('tyru/restart.vim')
 
         nnoremap <silent><nowait><space>   :<C-u>JumpToLine<cr>
-        nnoremap <silent><nowait><C-f>     :<C-u>Fern . -drawer<cr>
         nnoremap <silent><nowait><C-j>     :<C-u>cnext<cr>zz
         nnoremap <silent><nowait><C-k>     :<C-u>cprevious<cr>zz
-        nnoremap <silent><nowait><C-n>     :<C-u>tabnew \| terminal ++curwin<cr>
         map      <silent><nowait>*         <Plug>(asterisk-z*)
         map      <silent><nowait>g*        <Plug>(asterisk-gz*)
         nmap     <silent><nowait>s         <Plug>(operator-replace)
@@ -116,33 +113,17 @@ try
         for s:cmdname in [ 'MANPAGER', 'VimFoldh', ]
             execute printf('autocmd CmdlineEnter * :silent! delcommand %s', s:cmdname)
         endfor
-        autocmd TerminalWinOpen   *            :nnoremap <buffer><nowait>q   :<C-u>quit!<cr>
-        autocmd FileType          fern,help,qf :nnoremap <buffer><nowait>q   :<C-u>quit!<cr>
+        autocmd TerminalWinOpen   *       :nnoremap <buffer><nowait>q      :<C-u>quit!<cr>
+        autocmd FileType          help,qf :nnoremap <buffer><nowait>q      :<C-u>quit!<cr>
     augroup END
-
-    if has('win32')
-        function! VimTerminal(...) abort
-            let s = printf(':winsize %d %d | winpos %d %d', &columns, &lines, getwinposx(), getwinposy())
-            call job_start([exepath(v:progpath), '-c', s, '-c', printf('terminal ++curwin %s', get(a:000, 0, ''))])
-        endfunction
-        augroup vim-terminal
-            autocmd!
-            autocmd FileType  *       :nnoremap <buffer><nowait>R   <nop>
-            autocmd FileType  rust    :nnoremap <buffer><nowait>R   :<C-u>call VimTerminal('cargo run')<cr>
-            autocmd FileType  cs      :nnoremap <buffer><nowait>R   :<C-u>call VimTerminal('msbuild /nologo msbuild.xml')<cr>
-            autocmd FileType  python  :nnoremap <buffer><nowait>R   :<C-u>call VimTerminal('python3 ' .. expand('%'))<cr>
-        augroup END
-    endif
 
     if filereadable(expand('~/.vimrc.local'))
         source ~/.vimrc.local
     endif
 
     if get(g:, 'vimrc_extra', v:true)
-        command! -bar -nargs=0     HelpStartEditting
-            \  :setlocal colorcolumn=+1 conceallevel=0 list
-            \  |setlocal tabstop=8 shiftwidth=8 softtabstop=8
-            \  |setlocal noexpandtab textwidth=78
+        command! -bar -nargs=0     HelpStartEditting    :setlocal colorcolumn=+1 conceallevel=0 list
+            \  |setlocal tabstop=8 shiftwidth=8 softtabstop=8 noexpandtab textwidth=78
         command! -bar -nargs=0     SessionSave   :mksession! $VIMRC_DOTVIM/session.vim
         command! -bar -nargs=0     SessionLoad   :source $VIMRC_DOTVIM/session.vim
         command! -bar -nargs=0     TermKillAll   :call map(term_list(), { i,x -> job_stop(term_getjob(x)) })
