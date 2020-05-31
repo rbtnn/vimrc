@@ -28,7 +28,7 @@ try
     set noshellslash
     set noshowmode
     set nowrapscan
-    "set nrformats=unsigned
+    set nrformats=unsigned
     set pumheight=10 completeopt=menu
     set ruler rulerformat=%{&fenc}/%{&ff}/%{&ft}
     set scrolloff=0 nonumber norelativenumber
