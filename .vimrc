@@ -12,7 +12,7 @@ try
     set ambiwidth=double
     set autoread
     set clipboard=unnamed
-    set cursorline nocursorcolumn
+    set nocursorline nocursorcolumn
     set display=lastline
     set expandtab shiftround softtabstop=-1 shiftwidth=4 tabstop=4
     set fileencodings=utf-8,cp932,euc-jp,default,latin
@@ -93,6 +93,7 @@ try
         call minpac#add('rbtnn/vim-jumptoline')
         call minpac#add('rbtnn/vim-mrw')
         call minpac#add('rbtnn/vim-vimbuild')
+        call minpac#add('rbtnn/vim-winsbar')
         call minpac#add('thinca/vim-qfreplace')
         call minpac#add('tyru/restart.vim')
 
@@ -106,6 +107,7 @@ try
         let g:diffy_default_args_svn = '-x -w'
         let g:restart_sessionoptions = 'winpos,resize'
         let g:jellybeans_use_gui_italics = 0
+        let g:winsbar_highlights = ['PmenuSbar', 'ErrorMsg']
     endif
 
     augroup vimrc
