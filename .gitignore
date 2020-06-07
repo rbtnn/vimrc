@@ -1,7 +1,4 @@
 
-.cisco/
-.vuerc
-.rnd
 .CFUserTextEncoding
 .ICEauthority
 .Trash/
@@ -16,6 +13,7 @@
 .cabal/
 .cache/
 .cargo/
+.cisco/
 .compiz/
 .conda/
 .condarc
@@ -28,6 +26,7 @@
 .electron/
 .gem/
 .ghc/
+.git-for-windows-updater
 .gitconfig.local
 .gstreamer-0.10/
 .gtkrc-2.0
@@ -47,6 +46,7 @@
 .psql_history
 .pub-cache/
 .python_history
+.rnd
 .rustup/
 .sh_history
 .subversion/
@@ -55,6 +55,7 @@
 .themes/
 .viminfo
 .vimrc.*
+.vuerc
 .xinputrc
 .xsession-errors
 .xsession-errors.old

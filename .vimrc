@@ -85,29 +85,25 @@ try
         call minpac#init({ 'dir' : $VIMRC_DOTVIM })
         call minpac#add('haya14busa/vim-asterisk')
         call minpac#add('itchyny/lightline.vim')
+        call minpac#add('itchyny/vim-parenmatch')
         call minpac#add('k-takata/minpac', { 'type' : 'opt', 'branch' : 'devel' })
         call minpac#add('kana/vim-operator-replace')
         call minpac#add('kana/vim-operator-user')
         call minpac#add('nanotech/jellybeans.vim')
-        call minpac#add('rbtnn/vim-diffy')
         call minpac#add('rbtnn/vim-jumptoline')
-        call minpac#add('rbtnn/vim-mrw')
         call minpac#add('rbtnn/vim-vimbuild')
-        call minpac#add('rbtnn/vim-winsbar')
         call minpac#add('thinca/vim-qfreplace')
         call minpac#add('tyru/restart.vim')
 
         nnoremap <silent><nowait><space>   :<C-u>JumpToLine<cr>
-        nnoremap <silent><nowait><C-j>     :<C-u>cnext<cr>zz
-        nnoremap <silent><nowait><C-k>     :<C-u>cprevious<cr>zz
+        nnoremap <silent><nowait><C-f>     :<C-u>verbose pwd<cr>
+        nnoremap <silent><nowait><C-n>     :<C-u>cnext<cr>zz
+        nnoremap <silent><nowait><C-p>     :<C-u>cprevious<cr>zz
         map      <silent><nowait>*         <Plug>(asterisk-z*)
         map      <silent><nowait>g*        <Plug>(asterisk-gz*)
         nmap     <silent><nowait>s         <Plug>(operator-replace)
-        let g:diffy_default_args_git = '-w'
-        let g:diffy_default_args_svn = '-x -w'
         let g:restart_sessionoptions = 'winpos,resize'
         let g:jellybeans_use_gui_italics = 0
-        let g:winsbar_highlights = ['PmenuSbar', 'ErrorMsg']
     endif
 
     augroup vimrc
