@@ -90,22 +90,21 @@ try
         call minpac#add('kana/vim-operator-replace')
         call minpac#add('kana/vim-operator-user')
         call minpac#add('kana/vim-textobj-user')
-        call minpac#add('nanotech/jellybeans.vim')
         call minpac#add('rbtnn/vim-jumptoline')
         call minpac#add('rbtnn/vim-textobj-verbatimstring')
         call minpac#add('rbtnn/vim-vimbuild')
+        call minpac#add('srcery-colors/srcery-vim')
         call minpac#add('thinca/vim-qfreplace')
         call minpac#add('tyru/restart.vim')
 
         nnoremap <silent><nowait><space>   :<C-u>JumpToLine<cr>
-        nnoremap <silent><nowait><C-f>     :<C-u>verbose pwd<cr>
         nnoremap <silent><nowait><C-n>     :<C-u>cnext<cr>zz
         nnoremap <silent><nowait><C-p>     :<C-u>cprevious<cr>zz
         map      <silent><nowait>*         <Plug>(asterisk-z*)
         map      <silent><nowait>g*        <Plug>(asterisk-gz*)
         nmap     <silent><nowait>s         <Plug>(operator-replace)
         let g:restart_sessionoptions = 'winpos,resize'
-        let g:jellybeans_use_gui_italics = 0
+        let g:srcery_italic = 0
     endif
 
     augroup vimrc
@@ -113,8 +112,8 @@ try
         for s:cmdname in [ 'MANPAGER', 'VimFoldh', ]
             execute printf('autocmd CmdlineEnter * :silent! delcommand %s', s:cmdname)
         endfor
-        autocmd TerminalWinOpen   *       :nnoremap <buffer><nowait>q      :<C-u>quit!<cr>
-        autocmd FileType          help,qf :nnoremap <buffer><nowait>q      :<C-u>quit!<cr>
+        autocmd TerminalWinOpen   *            :nnoremap <buffer><nowait>q      :<C-u>quit!<cr>
+        autocmd FileType          help,qf,diff :nnoremap <buffer><nowait>q      :<C-u>quit!<cr>
     augroup END
 
     if filereadable(expand('~/.vimrc.local'))
@@ -127,15 +126,31 @@ try
         command! -bar -nargs=0     SessionSave   :mksession! $VIMRC_DOTVIM/session.vim
         command! -bar -nargs=0     SessionLoad   :source $VIMRC_DOTVIM/session.vim
         command! -bar -nargs=0     TermKillAll   :call map(term_list(), { i,x -> job_stop(term_getjob(x)) })
+        function! s:diffthis(cmd, q_args) abort
+            let cwd = fnamemodify(resolve(expand('%')), ':h')
+            if !executable(get(a:cmd, 0, ''))
+                echoerr printf('could not execute "%s"', get(a:cmd, 0, ''))
+            elseif !filereadable(expand('%'))
+                echoerr printf('no such as file "%s"', expand('%'))
+            elseif !isdirectory(cwd)
+                echoerr printf('no such as directory "%s"', cwd)
+            else
+                call term_start(a:cmd + split(a:q_args) + [expand('%:t')], #{ cwd: cwd })
+                setfiletype diff
+                lcd `=cwd`
+            endif
+        endfunction
+        command! -bar -nargs=*     DiffThisSvn :call <SID>diffthis(['svn', 'diff'], <q-args>)
+        command! -bar -nargs=*     DiffThisGit :call <SID>diffthis(['git', '--no-pager', 'diff'], <q-args>)
     endif
 
     syntax on
     filetype plugin indent on
     set secure
 
-    if has_key(minpac#getpluglist(), 'jellybeans.vim')
+    if has_key(minpac#getpluglist(), 'srcery-vim')
         set background=dark
-        silent! colorscheme jellybeans
+        silent! colorscheme srcery
     endif
 catch
     echomsg v:throwpoint
