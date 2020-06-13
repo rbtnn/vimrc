@@ -8,7 +8,7 @@ endif
 function! Tabsidebar() abort
     try
         let lines = []
-        let lines += [printf('%%#TabSideBar#TabPage %d', g:actual_curtabpage)]
+        let lines += [printf('%%#TabSideBar#TabPage %d/%d', g:actual_curtabpage, tabpagenr('$'))]
         for x in getwininfo()
             if x.tabnr == g:actual_curtabpage
                 let iscurr = (winnr() == x.winnr) && (g:actual_curtabpage == tabpagenr())

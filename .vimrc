@@ -12,7 +12,6 @@ try
     set ambiwidth=double
     set autoread
     set clipboard=unnamed
-    set nocursorline nocursorcolumn
     set display=lastline
     set expandtab shiftround softtabstop=-1 shiftwidth=4 tabstop=4
     set fileencodings=utf-8,cp932,euc-jp,default,latin
@@ -23,6 +22,8 @@ try
     set list nowrap breakindent& showbreak& listchars=tab:\ \ \|,trail:-
     set matchpairs+=<:>
     set mouse=a
+    set nobackup nowritebackup backupdir&
+    set nocursorline nocursorcolumn
     set nofoldenable foldcolumn& foldlevelstart& foldmethod&
     set noignorecase nosmartcase
     set noshellslash
@@ -30,11 +31,12 @@ try
     set nowrapscan
     set nrformats=unsigned
     set pumheight=10 completeopt=menu
-    set ruler rulerformat=%{&fenc}/%{&ff}/%{&ft}
+    set ruler rulerformat&
     set scrolloff=0 nonumber norelativenumber
     set sessionoptions=buffers,curdir,tabpages
     set shortmess& shortmess-=S
     set showtabline=0 tabline&
+    set swapfile
     set tags=./tags;
     set termguicolors
     set title titlestring=%{v:progname}[%{getpid()}]
@@ -54,11 +56,6 @@ try
     source $VIMRC_DOTVIM/tabsidebar.vim
     source $VIMRC_DOTVIM/vb.vim
 
-    " swap and backup files
-    silent! call mkdir(expand('$VIMRC_DOTVIM/backupfiles'), 'p')
-    set noswapfile backup nowritebackup backupdir=$VIMRC_DOTVIM/backupfiles//
-
-    " undo files
     if has('persistent_undo')
         silent! call mkdir(expand('$VIMRC_DOTVIM/undofiles'), 'p')
         set undofile undodir=$VIMRC_DOTVIM/undofiles//
@@ -76,13 +73,14 @@ try
     endif
 
     set runtimepath+=$VIMRC_DOTVIM
-    runtime! plugin/gloaded.vim
+    silent! source $VIMRC_DOTVIM/pack/minpac/start/vim-gloaded/plugin/gloaded.vim
 
     set packpath=$VIMRUNTIME,$VIMRC_DOTVIM
     silent! packadd minpac
 
     if exists('*minpac#init')
         call minpac#init({ 'dir' : $VIMRC_DOTVIM })
+
         call minpac#add('haya14busa/vim-asterisk')
         call minpac#add('itchyny/lightline.vim')
         call minpac#add('itchyny/vim-parenmatch')
@@ -90,6 +88,8 @@ try
         call minpac#add('kana/vim-operator-replace')
         call minpac#add('kana/vim-operator-user')
         call minpac#add('kana/vim-textobj-user')
+        call minpac#add('rbtnn/vim-diffy')
+        call minpac#add('rbtnn/vim-gloaded')
         call minpac#add('rbtnn/vim-jumptoline')
         call minpac#add('rbtnn/vim-textobj-verbatimstring')
         call minpac#add('rbtnn/vim-vimbuild')
@@ -103,6 +103,7 @@ try
         map      <silent><nowait>*         <Plug>(asterisk-z*)
         map      <silent><nowait>g*        <Plug>(asterisk-gz*)
         nmap     <silent><nowait>s         <Plug>(operator-replace)
+
         let g:restart_sessionoptions = 'winpos,resize'
         let g:srcery_italic = 0
     endif
@@ -112,8 +113,8 @@ try
         for s:cmdname in [ 'MANPAGER', 'VimFoldh', ]
             execute printf('autocmd CmdlineEnter * :silent! delcommand %s', s:cmdname)
         endfor
-        autocmd TerminalWinOpen   *            :nnoremap <buffer><nowait>q      :<C-u>quit!<cr>
-        autocmd FileType          help,qf,diff :nnoremap <buffer><nowait>q      :<C-u>quit!<cr>
+        autocmd TerminalWinOpen   *       :nnoremap <buffer><nowait>q      :<C-u>quit!<cr>
+        autocmd FileType          help,qf :nnoremap <buffer><nowait>q      :<C-u>quit!<cr>
     augroup END
 
     if filereadable(expand('~/.vimrc.local'))
@@ -126,22 +127,6 @@ try
         command! -bar -nargs=0     SessionSave   :mksession! $VIMRC_DOTVIM/session.vim
         command! -bar -nargs=0     SessionLoad   :source $VIMRC_DOTVIM/session.vim
         command! -bar -nargs=0     TermKillAll   :call map(term_list(), { i,x -> job_stop(term_getjob(x)) })
-        function! s:diffthis(cmd, q_args) abort
-            let cwd = fnamemodify(resolve(expand('%')), ':h')
-            if !executable(get(a:cmd, 0, ''))
-                echoerr printf('could not execute "%s"', get(a:cmd, 0, ''))
-            elseif !filereadable(expand('%'))
-                echoerr printf('no such as file "%s"', expand('%'))
-            elseif !isdirectory(cwd)
-                echoerr printf('no such as directory "%s"', cwd)
-            else
-                call term_start(a:cmd + split(a:q_args) + [expand('%:t')], #{ cwd: cwd })
-                setfiletype diff
-                lcd `=cwd`
-            endif
-        endfunction
-        command! -bar -nargs=*     DiffThisSvn :call <SID>diffthis(['svn', 'diff'], <q-args>)
-        command! -bar -nargs=*     DiffThisGit :call <SID>diffthis(['git', '--no-pager', 'diff'], <q-args>)
     endif
 
     syntax on
