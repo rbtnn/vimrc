@@ -54,7 +54,6 @@ try
     let g:mapleader = '\'
 
     source $VIMRC_DOTVIM/tabsidebar.vim
-    source $VIMRC_DOTVIM/vb.vim
 
     if has('persistent_undo')
         silent! call mkdir(expand('$VIMRC_DOTVIM/undofiles'), 'p')
@@ -92,6 +91,7 @@ try
         call minpac#add('rbtnn/vim-gloaded')
         call minpac#add('rbtnn/vim-jumptoline')
         call minpac#add('rbtnn/vim-textobj-verbatimstring')
+        call minpac#add('rbtnn/vim-vb')
         call minpac#add('rbtnn/vim-vimbuild')
         call minpac#add('srcery-colors/srcery-vim')
         call minpac#add('thinca/vim-qfreplace')
