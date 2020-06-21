@@ -24,7 +24,7 @@ try
     set mouse=a
     set nobackup nowritebackup backupdir&
     set nocursorline nocursorcolumn
-    set nofoldenable foldcolumn& foldlevelstart& foldmethod&
+    set nofoldenable foldcolumn& foldlevelstart& foldmethod=indent
     set noignorecase nosmartcase
     set noshellslash
     set noshowmode
@@ -38,7 +38,6 @@ try
     set showtabline=0 tabline&
     set swapfile
     set tags=./tags;
-    set termguicolors
     set title titlestring=%{v:progname}[%{getpid()}]
     set visualbell noerrorbells t_vb=
     set wildmenu wildmode&
@@ -82,7 +81,6 @@ try
         call minpac#init({ 'dir' : $VIMRC_DOTVIM })
 
         call minpac#add('haya14busa/vim-asterisk')
-        call minpac#add('itchyny/lightline.vim')
         call minpac#add('itchyny/vim-parenmatch')
         call minpac#add('k-takata/minpac', { 'type' : 'opt', 'branch' : 'devel' })
         call minpac#add('kana/vim-operator-replace')
@@ -91,9 +89,9 @@ try
         call minpac#add('rbtnn/vim-diffy')
         call minpac#add('rbtnn/vim-gloaded')
         call minpac#add('rbtnn/vim-jumptoline')
+        call minpac#add('rbtnn/vim-tabsidebar')
         call minpac#add('rbtnn/vim-textobj-verbatimstring')
         call minpac#add('rbtnn/vim-vimbuild')
-        call minpac#add('srcery-colors/srcery-vim')
         call minpac#add('thinca/vim-qfreplace')
         call minpac#add('tyru/restart.vim')
 
@@ -104,8 +102,10 @@ try
         map      <silent><nowait>g*        <Plug>(asterisk-gz*)
         nmap     <silent><nowait>s         <Plug>(operator-replace)
 
+        tnoremap <silent><nowait>gT     <C-w>gT
+        tnoremap <silent><nowait>gt     <C-w>gt
+
         let g:restart_sessionoptions = 'winpos,resize'
-        let g:srcery_italic = 0
     endif
 
     augroup vimrc
@@ -133,9 +133,8 @@ try
     filetype plugin indent on
     set secure
 
-    if has_key(minpac#getpluglist(), 'srcery-vim')
-        set background=dark
-        silent! colorscheme srcery
+    if has_key(minpac#getpluglist(), 'vim-tabsidebar')
+        silent! colorscheme tabsidebar
     endif
 catch
     echomsg v:throwpoint
