@@ -48,6 +48,7 @@
 .python_history
 .rnd
 .rustup/
+_netrc
 .sh_history
 .subversion/
 .sudo_as_admin_successful
