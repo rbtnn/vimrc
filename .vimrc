@@ -52,7 +52,6 @@ try
     let g:vim_indent_cont = &g:shiftwidth
     let g:mapleader = '\'
 
-    source $VIMRC_DOTVIM/tabsidebar.vim
     source $VIMRC_DOTVIM/vb.vim
 
     if has('persistent_undo')
