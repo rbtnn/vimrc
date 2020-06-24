@@ -52,8 +52,6 @@ try
     let g:vim_indent_cont = &g:shiftwidth
     let g:mapleader = '\'
 
-    source $VIMRC_DOTVIM/tabsidebar.vim
-
     if has('persistent_undo')
         silent! call mkdir(expand('$VIMRC_DOTVIM/undofiles'), 'p')
         set undofile undodir=$VIMRC_DOTVIM/undofiles//
