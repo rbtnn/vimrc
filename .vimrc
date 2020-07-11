@@ -17,6 +17,7 @@ try
     set fileencodings=utf-8,cp932,euc-jp,default,latin
     set fileformats=unix,dos,mac
     set grepprg=internal
+    set ignorecase nosmartcase
     set keywordprg=:help
     set laststatus=2 statusline&
     set list nowrap breakindent& showbreak& listchars=tab:\ \ \|,trail:-
@@ -25,7 +26,6 @@ try
     set nobackup nowritebackup backupdir&
     set nocursorline nocursorcolumn
     set nofoldenable foldcolumn& foldlevelstart& foldmethod=indent
-    set noignorecase nosmartcase
     set noshellslash
     set noshowmode
     set nowrapscan
@@ -86,14 +86,15 @@ try
         call minpac#add('rbtnn/vim-diffy')
         call minpac#add('rbtnn/vim-gloaded')
         call minpac#add('rbtnn/vim-jumptoline')
+        call minpac#add('rbtnn/vim-lsfiles')
         call minpac#add('rbtnn/vim-tabsidebar')
         call minpac#add('rbtnn/vim-textobj-verbatimstring')
         call minpac#add('rbtnn/vim-vb')
-        call minpac#add('rbtnn/vim-vimbuild')
         call minpac#add('thinca/vim-qfreplace')
         call minpac#add('tyru/restart.vim')
 
         nnoremap <silent><nowait><space>   :<C-u>JumpToLine<cr>
+        nnoremap <silent><nowait><C-f>     :<C-u>LsFiles<cr>
         nnoremap <silent><nowait><C-n>     :<C-u>cnext<cr>zz
         nnoremap <silent><nowait><C-p>     :<C-u>cprevious<cr>zz
         map      <silent><nowait>*         <Plug>(asterisk-z*)
@@ -103,7 +104,7 @@ try
         tnoremap <silent><nowait>gT     <C-w>gT
         tnoremap <silent><nowait>gt     <C-w>gt
 
-        let g:restart_sessionoptions = 'winpos,resize'
+        let g:restart_sessionoptions = 'curdir,winpos,resize'
     endif
 
     augroup vimrc
@@ -119,13 +120,11 @@ try
         source ~/.vimrc.local
     endif
 
-    if get(g:, 'vimrc_extra', v:true)
-        command! -bar -nargs=0     HelpStartEditting    :setlocal colorcolumn=+1 conceallevel=0 list
-            \  |setlocal tabstop=8 shiftwidth=8 softtabstop=8 noexpandtab textwidth=78
-        command! -bar -nargs=0     SessionSave   :mksession! $VIMRC_DOTVIM/session.vim
-        command! -bar -nargs=0     SessionLoad   :source $VIMRC_DOTVIM/session.vim
-        command! -bar -nargs=0     TermKillAll   :call map(term_list(), { i,x -> job_stop(term_getjob(x)) })
-    endif
+    command! -bar -nargs=0     ZHelpStartEditting    :setlocal colorcolumn=+1 conceallevel=0 list
+        \  |setlocal tabstop=8 shiftwidth=8 softtabstop=8 noexpandtab textwidth=78
+    command! -bar -nargs=0     ZSessionSave   :mksession! $VIMRC_DOTVIM/session.vim
+    command! -bar -nargs=0     ZSessionLoad   :source $VIMRC_DOTVIM/session.vim
+    command! -bar -nargs=0     ZTermKillAll   :call map(term_list(), { i,x -> job_stop(term_getjob(x)) })
 
     syntax on
     filetype plugin indent on
