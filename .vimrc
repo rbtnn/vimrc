@@ -85,16 +85,15 @@ try
         call minpac#add('kana/vim-textobj-user')
         call minpac#add('rbtnn/vim-gloaded')
         call minpac#add('rbtnn/vim-jumptoline')
-        call minpac#add('rbtnn/vim-popupwinfinder')
+        call minpac#add('rbtnn/vim-popupwin-action')
         call minpac#add('rbtnn/vim-tabsidebar')
         call minpac#add('rbtnn/vim-textobj-verbatimstring')
         call minpac#add('rbtnn/vim-vb')
         call minpac#add('thinca/vim-qfreplace')
         call minpac#add('tyru/restart.vim')
-        call minpac#add('vim-jp/vital.vim')
 
         nnoremap <silent><nowait><space>   :<C-u>JumpToLine<cr>
-        nnoremap <silent><nowait><C-f>     :<C-u>PopupWinFinder gitlsfiles<cr>
+        nnoremap <silent><nowait><C-f>     :<C-u>PopupWinAction<cr>
         nnoremap <silent><nowait><C-n>     :<C-u>cnext<cr>zz
         nnoremap <silent><nowait><C-p>     :<C-u>cprevious<cr>zz
         map      <silent><nowait>*         <Plug>(asterisk-z*)
@@ -109,7 +108,7 @@ try
 
     augroup vimrc
         autocmd!
-        for s:cmdname in [ 'MANPAGER', 'VimFoldh', ]
+        for s:cmdname in [ 'MANPAGER', 'VimFoldh', 'TextobjVerbatimstringDefaultKeyMappings', ]
             execute printf('autocmd CmdlineEnter * :silent! delcommand %s', s:cmdname)
         endfor
         autocmd TerminalWinOpen   *       :nnoremap <buffer><nowait>q      :<C-u>quit!<cr>
@@ -120,11 +119,11 @@ try
         source ~/.vimrc.local
     endif
 
-    command! -bar -nargs=0     ZHelpStartEditting    :setlocal colorcolumn=+1 conceallevel=0 list
-        \  |setlocal tabstop=8 shiftwidth=8 softtabstop=8 noexpandtab textwidth=78
-    command! -bar -nargs=0     ZSessionSave   :mksession! $VIMRC_DOTVIM/session.vim
-    command! -bar -nargs=0     ZSessionLoad   :source $VIMRC_DOTVIM/session.vim
-    command! -bar -nargs=0     ZTermKillAll   :call map(term_list(), { i,x -> job_stop(term_getjob(x)) })
+    "command! -bar -nargs=0     HelpStartEditting    :setlocal colorcolumn=+1 conceallevel=0 list
+    "    \  |setlocal tabstop=8 shiftwidth=8 softtabstop=8 noexpandtab textwidth=78
+    "command! -bar -nargs=0     SessionSave   :mksession! $VIMRC_DOTVIM/session.vim
+    "command! -bar -nargs=0     SessionLoad   :source $VIMRC_DOTVIM/session.vim
+    "command! -bar -nargs=0     TermKillAll   :call map(term_list(), { i,x -> job_stop(term_getjob(x)) })
 
     syntax on
     filetype plugin indent on
