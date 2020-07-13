@@ -83,18 +83,18 @@ try
         call minpac#add('kana/vim-operator-replace')
         call minpac#add('kana/vim-operator-user')
         call minpac#add('kana/vim-textobj-user')
-        call minpac#add('rbtnn/vim-diffy')
         call minpac#add('rbtnn/vim-gloaded')
         call minpac#add('rbtnn/vim-jumptoline')
-        call minpac#add('rbtnn/vim-lsfiles')
+        call minpac#add('rbtnn/vim-popupwinfinder')
         call minpac#add('rbtnn/vim-tabsidebar')
         call minpac#add('rbtnn/vim-textobj-verbatimstring')
         call minpac#add('rbtnn/vim-vb')
         call minpac#add('thinca/vim-qfreplace')
         call minpac#add('tyru/restart.vim')
+        call minpac#add('vim-jp/vital.vim')
 
         nnoremap <silent><nowait><space>   :<C-u>JumpToLine<cr>
-        nnoremap <silent><nowait><C-f>     :<C-u>LsFiles<cr>
+        nnoremap <silent><nowait><C-f>     :<C-u>PopupWinFinder gitlsfiles<cr>
         nnoremap <silent><nowait><C-n>     :<C-u>cnext<cr>zz
         nnoremap <silent><nowait><C-p>     :<C-u>cprevious<cr>zz
         map      <silent><nowait>*         <Plug>(asterisk-z*)
