@@ -28,6 +28,7 @@ try
     set nofoldenable foldcolumn& foldlevelstart& foldmethod=indent
     set noshellslash
     set noshowmode
+    set noswapfile
     set nowrapscan
     set nrformats=unsigned
     set pumheight=10 completeopt=menu
@@ -36,7 +37,6 @@ try
     set sessionoptions=buffers,curdir,tabpages
     set shortmess& shortmess-=S
     set showtabline=0 tabline&
-    set swapfile
     set tags=./tags;
     set title titlestring=%{v:progname}[%{getpid()}]
     set visualbell noerrorbells t_vb=
@@ -85,15 +85,15 @@ try
         call minpac#add('kana/vim-textobj-user')
         call minpac#add('rbtnn/vim-gloaded')
         call minpac#add('rbtnn/vim-jumptoline')
-        call minpac#add('rbtnn/vim-popupwin-action')
         call minpac#add('rbtnn/vim-tabsidebar')
         call minpac#add('rbtnn/vim-textobj-verbatimstring')
         call minpac#add('rbtnn/vim-vb')
+        call minpac#add('rbtnn/vim-wizard')
         call minpac#add('thinca/vim-qfreplace')
         call minpac#add('tyru/restart.vim')
 
         nnoremap <silent><nowait><space>   :<C-u>JumpToLine<cr>
-        nnoremap <silent><nowait><C-f>     :<C-u>PopupWinAction<cr>
+        nnoremap <silent><nowait><C-f>     :<C-u>Wizard<cr>
         nnoremap <silent><nowait><C-n>     :<C-u>cnext<cr>zz
         nnoremap <silent><nowait><C-p>     :<C-u>cprevious<cr>zz
         map      <silent><nowait>*         <Plug>(asterisk-z*)
