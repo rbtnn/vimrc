@@ -88,6 +88,7 @@ try
         call minpac#add('rbtnn/vim-tabsidebar')
         call minpac#add('rbtnn/vim-textobj-verbatimstring')
         call minpac#add('rbtnn/vim-vb')
+        call minpac#add('rbtnn/vim-vimscript_lasterror')
         call minpac#add('rbtnn/vim-wizard')
         call minpac#add('thinca/vim-qfreplace')
         call minpac#add('tyru/restart.vim')
@@ -133,6 +134,5 @@ try
         silent! colorscheme tabsidebar
     endif
 catch
-    echomsg v:throwpoint
-    echomsg v:exception
+    echoerr v:exception
 endtry
