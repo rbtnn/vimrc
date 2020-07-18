@@ -75,18 +75,30 @@ try
     silent! packadd minpac
 
     if exists('*minpac#init')
+        " ------------------
+        " PackageManager
+        " ------------------
         call minpac#init({ 'dir' : $VIMRC_DOTVIM })
-
-        call minpac#add('haya14busa/vim-asterisk')
-        call minpac#add('itchyny/vim-parenmatch')
         call minpac#add('k-takata/minpac', { 'type' : 'opt', 'branch' : 'devel' })
+
+        " ------------------
+        " Textobj/Operator
+        " ------------------
         call minpac#add('kana/vim-operator-replace')
         call minpac#add('kana/vim-operator-user')
         call minpac#add('kana/vim-textobj-user')
+        call minpac#add('rbtnn/vim-textobj-verbatimstring')
+
+        " ------------------
+        " ColorScheme
+        " ------------------
+        call minpac#add('rbtnn/vim-darkcrystal')
+
+        " ------------------
+        " Others
+        " ------------------
         call minpac#add('rbtnn/vim-gloaded')
         call minpac#add('rbtnn/vim-jumptoline')
-        call minpac#add('rbtnn/vim-tabsidebar')
-        call minpac#add('rbtnn/vim-textobj-verbatimstring')
         call minpac#add('rbtnn/vim-vb')
         call minpac#add('rbtnn/vim-vimscript_lasterror')
         call minpac#add('rbtnn/vim-wizard')
@@ -97,8 +109,6 @@ try
         nnoremap <silent><nowait><C-f>     :<C-u>Wizard<cr>
         nnoremap <silent><nowait><C-n>     :<C-u>cnext<cr>zz
         nnoremap <silent><nowait><C-p>     :<C-u>cprevious<cr>zz
-        map      <silent><nowait>*         <Plug>(asterisk-z*)
-        map      <silent><nowait>g*        <Plug>(asterisk-gz*)
         nmap     <silent><nowait>s         <Plug>(operator-replace)
 
         tnoremap <silent><nowait>gT     <C-w>gT
@@ -130,8 +140,8 @@ try
     filetype plugin indent on
     set secure
 
-    if has_key(minpac#getpluglist(), 'vim-tabsidebar')
-        silent! colorscheme tabsidebar
+    if has_key(minpac#getpluglist(), 'vim-darkcrystal')
+        silent! colorscheme darkcrystal
     endif
 catch
     echoerr v:exception
