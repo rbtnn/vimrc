@@ -97,9 +97,9 @@ try
         " ------------------
         " Others
         " ------------------
+        call minpac#add('rbtnn/vim-close_scratch')
         call minpac#add('rbtnn/vim-gloaded')
         call minpac#add('rbtnn/vim-jumptoline')
-        call minpac#add('rbtnn/vim-vb')
         call minpac#add('rbtnn/vim-vimscript_lasterror')
         call minpac#add('rbtnn/vim-wizard')
         call minpac#add('thinca/vim-qfreplace')
@@ -115,6 +115,7 @@ try
         tnoremap <silent><nowait>gt     <C-w>gt
 
         let g:restart_sessionoptions = 'curdir,winpos,resize'
+        let g:close_scratch_define_augroup = 1
     endif
 
     augroup vimrc
@@ -122,8 +123,6 @@ try
         for s:cmdname in [ 'MANPAGER', 'VimFoldh', 'TextobjVerbatimstringDefaultKeyMappings', ]
             execute printf('autocmd CmdlineEnter * :silent! delcommand %s', s:cmdname)
         endfor
-        autocmd TerminalWinOpen   *       :nnoremap <buffer><nowait>q      :<C-u>quit!<cr>
-        autocmd FileType          help,qf :nnoremap <buffer><nowait>q      :<C-u>quit!<cr>
     augroup END
 
     if filereadable(expand('~/.vimrc.local'))
