@@ -116,6 +116,10 @@ try
 
         let g:restart_sessionoptions = 'curdir,winpos,resize'
         let g:close_scratch_define_augroup = 1
+
+        if has_key(minpac#getpluglist(), 'vim-darkcrystal')
+            silent! colorscheme darkcrystal
+        endif
     endif
 
     augroup vimrc
@@ -138,10 +142,6 @@ try
     syntax on
     filetype plugin indent on
     set secure
-
-    if has_key(minpac#getpluglist(), 'vim-darkcrystal')
-        silent! colorscheme darkcrystal
-    endif
 catch
     echoerr v:exception
 endtry
