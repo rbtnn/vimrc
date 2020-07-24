@@ -9,6 +9,10 @@ try
     let $VIMRC_ROOT = expand('<sfile>:h')
     let $VIMRC_DOTVIM = expand('$VIMRC_ROOT/.vim')
 
+    if has('win32')
+        let &shell = printf('cmd.exe /k "prompt %s[$P]$_$E[00m$$"', windowsversion() == '10.0' ? '$E[36m' : '')
+    endif
+
     set ambiwidth=double
     set autoread
     set clipboard=unnamed
