@@ -125,6 +125,8 @@ try
     call plug#end()
 
     nnoremap <silent><nowait><C-f>     :<C-u>Wizard<cr>
+    nnoremap <silent><nowait><C-n>     :<C-u>cnext<cr>
+    nnoremap <silent><nowait><C-p>     :<C-u>cprevious<cr>
     nmap     <silent><nowait>s         <Plug>(operator-replace)
 
     let g:restart_sessionoptions = 'curdir,winpos,resize'
@@ -139,9 +141,8 @@ try
         endfor
     augroup END
 
-    if filereadable(expand('~/.vimrc.local'))
-        source ~/.vimrc.local
-    endif
+    silent! source ~/vim-on-windows/vimbatchfiles/setup.vim
+    silent! source ~/.vimrc.local
 
     syntax on
     filetype plugin indent on
