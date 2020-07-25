@@ -8,10 +8,7 @@ try
 
     let $VIMRC_ROOT = expand('<sfile>:h')
     let $VIMRC_DOTVIM = expand('$VIMRC_ROOT/.vim')
-
-    if has('win32')
-        let &shell = printf('cmd.exe /k "prompt %s[$P]$_$E[00m$$"', windowsversion() == '10.0' ? '$E[36m' : '')
-    endif
+    let $VIMRC_PLUGDIR = expand('$VIMRC_ROOT/.vim/plugged')
 
     set ambiwidth=double
     set autoread
@@ -34,7 +31,6 @@ try
     set noshowmode
     set noswapfile
     set nowrapscan
-    set nrformats=unsigned
     set pumheight=10 completeopt=menu
     set ruler rulerformat&
     set scrolloff=0 nonumber norelativenumber
@@ -45,6 +41,11 @@ try
     set title titlestring=%{v:progname}[%{getpid()}]
     set visualbell noerrorbells t_vb=
     set wildmenu wildmode&
+
+    set nrformats=
+    if has('patch-8.2.0860')
+        set nrformats+=unsigned
+    endif
 
     set wildignore=*.pdb,*.obj,*.dll,*.exe,*.idb,*.ncb,*.ilk,*.plg,*.bsc,*.sbr,*.opt,*.config
     set wildignore+=*.pdf,*.mp3,*.doc,*.docx,*.xls,*.xlsx,*.idx,*.jpg,*.png,*.zip,*.MMF,*.gif
@@ -61,6 +62,26 @@ try
         set undofile undodir=$VIMRC_DOTVIM/undofiles//
     endif
 
+    function! s:flash() abort
+        if !get(g:, 'flash_running', v:false)
+            let g:flash_running = v:true
+            for _ in range(1, 3)
+                call feedkeys('V', 'nx')
+                redraw
+                sleep 50m
+                call feedkeys("\<esc>", 'nx')
+                redraw
+                sleep 50m
+            endfor
+            let g:flash_running = v:false
+        endif
+    endfunction
+
+    nnoremap <silent><nowait><space>   :<C-u>call <SID>flash()<cr>
+
+    tnoremap <silent><nowait>gT     <C-w>gT
+    tnoremap <silent><nowait>gt     <C-w>gt
+
     if has('win32')
         " https://github.com/rprichard/winpty/releases/
         tnoremap <silent><C-p>       <up>
@@ -73,58 +94,43 @@ try
     endif
 
     set runtimepath+=$VIMRC_DOTVIM
-    silent! source $VIMRC_DOTVIM/pack/minpac/start/vim-gloaded/plugin/gloaded.vim
 
-    set packpath=$VIMRUNTIME,$VIMRC_DOTVIM
-    silent! packadd minpac
+    silent! source $VIMRC_PLUGDIR/vim-gloaded/plugin/gloaded.vim
 
-    if exists('*minpac#init')
-        " ------------------
-        " PackageManager
-        " ------------------
-        call minpac#init({ 'dir' : $VIMRC_DOTVIM })
-        call minpac#add('k-takata/minpac', { 'type' : 'opt', 'branch' : 'devel' })
+    call plug#begin($VIMRC_PLUGDIR)
 
-        " ------------------
-        " Textobj/Operator
-        " ------------------
-        call minpac#add('kana/vim-operator-replace')
-        call minpac#add('kana/vim-operator-user')
-        call minpac#add('kana/vim-textobj-user')
-        call minpac#add('rbtnn/vim-textobj-verbatimstring')
+    " ------------------
+    " Textobj/Operator
+    " ------------------
+    Plug 'kana/vim-operator-replace'
+    Plug 'kana/vim-operator-user'
+    Plug 'kana/vim-textobj-user'
+    Plug 'rbtnn/vim-textobj-verbatimstring'
 
-        " ------------------
-        " ColorScheme
-        " ------------------
-        call minpac#add('rbtnn/vim-darkcrystal')
+    " ------------------
+    " ColorScheme
+    " ------------------
+    Plug 'rbtnn/vim-darkcrystal'
 
-        " ------------------
-        " Others
-        " ------------------
-        call minpac#add('rbtnn/vim-close_scratch')
-        call minpac#add('rbtnn/vim-gloaded')
-        call minpac#add('rbtnn/vim-jumptoline')
-        call minpac#add('rbtnn/vim-vimscript_lasterror')
-        call minpac#add('rbtnn/vim-wizard')
-        call minpac#add('thinca/vim-qfreplace')
-        call minpac#add('tyru/restart.vim')
+    " ------------------
+    " Others
+    " ------------------
+    Plug 'rbtnn/vim-close_scratch'
+    Plug 'rbtnn/vim-gloaded'
+    Plug 'rbtnn/vim-vimscript_lasterror'
+    Plug 'rbtnn/vim-wizard'
+    Plug 'thinca/vim-qfreplace'
+    Plug 'tyru/restart.vim'
 
-        nnoremap <silent><nowait><space>   :<C-u>JumpToLine<cr>
-        nnoremap <silent><nowait><C-f>     :<C-u>Wizard<cr>
-        nnoremap <silent><nowait><C-n>     :<C-u>cnext<cr>zz
-        nnoremap <silent><nowait><C-p>     :<C-u>cprevious<cr>zz
-        nmap     <silent><nowait>s         <Plug>(operator-replace)
+    call plug#end()
 
-        tnoremap <silent><nowait>gT     <C-w>gT
-        tnoremap <silent><nowait>gt     <C-w>gt
+    nnoremap <silent><nowait><C-f>     :<C-u>Wizard<cr>
+    nmap     <silent><nowait>s         <Plug>(operator-replace)
 
-        let g:restart_sessionoptions = 'curdir,winpos,resize'
-        let g:close_scratch_define_augroup = 1
+    let g:restart_sessionoptions = 'curdir,winpos,resize'
+    let g:close_scratch_define_augroup = 1
 
-        if has_key(minpac#getpluglist(), 'vim-darkcrystal')
-            silent! colorscheme darkcrystal
-        endif
-    endif
+    silent! colorscheme darkcrystal
 
     augroup vimrc
         autocmd!
@@ -136,12 +142,6 @@ try
     if filereadable(expand('~/.vimrc.local'))
         source ~/.vimrc.local
     endif
-
-    "command! -bar -nargs=0     HelpStartEditting    :setlocal colorcolumn=+1 conceallevel=0 list
-    "    \  |setlocal tabstop=8 shiftwidth=8 softtabstop=8 noexpandtab textwidth=78
-    "command! -bar -nargs=0     SessionSave   :mksession! $VIMRC_DOTVIM/session.vim
-    "command! -bar -nargs=0     SessionLoad   :source $VIMRC_DOTVIM/session.vim
-    "command! -bar -nargs=0     TermKillAll   :call map(term_list(), { i,x -> job_stop(term_getjob(x)) })
 
     syntax on
     filetype plugin indent on
