@@ -62,23 +62,6 @@ try
         set undofile undodir=$VIMRC_DOTVIM/undofiles//
     endif
 
-    function! s:flash() abort
-        if !get(g:, 'flash_running', v:false)
-            let g:flash_running = v:true
-            for _ in range(1, 3)
-                call feedkeys('V', 'nx')
-                redraw
-                sleep 50m
-                call feedkeys("\<esc>", 'nx')
-                redraw
-                sleep 50m
-            endfor
-            let g:flash_running = v:false
-        endif
-    endfunction
-
-    nnoremap <silent><nowait><space>   :<C-u>call <SID>flash()<cr>
-
     tnoremap <silent><nowait>gT     <C-w>gT
     tnoremap <silent><nowait>gt     <C-w>gt
 
@@ -93,7 +76,8 @@ try
         tnoremap <silent><C-u>       <esc>
     endif
 
-    set runtimepath+=$VIMRC_DOTVIM
+    set packpath=
+    set runtimepath=$VIMRUNTIME,$VIMRC_DOTVIM
 
     silent! source $VIMRC_PLUGDIR/vim-gloaded/plugin/gloaded.vim
 
@@ -124,10 +108,10 @@ try
 
     call plug#end()
 
-    nnoremap <silent><nowait><C-f>     :<C-u>Wizard<cr>
-    nnoremap <silent><nowait><C-n>     :<C-u>cnext<cr>
-    nnoremap <silent><nowait><C-p>     :<C-u>cprevious<cr>
-    nmap     <silent><nowait>s         <Plug>(operator-replace)
+    nnoremap <silent><nowait><space>     :<C-u>Wizard<cr>
+    nnoremap <silent><nowait><C-n>       :<C-u>cnext<cr>
+    nnoremap <silent><nowait><C-p>       :<C-u>cprevious<cr>
+    nmap     <silent><nowait>s           <Plug>(operator-replace)
 
     let g:restart_sessionoptions = 'curdir,winpos,resize'
     let g:close_scratch_define_augroup = 1
@@ -141,8 +125,8 @@ try
         endfor
     augroup END
 
-    silent! source ~/vim-on-windows/vimbatchfiles/setup.vim
-    silent! source ~/.vimrc.local
+    silent! source $VIMRC_ROOT/vim-on-windows/vimbatchfiles/setup.vim
+    silent! source $VIMRC_ROOT/.vimrc.local
 
     syntax on
     filetype plugin indent on
