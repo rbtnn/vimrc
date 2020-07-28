@@ -5,6 +5,8 @@ if !has('tabsidebar') && !get(g:, 'tabsidebar_disabled', 0)
     finish
 endif
 
+silent! runtime autoload/nerdfont.vim
+
 function! s:display_string(wininfo, iscurr) abort
     let name = bufname(a:wininfo.bufnr)
     let s = '[No Name]'
@@ -26,16 +28,20 @@ function! s:display_string(wininfo, iscurr) abort
         endif
         let s = printf('%s%s%s', (read ? '[R]' : ''), (modi ? '[+]' : ''), name)
     endif
+    if exists('*nerdfont#find')
+        let s = nerdfont#find(name) .. ' ' .. s
+    endif
     return s
 endfunction
 
 function! Tabsidebar() abort
     try
         let wins = filter(getwininfo(), { i,x -> x.tabnr == g:actual_curtabpage })
-        let lines = [printf('%%#TabSideBarTitle#TabPage %d/%d%%#TabSideBar#', g:actual_curtabpage, tabpagenr('$'))]
+        let s = printf('[%d/%d]', g:actual_curtabpage, tabpagenr('$'))
+        let lines = [printf('%%#TabSideBar#%s%s', repeat(' ', &tabsidebarcolumns - len(s)), s)]
         for n in range(1, len(wins))
             let iscurr = (winnr() == wins[n - 1].winnr) && (g:actual_curtabpage == tabpagenr())
-            let lines += [printf('%%#TabSideBar# %s %s', (iscurr ? '▶' : '  '), s:display_string(wins[n - 1], iscurr))]
+            let lines += [printf('%%#%s#%s', (iscurr ? 'TabSideBarSel' : 'TabSideBar'), s:display_string(wins[n - 1], iscurr))]
         endfor
         let lines += ['%#TabSideBarUnderline#']
         return join(lines, "\n")

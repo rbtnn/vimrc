@@ -79,9 +79,11 @@ try
     set packpath=
     set runtimepath=$VIMRUNTIME,$VIMRC_DOTVIM
 
-    silent! source $VIMRC_PLUGDIR/vim-gloaded/plugin/gloaded.vim
-
     call plug#begin($VIMRC_PLUGDIR)
+
+    silent! source $VIMRC_PLUGDIR/vim-gloaded/plugin/gloaded.vim
+    silent! source $VIMRC_ROOT/vim-on-windows/vimbatchfiles/setup.vim
+    silent! source ~/.vimrc.local
 
     " ------------------
     " Textobj/Operator
@@ -99,6 +101,7 @@ try
     " ------------------
     " Others
     " ------------------
+    Plug 'lambdalisue/nerdfont.vim'
     Plug 'rbtnn/vim-close_scratch'
     Plug 'rbtnn/vim-gloaded'
     Plug 'rbtnn/vim-vimscript_lasterror'
@@ -124,9 +127,6 @@ try
             execute printf('autocmd CmdlineEnter * :silent! delcommand %s', s:cmdname)
         endfor
     augroup END
-
-    silent! source $VIMRC_ROOT/vim-on-windows/vimbatchfiles/setup.vim
-    silent! source $VIMRC_ROOT/.vimrc.local
 
     syntax on
     filetype plugin indent on
