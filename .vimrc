@@ -101,9 +101,11 @@ try
     " ------------------
     " Others
     " ------------------
+    Plug 'lambdalisue/nerdfont-palette.vim'
     Plug 'lambdalisue/nerdfont.vim'
     Plug 'rbtnn/vim-close_scratch'
     Plug 'rbtnn/vim-gloaded'
+    Plug 'rbtnn/vim-jumptoline'
     Plug 'rbtnn/vim-vimscript_lasterror'
     Plug 'rbtnn/vim-wizard'
     Plug 'thinca/vim-qfreplace'
