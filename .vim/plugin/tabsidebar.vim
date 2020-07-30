@@ -16,7 +16,7 @@ let s:tsbsel_ctermbg = matchstr(trim(execute('highlight TabSideBarSel')), 'cterm
 function! s:with_icon(s, name, ft, highlight_name) abort
     let s = a:s
     let icon = ''
-    let hl = ''
+    let hl = '%#' .. a:highlight_name .. '#'
     if exists('*nerdfont#find')
         let icon = nerdfont#find(a:name)
         let ext = fnamemodify(a:name, ':t:e')
