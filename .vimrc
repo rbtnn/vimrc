@@ -34,7 +34,7 @@ try
     set pumheight=10 completeopt=menu
     set ruler rulerformat&
     set scrolloff=0 nonumber norelativenumber
-    set sessionoptions=buffers,curdir,tabpages
+    set sessionoptions=buffers,curdir,tabpages,help
     set shortmess& shortmess-=S
     set showtabline=0 tabline&
     set tags=./tags;
@@ -107,18 +107,21 @@ try
     Plug 'rbtnn/vim-gloaded'
     Plug 'rbtnn/vim-jumptoline'
     Plug 'rbtnn/vim-vimscript_lasterror'
+    Plug 'rbtnn/vim-vimscript_tagfunc'
     Plug 'rbtnn/vim-wizard'
     Plug 'thinca/vim-qfreplace'
     Plug 'tyru/restart.vim'
 
     call plug#end()
 
-    nnoremap <silent><nowait><space>     :<C-u>Wizard<cr>
+    if !has('nvim')
+        nnoremap <silent><nowait><space>     :<C-u>Wizard<cr>
+    endif
     nnoremap <silent><nowait><C-n>       :<C-u>cnext<cr>
     nnoremap <silent><nowait><C-p>       :<C-u>cprevious<cr>
     nmap     <silent><nowait>s           <Plug>(operator-replace)
 
-    let g:restart_sessionoptions = 'curdir,winpos,resize'
+    let g:restart_sessionoptions = 'winpos,winsize,resize,' .. &sessionoptions
     let g:close_scratch_define_augroup = 1
 
     silent! colorscheme darkcrystal
@@ -129,6 +132,13 @@ try
             execute printf('autocmd CmdlineEnter * :silent! delcommand %s', s:cmdname)
         endfor
     augroup END
+
+    if !has('nvim') && has('win32')
+        " This is the same as stdpath('config') in nvim.
+        let initdir = expand('~/AppData/Local/nvim')
+        call mkdir(initdir, 'p')
+        call writefile(['silent! source ~/.vimrc'], initdir .. '/init.vim')
+    endif
 
     syntax on
     filetype plugin indent on

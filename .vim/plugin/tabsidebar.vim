@@ -1,7 +1,7 @@
 
 let g:loaded_tabsidebar = 1
 
-if !has('tabsidebar') && !get(g:, 'tabsidebar_disabled', 0)
+if !has('tabsidebar')
     finish
 endif
 
@@ -33,7 +33,7 @@ function! s:with_icon(s, name, ft, highlight_name) abort
             endfor
         endif
     endif
-    return printf('%s%s%%#%s#%s', hl, icon, a:highlight_name, s)
+    return printf(' %s%s%%#%s#%s', hl, icon, a:highlight_name, s)
 endfunction
 
 function! s:display_string(wininfo, iscurr) abort
