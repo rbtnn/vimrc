@@ -62,18 +62,28 @@ try
         set undofile undodir=$VIMRC_DOTVIM/undofiles//
     endif
 
-    tnoremap <silent><nowait>gT     <C-w>gT
-    tnoremap <silent><nowait>gt     <C-w>gt
-
     if has('win32')
+        if has('nvim')
+            tnoremap <silent><nowait>gT       <C-\><C-n>gT
+            tnoremap <silent><nowait>gt       <C-\><C-n>gt
+            tnoremap <silent><nowait><C-w>N   <C-\><C-n>
+        else
+            tnoremap <silent><nowait>gT       <C-w>gT
+            tnoremap <silent><nowait>gt       <C-w>gt
+
+            " This is the same as stdpath('config') in nvim.
+            let initdir = expand('~/AppData/Local/nvim')
+            call mkdir(initdir, 'p')
+            call writefile(['silent! source ~/.vimrc'], initdir .. '/init.vim')
+        endif
         " https://github.com/rprichard/winpty/releases/
-        tnoremap <silent><C-p>       <up>
-        tnoremap <silent><C-n>       <down>
-        tnoremap <silent><C-b>       <left>
-        tnoremap <silent><C-f>       <right>
-        tnoremap <silent><C-e>       <end>
-        tnoremap <silent><C-a>       <home>
-        tnoremap <silent><C-u>       <esc>
+        tnoremap <silent><nowait><C-p>       <up>
+        tnoremap <silent><nowait><C-n>       <down>
+        tnoremap <silent><nowait><C-b>       <left>
+        tnoremap <silent><nowait><C-f>       <right>
+        tnoremap <silent><nowait><C-e>       <end>
+        tnoremap <silent><nowait><C-a>       <home>
+        tnoremap <silent><nowait><C-u>       <esc>
     endif
 
     set packpath=
@@ -133,16 +143,15 @@ try
         endfor
     augroup END
 
-    if !has('nvim') && has('win32')
-        " This is the same as stdpath('config') in nvim.
-        let initdir = expand('~/AppData/Local/nvim')
-        call mkdir(initdir, 'p')
-        call writefile(['silent! source ~/.vimrc'], initdir .. '/init.vim')
-    endif
-
     syntax on
     filetype plugin indent on
     set secure
 catch
-    echoerr v:exception
+    echohl Error
+    echomsg printf('Error detected while processing %s:', split(v:throwpoint, ',')[0])
+    echohl LineNr
+    echomsg printf('line  %s:', matchstr(split(v:throwpoint, ',')[1], '^\s*line\s*\zs.*$'))
+    echohl Error
+    echomsg v:exception
+    echohl None
 endtry
