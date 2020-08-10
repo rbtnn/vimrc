@@ -8,10 +8,10 @@ endif
 silent! runtime autoload/nerdfont.vim
 silent! runtime autoload/nerdfont_palette/defaults/palette.vim
 
-let s:tsb_guibg = matchstr(trim(execute('highlight TabSideBar')), 'guibg=\S\+')
-let s:tsbsel_guibg = matchstr(trim(execute('highlight TabSideBarSel')), 'guibg=\S\+')
-let s:tsb_ctermbg = matchstr(trim(execute('highlight TabSideBar')), 'ctermbg=\S\+')
-let s:tsbsel_ctermbg = matchstr(trim(execute('highlight TabSideBarSel')), 'ctermbg=\S\+')
+let s:tsb_guibg = matchstr(trim(execute('highlight TabSideBar', 'silent!')), 'guibg=\S\+')
+let s:tsbsel_guibg = matchstr(trim(execute('highlight TabSideBarSel', 'silent!')), 'guibg=\S\+')
+let s:tsb_ctermbg = matchstr(trim(execute('highlight TabSideBar', 'silent!')), 'ctermbg=\S\+')
+let s:tsbsel_ctermbg = matchstr(trim(execute('highlight TabSideBarSel', 'silent!')), 'ctermbg=\S\+')
 
 function! s:with_icon(s, name, ft, highlight_name) abort
     let s = a:s
@@ -24,9 +24,9 @@ function! s:with_icon(s, name, ft, highlight_name) abort
             for key in keys(g:nerdfont_palette#defaults#palette)
                 if (-1 != index(g:nerdfont_palette#defaults#palette[key], ext)) || (-1 != index(g:nerdfont_palette#defaults#palette[key], a:ft))
                     if a:highlight_name == 'TabSideBar'
-                        execute printf('highlight %s %s %s', key, s:tsb_guibg, s:tsb_ctermbg)
+                        silent! execute printf('highlight %s %s %s', key, s:tsb_guibg, s:tsb_ctermbg)
                     elseif a:highlight_name == 'TabSideBarSel'
-                        execute printf('highlight %s %s %s', key, s:tsbsel_guibg, s:tsbsel_ctermbg)
+                        silent! execute printf('highlight %s %s %s', key, s:tsbsel_guibg, s:tsbsel_ctermbg)
                     endif
                     let hl = '%#' .. key .. '#'
                 endif

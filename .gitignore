@@ -1,5 +1,4 @@
 
-.motd_shown
 .CFUserTextEncoding
 .ICEauthority
 .Trash/
@@ -36,6 +35,7 @@
 .local/
 .matplotlib/
 .mono/
+.motd_shown
 .mozilla/
 .multirust/
 .netrc
@@ -49,7 +49,6 @@
 .python_history
 .rnd
 .rustup/
-_netrc
 .sh_history
 .subversion/
 .sudo_as_admin_successful
@@ -58,6 +57,7 @@ _netrc
 .viminfo
 .vimrc.*
 .vuerc
+.windows-build-tools/
 .xinputrc
 .xsession-errors
 .xsession-errors.old
@@ -94,6 +94,7 @@ SendTo/
 Start Menu/
 Templates/
 Videos/
+_netrc
 _viminfo
 examples.desktop
 go/
