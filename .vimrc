@@ -89,6 +89,8 @@ try
     set packpath=
     set runtimepath=$VIMRUNTIME,$VIMRC_DOTVIM
 
+    let g:plug_url_format = 'https://github.com/%s.git'
+
     call plug#begin($VIMRC_PLUGDIR)
 
     silent! source $VIMRC_PLUGDIR/vim-gloaded/plugin/gloaded.vim
@@ -111,8 +113,6 @@ try
     " ------------------
     " Others
     " ------------------
-    Plug 'lambdalisue/nerdfont-palette.vim'
-    Plug 'lambdalisue/nerdfont.vim'
     Plug 'rbtnn/vim-close_scratch'
     Plug 'rbtnn/vim-gloaded'
     Plug 'rbtnn/vim-jumptoline'
@@ -127,6 +127,7 @@ try
     if !has('nvim')
         nnoremap <silent><nowait><space>     :<C-u>Wizard<cr>
     endif
+    nnoremap <silent><nowait><C-j>       :<C-u>JumpToLine<cr>
     nnoremap <silent><nowait><C-n>       :<C-u>cnext<cr>
     nnoremap <silent><nowait><C-p>       :<C-u>cprevious<cr>
     nmap     <silent><nowait>s           <Plug>(operator-replace)
