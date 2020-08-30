@@ -111,22 +111,24 @@ try
     Plug 'rbtnn/vim-darkcrystal'
 
     " ------------------
+    " for Vim scripting
+    " ------------------
+    Plug 'rbtnn/vim-vimscript_lasterror'
+    Plug 'rbtnn/vim-vimscript_tagfunc'
+    
+    " ------------------
     " Others
     " ------------------
     Plug 'rbtnn/vim-close_scratch'
+    Plug 'rbtnn/vim-diffy'
     Plug 'rbtnn/vim-gloaded'
     Plug 'rbtnn/vim-jumptoline'
-    Plug 'rbtnn/vim-vimscript_lasterror'
-    Plug 'rbtnn/vim-vimscript_tagfunc'
-    Plug 'rbtnn/vim-wizard'
     Plug 'thinca/vim-qfreplace'
     Plug 'tyru/restart.vim'
 
     call plug#end()
 
-    if !has('nvim')
-        nnoremap <silent><nowait><space>     :<C-u>Wizard<cr>
-    endif
+    nnoremap <silent><nowait><space>     :<C-u>Diffy -w<cr>
     nnoremap <silent><nowait><C-j>       :<C-u>JumpToLine<cr>
     nnoremap <silent><nowait><C-n>       :<C-u>cnext<cr>
     nnoremap <silent><nowait><C-p>       :<C-u>cprevious<cr>
