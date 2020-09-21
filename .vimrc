@@ -21,7 +21,7 @@ try
     set ignorecase nosmartcase
     set keywordprg=:help
     set laststatus=2 statusline&
-    set list nowrap breakindent& showbreak& listchars=tab:\ \ \|,trail:-
+    set list nowrap breakindent& showbreak& listchars=tab:\ \ \|,trail:-,trail:-
     set matchpairs+=<:>
     set mouse=a
     set nobackup nowritebackup backupdir&
@@ -113,9 +113,10 @@ try
     " ------------------
     " for Vim scripting
     " ------------------
+    Plug 'rbtnn/vim-vimscript_indentexpr'
     Plug 'rbtnn/vim-vimscript_lasterror'
     Plug 'rbtnn/vim-vimscript_tagfunc'
-    
+
     " ------------------
     " Others
     " ------------------
