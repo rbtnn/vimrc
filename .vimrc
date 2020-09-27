@@ -127,7 +127,6 @@ try
     Plug 'rbtnn/vim-gloaded'
     Plug 'rbtnn/vim-jumptoline'
     Plug 'thinca/vim-qfreplace'
-    Plug 'thinca/vim-quickrun'
     Plug 'tyru/restart.vim'
 
     call plug#end()
@@ -141,15 +140,11 @@ try
     let g:restart_sessionoptions = 'winpos,winsize,resize,' .. &sessionoptions
     let g:close_scratch_define_augroup = 1
     let g:molder_show_hidden = 1
-    let g:quickrun_no_default_key_mappings = 1
 
-    "let g:quickrun_config = get(g:, 'quickrun_config', {})
-    "let g:quickrun_config['_'] = {
-    "    \   'runner' : 'terminal',
-    "    \   'runner/terminal/into' : 1,
-    "    \ }
-    " let g:quickrun_config['_']['hook/output_encode/encoding'] = &encoding
-    " let g:quickrun_config['_']['hook/output_encode/encoding'] = &termencoding
+    command! -bar -nargs=0     MessagesDump
+        \ :new
+        \ |call setbufline(bufnr(), 1, filter(split(execute('messages'), "\n"), {i,x -> !empty(x)}))
+        \ |setlocal nomodified nomodifiable buftype=nofile
 
     silent! colorscheme darkcrystal
 
@@ -161,7 +156,7 @@ try
     augroup END
 
     syntax on
-    filetype plugin indent on
+     filetype plugin indent on
     set secure
 catch
     echohl Error
