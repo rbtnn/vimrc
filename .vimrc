@@ -38,7 +38,7 @@ try
     set shortmess& shortmess-=S
     set showtabline=0 tabline&
     set tags=./tags;
-    set title titlestring=%{v:progname}[%{getpid()}]
+    set title titlestring=[%{getpid()}]\ %{expand('%:t')}
     set visualbell noerrorbells t_vb=
     set wildmenu wildmode&
 
@@ -120,11 +120,14 @@ try
     " ------------------
     " Others
     " ------------------
+    Plug 'mattn/vim-molder'
+    Plug 'mattn/vim-molder-operations'
     Plug 'rbtnn/vim-close_scratch'
     Plug 'rbtnn/vim-diffy'
     Plug 'rbtnn/vim-gloaded'
     Plug 'rbtnn/vim-jumptoline'
     Plug 'thinca/vim-qfreplace'
+    Plug 'thinca/vim-quickrun'
     Plug 'tyru/restart.vim'
 
     call plug#end()
@@ -137,6 +140,16 @@ try
 
     let g:restart_sessionoptions = 'winpos,winsize,resize,' .. &sessionoptions
     let g:close_scratch_define_augroup = 1
+    let g:molder_show_hidden = 1
+    let g:quickrun_no_default_key_mappings = 1
+
+    "let g:quickrun_config = get(g:, 'quickrun_config', {})
+    "let g:quickrun_config['_'] = {
+    "    \   'runner' : 'terminal',
+    "    \   'runner/terminal/into' : 1,
+    "    \ }
+    " let g:quickrun_config['_']['hook/output_encode/encoding'] = &encoding
+    " let g:quickrun_config['_']['hook/output_encode/encoding'] = &termencoding
 
     silent! colorscheme darkcrystal
 

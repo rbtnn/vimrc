@@ -50,6 +50,8 @@ function! s:display_string(wininfo, iscurr) abort
         let s = '[CmdLineWindow]'
     elseif 'diff' == getbufvar(a:wininfo.bufnr, '&filetype')
         let s = '[Diff]'
+    elseif 'diffy' == getbufvar(a:wininfo.bufnr, '&filetype')
+        let s = '[Diffy]'
     elseif !empty(name)
         let modi = getbufvar(a:wininfo.bufnr, '&modified')
         let read = getbufvar(a:wininfo.bufnr, '&readonly')
