@@ -38,7 +38,7 @@ try
     set shortmess& shortmess-=S
     set showtabline=0 tabline&
     set tags=./tags;
-    set title titlestring=[%{getpid()}]\ %{expand('%:t')}
+    set title titlestring=[%{getpid()}]\ %{label#string()}
     set visualbell noerrorbells t_vb=
     set wildmenu wildmode&
 
@@ -127,6 +127,7 @@ try
     Plug 'rbtnn/vim-gloaded'
     Plug 'rbtnn/vim-jumptoline'
     Plug 'thinca/vim-qfreplace'
+    Plug 'thinca/vim-quickrun'
     Plug 'tyru/restart.vim'
 
     call plug#end()
