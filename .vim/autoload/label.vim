@@ -17,17 +17,19 @@ function! label#string(...) abort
     elseif 'diff' == ft
         return '[Diff]'
     else
-        for x in map(split(&runtimepath, ','), { i, x -> fnamemodify(x, ':t') })
-            for m in [matchlist(x, '^vim-\(.\+\)$'), matchlist(x, '^\(.\+\)\.vim$')]
-                if !empty(m)
-                    if m[1] == ft
-                        return '[' .. toupper(ft[0]) .. ft[1:] .. ']'
-                    endif
-                endif
-            endfor
-        endfor
-        let s = '[No Name]'
         let name = bufname(w.bufnr)
+        if !filereadable(name)
+            for x in map(split(&runtimepath, ','), { i, x -> fnamemodify(x, ':t') })
+                for m in [matchlist(x, '^vim-\(.\+\)$'), matchlist(x, '^\(.\+\)\.vim$')]
+                    if !empty(m)
+                        if m[1] == ft
+                            return '[' .. toupper(ft[0]) .. ft[1:] .. ']'
+                        endif
+                    endif
+                endfor
+            endfor
+        endif
+        let s = '[No Name]'
         if !empty(name)
             let modi = getbufvar(w.bufnr, '&modified')
             let read = getbufvar(w.bufnr, '&readonly')

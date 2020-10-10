@@ -63,14 +63,7 @@ try
     endif
 
     if has('win32')
-        if has('nvim')
-            tnoremap <silent><nowait>gT       <C-\><C-n>gT
-            tnoremap <silent><nowait>gt       <C-\><C-n>gt
-            tnoremap <silent><nowait><C-w>N   <C-\><C-n>
-        else
-            tnoremap <silent><nowait>gT       <C-w>gT
-            tnoremap <silent><nowait>gt       <C-w>gt
-
+        if !has('nvim')
             " This is the same as stdpath('config') in nvim.
             let initdir = expand('~/AppData/Local/nvim')
             call mkdir(initdir, 'p')
@@ -84,6 +77,15 @@ try
         tnoremap <silent><nowait><C-e>       <end>
         tnoremap <silent><nowait><C-a>       <home>
         tnoremap <silent><nowait><C-u>       <esc>
+    endif
+
+    if has('nvim')
+        tnoremap <silent><nowait>gT       <C-\><C-n>gT
+        tnoremap <silent><nowait>gt       <C-\><C-n>gt
+        tnoremap <silent><nowait><C-w>N   <C-\><C-n>
+    else
+        tnoremap <silent><nowait>gT       <C-w>gT
+        tnoremap <silent><nowait>gt       <C-w>gt
     endif
 
     set packpath=
@@ -127,7 +129,6 @@ try
     Plug 'rbtnn/vim-gloaded'
     Plug 'rbtnn/vim-jumptoline'
     Plug 'thinca/vim-qfreplace'
-    Plug 'thinca/vim-quickrun'
     Plug 'tyru/restart.vim'
 
     call plug#end()
@@ -157,7 +158,7 @@ try
     augroup END
 
     syntax on
-     filetype plugin indent on
+    filetype plugin indent on
     set secure
 catch
     echohl Error
