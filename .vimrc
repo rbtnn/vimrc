@@ -148,6 +148,7 @@ command! -bar -nargs=0     MessagesDump
     \ |call setbufline(bufnr(), 1, filter(split(execute('messages'), "\n"), {i,x -> !empty(x)}))
     \ |setlocal nomodified nomodifiable buftype=nofile
 
+set background=light
 silent! colorscheme darkcrystal
 
 augroup vimrc
