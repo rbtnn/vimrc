@@ -44,7 +44,7 @@ set wildmenu wildmode&
 
 set nrformats=
 if has('patch-8.2.0860')
-    set nrformats+=unsigned
+  set nrformats+=unsigned
 endif
 
 set wildignore=*.pdb,*.obj,*.dll,*.exe,*.idb,*.ncb,*.ilk,*.plg,*.bsc,*.sbr,*.opt,*.config
@@ -58,34 +58,34 @@ let g:vim_indent_cont = &g:shiftwidth
 let g:mapleader = '\'
 
 if has('persistent_undo')
-    silent! call mkdir(expand('$VIMRC_DOTVIM/undofiles'), 'p')
-    set undofile undodir=$VIMRC_DOTVIM/undofiles//
+  silent! call mkdir(expand('$VIMRC_DOTVIM/undofiles'), 'p')
+  set undofile undodir=$VIMRC_DOTVIM/undofiles//
 endif
 
 if has('win32')
-    if !has('nvim')
-        " This is the same as stdpath('config') in nvim.
-        let initdir = expand('~/AppData/Local/nvim')
-        call mkdir(initdir, 'p')
-        call writefile(['silent! source ~/.vimrc'], initdir .. '/init.vim')
-    endif
-    " https://github.com/rprichard/winpty/releases/
-    tnoremap <silent><nowait><C-p>       <up>
-    tnoremap <silent><nowait><C-n>       <down>
-    tnoremap <silent><nowait><C-b>       <left>
-    tnoremap <silent><nowait><C-f>       <right>
-    tnoremap <silent><nowait><C-e>       <end>
-    tnoremap <silent><nowait><C-a>       <home>
-    tnoremap <silent><nowait><C-u>       <esc>
+  if !has('nvim')
+    " This is the same as stdpath('config') in nvim.
+    let initdir = expand('~/AppData/Local/nvim')
+    call mkdir(initdir, 'p')
+    call writefile(['silent! source ~/.vimrc'], initdir .. '/init.vim')
+  endif
+  " https://github.com/rprichard/winpty/releases/
+  tnoremap <silent><nowait><C-p>       <up>
+  tnoremap <silent><nowait><C-n>       <down>
+  tnoremap <silent><nowait><C-b>       <left>
+  tnoremap <silent><nowait><C-f>       <right>
+  tnoremap <silent><nowait><C-e>       <end>
+  tnoremap <silent><nowait><C-a>       <home>
+  tnoremap <silent><nowait><C-u>       <esc>
 endif
 
 if has('nvim')
-    tnoremap <silent><nowait>gT       <C-\><C-n>gT
-    tnoremap <silent><nowait>gt       <C-\><C-n>gt
-    tnoremap <silent><nowait><C-w>N   <C-\><C-n>
+  tnoremap <silent><nowait>gT       <C-\><C-n>gT
+  tnoremap <silent><nowait>gt       <C-\><C-n>gt
+  tnoremap <silent><nowait><C-w>N   <C-\><C-n>
 else
-    tnoremap <silent><nowait>gT       <C-w>gT
-    tnoremap <silent><nowait>gt       <C-w>gt
+  tnoremap <silent><nowait>gT       <C-w>gT
+  tnoremap <silent><nowait>gt       <C-w>gt
 endif
 
 set packpath=
@@ -102,34 +102,35 @@ silent! source ~/.vimrc.local
 " ------------------
 " Textobj/Operator
 " ------------------
-Plug 'kana/vim-operator-replace'
-Plug 'kana/vim-operator-user'
-Plug 'kana/vim-textobj-user'
-Plug 'rbtnn/vim-textobj-verbatimstring'
+call plug#('kana/vim-operator-replace')
+call plug#('kana/vim-operator-user')
+call plug#('kana/vim-textobj-user')
+call plug#('rbtnn/vim-textobj-verbatimstring')
 
 " ------------------
 " ColorScheme
 " ------------------
-Plug 'rbtnn/vim-darkcrystal'
+call plug#('rbtnn/vim-darkcrystal')
 
 " ------------------
 " for Vim scripting
 " ------------------
-Plug 'rbtnn/vim-vimscript_indentexpr'
-Plug 'rbtnn/vim-vimscript_lasterror'
-Plug 'rbtnn/vim-vimscript_tagfunc'
+call plug#('rbtnn/vim-vimscript_indentexpr')
+call plug#('rbtnn/vim-vimscript_lasterror')
+call plug#('rbtnn/vim-vimscript_tagfunc')
 
 " ------------------
 " Others
 " ------------------
-Plug 'mattn/vim-molder'
-Plug 'mattn/vim-molder-operations'
-Plug 'rbtnn/vim-close_scratch'
-Plug 'rbtnn/vim-diffy'
-Plug 'rbtnn/vim-gloaded'
-Plug 'rbtnn/vim-jumptoline'
-Plug 'thinca/vim-qfreplace'
-Plug 'tyru/restart.vim'
+call plug#('mattn/vim-molder')
+call plug#('mattn/vim-molder-operations')
+call plug#('rbtnn/vim-close_scratch')
+call plug#('rbtnn/vim-diffy')
+call plug#('rbtnn/vim-gloaded')
+call plug#('rbtnn/vim-jumptoline')
+call plug#('thinca/vim-qfreplace')
+call plug#('tyru/capture.vim')
+call plug#('tyru/restart.vim')
 
 call plug#end()
 
@@ -143,19 +144,18 @@ let g:restart_sessionoptions = 'winpos,winsize,resize,buffers,curdir,tabpages,he
 let g:close_scratch_define_augroup = 1
 let g:molder_show_hidden = 1
 
-command! -bar -nargs=0     MessagesDump
-    \ :new
-    \ |call setbufline(bufnr(), 1, filter(split(execute('messages'), "\n"), {i,x -> !empty(x)}))
-    \ |setlocal nomodified nomodifiable buftype=nofile
-
 set background=light
 silent! colorscheme darkcrystal
 
 augroup vimrc
-    autocmd!
-    for s:cmdname in [ 'MANPAGER', 'VimFoldh', 'TextobjVerbatimstringDefaultKeyMappings', ]
-        execute printf('autocmd CmdlineEnter * :silent! delcommand %s', s:cmdname)
-    endfor
+  autocmd!
+  autocmd FileType vim :setlocal expandtab   shiftround softtabstop=-1 shiftwidth=2 tabstop=2
+  autocmd FileType cpp :setlocal noexpandtab shiftround softtabstop=-1 shiftwidth=2 tabstop=2
+  for s:cmdname in [
+      \ 'MANPAGER', 'VimFoldh', 'TextobjVerbatimstringDefaultKeyMappings',
+      \ 'PlugSnapshot', 'PlugDiff', 'PlugStatus', 'PlugInstall', 'Plug', 'PlugUpgrade']
+    execute printf('autocmd CmdlineEnter * :silent! delcommand %s', s:cmdname)
+  endfor
 augroup END
 
 syntax on
