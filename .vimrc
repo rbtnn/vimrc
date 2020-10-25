@@ -14,10 +14,9 @@ set autoread
 set clipboard=unnamed
 set cmdheight=3
 set display=lastline
-set expandtab shiftround softtabstop=-1 shiftwidth=4 tabstop=4
+set expandtab shiftround softtabstop=-1 shiftwidth=2 tabstop=2
 set fileencodings=utf-8,cp932,euc-jp,default,latin
 set fileformats=unix,dos,mac
-set grepprg=internal
 set ignorecase nosmartcase
 set keywordprg=:help
 set laststatus=2 statusline&
@@ -41,6 +40,13 @@ set tags=./tags;
 set title titlestring=[%{getpid()}]\ %{label#string()}
 set visualbell noerrorbells t_vb=
 set wildmenu wildmode&
+
+if executable('rg')
+  set grepprg=rg\ --vimgrep
+  set grepformat=%f:%l:%c:%m
+else
+  set grepprg=internal
+endif
 
 set nrformats=
 if has('patch-8.2.0860')
@@ -128,6 +134,7 @@ call plug#('rbtnn/vim-close_scratch')
 call plug#('rbtnn/vim-diffy')
 call plug#('rbtnn/vim-gloaded')
 call plug#('rbtnn/vim-jumptoline')
+call plug#('rbtnn/vim-pterm')
 call plug#('thinca/vim-qfreplace')
 call plug#('tyru/capture.vim')
 call plug#('tyru/restart.vim')
@@ -149,8 +156,7 @@ silent! colorscheme darkcrystal
 
 augroup vimrc
   autocmd!
-  autocmd FileType vim :setlocal expandtab   shiftround softtabstop=-1 shiftwidth=2 tabstop=2
-  autocmd FileType cpp :setlocal noexpandtab shiftround softtabstop=-1 shiftwidth=2 tabstop=2
+  autocmd FileType cpp :setlocal noexpandtab
   for s:cmdname in [
       \ 'MANPAGER', 'VimFoldh', 'TextobjVerbatimstringDefaultKeyMappings',
       \ 'PlugSnapshot', 'PlugDiff', 'PlugStatus', 'PlugInstall', 'Plug', 'PlugUpgrade']
