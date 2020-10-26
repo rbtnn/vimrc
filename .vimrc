@@ -105,36 +105,20 @@ silent! source $VIMRC_PLUGDIR/vim-gloaded/plugin/gloaded.vim
 silent! source $VIMRC_ROOT/vim-on-windows/vimbatchfiles/setup.vim
 silent! source ~/.vimrc.local
 
-" ------------------
-" Textobj/Operator
-" ------------------
 call plug#('kana/vim-operator-replace')
 call plug#('kana/vim-operator-user')
 call plug#('kana/vim-textobj-user')
-call plug#('rbtnn/vim-textobj-verbatimstring')
-
-" ------------------
-" ColorScheme
-" ------------------
-call plug#('rbtnn/vim-darkcrystal')
-
-" ------------------
-" for Vim scripting
-" ------------------
-call plug#('rbtnn/vim-vimscript_indentexpr')
-call plug#('rbtnn/vim-vimscript_lasterror')
-call plug#('rbtnn/vim-vimscript_tagfunc')
-
-" ------------------
-" Others
-" ------------------
 call plug#('mattn/vim-molder')
-call plug#('mattn/vim-molder-operations')
 call plug#('rbtnn/vim-close_scratch')
+call plug#('rbtnn/vim-darkcrystal')
 call plug#('rbtnn/vim-diffy')
 call plug#('rbtnn/vim-gloaded')
 call plug#('rbtnn/vim-jumptoline')
 call plug#('rbtnn/vim-pterm')
+call plug#('rbtnn/vim-textobj-verbatimstring')
+call plug#('rbtnn/vim-vimscript_indentexpr')
+call plug#('rbtnn/vim-vimscript_lasterror')
+call plug#('rbtnn/vim-vimscript_tagfunc')
 call plug#('thinca/vim-qfreplace')
 call plug#('tyru/capture.vim')
 call plug#('tyru/restart.vim')
@@ -147,6 +131,8 @@ nnoremap <silent><nowait><C-n>       :<C-u>cnext<cr>
 nnoremap <silent><nowait><C-p>       :<C-u>cprevious<cr>
 nmap     <silent><nowait>s           <Plug>(operator-replace)
 
+let g:pterm_width = '&columns * 9 / 10'
+let g:pterm_height = '&lines * 9 / 10'
 let g:restart_sessionoptions = 'winpos,winsize,resize,buffers,curdir,tabpages,help'
 let g:close_scratch_define_augroup = 1
 let g:molder_show_hidden = 1
@@ -156,7 +142,9 @@ silent! colorscheme darkcrystal
 
 augroup vimrc
   autocmd!
-  autocmd FileType cpp :setlocal noexpandtab
+  autocmd FileType cpp  :setlocal noexpandtab
+  autocmd FileType help :command! -buffer -bar -nargs=0 HelpStartEditting
+    \ :setlocal colorcolumn=+1 conceallevel=0 list setlocal tabstop=8 shiftwidth=8 softtabstop=8 noexpandtab textwidth=78
   for s:cmdname in [
       \ 'MANPAGER', 'VimFoldh', 'TextobjVerbatimstringDefaultKeyMappings',
       \ 'PlugSnapshot', 'PlugDiff', 'PlugStatus', 'PlugInstall', 'Plug', 'PlugUpgrade']
