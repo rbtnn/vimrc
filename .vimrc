@@ -131,11 +131,11 @@ nnoremap <silent><nowait><C-n>       :<C-u>cnext<cr>
 nnoremap <silent><nowait><C-p>       :<C-u>cprevious<cr>
 nmap     <silent><nowait>s           <Plug>(operator-replace)
 
-let g:pterm_width = '&columns * 9 / 10'
-let g:pterm_height = '&lines * 9 / 10'
-let g:restart_sessionoptions = 'winpos,winsize,resize,buffers,curdir,tabpages,help'
-let g:close_scratch_define_augroup = 1
-let g:molder_show_hidden = 1
+let g:pterm_width = get(g:, 'pterm_width', '&columns * 9 / 10')
+let g:pterm_height = get(g:, 'pterm_height', '&lines * 6 / 10')
+let g:restart_sessionoptions = get(g:, 'restart_sessionoptions', 'winpos,winsize,resize,buffers,curdir,tabpages')
+let g:close_scratch_define_augroup = get(g:, 'close_scratch_define_augroup', 1)
+let g:molder_show_hidden = get(g:, 'molder_show_hidden', 1)
 
 set background=light
 silent! colorscheme darkcrystal
