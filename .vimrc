@@ -85,15 +85,6 @@ if has('win32')
   tnoremap <silent><nowait><C-u>       <esc>
 endif
 
-if has('nvim')
-  tnoremap <silent><nowait>gT       <C-\><C-n>gT
-  tnoremap <silent><nowait>gt       <C-\><C-n>gt
-  tnoremap <silent><nowait><C-w>N   <C-\><C-n>
-else
-  tnoremap <silent><nowait>gT       <C-w>gT
-  tnoremap <silent><nowait>gt       <C-w>gt
-endif
-
 set packpath=
 set runtimepath=$VIMRUNTIME,$VIMRC_DOTVIM
 
@@ -103,24 +94,31 @@ call plug#begin($VIMRC_PLUGDIR)
 
 silent! source $VIMRC_PLUGDIR/vim-gloaded/plugin/gloaded.vim
 silent! source $VIMRC_ROOT/vim-on-windows/vimbatchfiles/setup.vim
+
+if has('tabsidebar')
+  let g:pterm_width = '(&columns - &tabsidebarcolumns) * 9 / 10'
+  let g:pterm_col = '&tabsidebarcolumns + (&columns - &tabsidebarcolumns - eval(g:pterm_width)) / 2'
+else
+  let g:pterm_width = '&columns * 9 / 10'
+  let g:pterm_col = '(&columns - eval(g:pterm_width)) / 2'
+endif
+let g:restart_sessionoptions = 'winpos,winsize,resize,buffers,curdir,tabpages'
+let g:molder_show_hidden = 1
+
 silent! source ~/.vimrc.local
 
 call plug#('kana/vim-operator-replace')
 call plug#('kana/vim-operator-user')
-call plug#('kana/vim-textobj-user')
 call plug#('mattn/vim-molder')
-call plug#('rbtnn/vim-close_scratch')
 call plug#('rbtnn/vim-darkcrystal')
 call plug#('rbtnn/vim-diffy')
 call plug#('rbtnn/vim-gloaded')
 call plug#('rbtnn/vim-jumptoline')
 call plug#('rbtnn/vim-pterm')
-call plug#('rbtnn/vim-textobj-verbatimstring')
 call plug#('rbtnn/vim-vimscript_indentexpr')
 call plug#('rbtnn/vim-vimscript_lasterror')
 call plug#('rbtnn/vim-vimscript_tagfunc')
 call plug#('thinca/vim-qfreplace')
-call plug#('tyru/capture.vim')
 call plug#('tyru/restart.vim')
 
 call plug#end()
@@ -130,12 +128,6 @@ nnoremap <silent><nowait><C-j>       :<C-u>JumpToLine<cr>
 nnoremap <silent><nowait><C-n>       :<C-u>cnext<cr>
 nnoremap <silent><nowait><C-p>       :<C-u>cprevious<cr>
 nmap     <silent><nowait>s           <Plug>(operator-replace)
-
-let g:pterm_width = get(g:, 'pterm_width', '&columns * 9 / 10')
-let g:pterm_height = get(g:, 'pterm_height', '&lines * 6 / 10')
-let g:restart_sessionoptions = get(g:, 'restart_sessionoptions', 'winpos,winsize,resize,buffers,curdir,tabpages')
-let g:close_scratch_define_augroup = get(g:, 'close_scratch_define_augroup', 1)
-let g:molder_show_hidden = get(g:, 'molder_show_hidden', 1)
 
 set background=light
 silent! colorscheme darkcrystal
