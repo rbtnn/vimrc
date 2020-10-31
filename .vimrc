@@ -17,6 +17,7 @@ set display=lastline
 set expandtab shiftround softtabstop=-1 shiftwidth=2 tabstop=2
 set fileencodings=utf-8,cp932,euc-jp,default,latin
 set fileformats=unix,dos,mac
+set grepprg=internal
 set ignorecase nosmartcase
 set keywordprg=:help
 set laststatus=2 statusline&
@@ -40,13 +41,6 @@ set tags=./tags;
 set title titlestring=[%{getpid()}]\ %{label#string()}
 set visualbell noerrorbells t_vb=
 set wildmenu wildmode&
-
-if executable('rg')
-  set grepprg=rg\ --vimgrep
-  set grepformat=%f:%l:%c:%m
-else
-  set grepprg=internal
-endif
 
 set nrformats=
 if has('patch-8.2.0860')
@@ -95,6 +89,8 @@ call plug#begin($VIMRC_PLUGDIR)
 silent! source $VIMRC_PLUGDIR/vim-gloaded/plugin/gloaded.vim
 silent! source $VIMRC_ROOT/vim-on-windows/vimbatchfiles/setup.vim
 
+let g:pterm_options = { 'border' : [], 'borderhighlight' : ['Label'], }
+let g:pterm_using_title_for_tabs = v:true
 if has('tabsidebar')
   let g:pterm_width = '(&columns - &tabsidebarcolumns) * 9 / 10'
   let g:pterm_col = '&tabsidebarcolumns + (&columns - &tabsidebarcolumns - eval(g:pterm_width)) / 2'
@@ -124,12 +120,12 @@ call plug#('tyru/restart.vim')
 call plug#end()
 
 nnoremap <silent><nowait><space>     :<C-u>Diffy -w<cr>
-nnoremap <silent><nowait><C-j>       :<C-u>JumpToLine<cr>
+nnoremap <silent><nowait><C-j>       :<C-u>JumpToLine!<cr>
 nnoremap <silent><nowait><C-n>       :<C-u>cnext<cr>
 nnoremap <silent><nowait><C-p>       :<C-u>cprevious<cr>
 nmap     <silent><nowait>s           <Plug>(operator-replace)
 
-set background=light
+set background=dark
 silent! colorscheme darkcrystal
 
 augroup vimrc
