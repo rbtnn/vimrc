@@ -91,13 +91,6 @@ silent! source $VIMRC_ROOT/vim-on-windows/vimbatchfiles/setup.vim
 
 let g:pterm_options = { 'border' : [], 'borderhighlight' : ['Label'], }
 let g:pterm_using_title_for_tabs = v:true
-if has('tabsidebar')
-  let g:pterm_width = '(&columns - &tabsidebarcolumns) * 9 / 10'
-  let g:pterm_col = '&tabsidebarcolumns + (&columns - &tabsidebarcolumns - eval(g:pterm_width)) / 2'
-else
-  let g:pterm_width = '&columns * 9 / 10'
-  let g:pterm_col = '(&columns - eval(g:pterm_width)) / 2'
-endif
 let g:restart_sessionoptions = 'winpos,winsize,resize,buffers,curdir,tabpages'
 let g:molder_show_hidden = 1
 
