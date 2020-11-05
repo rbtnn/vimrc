@@ -173,8 +173,8 @@ function! s:system(cmd, toplevel) abort
             call delete(path)
         endif
     endtry
-    if get(g:, 'diffy_use_sillyiconv', v:false)
-        return diffy#sillyiconv#iconv(lines)
+    if get(g:, 'vimrc_use_sillyiconv', v:false)
+        return vimrc#sillyiconv#iconv(lines)
     else
         return lines
     endif
