@@ -14,7 +14,7 @@ set autoread
 set clipboard=unnamed
 set cmdheight=3
 set display=lastline
-set expandtab shiftround softtabstop=-1 shiftwidth=2 tabstop=2
+set expandtab shiftround softtabstop=-1 shiftwidth=4 tabstop=4
 set fileencodings=utf-8,cp932,euc-jp,default,latin
 set fileformats=unix,dos,mac
 set grepprg=internal
@@ -31,6 +31,7 @@ set noshellslash
 set noshowmode
 set noswapfile
 set nowrapscan
+set nrformats=unsigned
 set pumheight=10 completeopt=menu
 set ruler rulerformat=%l/%L
 set scrolloff=0 nonumber norelativenumber
@@ -38,14 +39,9 @@ set sessionoptions=
 set shortmess& shortmess-=S
 set showtabline=0 tabline&
 set tags=./tags;
-set title titlestring=[%{getpid()}]\ %{label#string()}
+set title titlestring=[%{getpid()}]\ %{vimrc#label#string()}
 set visualbell noerrorbells t_vb=
 set wildmenu wildmode&
-
-set nrformats=
-if has('patch-8.2.0860')
-  set nrformats+=unsigned
-endif
 
 set wildignore=*.pdb,*.obj,*.dll,*.exe,*.idb,*.ncb,*.ilk,*.plg,*.bsc,*.sbr,*.opt,*.config
 set wildignore+=*.pdf,*.mp3,*.doc,*.docx,*.xls,*.xlsx,*.idx,*.jpg,*.png,*.zip,*.MMF,*.gif
@@ -58,25 +54,25 @@ let g:vim_indent_cont = &g:shiftwidth
 let g:mapleader = '\'
 
 if has('persistent_undo')
-  silent! call mkdir(expand('$VIMRC_DOTVIM/undofiles'), 'p')
-  set undofile undodir=$VIMRC_DOTVIM/undofiles//
+    silent! call mkdir(expand('$VIMRC_DOTVIM/undofiles'), 'p')
+    set undofile undodir=$VIMRC_DOTVIM/undofiles//
 endif
 
 if has('win32')
-  if !has('nvim')
-    " This is the same as stdpath('config') in nvim.
-    let initdir = expand('~/AppData/Local/nvim')
-    call mkdir(initdir, 'p')
-    call writefile(['silent! source ~/.vimrc'], initdir .. '/init.vim')
-  endif
-  " https://github.com/rprichard/winpty/releases/
-  tnoremap <silent><nowait><C-p>       <up>
-  tnoremap <silent><nowait><C-n>       <down>
-  tnoremap <silent><nowait><C-b>       <left>
-  tnoremap <silent><nowait><C-f>       <right>
-  tnoremap <silent><nowait><C-e>       <end>
-  tnoremap <silent><nowait><C-a>       <home>
-  tnoremap <silent><nowait><C-u>       <esc>
+    if !has('nvim')
+        " This is the same as stdpath('config') in nvim.
+        let initdir = expand('~/AppData/Local/nvim')
+        call mkdir(initdir, 'p')
+        call writefile(['silent! source ~/.vimrc'], initdir .. '/init.vim')
+    endif
+    " https://github.com/rprichard/winpty/releases/
+    tnoremap <silent><nowait><C-p>       <up>
+    tnoremap <silent><nowait><C-n>       <down>
+    tnoremap <silent><nowait><C-b>       <left>
+    tnoremap <silent><nowait><C-f>       <right>
+    tnoremap <silent><nowait><C-e>       <end>
+    tnoremap <silent><nowait><C-a>       <home>
+    tnoremap <silent><nowait><C-u>       <esc>
 endif
 
 set packpath=
@@ -91,6 +87,7 @@ silent! source $VIMRC_ROOT/vim-on-windows/vimbatchfiles/setup.vim
 
 let g:pterm_options = { 'border' : [], 'borderhighlight' : ['Label'], }
 let g:pterm_using_title_for_tabs = v:true
+let g:pterm_term_highlight = 'Terminal'
 let g:restart_sessionoptions = 'winpos,winsize,resize,buffers,curdir,tabpages'
 let g:molder_show_hidden = 1
 
@@ -100,7 +97,6 @@ call plug#('kana/vim-operator-replace')
 call plug#('kana/vim-operator-user')
 call plug#('mattn/vim-molder')
 call plug#('rbtnn/vim-darkcrystal')
-call plug#('rbtnn/vim-diffy')
 call plug#('rbtnn/vim-gloaded')
 call plug#('rbtnn/vim-jumptoline')
 call plug#('rbtnn/vim-pterm')
@@ -112,7 +108,8 @@ call plug#('tyru/restart.vim')
 
 call plug#end()
 
-nnoremap <silent><nowait><space>     :<C-u>Diffy -w<cr>
+nnoremap <silent><nowait><C-f>       :<C-u>call vimrc#git#diff('-w')<cr>
+nnoremap <silent><nowait><C-s>       :<C-u>call vimrc#git#lsfiles()<cr>
 nnoremap <silent><nowait><C-j>       :<C-u>JumpToLine!<cr>
 nnoremap <silent><nowait><C-n>       :<C-u>cnext<cr>
 nnoremap <silent><nowait><C-p>       :<C-u>cprevious<cr>
@@ -122,15 +119,15 @@ set background=dark
 silent! colorscheme darkcrystal
 
 augroup vimrc
-  autocmd!
-  autocmd FileType cpp  :setlocal noexpandtab
-  autocmd FileType help :command! -buffer -bar -nargs=0 HelpStartEditting
-    \ :setlocal colorcolumn=+1 conceallevel=0 list setlocal tabstop=8 shiftwidth=8 softtabstop=8 noexpandtab textwidth=78
-  for s:cmdname in [
-      \ 'MANPAGER', 'VimFoldh', 'TextobjVerbatimstringDefaultKeyMappings',
-      \ 'PlugSnapshot', 'PlugDiff', 'PlugStatus', 'PlugInstall', 'Plug', 'PlugUpgrade']
-    execute printf('autocmd CmdlineEnter * :silent! delcommand %s', s:cmdname)
-  endfor
+    autocmd!
+    autocmd FileType cpp  :setlocal noexpandtab
+    autocmd FileType help :command! -buffer -bar -nargs=0 HelpStartEditting
+        \ :setlocal colorcolumn=+1 conceallevel=0 list setlocal tabstop=8 shiftwidth=8 softtabstop=8 noexpandtab textwidth=78
+    for s:cmdname in [
+            \ 'MANPAGER', 'VimFoldh', 'TextobjVerbatimstringDefaultKeyMappings',
+            \ 'PlugSnapshot', 'PlugDiff', 'PlugStatus', 'PlugInstall', 'Plug', 'PlugUpgrade']
+        execute printf('autocmd CmdlineEnter * :silent! delcommand %s', s:cmdname)
+    endfor
 augroup END
 
 syntax on

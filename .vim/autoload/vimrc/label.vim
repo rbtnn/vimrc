@@ -1,5 +1,5 @@
 
-function! label#string(...) abort
+function! vimrc#label#string(...) abort
     let w = getwininfo((0 < a:0) ? a:1 : win_getid())[0]
     let ft = getbufvar(w.bufnr, '&filetype')
     if w.terminal
