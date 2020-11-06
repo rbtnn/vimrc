@@ -1,5 +1,6 @@
 
 let s:NO_MATCHES = 'no matches'
+let s:lsfiles_caches = get(s:, 'lsfiles_caches', {})
 
 function! vimrc#git#diff(q_args) abort
     let args = split(a:q_args, '\s\+')
@@ -25,6 +26,9 @@ function! vimrc#git#diff(q_args) abort
             call setwinvar(winid, 'toplevel', toplevel)
             call setwinvar(winid, 'args', args)
             call setwinvar(winid, 'info', dict)
+            call win_execute(winid, 'call clearmatches()')
+            call win_execute(winid, 'call matchadd("DiffAdd", "+\\d\\+")')
+            call win_execute(winid, 'call matchadd("DiffDelete", "-\\d\\+")')
         else
             call s:error('No modified files')
         endif
@@ -37,11 +41,15 @@ function! vimrc#git#lsfiles() abort
     let toplevel = s:get_toplevel_git()
     if isdirectory(toplevel)
         let cmd = ['git', 'ls-files']
-        let files = s:system(cmd, toplevel)
-        if empty(files)
+        if has_key(s:lsfiles_caches, toplevel)
+            let files = s:lsfiles_caches[toplevel]
+        else
+            let s:lsfiles_caches[toplevel] = s:system(cmd, toplevel)
+        endif
+        if empty(s:lsfiles_caches[toplevel])
             call s:error('no such file')
         else
-            let winid = s:open(files, join(cmd), function('s:cb_lsfiles'))
+            let winid = s:open(s:lsfiles_caches[toplevel], join(cmd), function('s:cb_lsfiles'))
             call setwinvar(winid, 'toplevel', toplevel)
         endif
     else
@@ -219,7 +227,7 @@ function! s:cb_lsfiles(winid, key) abort
     endif
 endfunction
 
-function! s:open(lines, title, cb) abort
+function! s:open(lines, cmd, cb) abort
     let winid = popup_menu(a:lines, {})
     let s:search_winid = -1
 
@@ -234,7 +242,7 @@ function! s:open(lines, title, cb) abort
         \ curr_filter_text: '',
         \ prev_filter_text: '',
         \ search_mode: v:false,
-        \ title: a:title,
+        \ cmd: a:cmd,
         \ user_callback: a:cb,
         \ orig_lines: a:lines,
         \ lines_width: lines_width,
@@ -258,7 +266,7 @@ function! s:set_options(winid) abort
         catch
         endtry
         call popup_setoptions(a:winid, extend(base_opts, #{
-            \ title: printf('%s(%d/%d)', opts.title, filter_len, orig_len),
+            \ title: printf('%s (%d/%d)', opts.cmd, filter_len, orig_len),
             \ zindex: 100,
             \ padding: [(opts.search_mode ? 1 : 0), 1, 0, 1],
             \ filter: function('s:filter'),
@@ -288,8 +296,8 @@ function! s:callback(winid, key) abort
 endfunction
 
 function! s:filter(winid, key) abort
-    let opts = getwinvar(a:winid, 'options')
     "echo printf('%x,"%s"', char2nr(a:key), a:key)
+    let opts = getwinvar(a:winid, 'options')
     if opts.search_mode
         let opts.curr_filter_text = get(getbufline(winbufnr(s:search_winid), 1, 1), 0, '/')[1:]
         let chars = split(opts.curr_filter_text, '\zs')
@@ -350,7 +358,12 @@ function! s:update_lines(winid, force) abort
         endif
         call popup_settext(a:winid, !empty(lines) ? lines : s:NO_MATCHES)
         call s:set_options(a:winid)
+        call s:set_curpos(a:winid, 1)
         redraw
     endif
+endfunction
+
+function! s:set_curpos(winid, lnum) abort
+    call win_execute(a:winid, printf('call setpos(".", [0, %d, 0, 0])', a:lnum))
 endfunction
 

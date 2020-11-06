@@ -12,7 +12,7 @@ function! Tabsidebar() abort
     for w in filter(getwininfo(), { i,x -> x.tabnr == g:actual_curtabpage })
       let hi = (win_getid() == w.winid) ? 'TabSideBarSel' : 'TabSideBar'
       try
-        let x = label#string(w.winid)
+        let x = vimrc#label#string(w.winid)
       catch
         let x = bufname(w.bufnr)
       endtry
