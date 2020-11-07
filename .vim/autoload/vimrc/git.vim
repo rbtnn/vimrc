@@ -2,7 +2,7 @@
 let s:NO_MATCHES = 'no matches'
 let s:lsfiles_caches = get(s:, 'lsfiles_caches', {})
 
-function! vimrc#git#diff(q_args) abort
+function! vimrc#git#diff(cancel_nr, q_args) abort
     let args = split(a:q_args, '\s\+')
     let toplevel = s:get_toplevel_git()
     if isdirectory(toplevel)
@@ -26,6 +26,7 @@ function! vimrc#git#diff(q_args) abort
             call setwinvar(winid, 'toplevel', toplevel)
             call setwinvar(winid, 'args', args)
             call setwinvar(winid, 'info', dict)
+            call setwinvar(winid, 'cancel_nr', a:cancel_nr)
             call win_execute(winid, 'call clearmatches()')
             call win_execute(winid, 'call matchadd("DiffAdd", "+\\d\\+")')
             call win_execute(winid, 'call matchadd("DiffDelete", "-\\d\\+")')
@@ -37,7 +38,7 @@ function! vimrc#git#diff(q_args) abort
     endif
 endfunction
 
-function! vimrc#git#lsfiles() abort
+function! vimrc#git#lsfiles(cancel_nr) abort
     let toplevel = s:get_toplevel_git()
     if isdirectory(toplevel)
         let cmd = ['git', 'ls-files']
@@ -51,6 +52,7 @@ function! vimrc#git#lsfiles() abort
         else
             let winid = s:open(s:lsfiles_caches[toplevel], join(cmd), function('s:cb_lsfiles'))
             call setwinvar(winid, 'toplevel', toplevel)
+            call setwinvar(winid, 'cancel_nr', a:cancel_nr)
         endif
     else
         call s:error('not a git repository')
@@ -297,6 +299,9 @@ endfunction
 
 function! s:filter(winid, key) abort
     "echo printf('%x,"%s"', char2nr(a:key), a:key)
+    if char2nr(a:key) == getwinvar(a:winid, 'cancel_nr')
+        return popup_filter_menu(a:winid, "\<esc>")
+    endif
     let opts = getwinvar(a:winid, 'options')
     if opts.search_mode
         let opts.curr_filter_text = get(getbufline(winbufnr(s:search_winid), 1, 1), 0, '/')[1:]
@@ -340,8 +345,6 @@ function! s:filter(winid, key) abort
             let s:search_winid = popup_create('', {})
             call s:set_options(a:winid)
             return 1
-        elseif 'q' ==# a:key
-            return popup_filter_menu(a:winid, "\<esc>")
         else
             return popup_filter_menu(a:winid, a:key)
         endif

@@ -78,10 +78,6 @@ endif
 set packpath=
 set runtimepath=$VIMRUNTIME,$VIMRC_DOTVIM
 
-let g:plug_url_format = 'https://github.com/%s.git'
-
-call plug#begin($VIMRC_PLUGDIR)
-
 silent! source $VIMRC_PLUGDIR/vim-gloaded/plugin/gloaded.vim
 silent! source $VIMRC_ROOT/vim-on-windows/vimbatchfiles/setup.vim
 
@@ -93,6 +89,8 @@ let g:molder_show_hidden = 1
 
 silent! source ~/.vimrc.local
 
+let g:plug_url_format = 'https://github.com/%s.git'
+call plug#begin($VIMRC_PLUGDIR)
 call plug#('kana/vim-operator-replace')
 call plug#('kana/vim-operator-user')
 call plug#('mattn/vim-molder')
@@ -105,11 +103,10 @@ call plug#('rbtnn/vim-vimscript_lasterror')
 call plug#('rbtnn/vim-vimscript_tagfunc')
 call plug#('thinca/vim-qfreplace')
 call plug#('tyru/restart.vim')
-
 call plug#end()
 
-nnoremap <silent><nowait><C-f>       :<C-u>call vimrc#git#diff('-w')<cr>
-nnoremap <silent><nowait><C-s>       :<C-u>call vimrc#git#lsfiles()<cr>
+nnoremap <silent><nowait><C-f>       :<C-u>call vimrc#git#diff(6, '-w')<cr>
+nnoremap <silent><nowait><C-s>       :<C-u>call vimrc#git#lsfiles(19)<cr>
 nnoremap <silent><nowait><C-j>       :<C-u>JumpToLine!<cr>
 nnoremap <silent><nowait><C-n>       :<C-u>cnext<cr>
 nnoremap <silent><nowait><C-p>       :<C-u>cprevious<cr>
