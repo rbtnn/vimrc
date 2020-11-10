@@ -27,13 +27,13 @@ set mouse=a
 set nobackup nowritebackup backupdir&
 set nocursorline nocursorcolumn
 set nofoldenable foldcolumn& foldlevelstart& foldmethod=indent
+set noruler rulerformat&
 set noshellslash
 set noshowmode
 set noswapfile
 set nowrapscan
 set nrformats=unsigned
 set pumheight=10 completeopt=menu
-set ruler rulerformat=%l/%L
 set scrolloff=0 nonumber norelativenumber
 set sessionoptions=
 set shortmess& shortmess-=S
@@ -89,21 +89,23 @@ let g:molder_show_hidden = 1
 
 silent! source ~/.vimrc.local
 
-let g:plug_url_format = 'https://github.com/%s.git'
-call plug#begin($VIMRC_PLUGDIR)
-call plug#('kana/vim-operator-replace')
-call plug#('kana/vim-operator-user')
-call plug#('mattn/vim-molder')
-call plug#('rbtnn/vim-darkcrystal')
-call plug#('rbtnn/vim-gloaded')
-call plug#('rbtnn/vim-jumptoline')
-call plug#('rbtnn/vim-pterm')
-call plug#('rbtnn/vim-vimscript_indentexpr')
-call plug#('rbtnn/vim-vimscript_lasterror')
-call plug#('rbtnn/vim-vimscript_tagfunc')
-call plug#('thinca/vim-qfreplace')
-call plug#('tyru/restart.vim')
-call plug#end()
+if executable('git')
+    let g:plug_url_format = 'https://github.com/%s.git'
+    call plug#begin($VIMRC_PLUGDIR)
+    call plug#('kana/vim-operator-replace')
+    call plug#('kana/vim-operator-user')
+    call plug#('mattn/vim-molder')
+    call plug#('rbtnn/vim-darkcrystal')
+    call plug#('rbtnn/vim-gloaded')
+    call plug#('rbtnn/vim-jumptoline')
+    call plug#('rbtnn/vim-pterm')
+    call plug#('rbtnn/vim-vimscript_indentexpr')
+    call plug#('rbtnn/vim-vimscript_lasterror')
+    call plug#('rbtnn/vim-vimscript_tagfunc')
+    call plug#('thinca/vim-qfreplace')
+    call plug#('tyru/restart.vim')
+    call plug#end()
+endif
 
 nnoremap <silent><nowait><C-f>       :<C-u>call vimrc#git#diff(6, '-w')<cr>
 nnoremap <silent><nowait><C-s>       :<C-u>call vimrc#git#lsfiles(19)<cr>
