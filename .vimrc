@@ -83,29 +83,27 @@ silent! source $VIMRC_ROOT/vim-on-windows/vimbatchfiles/setup.vim
 
 let g:pterm_options = { 'border' : [], 'borderhighlight' : ['Label'], }
 let g:pterm_using_title_for_tabs = v:true
-let g:pterm_term_highlight = 'Terminal'
+let g:pterm_width = '&columns * 4 / 5'
 let g:restart_sessionoptions = 'winpos,winsize,resize,buffers,curdir,tabpages'
 let g:molder_show_hidden = 1
 
 silent! source ~/.vimrc.local
 
-if executable('git')
-    let g:plug_url_format = 'https://github.com/%s.git'
-    call plug#begin($VIMRC_PLUGDIR)
-    call plug#('kana/vim-operator-replace')
-    call plug#('kana/vim-operator-user')
-    call plug#('mattn/vim-molder')
-    call plug#('rbtnn/vim-darkcrystal')
-    call plug#('rbtnn/vim-gloaded')
-    call plug#('rbtnn/vim-jumptoline')
-    call plug#('rbtnn/vim-pterm')
-    call plug#('rbtnn/vim-vimscript_indentexpr')
-    call plug#('rbtnn/vim-vimscript_lasterror')
-    call plug#('rbtnn/vim-vimscript_tagfunc')
-    call plug#('thinca/vim-qfreplace')
-    call plug#('tyru/restart.vim')
-    call plug#end()
-endif
+let g:plug_url_format = 'https://github.com/%s.git'
+silent! call plug#begin($VIMRC_PLUGDIR)
+call plug#('kana/vim-operator-replace')
+call plug#('kana/vim-operator-user')
+call plug#('mattn/vim-molder')
+call plug#('rbtnn/vim-darkcrystal')
+call plug#('rbtnn/vim-gloaded')
+call plug#('rbtnn/vim-jumptoline')
+call plug#('rbtnn/vim-pterm')
+call plug#('rbtnn/vim-vimscript_indentexpr')
+call plug#('rbtnn/vim-vimscript_lasterror')
+call plug#('rbtnn/vim-vimscript_tagfunc')
+call plug#('thinca/vim-qfreplace')
+call plug#('tyru/restart.vim')
+call plug#end()
 
 nnoremap <silent><nowait><C-f>       :<C-u>call vimrc#git#diff(6, '-w')<cr>
 nnoremap <silent><nowait><C-s>       :<C-u>call vimrc#git#lsfiles(19)<cr>

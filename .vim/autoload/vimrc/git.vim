@@ -1,10 +1,25 @@
 
 let s:NO_MATCHES = 'no matches'
-let s:lsfiles_caches = get(s:, 'lsfiles_caches', {})
+
+function! vimrc#git#get_toplevel() abort
+    for dir in [expand('%:p:h'), getcwd()]
+        for do_resolve in [v:false, v:true]
+            let xs = split((do_resolve ? resolve(dir) : dir), '[\/]')
+            let prefix = (has('mac') || has('linux')) ? '/' : ''
+            while !empty(xs)
+                if isdirectory(prefix .. join(xs + ['.git'], '/'))
+                    return s:expand2fullpath(prefix .. join(xs, '/'))
+                endif
+                call remove(xs, -1)
+            endwhile
+        endfor
+    endfor
+    return ''
+endfunction
 
 function! vimrc#git#diff(cancel_nr, q_args) abort
     let args = split(a:q_args, '\s\+')
-    let toplevel = s:get_toplevel_git()
+    let toplevel = vimrc#git#get_toplevel()
     if isdirectory(toplevel)
         let dict = {}
         let cmd = ['git', 'diff', '--numstat'] + args
@@ -17,16 +32,18 @@ function! vimrc#git#diff(cancel_nr, q_args) abort
                 endif
             endif
         endfor
-        let lines = map(keys(dict), { i,key ->
-            \ printf('%5s %5s %s', '+' .. dict[key]['additions'], '-' .. dict[key]['deletions'], key)
-            \ })
-        call sort(lines, { x,y -> x[12:] == y[12:] ? 0 : x[12:] > y[12:] ? 1 : -1 })
+        let lines = keys(dict)
         if !empty(lines)
+            call map(lines, { i,key ->
+                \ printf('%5s %5s %s', '+' .. dict[key]['additions'], '-' .. dict[key]['deletions'], key)
+                \ })
+            call sort(lines, { x,y -> x[12:] == y[12:] ? 0 : x[12:] > y[12:] ? 1 : -1 })
             let winid = s:open(lines, join(cmd), function('s:cb_diff'))
             call setwinvar(winid, 'toplevel', toplevel)
             call setwinvar(winid, 'args', args)
             call setwinvar(winid, 'info', dict)
             call setwinvar(winid, 'cancel_nr', a:cancel_nr)
+            call win_execute(winid, 'setlocal wrap')
             call win_execute(winid, 'call clearmatches()')
             call win_execute(winid, 'call matchadd("DiffAdd", "+\\d\\+")')
             call win_execute(winid, 'call matchadd("DiffDelete", "-\\d\\+")')
@@ -39,18 +56,20 @@ function! vimrc#git#diff(cancel_nr, q_args) abort
 endfunction
 
 function! vimrc#git#lsfiles(cancel_nr) abort
-    let toplevel = s:get_toplevel_git()
+    let toplevel = vimrc#git#get_toplevel()
     if isdirectory(toplevel)
         let cmd = ['git', 'ls-files']
-        if has_key(s:lsfiles_caches, toplevel)
-            let files = s:lsfiles_caches[toplevel]
+        let cachepath = toplevel .. '/.lsfiles.caches'
+        if filereadable(cachepath)
+            let files = readfile(cachepath)
         else
-            let s:lsfiles_caches[toplevel] = s:system(cmd, toplevel)
+            let files = s:system(cmd, toplevel)
+            call writefile(files, cachepath)
         endif
-        if empty(s:lsfiles_caches[toplevel])
+        if empty(files)
             call s:error('no such file')
         else
-            let winid = s:open(s:lsfiles_caches[toplevel], join(cmd), function('s:cb_lsfiles'))
+            let winid = s:open(files, join(cmd), function('s:cb_lsfiles'))
             call setwinvar(winid, 'toplevel', toplevel)
             call setwinvar(winid, 'cancel_nr', a:cancel_nr)
         endif
@@ -194,18 +213,6 @@ function! s:error(text) abort
     echohl Error
     echo a:text
     echohl None
-endfunction
-
-function! s:get_toplevel_git() abort
-    let xs = split(getcwd(), '[\/]')
-    let prefix = (has('mac') || has('linux')) ? '/' : ''
-    while !empty(xs)
-        if isdirectory(prefix .. join(xs + ['.git'], '/'))
-            return s:expand2fullpath(prefix .. join(xs, '/'))
-        endif
-        call remove(xs, -1)
-    endwhile
-    return ''
 endfunction
 
 function! s:expand2fullpath(path) abort
