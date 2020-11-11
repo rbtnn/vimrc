@@ -18,6 +18,7 @@ function! vimrc#git#get_toplevel() abort
 endfunction
 
 function! vimrc#git#diff(cancel_nr, q_args) abort
+    let st = reltime()
     let args = split(a:q_args, '\s\+')
     let toplevel = vimrc#git#get_toplevel()
     if isdirectory(toplevel)
@@ -38,7 +39,7 @@ function! vimrc#git#diff(cancel_nr, q_args) abort
                 \ printf('%5s %5s %s', '+' .. dict[key]['additions'], '-' .. dict[key]['deletions'], key)
                 \ })
             call sort(lines, { x,y -> x[12:] == y[12:] ? 0 : x[12:] > y[12:] ? 1 : -1 })
-            let winid = s:open(lines, join(cmd), function('s:cb_diff'))
+            let winid = s:open(lines, reltimestr(reltime(st)), join(cmd), function('s:cb_diff'))
             call setwinvar(winid, 'toplevel', toplevel)
             call setwinvar(winid, 'args', args)
             call setwinvar(winid, 'info', dict)
@@ -56,6 +57,7 @@ function! vimrc#git#diff(cancel_nr, q_args) abort
 endfunction
 
 function! vimrc#git#lsfiles(cancel_nr) abort
+    let st = reltime()
     let toplevel = vimrc#git#get_toplevel()
     if isdirectory(toplevel)
         let cmd = ['git', 'ls-files']
@@ -69,7 +71,7 @@ function! vimrc#git#lsfiles(cancel_nr) abort
         if empty(files)
             call s:error('no such file')
         else
-            let winid = s:open(files, join(cmd), function('s:cb_lsfiles'))
+            let winid = s:open(files, reltimestr(reltime(st)), join(cmd), function('s:cb_lsfiles'))
             call setwinvar(winid, 'toplevel', toplevel)
             call setwinvar(winid, 'cancel_nr', a:cancel_nr)
         endif
@@ -174,6 +176,7 @@ function! s:new_window(lines, cmd) abort
     endfor
     if !exists
         new
+        wincmd L
     endif
     silent % delete _
     silent put=a:lines
@@ -236,7 +239,7 @@ function! s:cb_lsfiles(winid, key) abort
     endif
 endfunction
 
-function! s:open(lines, cmd, cb) abort
+function! s:open(lines, time, cmd, cb) abort
     let winid = popup_menu(a:lines, {})
     let s:search_winid = -1
 
@@ -252,6 +255,7 @@ function! s:open(lines, cmd, cb) abort
         \ prev_filter_text: '',
         \ search_mode: v:false,
         \ cmd: a:cmd,
+        \ time: a:time,
         \ user_callback: a:cb,
         \ orig_lines: a:lines,
         \ lines_width: lines_width,
@@ -275,7 +279,7 @@ function! s:set_options(winid) abort
         catch
         endtry
         call popup_setoptions(a:winid, extend(base_opts, #{
-            \ title: printf('%s (%d/%d)', opts.cmd, filter_len, orig_len),
+            \ title: printf('[%s] %s (%d/%d)', opts.time, opts.cmd, filter_len, orig_len),
             \ zindex: 100,
             \ padding: [(opts.search_mode ? 1 : 0), 1, 0, 1],
             \ filter: function('s:filter'),
@@ -311,8 +315,6 @@ function! s:filter(winid, key) abort
     endif
     let opts = getwinvar(a:winid, 'options')
     if opts.search_mode
-        let opts.curr_filter_text = get(getbufline(winbufnr(s:search_winid), 1, 1), 0, '/')[1:]
-        let chars = split(opts.curr_filter_text, '\zs')
         if ("\<esc>" == a:key) || ("\<cr>" == a:key)
             let opts.search_mode = v:false
             call popup_close(s:search_winid)
@@ -320,6 +322,7 @@ function! s:filter(winid, key) abort
             call s:set_options(a:winid)
             return 1
         else
+            let chars = split(opts.curr_filter_text, '\zs')
             if 21 == char2nr(a:key)
                 let opts.curr_filter_text = ''
             elseif (8 == char2nr(a:key)) || ("\x80kb" == a:key)
@@ -351,6 +354,12 @@ function! s:filter(winid, key) abort
             let parent_pos = popup_getpos(a:winid)
             let s:search_winid = popup_create('', {})
             call s:set_options(a:winid)
+            return 1
+        elseif 'g' ==# a:key
+            call s:set_curpos(a:winid, 1)
+            return 1
+        elseif 'G' ==# a:key
+            call s:set_curpos(a:winid, line('$', a:winid))
             return 1
         else
             return popup_filter_menu(a:winid, a:key)
