@@ -74,6 +74,7 @@ function! vimrc#git#lsfiles(cancel_nr) abort
             let winid = s:open(files, reltimestr(reltime(st)), join(cmd), function('s:cb_lsfiles'))
             call setwinvar(winid, 'toplevel', toplevel)
             call setwinvar(winid, 'cancel_nr', a:cancel_nr)
+            call win_execute(winid, 'setlocal wrap')
         endif
     else
         call s:error('not a git repository')
