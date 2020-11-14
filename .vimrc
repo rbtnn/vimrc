@@ -105,8 +105,8 @@ call plug#('thinca/vim-qfreplace')
 call plug#('tyru/restart.vim')
 call plug#end()
 
-nnoremap <silent><nowait><C-s>       :<C-u>call vimrc#git#diff(19, '-w')<cr>
-nnoremap <silent><nowait><C-f>       :<C-u>call vimrc#git#lsfiles(6)<cr>
+nnoremap <silent><nowait><C-s>       :<C-u>call vimrc#git#diff('-w')<cr>
+nnoremap <silent><nowait><C-f>       :<C-u>call vimrc#git#lsfiles()<cr>
 nnoremap <silent><nowait><C-j>       :<C-u>JumpToLine!<cr>
 nnoremap <silent><nowait><C-n>       :<C-u>cnext<cr>
 nnoremap <silent><nowait><C-p>       :<C-u>cprevious<cr>

@@ -1,7 +1,7 @@
 
 let s:NO_MATCHES = 'no matches'
 
-function! vimrc#git#diff(same_as_enter, q_args) abort
+function! vimrc#git#diff(q_args) abort
     if s:change_to_the_toplevel()
         let st = reltime()
         let args = split(a:q_args, '\s\+')
@@ -25,7 +25,6 @@ function! vimrc#git#diff(same_as_enter, q_args) abort
             let winid = s:open(lines, reltimestr(reltime(st)), join(cmd), function('s:cb_diff'))
             call setwinvar(winid, 'args', args)
             call setwinvar(winid, 'info', dict)
-            call setwinvar(winid, 'same_as_enter', a:same_as_enter)
             call win_execute(winid, 'setlocal wrap')
             call win_execute(winid, 'call clearmatches()')
             call win_execute(winid, 'call matchadd("DiffAdd", "+\\d\\+")')
@@ -38,7 +37,7 @@ function! vimrc#git#diff(same_as_enter, q_args) abort
     endif
 endfunction
 
-function! vimrc#git#lsfiles(same_as_enter) abort
+function! vimrc#git#lsfiles() abort
     if s:change_to_the_toplevel()
         let st = reltime()
         let cmd = ['git', 'ls-files']
@@ -53,7 +52,7 @@ function! vimrc#git#lsfiles(same_as_enter) abort
             call s:error('no such file')
         else
             let winid = s:open(files, reltimestr(reltime(st)), join(cmd), function('s:cb_lsfiles'))
-            call setwinvar(winid, 'same_as_enter', a:same_as_enter)
+            call win_execute(winid, 'setlocal wrap')
         endif
     else
         call s:error('not a git repository')
@@ -286,10 +285,9 @@ endfunction
 
 function! s:filter(winid, key) abort
     "echo printf('%x,"%s"', char2nr(a:key), a:key)
-    let same_as_enter = char2nr(a:key) == getwinvar(a:winid, 'same_as_enter')
     let opts = getwinvar(a:winid, 'options')
     if opts.search_mode
-        if ("\<esc>" == a:key) || ("\<cr>" == a:key) || same_as_enter
+        if ("\<esc>" == a:key) || ("\<cr>" == a:key)
             let opts.search_mode = v:false
             call popup_close(s:search_winid)
             let s:search_winid = -1
@@ -335,8 +333,6 @@ function! s:filter(winid, key) abort
         elseif 'G' ==# a:key
             call s:set_curpos(a:winid, line('$', a:winid))
             return 1
-        elseif same_as_enter
-            return popup_filter_menu(a:winid, "\<cr>")
         else
             return popup_filter_menu(a:winid, a:key)
         endif
