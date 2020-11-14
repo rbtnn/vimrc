@@ -1,30 +1,13 @@
 
 let s:NO_MATCHES = 'no matches'
 
-function! vimrc#git#get_toplevel() abort
-    for dir in [expand('%:p:h'), getcwd()]
-        for do_resolve in [v:false, v:true]
-            let xs = split((do_resolve ? resolve(dir) : dir), '[\/]')
-            let prefix = (has('mac') || has('linux')) ? '/' : ''
-            while !empty(xs)
-                if isdirectory(prefix .. join(xs + ['.git'], '/'))
-                    return s:expand2fullpath(prefix .. join(xs, '/'))
-                endif
-                call remove(xs, -1)
-            endwhile
-        endfor
-    endfor
-    return ''
-endfunction
-
 function! vimrc#git#diff(same_as_enter, q_args) abort
-    let st = reltime()
-    let args = split(a:q_args, '\s\+')
-    let toplevel = vimrc#git#get_toplevel()
-    if isdirectory(toplevel)
+    if s:change_to_the_toplevel()
+        let st = reltime()
+        let args = split(a:q_args, '\s\+')
         let dict = {}
         let cmd = ['git', 'diff', '--numstat'] + args
-        for line in s:system(cmd, toplevel)
+        for line in s:system(cmd)
             let m = matchlist(line, '^\s*\(\d\+\)\s\+\(\d\+\)\s\+\(.*\)$')
             if !empty(m)
                 let key = m[3]
@@ -40,7 +23,6 @@ function! vimrc#git#diff(same_as_enter, q_args) abort
                 \ })
             call sort(lines, { x,y -> x[12:] == y[12:] ? 0 : x[12:] > y[12:] ? 1 : -1 })
             let winid = s:open(lines, reltimestr(reltime(st)), join(cmd), function('s:cb_diff'))
-            call setwinvar(winid, 'toplevel', toplevel)
             call setwinvar(winid, 'args', args)
             call setwinvar(winid, 'info', dict)
             call setwinvar(winid, 'same_as_enter', a:same_as_enter)
@@ -57,22 +39,20 @@ function! vimrc#git#diff(same_as_enter, q_args) abort
 endfunction
 
 function! vimrc#git#lsfiles(same_as_enter) abort
-    let st = reltime()
-    let toplevel = vimrc#git#get_toplevel()
-    if isdirectory(toplevel)
+    if s:change_to_the_toplevel()
+        let st = reltime()
         let cmd = ['git', 'ls-files']
-        let cachepath = toplevel .. '/.lsfiles.caches'
+        let cachepath = '.lsfiles.caches'
         if filereadable(cachepath)
             let files = readfile(cachepath)
         else
-            let files = s:system(cmd, toplevel)
+            let files = s:system(cmd)
             call writefile(files, cachepath)
         endif
         if empty(files)
             call s:error('no such file')
         else
             let winid = s:open(files, reltimestr(reltime(st)), join(cmd), function('s:cb_lsfiles'))
-            call setwinvar(winid, 'toplevel', toplevel)
             call setwinvar(winid, 'same_as_enter', a:same_as_enter)
         endif
     else
@@ -88,11 +68,10 @@ function! s:cb_diff(winid, key) abort
         let path = getbufline(winbufnr(a:winid), lnum, lnum)[0]
         if s:NO_MATCHES != path
             let path = path[12:]
-            let toplevel = getwinvar(a:winid, 'toplevel')
             let args = getwinvar(a:winid, 'args')
             let cmd = ['git', 'diff'] + args + ['--', path]
-            call s:new_window(s:system(cmd, toplevel), cmd)
-            let fullpath = s:expand2fullpath(toplevel .. '/' .. path)
+            call s:new_window(s:system(cmd), cmd)
+            let fullpath = s:expand2fullpath(path)
             execute printf('nnoremap <buffer><silent><nowait><space>    :<C-w>call <SID>jump_diff(%s)<cr>', string(fullpath))
             execute printf('nnoremap <buffer><silent><nowait><cr>       :<C-w>call <SID>jump_diff(%s)<cr>', string(fullpath))
         endif
@@ -185,12 +164,11 @@ function! s:new_window(lines, cmd) abort
     let &l:statusline = join(a:cmd)
 endfunction
 
-function! s:system(cmd, toplevel) abort
+function! s:system(cmd) abort
     let lines = []
     let path = tempname()
     try
         let job = job_start(a:cmd, {
-            \ 'cwd' : a:toplevel,
             \ 'out_io' : 'file',
             \ 'out_name' : path,
             \ })
@@ -226,8 +204,7 @@ function! s:cb_lsfiles(winid, key) abort
         let lnum = a:key
         let path = getbufline(winbufnr(a:winid), lnum, lnum)[0]
         if s:NO_MATCHES != path
-            let toplevel = getwinvar(a:winid, 'toplevel')
-            let fullpath = s:expand2fullpath(toplevel .. '/' .. path)
+            let fullpath = s:expand2fullpath(path)
             let matches = filter(getbufinfo(), {i,x -> s:expand2fullpath(x.name) == fullpath })
             if !empty(matches)
                 execute printf('%s %d', 'buffer', matches[0]['bufnr'])
@@ -378,8 +355,7 @@ function! s:update_lines(winid, force, set_currfile) abort
         call s:set_options(a:winid)
         let init_lnum = 1
         if a:set_currfile
-            let toplevel = vimrc#git#get_toplevel()
-            let target = substitute(s:expand2fullpath(bufname()), toplevel, '', '')
+            let target = substitute(s:expand2fullpath(bufname()), s:get_toplevel(), '', '')
             for i in range(0, len(lines) - 1)
                 if lines[i] =~# target .. '$'
                     let init_lnum = i + 1
@@ -393,5 +369,30 @@ endfunction
 
 function! s:set_curpos(winid, lnum) abort
     call win_execute(a:winid, printf('call setpos(".", [0, %d, 0, 0])', a:lnum))
+endfunction
+
+function! s:change_to_the_toplevel() abort
+    let toplevel = s:get_toplevel()
+    if s:expand2fullpath(getcwd()) != toplevel
+        execute printf('lcd %s', escape(toplevel, ' '))
+        echo printf('Changed the current directory to "%s".', toplevel)
+    endif
+    return isdirectory(toplevel)
+endfunction
+
+function! s:get_toplevel() abort
+    for dir in [expand('%:p:h'), getcwd()]
+        for do_resolve in [v:false, v:true]
+            let xs = split((do_resolve ? resolve(dir) : dir), '[\/]')
+            let prefix = (has('mac') || has('linux')) ? '/' : ''
+            while !empty(xs)
+                if isdirectory(prefix .. join(xs + ['.git'], '/'))
+                    return s:expand2fullpath(prefix .. join(xs, '/'))
+                endif
+                call remove(xs, -1)
+            endwhile
+        endfor
+    endfor
+    return ''
 endfunction
 
