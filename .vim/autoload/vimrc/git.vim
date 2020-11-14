@@ -17,7 +17,7 @@ function! vimrc#git#get_toplevel() abort
     return ''
 endfunction
 
-function! vimrc#git#diff(cancel_nr, q_args) abort
+function! vimrc#git#diff(same_as_enter, q_args) abort
     let st = reltime()
     let args = split(a:q_args, '\s\+')
     let toplevel = vimrc#git#get_toplevel()
@@ -43,7 +43,7 @@ function! vimrc#git#diff(cancel_nr, q_args) abort
             call setwinvar(winid, 'toplevel', toplevel)
             call setwinvar(winid, 'args', args)
             call setwinvar(winid, 'info', dict)
-            call setwinvar(winid, 'cancel_nr', a:cancel_nr)
+            call setwinvar(winid, 'same_as_enter', a:same_as_enter)
             call win_execute(winid, 'setlocal wrap')
             call win_execute(winid, 'call clearmatches()')
             call win_execute(winid, 'call matchadd("DiffAdd", "+\\d\\+")')
@@ -56,7 +56,7 @@ function! vimrc#git#diff(cancel_nr, q_args) abort
     endif
 endfunction
 
-function! vimrc#git#lsfiles(cancel_nr) abort
+function! vimrc#git#lsfiles(same_as_enter) abort
     let st = reltime()
     let toplevel = vimrc#git#get_toplevel()
     if isdirectory(toplevel)
@@ -73,7 +73,7 @@ function! vimrc#git#lsfiles(cancel_nr) abort
         else
             let winid = s:open(files, reltimestr(reltime(st)), join(cmd), function('s:cb_lsfiles'))
             call setwinvar(winid, 'toplevel', toplevel)
-            call setwinvar(winid, 'cancel_nr', a:cancel_nr)
+            call setwinvar(winid, 'same_as_enter', a:same_as_enter)
         endif
     else
         call s:error('not a git repository')
@@ -176,7 +176,6 @@ function! s:new_window(lines, cmd) abort
     endfor
     if !exists
         new
-        wincmd L
     endif
     silent % delete _
     silent put=a:lines
@@ -261,7 +260,7 @@ function! s:open(lines, time, cmd, cb) abort
         \ lines_width: lines_width,
         \ })
 
-    call s:update_lines(winid, v:true)
+    call s:update_lines(winid, v:true, v:true)
     call s:set_options(winid)
 
     return winid
@@ -310,12 +309,10 @@ endfunction
 
 function! s:filter(winid, key) abort
     "echo printf('%x,"%s"', char2nr(a:key), a:key)
-    if char2nr(a:key) == getwinvar(a:winid, 'cancel_nr')
-        return popup_filter_menu(a:winid, "\<esc>")
-    endif
+    let same_as_enter = char2nr(a:key) == getwinvar(a:winid, 'same_as_enter')
     let opts = getwinvar(a:winid, 'options')
     if opts.search_mode
-        if ("\<esc>" == a:key) || ("\<cr>" == a:key)
+        if ("\<esc>" == a:key) || ("\<cr>" == a:key) || same_as_enter
             let opts.search_mode = v:false
             call popup_close(s:search_winid)
             let s:search_winid = -1
@@ -343,14 +340,14 @@ function! s:filter(winid, key) abort
                 let opts.curr_filter_text = opts.curr_filter_text .. a:key
             endif
             let opts.curr_filter_text = trim(opts.curr_filter_text)
-            call s:update_lines(a:winid, v:false)
+            call s:update_lines(a:winid, v:false, v:false)
             call s:set_options(a:winid)
             return 1
         endif
     else
         if '/' ==# a:key
             let opts.search_mode = v:true
-            call s:update_lines(a:winid, v:false)
+            call s:update_lines(a:winid, v:false, v:false)
             let parent_pos = popup_getpos(a:winid)
             let s:search_winid = popup_create('', {})
             call s:set_options(a:winid)
@@ -361,13 +358,15 @@ function! s:filter(winid, key) abort
         elseif 'G' ==# a:key
             call s:set_curpos(a:winid, line('$', a:winid))
             return 1
+        elseif same_as_enter
+            return popup_filter_menu(a:winid, "\<cr>")
         else
             return popup_filter_menu(a:winid, a:key)
         endif
     endif
 endfunction
 
-function! s:update_lines(winid, force) abort
+function! s:update_lines(winid, force, set_currfile) abort
     let opts = getwinvar(a:winid, 'options')
     if (opts.prev_filter_text != opts.curr_filter_text) || a:force
         let opts.prev_filter_text = opts.curr_filter_text
@@ -377,7 +376,17 @@ function! s:update_lines(winid, force) abort
         endif
         call popup_settext(a:winid, !empty(lines) ? lines : s:NO_MATCHES)
         call s:set_options(a:winid)
-        call s:set_curpos(a:winid, 1)
+        let init_lnum = 1
+        if a:set_currfile
+            let toplevel = vimrc#git#get_toplevel()
+            let target = substitute(s:expand2fullpath(bufname()), toplevel, '', '')
+            for i in range(0, len(lines) - 1)
+                if lines[i] =~# target .. '$'
+                    let init_lnum = i + 1
+                endif
+            endfor
+        endif
+        call s:set_curpos(a:winid, init_lnum)
         redraw
     endif
 endfunction
