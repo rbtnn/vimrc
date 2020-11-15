@@ -44,7 +44,14 @@ function! vimrc#git#lsfiles() abort
         let cachepath = '.lsfiles.caches'
         if filereadable(cachepath)
             let files = readfile(cachepath)
-        else
+            for path in files
+                if !filereadable(path)
+                    call delete(cachepath)
+                    break
+                endif
+            endfor
+        endif
+        if !filereadable(cachepath)
             let files = s:system(cmd)
             call writefile(files, cachepath)
         endif
