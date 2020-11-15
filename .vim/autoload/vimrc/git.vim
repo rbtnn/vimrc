@@ -350,7 +350,7 @@ function! s:update_lines(winid, force, set_currfile) abort
         call popup_settext(a:winid, !empty(lines) ? lines : s:NO_MATCHES)
         call s:set_options(a:winid)
         let init_lnum = 1
-        if a:set_currfile
+        if a:set_currfile && !empty(bufname())
             let target = substitute(s:expand2fullpath(bufname()), s:get_toplevel(), '', '')
             for i in range(0, len(lines) - 1)
                 if lines[i] =~# target .. '$'
