@@ -1,5 +1,41 @@
 
 let s:NO_MATCHES = 'no matches'
+let s:NUMSTAT_HEAD = 12
+let s:ERR_MESSAGE_1 = 'No modified files'
+let s:ERR_MESSAGE_2 = 'Not a git repository'
+let s:ERR_MESSAGE_3 = 'No such file'
+let s:ERR_MESSAGE_4 = 'Can not jump this!'
+
+function! vimrc#git#grep(q_args) abort
+    if empty(trim(a:q_args))
+        return
+    endif
+    if s:change_to_the_toplevel()
+        let st = reltime()
+        let args = split(a:q_args, '\s\+')
+        let cmd = ['git', 'grep', '--full-name', '-I', '--no-color', '-n'] + args
+        let xs = []
+        for line in s:system(cmd)
+            let m = matchlist(line, '^\(..[^:]*\):\(\d\+\):\(.*$\)$')
+            if !empty(m)
+                let lines = [m[3]]
+                call s:decode_lines(lines)
+                let xs += [#{
+                    \ filename: m[1],
+                    \ lnum: str2nr(m[2]),
+                    \ text: lines[0],
+                    \ }]
+            else
+                echo line
+            endif
+        endfor
+        call setqflist(xs)
+        copen
+        echo reltimestr(reltime(st))
+    else
+        call s:error(s:ERR_MESSAGE_2, getcwd())
+    endif
+endfunction
 
 function! vimrc#git#diff(q_args) abort
     if s:change_to_the_toplevel()
@@ -21,7 +57,14 @@ function! vimrc#git#diff(q_args) abort
             call map(lines, { i,key ->
                 \ printf('%5s %5s %s', '+' .. dict[key]['additions'], '-' .. dict[key]['deletions'], key)
                 \ })
-            call sort(lines, { x,y -> x[12:] == y[12:] ? 0 : x[12:] > y[12:] ? 1 : -1 })
+            call sort(lines, { x,y ->
+                \ x[(s:NUMSTAT_HEAD):] == y[(s:NUMSTAT_HEAD):]
+                \ ? 0
+                \ : (
+                \   x[(s:NUMSTAT_HEAD):] > y[(s:NUMSTAT_HEAD):]
+                \   ? 1
+                \   : -1
+                \ )})
             let winid = s:open(lines, reltimestr(reltime(st)), join(cmd), function('s:cb_diff'))
             call setwinvar(winid, 'args', args)
             call setwinvar(winid, 'info', dict)
@@ -30,10 +73,10 @@ function! vimrc#git#diff(q_args) abort
             call win_execute(winid, 'call matchadd("DiffAdd", "+\\d\\+")')
             call win_execute(winid, 'call matchadd("DiffDelete", "-\\d\\+")')
         else
-            call s:error('No modified files')
+            call s:error(s:ERR_MESSAGE_1, join(cmd))
         endif
     else
-        call s:error('Not a git repository')
+        call s:error(s:ERR_MESSAGE_2, getcwd())
     endif
 endfunction
 
@@ -41,28 +84,15 @@ function! vimrc#git#lsfiles() abort
     if s:change_to_the_toplevel()
         let st = reltime()
         let cmd = ['git', 'ls-files']
-        let cachepath = '.lsfiles.caches'
-        if filereadable(cachepath)
-            let files = readfile(cachepath)
-            for path in files
-                if !filereadable(path)
-                    call delete(cachepath)
-                    break
-                endif
-            endfor
-        endif
-        if !filereadable(cachepath)
-            let files = s:system(cmd)
-            call writefile(files, cachepath)
-        endif
+        let files = s:system(cmd)
         if empty(files)
-            call s:error('no such file')
+            call s:error(s:ERR_MESSAGE_3, join(cmd))
         else
             let winid = s:open(files, reltimestr(reltime(st)), join(cmd), function('s:cb_lsfiles'))
             call win_execute(winid, 'setlocal wrap')
         endif
     else
-        call s:error('not a git repository')
+        call s:error(s:ERR_MESSAGE_2, getcwd())
     endif
 endfunction
 
@@ -73,13 +103,16 @@ function! s:cb_diff(winid, key) abort
         let lnum = a:key
         let path = getbufline(winbufnr(a:winid), lnum, lnum)[0]
         if s:NO_MATCHES != path
-            let path = path[12:]
+            let path = path[(s:NUMSTAT_HEAD):]
             let args = getwinvar(a:winid, 'args')
             let cmd = ['git', 'diff'] + args + ['--', path]
-            call s:new_window(s:system(cmd), cmd)
+            let lines = s:system(cmd)
+            call s:decode_lines(lines)
+            call s:new_window(lines, cmd)
             let fullpath = s:expand2fullpath(path)
             execute printf('nnoremap <buffer><silent><nowait><space>    :<C-w>call <SID>jump_diff(%s)<cr>', string(fullpath))
             execute printf('nnoremap <buffer><silent><nowait><cr>       :<C-w>call <SID>jump_diff(%s)<cr>', string(fullpath))
+            execute printf('nnoremap <buffer><silent><nowait>R          :<C-w>call <SID>rediff(%s)<cr>', string(cmd))
         endif
     endif
 endfunction
@@ -118,7 +151,7 @@ function! s:jump_diff(fullpath) abort
         endif
     endif
     if !ok
-        call s:error('Can not jump this!')
+        call s:error(s:ERR_MESSAGE_4, '')
     endif
 endfunction
 
@@ -129,6 +162,8 @@ function! s:open_file(path, lnum) abort
         for x in filter(getwininfo(), { i,x -> x['tabnr'] == tabpagenr() })
             if s:expand2fullpath(bufname(x['bufnr'])) is fullpath
                 execute x['winnr'] .. 'wincmd w'
+                " reload the buffer
+                silent! edit
                 let b = 1
                 break
             endif
@@ -147,6 +182,14 @@ function! s:open_file(path, lnum) abort
     else
         return 0
     endif
+endfunction
+
+function! s:rediff(cmd) abort
+    let pos = getcurpos()
+    let lines = s:system(a:cmd)
+    call s:decode_lines(lines)
+    call s:new_window(lines, a:cmd)
+    call setpos('.', pos)
 endfunction
 
 function! s:new_window(lines, cmd) abort
@@ -188,21 +231,17 @@ function! s:system(cmd) abort
             call delete(path)
         endif
     endtry
-    if get(g:, 'vimrc_use_sillyiconv', v:false)
-        return vimrc#sillyiconv#iconv(lines)
-    else
-        return lines
-    endif
+    return lines
 endfunction
 
-function! s:error(text) abort
+function! s:error(text, info) abort
     echohl Error
-    echo a:text
+    echo printf('%s%s%s', a:text, empty(a:info) ? '' : ': ', string(a:info))
     echohl None
 endfunction
 
 function! s:expand2fullpath(path) abort
-    return resolve(fnamemodify(a:path, ':p:gs?\\?/?'))
+    return substitute(resolve(fnamemodify(a:path, ':p')), '\', '/', 'g')
 endfunction
 
 function! s:cb_lsfiles(winid, key) abort
@@ -376,7 +415,7 @@ endfunction
 
 function! s:change_to_the_toplevel() abort
     let toplevel = s:get_toplevel()
-    if s:expand2fullpath(getcwd()) != toplevel
+    if !empty(toplevel) && (s:expand2fullpath(getcwd()) != toplevel)
         execute printf('lcd %s', escape(toplevel, ' '))
         echo printf('Changed the current directory to "%s".', toplevel)
     endif
@@ -397,5 +436,13 @@ function! s:get_toplevel() abort
         endfor
     endfor
     return ''
+endfunction
+
+function! s:decode_lines(lines) abort
+    for i in range(0, len(a:lines) - 1)
+        if vimrc#sillyiconv#shift_jis(a:lines[i])
+            let a:lines[i] = iconv(a:lines[i], 'shift_jis', &encoding)
+        endif
+    endfor
 endfunction
 

@@ -107,6 +107,7 @@ call plug#end()
 
 nnoremap <silent><nowait><C-s>       :<C-u>call vimrc#git#diff('-w')<cr>
 nnoremap <silent><nowait><C-f>       :<C-u>call vimrc#git#lsfiles()<cr>
+nnoremap <silent><nowait><C-g>       :<C-u>call vimrc#git#grep(input('gitgrep>'))<cr>
 nnoremap <silent><nowait><C-j>       :<C-u>JumpToLine!<cr>
 nnoremap <silent><nowait><C-n>       :<C-u>cnext<cr>
 nnoremap <silent><nowait><C-p>       :<C-u>cprevious<cr>
