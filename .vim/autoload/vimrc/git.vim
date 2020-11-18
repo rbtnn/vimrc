@@ -73,7 +73,7 @@ function! vimrc#git#diff(q_args) abort
             call win_execute(winid, 'call matchadd("DiffAdd", "+\\d\\+")')
             call win_execute(winid, 'call matchadd("DiffDelete", "-\\d\\+")')
         else
-            call s:error(s:ERR_MESSAGE_1, join(cmd))
+            call s:error(s:ERR_MESSAGE_1, getcwd())
         endif
     else
         call s:error(s:ERR_MESSAGE_2, getcwd())
@@ -417,7 +417,9 @@ function! s:change_to_the_toplevel() abort
     let toplevel = s:get_toplevel()
     if !empty(toplevel) && (s:expand2fullpath(getcwd()) != toplevel)
         execute printf('lcd %s', escape(toplevel, ' '))
-        echo printf('Changed the current directory to "%s".', toplevel)
+        echohl WarningMsg
+        echo printf('Changed the current directory to "%s" in the current window.', toplevel)
+        echohl None
     endif
     return isdirectory(toplevel)
 endfunction
@@ -440,7 +442,9 @@ endfunction
 
 function! s:decode_lines(lines) abort
     for i in range(0, len(a:lines) - 1)
-        if vimrc#sillyiconv#shift_jis(a:lines[i])
+        if vimrc#sillyiconv#utf_8(a:lines[i]) && ('utf-8' == &encoding)
+            " nop
+        elseif vimrc#sillyiconv#shift_jis(a:lines[i] && ('cp932' != &encoding) && ('shift_jis' != &encoding))
             let a:lines[i] = iconv(a:lines[i], 'shift_jis', &encoding)
         endif
     endfor
