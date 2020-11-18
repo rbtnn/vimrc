@@ -94,7 +94,6 @@ silent! call plug#begin($VIMRC_PLUGDIR)
 call plug#('kana/vim-operator-replace')
 call plug#('kana/vim-operator-user')
 call plug#('mattn/vim-molder')
-call plug#('rbtnn/vim-darkcrystal')
 call plug#('rbtnn/vim-gloaded')
 call plug#('rbtnn/vim-jumptoline')
 call plug#('rbtnn/vim-pterm')
@@ -114,7 +113,7 @@ nnoremap <silent><nowait><C-p>       :<C-u>cprevious<cr>
 nmap     <silent><nowait>s           <Plug>(operator-replace)
 
 set background=dark
-silent! colorscheme darkcrystal
+silent! colorscheme mycolorscheme
 
 augroup vimrc
     autocmd!
