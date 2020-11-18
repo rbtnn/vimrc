@@ -4,36 +4,35 @@ let s:NUMSTAT_HEAD = 12
 let s:ERR_MESSAGE_1 = 'No modified files'
 let s:ERR_MESSAGE_2 = 'Not a git repository'
 let s:ERR_MESSAGE_3 = 'No such file'
-let s:ERR_MESSAGE_4 = 'Can not jump this!'
+let s:ERR_MESSAGE_4 = 'Could not jump this'
+let s:ERR_MESSAGE_5 = 'Could not execute "git"'
 
-function! vimrc#git#grep(q_args) abort
-    if empty(trim(a:q_args))
-        return
-    endif
+function! vimrc#git#grep() abort
     if s:change_to_the_toplevel()
-        let st = reltime()
-        let args = split(a:q_args, '\s\+')
-        let cmd = ['git', 'grep', '--full-name', '-I', '--no-color', '-n'] + args
-        let xs = []
-        for line in s:system(cmd)
-            let m = matchlist(line, '^\(..[^:]*\):\(\d\+\):\(.*$\)$')
-            if !empty(m)
-                let lines = [m[3]]
-                call s:decode_lines(lines)
-                let xs += [#{
-                    \ filename: m[1],
-                    \ lnum: str2nr(m[2]),
-                    \ text: lines[0],
-                    \ }]
-            else
-                echo line
-            endif
-        endfor
-        call setqflist(xs)
-        copen
-        echo reltimestr(reltime(st))
-    else
-        call s:error(s:ERR_MESSAGE_2, getcwd())
+        let text = trim(input('gitgrep>'))
+        if !empty(text)
+            let st = reltime()
+            let args = split(text, '\s\+')
+            let cmd = ['git', 'grep', '--full-name', '-I', '--no-color', '-n'] + args
+            let xs = []
+            for line in s:system(cmd)
+                let m = matchlist(line, '^\(..[^:]*\):\(\d\+\):\(.*$\)$')
+                if !empty(m)
+                    let lines = [m[3]]
+                    call s:decode_lines(lines)
+                    let xs += [#{
+                        \ filename: m[1],
+                        \ lnum: str2nr(m[2]),
+                        \ text: lines[0],
+                        \ }]
+                else
+                    echo line
+                endif
+            endfor
+            call setqflist(xs)
+            copen
+            echo reltimestr(reltime(st))
+        endif
     endif
 endfunction
 
@@ -75,8 +74,6 @@ function! vimrc#git#diff(q_args) abort
         else
             call s:error(s:ERR_MESSAGE_1, getcwd())
         endif
-    else
-        call s:error(s:ERR_MESSAGE_2, getcwd())
     endif
 endfunction
 
@@ -91,8 +88,6 @@ function! vimrc#git#lsfiles() abort
             let winid = s:open(files, reltimestr(reltime(st)), join(cmd), function('s:cb_lsfiles'))
             call win_execute(winid, 'setlocal wrap')
         endif
-    else
-        call s:error(s:ERR_MESSAGE_2, getcwd())
     endif
 endfunction
 
@@ -414,14 +409,24 @@ function! s:set_curpos(winid, lnum) abort
 endfunction
 
 function! s:change_to_the_toplevel() abort
-    let toplevel = s:get_toplevel()
-    if !empty(toplevel) && (s:expand2fullpath(getcwd()) != toplevel)
-        execute printf('lcd %s', escape(toplevel, ' '))
-        echohl WarningMsg
-        echo printf('Changed the current directory to "%s" in the current window.', toplevel)
-        echohl None
+    if executable('git')
+        let toplevel = s:get_toplevel()
+        if !empty(toplevel) && (s:expand2fullpath(getcwd()) != toplevel)
+            execute printf('lcd %s', escape(toplevel, ' '))
+            echohl WarningMsg
+            echo printf('Changed the current directory to "%s" in the current window.', toplevel)
+            echohl None
+        endif
+        if isdirectory(toplevel)
+            return v:true
+        else
+            call s:error(s:ERR_MESSAGE_2, getcwd())
+            return v:false
+        endif
+    else
+        call s:error(s:ERR_MESSAGE_5, getcwd())
+        return v:false
     endif
-    return isdirectory(toplevel)
 endfunction
 
 function! s:get_toplevel() abort
