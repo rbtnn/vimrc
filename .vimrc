@@ -119,7 +119,7 @@ augroup vimrc
     autocmd!
     autocmd FileType cpp  :setlocal noexpandtab
     autocmd FileType help :command! -buffer -bar -nargs=0 HelpStartEditting
-        \ :setlocal colorcolumn=+1 conceallevel=0 list setlocal tabstop=8 shiftwidth=8 softtabstop=8 noexpandtab textwidth=78
+        \ :setlocal colorcolumn=+1 conceallevel=0 list tabstop=8 shiftwidth=8 softtabstop=8 noexpandtab textwidth=78
     for s:cmdname in [
             \ 'MANPAGER', 'VimFoldh', 'TextobjVerbatimstringDefaultKeyMappings',
             \ 'PlugSnapshot', 'PlugDiff', 'PlugStatus', 'PlugInstall', 'Plug', 'PlugUpgrade']
