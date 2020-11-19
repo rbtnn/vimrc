@@ -78,7 +78,7 @@ highlight!      CursorLineNr       gui=BOLD           cterm=BOLD           guifg
 highlight!      Terminal           gui=NONE           cterm=NONE           guifg=#e0e0e0 guibg=#111111
 highlight!      Normal             gui=NONE           cterm=NONE           guifg=#ffffff guibg=#111111
 highlight!      EndOfBuffer        gui=NONE           cterm=NONE           guifg=#1f1f1f guibg=#111111
-highlight!      Visual             gui=NONE           cterm=NONE           guifg=#333333 guibg=#101010
+highlight!      Visual             gui=NONE           cterm=NONE           guifg=#aaaaaa guibg=#191919
 highlight!      LineNr             gui=NONE           cterm=NONE           guifg=#888888 guibg=#0a0a0a
 highlight!      QuickFixLine       gui=BOLD,UNDERLINE cterm=BOLD,UNDERLINE guifg=NONE    guibg=NONE    ctermfg=NONE ctermbg=NONE
 highlight!      Search             gui=BOLD,UNDERLINE cterm=BOLD,UNDERLINE guifg=NONE    guibg=NONE    ctermfg=NONE ctermbg=NONE
