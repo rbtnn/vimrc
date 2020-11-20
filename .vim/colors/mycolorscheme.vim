@@ -54,10 +54,12 @@ highlight!      Error              gui=NONE           cterm=NONE           guifg
 highlight!      Cursor             gui=NONE           cterm=NONE           guifg=#000000 guibg=#cccccc
 highlight!      CursorIM           gui=NONE           cterm=NONE           guifg=#000000 guibg=#cc0000
 
-highlight!      Pmenu              gui=NONE           cterm=NONE           guifg=#888888 guibg=#111111
-highlight!      PmenuSbar          gui=NONE           cterm=NONE           guifg=#000000 guibg=#111111
-highlight!      PmenuSel           gui=BOLD           cterm=BOLD           guifg=#04aadd guibg=#111111
+highlight!      Pmenu              gui=NONE           cterm=NONE           guifg=#888888 guibg=#1a1a1a
+highlight!      PmenuSbar          gui=NONE           cterm=NONE           guifg=#000000 guibg=#1a1a1a
+highlight!      PmenuSel           gui=BOLD           cterm=BOLD           guifg=#04aadd guibg=#1a1a1a
 highlight!      PmenuThumb         gui=NONE           cterm=NONE           guifg=NONE    guibg=#cccccc ctermfg=NONE
+
+highlight!      PopupSelected      gui=BOLD           cterm=BOLD           guifg=#04aadd guibg=#111111
 
 highlight!      StatusLine         gui=NONE           cterm=NONE           guifg=#cccccc guibg=#016699
 highlight!      StatusLineNC       gui=NONE           cterm=NONE           guifg=#cccccc guibg=#01669a
