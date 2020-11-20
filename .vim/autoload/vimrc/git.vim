@@ -9,7 +9,9 @@ let s:ERR_MESSAGE_5 = 'Could not execute "git"'
 
 function! vimrc#git#grep() abort
     if s:change_to_the_toplevel()
+        echohl Label
         let text = trim(input('gitgrep>'))
+        echohl None
         if !empty(text)
             let st = reltime()
             let args = split(text, '\s\+')
@@ -20,10 +22,10 @@ function! vimrc#git#grep() abort
                 if !empty(m)
                     let lines = [m[3]]
                     call s:decode_lines(lines)
-                    let xs += [#{
-                        \ filename: m[1],
-                        \ lnum: str2nr(m[2]),
-                        \ text: lines[0],
+                    let xs += [{
+                        \ 'filename' : m[1],
+                        \ 'lnum' : str2nr(m[2]),
+                        \ 'text' : lines[0],
                         \ }]
                 else
                     echo line
@@ -266,15 +268,15 @@ function! s:open(lines, time, cmd, cb) abort
         endif
     endfor
 
-    call setwinvar(winid, 'options', #{
-        \ curr_filter_text: '',
-        \ prev_filter_text: '',
-        \ search_mode: v:false,
-        \ cmd: a:cmd,
-        \ time: a:time,
-        \ user_callback: a:cb,
-        \ orig_lines: a:lines,
-        \ lines_width: lines_width,
+    call setwinvar(winid, 'options', {
+        \ 'curr_filter_text' : '',
+        \ 'prev_filter_text' : '',
+        \ 'search_mode' : v:false,
+        \ 'cmd' : a:cmd,
+        \ 'time' : a:time,
+        \ 'user_callback' : a:cb,
+        \ 'orig_lines' : a:lines,
+        \ 'lines_width' : lines_width,
         \ })
 
     call s:update_lines(winid, v:true, v:true)
@@ -294,26 +296,26 @@ function! s:set_options(winid) abort
             let base_opts = pterm#build_options()
         catch
         endtry
-        call popup_setoptions(a:winid, extend(base_opts, #{
-            \ title: printf('[%s] %s (%d/%d)', opts.time, opts.cmd, filter_len, orig_len),
-            \ zindex: 100,
-            \ padding: [(opts.search_mode ? 1 : 0), 1, 0, 1],
-            \ filter: function('s:filter'),
-            \ callback: function('s:callback'),
+        call popup_setoptions(a:winid, extend(base_opts, {
+            \ 'title' : printf('[%s] %s (%d/%d)', opts.time, opts.cmd, filter_len, orig_len),
+            \ 'zindex' : 100,
+            \ 'padding' : [(opts.search_mode ? 1 : 0), 1, 0, 1],
+            \ 'filter' : function('s:filter'),
+            \ 'callback' : function('s:callback'),
             \ }, 'force'))
     endif
     if s:search_winid != -1
         call popup_settext(s:search_winid, '/' .. opts.curr_filter_text)
         let parent_pos = popup_getpos(a:winid)
-        call popup_setoptions(s:search_winid, #{
-            \ pos: 'topleft',
-            \ zindex: 200,
-            \ line: parent_pos['line'] + 1,
-            \ col: parent_pos['col'] + 2,
-            \ minwidth: parent_pos['core_width'],
-            \ highlight: 'Terminal',
-            \ padding: [0, 0, 0, 0],
-            \ border: [0, 0, 0, 0],
+        call popup_setoptions(s:search_winid, {
+            \ 'pos' : 'topleft',
+            \ 'zindex' : 200,
+            \ 'line' : parent_pos['line'] + 1,
+            \ 'col' : parent_pos['col'] + 2,
+            \ 'minwidth' : parent_pos['core_width'],
+            \ 'highlight' : 'Terminal',
+            \ 'padding' : [0, 0, 0, 0],
+            \ 'border' : [0, 0, 0, 0],
             \ })
     endif
 endfunction

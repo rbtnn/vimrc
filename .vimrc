@@ -2,6 +2,7 @@ set encoding=utf-8
 set makeencoding=char
 scriptencoding utf-8
 
+let $MYVIMRC = resolve($MYVIMRC)
 let $VIMRC_ROOT = expand('<sfile>:h')
 let $VIMRC_DOTVIM = expand('$VIMRC_ROOT/.vim')
 let $VIMRC_PLUGDIR = expand('$VIMRC_ROOT/.vim/plugged')
@@ -11,6 +12,7 @@ set winaltkeys=yes guioptions=mM mouse=a clipboard=unnamed fileformats=unix,dos
 set expandtab shiftround softtabstop=-1 shiftwidth=4 tabstop=4
 set keywordprg=:help wildmenu cmdheight=3 tags=./tags;
 set list nowrap listchars=tab:\ \ \|,trail:-
+set showtabline=0 laststatus&
 set nobackup nowritebackup noswapfile undofile undodir=$VIMRC_DOTVIM/undofiles//
 set packpath= runtimepath=$VIMRUNTIME,$VIMRC_DOTVIM
 setglobal incsearch hlsearch nowrapscan ignorecase

@@ -42,6 +42,7 @@ highlight!      Special            gui=NONE           cterm=NONE           guifg
 
 " Gray
 highlight!      SpecialKey         gui=NONE           cterm=NONE           guifg=#202020 guibg=NONE    ctermbg=NONE
+highlight!      NonText            gui=NONE           cterm=NONE           guifg=#202020 guibg=NONE    ctermbg=NONE
 highlight!      Comment            gui=NONE           cterm=NONE           guifg=#414141 guibg=NONE    ctermbg=NONE
 
 " --------------------------------------------------------------------------------------------------------------------
