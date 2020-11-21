@@ -16,7 +16,6 @@ def vimrc#git#grep()
         var text = trim(input('gitgrep>'))
         echohl None
         if !empty(text)
-            var st = reltime()
             var args = split(text, '\s\+')
             var cmd = ['git', '--no-pager', 'grep', '--full-name', '-I', '--no-color', '-n'] + args
             var xs = []
@@ -28,7 +27,7 @@ def vimrc#git#grep()
                     xs += [{
                         \ 'filename': m[1],
                         \ 'lnum': str2nr(m[2]),
-                        \ 'text' : lines[0],
+                        \ 'text': lines[0],
                         \ }]
                 else
                     echo line
@@ -36,14 +35,12 @@ def vimrc#git#grep()
             endfor
             call setqflist(xs)
             copen
-            echo reltimestr(reltime(st))
         endif
     endif
 enddef
 
 def vimrc#git#diff(q_args: string)
     if s:change_to_the_toplevel()
-        var st = reltime()
         var args = split(q_args, '\s\+')
         var dict = {}
         var cmd = ['git', '--no-pager', 'diff', '--numstat'] + args
@@ -69,7 +66,7 @@ def vimrc#git#diff(q_args: string)
                 \   ? 1
                 \   : -1
                 \ )})
-            var winid = s:open(lines, reltimestr(reltime(st)), join(cmd), function('s:cb_diff'))
+            var winid = s:open(lines, join(cmd), function('s:cb_diff'))
             call setwinvar(winid, 'args', args)
             call setwinvar(winid, 'info', dict)
             call win_execute(winid, 'setlocal wrap')
@@ -84,13 +81,12 @@ enddef
 
 def vimrc#git#lsfiles()
     if s:change_to_the_toplevel()
-        var st = reltime()
         var cmd = ['git', '--no-pager', 'ls-files']
         var files = s:system(cmd)
         if empty(files)
             call s:error(ERR_MESSAGE_3, join(cmd))
         else
-            var winid = s:open(files, reltimestr(reltime(st)), join(cmd), function('s:cb_lsfiles'))
+            var winid = s:open(files, join(cmd), function('s:cb_lsfiles'))
             call win_execute(winid, 'setlocal wrap')
         endif
     endif
@@ -231,9 +227,9 @@ def s:system(cmd: list<string>): list<string>
 enddef
 
 def s:error(text: string, info: string)
-    echohl Error
-    echo printf('%s%s%s', text, empty(info) ? '' : ': ', string(info))
-    echohl None
+    call popup_notification(printf('%s%s%s', text, empty(info) ? '' : ': ', string(info)), {
+        \ 'highlight': 'ErrorMsg',
+        \ })
 enddef
 
 def s:expand2fullpath(path: string): string
@@ -256,7 +252,7 @@ def s:cb_lsfiles(winid: number, key: number)
     endif
 enddef
 
-def s:open(lines: list<string>, time: string, cmd: string, cb: func): number
+def s:open(lines: list<string>, cmd: string, cb: func): number
     var winid = popup_menu(lines, {})
     s:search_winid = -1
 
@@ -272,7 +268,6 @@ def s:open(lines: list<string>, time: string, cmd: string, cb: func): number
         \ 'prev_filter_text': '',
         \ 'search_mode': v:false,
         \ 'cmd': cmd,
-        \ 'time': time,
         \ 'user_callback': cb,
         \ 'orig_lines': lines,
         \ 'lines_width': lines_width,
@@ -296,7 +291,7 @@ def s:set_options(winid: number)
         catch
         endtry
         call popup_setoptions(winid, extend(base_opts, {
-            \ 'title': printf('[%s] %s (%d/%d)', opts.time, opts.cmd, filter_len, orig_len),
+            \ 'title': printf('%s (%d/%d)', opts.cmd, filter_len, orig_len),
             \ 'zindex': 100,
             \ 'padding': [(opts.search_mode ? 1 : 0), 1, 0, 1],
             \ 'filter': function('s:filter'),
