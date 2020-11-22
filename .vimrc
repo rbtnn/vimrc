@@ -22,9 +22,6 @@ silent! source $VIMRC_PLUGDIR/vim-gloaded/plugin/gloaded.vim
 silent! source $VIMRC_ROOT/vim-on-windows/vimbatchfiles/setup.vim
 
 let g:vim_indent_cont = &g:shiftwidth
-let g:pterm_options = { 'border' : [], 'borderhighlight' : ['Label'], }
-let g:pterm_using_title_for_tabs = v:true
-let g:pterm_width = '&columns * 4 / 5'
 let g:restart_sessionoptions = 'winpos,winsize,resize,buffers,curdir,tabpages'
 let g:molder_show_hidden = 1
 let g:plug_url_format = 'https://github.com/%s.git'

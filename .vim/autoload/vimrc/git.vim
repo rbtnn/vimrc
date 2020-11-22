@@ -168,9 +168,9 @@ def s:open_file(path: string, lnum: number)
             execute printf(':%d', lnum)
         else
             if 0 < lnum
-                execute printf(':new +%d %s', lnum, fnameescape(fullpath))
+                execute printf('new +%d %s', lnum, fnameescape(fullpath))
             else
-                execute printf(':new %s', fnameescape(fullpath))
+                execute printf('new %s', fnameescape(fullpath))
             endif
         endif
         normal! zz
@@ -291,7 +291,7 @@ def s:set_options(winid: number)
         catch
         endtry
         call popup_setoptions(winid, extend(base_opts, {
-            \ 'title': printf('%s (%d/%d)', opts.cmd, filter_len, orig_len),
+            \ 'title': printf(' %s (%d/%d) ', opts.cmd, filter_len, orig_len),
             \ 'zindex': 100,
             \ 'padding': [(opts.search_mode ? 1 : 0), 1, 0, 1],
             \ 'filter': function('s:filter'),
