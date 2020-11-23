@@ -99,8 +99,8 @@ if !has('tabsidebar')
     finish
 endif
 
-highlight!      TabSideBar          gui=NONE          cterm=NONE           guifg=#888888 guibg=#1a1a1a
-highlight!      TabSideBarFill      gui=NONE          cterm=NONE           guifg=NONE    guibg=#1a1a1a ctermfg=NONE
-highlight!      TabSideBarSel       gui=BOLD          cterm=BOLD           guifg=#04aadd guibg=#1a1a1a
-highlight!      TabSideBarUnderline gui=UNDERLINE     cterm=UNDERLINE      guifg=#111111 guibg=#1a1a1a
+highlight!      TabSideBar          gui=NONE          cterm=NONE           guifg=#888888 guibg=#171717
+highlight!      TabSideBarFill      gui=NONE          cterm=NONE           guifg=NONE    guibg=#171717 ctermfg=NONE
+highlight!      TabSideBarSel       gui=BOLD          cterm=BOLD           guifg=#dddddd guibg=#171717
+highlight!      TabSideBarTitle     gui=BOLD          cterm=NONE           guifg=#555588 guibg=#171717
 

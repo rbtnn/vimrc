@@ -7,9 +7,9 @@ endif
 
 function! Tabsidebar() abort
     try
-        let lines = ['%#TabSideBar#', repeat('=', &tabsidebarcolumns)]
-        let lines += split(printf('%s', fnamemodify(getcwd(1, g:actual_curtabpage), ':.')), printf('.\{%d}\zs', &tabsidebarcolumns))
-        let lines += [repeat('=', &tabsidebarcolumns)]
+        let lines = ['%#TabSideBarTitle#', repeat('=', &tabsidebarcolumns)]
+            \ + [g:actual_curtabpage .. '. ' .. fnamemodify(getcwd(tabpagewinnr(g:actual_curtabpage), g:actual_curtabpage), ':~')]
+            \ + [repeat('=', &tabsidebarcolumns)]
         for w in filter(getwininfo(), { i,x -> x.tabnr == g:actual_curtabpage })
             let hi = (win_getid() == w.winid) ? 'TabSideBarSel' : 'TabSideBar'
             try
@@ -19,10 +19,9 @@ function! Tabsidebar() abort
             endtry
             let lines += [printf('  %%#%s#%s', hi, x)]
         endfor
-        let lines += ['%#TabSideBarUnderline#']
         return join(lines, "\n")
     catch
-        return string(v:exception)
+        return v:exception
     endtry
 endfunction
 
@@ -30,7 +29,7 @@ function! TabsidebarSetting() abort
     let &tabsidebarcolumns = 28
     if &tabsidebarcolumns * 4 < &columns
         set showtabsidebar=2
-        set notabsidebarwrap
+        set tabsidebarwrap
         set notabsidebaralign
         set tabsidebar=%!Tabsidebar()
     else
