@@ -9,7 +9,7 @@ let $VIMRC_PLUGDIR = expand('$VIMRC_ROOT/.vim/plugged')
 
 set langmenu=en_gb.latin1
 set winaltkeys=yes guioptions=mM mouse=a clipboard=unnamed belloff=all
-set expandtab shiftround softtabstop=-1 shiftwidth=4 tabstop=4
+set shiftround softtabstop=-1 shiftwidth=4 tabstop=4
 set keywordprg=:help wildmenu cmdheight=3 tags=./tags;
 set list nowrap listchars=tab:\ \ \|,trail:- fileformats=unix,dos
 set showtabline=0 laststatus&
@@ -28,19 +28,19 @@ let g:plug_url_format = 'https://github.com/%s.git'
 
 silent! call plug#begin($VIMRC_PLUGDIR)
 for s:plug_name in [
-        \ 'kana/vim-operator-replace',
-        \ 'kana/vim-operator-user',
-        \ 'mattn/vim-molder',
-        \ 'rbtnn/vim-gloaded',
-        \ 'rbtnn/vim-jumptoline',
-        \ 'rbtnn/vim-pterm',
-        \ 'rbtnn/vim-vimscript_indentexpr',
-        \ 'rbtnn/vim-vimscript_lasterror',
-        \ 'rbtnn/vim-vimscript_tagfunc',
-        \ 'thinca/vim-qfreplace',
-        \ 'tyru/restart.vim',
-        \ ]
-    call plug#(s:plug_name)
+		\ 'kana/vim-operator-replace',
+		\ 'kana/vim-operator-user',
+		\ 'mattn/vim-molder',
+		\ 'rbtnn/vim-gloaded',
+		\ 'rbtnn/vim-jumptoline',
+		\ 'rbtnn/vim-pterm',
+		\ 'rbtnn/vim-vimscript_indentexpr',
+		\ 'rbtnn/vim-vimscript_lasterror',
+		\ 'rbtnn/vim-vimscript_tagfunc',
+		\ 'thinca/vim-qfreplace',
+		\ 'tyru/restart.vim',
+		\ ]
+	call plug#(s:plug_name)
 endfor
 call plug#end()
 

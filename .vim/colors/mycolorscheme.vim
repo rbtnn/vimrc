@@ -2,20 +2,20 @@
 let s:flag = v:false
 
 if has('gui_running')
-    let s:flag = v:true
+	let s:flag = v:true
 elseif exists('&termguicolors')
-    set termguicolors
-    let s:flag = v:true
+	set termguicolors
+	let s:flag = v:true
 endif
 
 if !s:flag
-    finish
+	finish
 endif
 
 highlight clear
 
 if exists('syntax_on')
-    syntax reset
+	syntax reset
 endif
 
 let g:colors_name = substitute(fnamemodify(expand('<sfile>'), ':t'), '.vim', '', '')
@@ -40,10 +40,10 @@ highlight!      Statement          gui=NONE           cterm=NONE           guifg
 " Yellow
 highlight!      Special            gui=NONE           cterm=NONE           guifg=#b4b755 guibg=NONE    ctermbg=NONE
 
-" Gray
-highlight!      SpecialKey         gui=NONE           cterm=NONE           guifg=#202020 guibg=NONE    ctermbg=NONE
-highlight!      NonText            gui=NONE           cterm=NONE           guifg=#202020 guibg=NONE    ctermbg=NONE
-highlight!      Comment            gui=NONE           cterm=NONE           guifg=#414141 guibg=NONE    ctermbg=NONE
+" Dark Green
+highlight!      SpecialKey         gui=NONE           cterm=NONE           guifg=#205020 guibg=NONE    ctermbg=NONE
+highlight!      NonText            gui=NONE           cterm=NONE           guifg=#205020 guibg=NONE    ctermbg=NONE
+highlight!      Comment            gui=NONE           cterm=NONE           guifg=#205020 guibg=NONE    ctermbg=NONE
 
 " --------------------------------------------------------------------------------------------------------------------
 
@@ -96,7 +96,7 @@ highlight! link diffAdded          DiffAdd
 highlight! link diffRemoved        DiffDelete
 
 if !has('tabsidebar')
-    finish
+	finish
 endif
 
 highlight!      TabSideBar          gui=NONE          cterm=NONE           guifg=#888888 guibg=#171717
