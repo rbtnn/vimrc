@@ -1,15 +1,12 @@
 
-let s:flag = v:false
-
-if has('gui_running')
-	let s:flag = v:true
-elseif exists('&termguicolors')
-	set termguicolors
-	let s:flag = v:true
-endif
-
-if !s:flag
-	finish
+if !has('gui_running')
+	if $TERM_PROGRAM == 'Apple_Terminal'
+		finish
+	elseif exists('&termguicolors')
+		set termguicolors
+	else
+		finish
+	endif
 endif
 
 highlight clear
