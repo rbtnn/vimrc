@@ -33,7 +33,6 @@ for s:plug_name in [
 		\ 'mattn/vim-molder',
 		\ 'rbtnn/vim-gloaded',
 		\ 'rbtnn/vim-jumptoline',
-		\ 'rbtnn/vim-pterm',
 		\ 'rbtnn/vim-vimscript_indentexpr',
 		\ 'rbtnn/vim-vimscript_lasterror',
 		\ 'rbtnn/vim-vimscript_tagfunc',

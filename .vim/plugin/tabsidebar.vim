@@ -32,6 +32,7 @@ function! TabsidebarSetting() abort
 		set tabsidebarwrap
 		set notabsidebaralign
 		set tabsidebar=%!Tabsidebar()
+		wincmd =
 	else
 		let &tabsidebarcolumns = 0
 		set showtabsidebar=0
@@ -42,4 +43,3 @@ augroup tabsidebar
 	autocmd!
 	autocmd VimEnter,VimResized * :call TabsidebarSetting()
 augroup END
-

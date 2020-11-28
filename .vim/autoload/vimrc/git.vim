@@ -286,18 +286,15 @@ def s:set_options(winid: number)
 		var orig_len = len(opts.orig_lines)
 		var filter_lines = getbufline(winbufnr(winid), 1, '$')
 		var filter_len = (get(filter_lines, 0, '') == NO_MATCHES) ? 0 : len(filter_lines)
-		var base_opts = {}
-		try
-			base_opts = pterm#build_options()
-		catch
-		endtry
-		call popup_setoptions(winid, extend(base_opts, {
+		call popup_setoptions(winid, {
 			\ 'title': printf(' %s (%d/%d) ', opts.cmd, filter_len, orig_len),
 			\ 'zindex': 100,
-			\ 'padding': [(opts.search_mode ? 1 : 0), 1, 0, 1],
+			\ 'minheight': 10,
+			\ 'maxheight': 10,
+			\ 'padding': [(opts.search_mode ? 1 : 0), 0, 0, 0],
 			\ 'filter': function('s:filter'),
 			\ 'callback': function('s:callback'),
-			\ }, 'force'))
+			\ })
 	endif
 	if s:search_winid != -1
 		call popup_settext(s:search_winid, '/' .. opts.curr_filter_text)
@@ -306,7 +303,7 @@ def s:set_options(winid: number)
 			\ 'pos': 'topleft',
 			\ 'zindex': 200,
 			\ 'line': parent_pos['line'] + 1,
-			\ 'col': parent_pos['col'] + 2,
+			\ 'col': parent_pos['col'] + 1,
 			\ 'minwidth': parent_pos['core_width'],
 			\ 'highlight': 'Terminal',
 			\ 'padding': [0, 0, 0, 0],
