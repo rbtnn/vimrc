@@ -41,6 +41,7 @@ for s:plug_name in [
 		\ ]
 	call plug#(s:plug_name)
 endfor
+silent! source ~/.vimrc.local
 call plug#end()
 
 tnoremap <silent><nowait><C-p>       <up>
@@ -59,5 +60,3 @@ nnoremap <silent><nowait><C-p>       :<C-u>cprevious<cr>
 nmap     <silent><nowait>s           <Plug>(operator-replace)
 
 silent! colorscheme mycolorscheme
-
-silent! source ~/.vimrc.local

@@ -25,9 +25,9 @@ def vimrc#git#grep()
 					var lines = [m[3]]
 					call s:decode_lines(lines)
 					xs += [{
-						\ 'filename': m[1],
-						\ 'lnum': str2nr(m[2]),
-						\ 'text': lines[0],
+						\ filename: m[1],
+						\ lnum: str2nr(m[2]),
+						\ text: lines[0],
 						\ }]
 				else
 					echo line
@@ -49,7 +49,7 @@ def vimrc#git#diff(q_args: string)
 			if !empty(m)
 				var key = m[3]
 				if !has_key(dict, key)
-					dict[key] = { 'additions': m[1], 'deletions': m[2], 'path': key, }
+					dict[key] = { additions: m[1], deletions: m[2], path: key, }
 				endif
 			endif
 		endfor
@@ -129,7 +129,7 @@ def s:jump_diff(fullpath: string)
 		endfor
 		var n3 = line('.') - lnum - n1 - n2 - 1
 		var m = []
-		var m2 = matchlist(getline(lnum), '^@@ \([+-]\)\(\d\+\)\%(,\d\+\)\? \([+-]\)\(\d\+\),\d\+\s*@@\(.*\)$')
+		var m2 = matchlist(getline(lnum), '^@@ \([+-]\)\(\d\+\)\%(,\d\+\)\? \([+-]\)\(\d\+\)\%(,\d\+\)\?\s*@@\(.*\)$')
 		var m3 = matchlist(getline(lnum), '^@@@ \([+-]\)\(\d\+\)\%(,\d\+\)\? \([+-]\)\(\d\+\)\%(,\d\+\)\? \([+-]\)\(\d\+\),\d\+\s*@@@\(.*\)$')
 		if !empty(m2)
 			m = m2
@@ -187,18 +187,7 @@ def s:rediff(cmd: list<string>)
 enddef
 
 def s:new_window(lines: list<string>, cmd: list<string>)
-	var exists = v:false
-	for info in getwininfo()
-		if (info['tabnr'] == tabpagenr()) && (getbufvar(info['bufnr'], '&filetype') == 'diff')
-			execute printf(':%dwincmd w', info['winnr'])
-			setlocal noreadonly modifiable
-			exists = v:true
-			break
-		endif
-	endfor
-	if !exists
-		new
-	endif
+	new
 	call deletebufline('%', 1, '$')
 	call setbufline('%', 1, lines)
 	setlocal readonly nomodifiable buftype=nofile nocursorline
@@ -211,8 +200,8 @@ def s:system(cmd: list<string>): list<string>
 	var path = tempname()
 	try
 		var job = job_start(cmd, {
-			\ 'out_io': 'file',
-			\ 'out_name': path,
+			\ out_io: 'file',
+			\ out_name: path,
 			\ })
 		while 'run' == job_status(job)
 		endwhile
@@ -229,7 +218,7 @@ enddef
 
 def s:error(text: string, info: string)
 	call popup_notification(printf('%s%s%s', text, empty(info) ? '' : ': ', string(info)), {
-		\ 'highlight': 'ErrorMsg',
+		\ highlight: 'ErrorMsg',
 		\ })
 enddef
 
@@ -265,13 +254,13 @@ def s:open(lines: list<string>, cmd: string, cb: func): number
 	endfor
 
 	call setwinvar(winid, 'options', {
-		\ 'curr_filter_text': '',
-		\ 'prev_filter_text': '',
-		\ 'search_mode': v:false,
-		\ 'cmd': cmd,
-		\ 'user_callback': cb,
-		\ 'orig_lines': lines,
-		\ 'lines_width': lines_width,
+		\ curr_filter_text: '',
+		\ prev_filter_text: '',
+		\ search_mode: v:false,
+		\ cmd: cmd,
+		\ user_callback: cb,
+		\ orig_lines: lines,
+		\ lines_width: lines_width,
 		\ })
 
 	call s:update_lines(winid, v:true, v:true)
@@ -287,27 +276,27 @@ def s:set_options(winid: number)
 		var filter_lines = getbufline(winbufnr(winid), 1, '$')
 		var filter_len = (get(filter_lines, 0, '') == NO_MATCHES) ? 0 : len(filter_lines)
 		call popup_setoptions(winid, {
-			\ 'title': printf(' %s (%d/%d) ', opts.cmd, filter_len, orig_len),
-			\ 'zindex': 100,
-			\ 'minheight': 10,
-			\ 'maxheight': 10,
-			\ 'padding': [(opts.search_mode ? 1 : 0), 0, 0, 0],
-			\ 'filter': function('s:filter'),
-			\ 'callback': function('s:callback'),
+			\ title: printf(' %s (%d/%d) ', substitute(opts.cmd, '^git --no-pager ', '', ''), filter_len, orig_len),
+			\ zindex: 100,
+			\ minheight: 10,
+			\ maxheight: 10,
+			\ padding: [(opts.search_mode ? 1 : 0), 0, 0, 0],
+			\ filter: function('s:filter'),
+			\ callback: function('s:callback'),
 			\ })
 	endif
 	if s:search_winid != -1
 		call popup_settext(s:search_winid, '/' .. opts.curr_filter_text)
 		var parent_pos = popup_getpos(winid)
 		call popup_setoptions(s:search_winid, {
-			\ 'pos': 'topleft',
-			\ 'zindex': 200,
-			\ 'line': parent_pos['line'] + 1,
-			\ 'col': parent_pos['col'] + 1,
-			\ 'minwidth': parent_pos['core_width'],
-			\ 'highlight': 'Terminal',
-			\ 'padding': [0, 0, 0, 0],
-			\ 'border': [0, 0, 0, 0],
+			\ pos: 'topleft',
+			\ zindex: 200,
+			\ line: parent_pos['line'] + 1,
+			\ col: parent_pos['col'] + 1,
+			\ minwidth: parent_pos['core_width'],
+			\ highlight: 'Terminal',
+			\ padding: [0, 0, 0, 0],
+			\ border: [0, 0, 0, 0],
 			\ })
 	endif
 enddef
