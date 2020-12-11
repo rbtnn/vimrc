@@ -104,7 +104,12 @@ def s:cb_diff(winid: number, key: number)
 			var cmd = ['git', '--no-pager', 'diff'] + args + ['--', path]
 			var lines = s:system(cmd)
 			call s:decode_lines(lines)
-			call s:new_window(lines, cmd)
+			new
+			call deletebufline('%', 1, '$')
+			call setbufline('%', 1, lines)
+			setlocal readonly nomodifiable buftype=nofile nocursorline
+			&l:filetype = 'diff'
+			&l:statusline = join(cmd)
 			var fullpath = s:expand2fullpath(path)
 			execute printf('nnoremap <buffer><silent><nowait><space>    :<C-w>call <SID>jump_diff(%s)<cr>', string(fullpath))
 			execute printf('nnoremap <buffer><silent><nowait><cr>       :<C-w>call <SID>jump_diff(%s)<cr>', string(fullpath))
@@ -179,20 +184,14 @@ def s:open_file(path: string, lnum: number)
 enddef
 
 def s:rediff(cmd: list<string>)
-	var pos = getcurpos()
+	var view = winsaveview()
 	var lines = s:system(cmd)
 	call s:decode_lines(lines)
-	call s:new_window(lines, cmd)
-	call setpos('.', pos)
-enddef
-
-def s:new_window(lines: list<string>, cmd: list<string>)
-	new
+	setlocal noreadonly modifiable
 	call deletebufline('%', 1, '$')
 	call setbufline('%', 1, lines)
-	setlocal readonly nomodifiable buftype=nofile nocursorline
-	&l:filetype = 'diff'
-	&l:statusline = join(cmd)
+	setlocal readonly nomodifiable
+	winrestview(view)
 enddef
 
 def s:system(cmd: list<string>): list<string>
