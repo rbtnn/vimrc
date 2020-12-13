@@ -222,7 +222,11 @@ def s:error(text: string, info: string)
 enddef
 
 def s:expand2fullpath(path: string): string
-	return substitute(resolve(fnamemodify(path, ':p')), '\', '/', 'g')
+	if !empty(path)
+		return substitute(resolve(fnamemodify(path, ':p')), '\', '/', 'g')
+	else
+		return ''
+	endif
 enddef
 
 def s:cb_lsfiles(winid: number, key: number)
