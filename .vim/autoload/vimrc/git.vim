@@ -391,6 +391,7 @@ enddef
 
 def s:set_curpos(winid: number, lnum: number)
 	call win_execute(winid, printf('call setpos(".", [0, %d, 0, 0])', lnum))
+	call win_execute(winid, 'redraw')
 enddef
 
 def s:change_to_the_toplevel(): bool
