@@ -31,8 +31,8 @@ for s:plug_name in [
 		\ 'kana/vim-operator-replace',
 		\ 'kana/vim-operator-user',
 		\ 'mattn/vim-molder',
+		\ 'rbtnn/vim-diffy',
 		\ 'rbtnn/vim-gloaded',
-		\ 'rbtnn/vim-jumptoline',
 		\ 'rbtnn/vim-vimscript_indentexpr',
 		\ 'rbtnn/vim-vimscript_lasterror',
 		\ 'rbtnn/vim-vimscript_tagfunc',
@@ -51,10 +51,9 @@ tnoremap <silent><nowait><C-f>       <right>
 tnoremap <silent><nowait><C-e>       <end>
 tnoremap <silent><nowait><C-a>       <home>
 tnoremap <silent><nowait><C-u>       <esc>
-nnoremap <silent><nowait><C-s>       :<C-u>call vimrc#git#diff('-w')<cr>
-nnoremap <silent><nowait><C-f>       :<C-u>call vimrc#git#lsfiles()<cr>
-nnoremap <silent><nowait><C-g>       :<C-u>call vimrc#git#grep()<cr>
-nnoremap <silent><nowait><C-j>       :<C-u>JumpToLine!<cr>
+
+nnoremap <silent><nowait><C-s>       :<C-u>Diffy -w<cr>
+nnoremap <silent><nowait><C-f>       :<C-u>execute empty(bufname()) ? 'edit .' : 'edit %:h'<cr>
 nnoremap <silent><nowait><C-n>       :<C-u>cnext<cr>
 nnoremap <silent><nowait><C-p>       :<C-u>cprevious<cr>
 nmap     <silent><nowait>s           <Plug>(operator-replace)
