@@ -21,10 +21,11 @@ silent! call mkdir(expand('$VIMRC_DOTVIM/undofiles'), 'p')
 silent! source $VIMRC_PLUGDIR/vim-gloaded/plugin/gloaded.vim
 silent! source $VIMRC_ROOT/vim-on-windows/vimbatchfiles/setup.vim
 
-let g:vim_indent_cont = &g:shiftwidth
-let g:restart_sessionoptions = 'winpos,winsize,resize,buffers,curdir,tabpages'
 let g:molder_show_hidden = 1
 let g:plug_url_format = 'https://github.com/%s.git'
+let g:quickrun_no_default_key_mappings = 1
+let g:restart_sessionoptions = 'winpos,winsize,resize,buffers,curdir,tabpages'
+let g:vim_indent_cont = &g:shiftwidth
 
 silent! call plug#begin($VIMRC_PLUGDIR)
 for s:plug_name in [
@@ -37,6 +38,7 @@ for s:plug_name in [
 		\ 'rbtnn/vim-vimscript_lasterror',
 		\ 'rbtnn/vim-vimscript_tagfunc',
 		\ 'thinca/vim-qfreplace',
+		\ 'thinca/vim-quickrun',
 		\ 'tyru/restart.vim',
 		\ ]
 	call plug#(s:plug_name)
@@ -52,6 +54,7 @@ tnoremap <silent><nowait><C-e>       <end>
 tnoremap <silent><nowait><C-a>       <home>
 tnoremap <silent><nowait><C-u>       <esc>
 
+nnoremap <silent><nowait><C-q>       :<C-u>QuickRun -runner terminal<cr>
 nnoremap <silent><nowait><C-s>       :<C-u>Diffy -w<cr>
 nnoremap <silent><nowait><C-f>       :<C-u>execute empty(bufname()) ? 'edit .' : 'edit %:h'<cr>
 nnoremap <silent><nowait><C-n>       :<C-u>cnext<cr>
