@@ -31,14 +31,12 @@ silent! call plug#begin($VIMRC_PLUGDIR)
 for s:plug_name in [
 		\ 'kana/vim-operator-replace',
 		\ 'kana/vim-operator-user',
-		\ 'mattn/vim-molder',
 		\ 'rbtnn/vim-diffy',
 		\ 'rbtnn/vim-gloaded',
 		\ 'rbtnn/vim-vimscript_indentexpr',
 		\ 'rbtnn/vim-vimscript_lasterror',
 		\ 'rbtnn/vim-vimscript_tagfunc',
 		\ 'thinca/vim-qfreplace',
-		\ 'thinca/vim-quickrun',
 		\ 'tyru/restart.vim',
 		\ ]
 	call plug#(s:plug_name)
@@ -53,10 +51,10 @@ tnoremap <silent><nowait><C-f>       <right>
 tnoremap <silent><nowait><C-e>       <end>
 tnoremap <silent><nowait><C-a>       <home>
 tnoremap <silent><nowait><C-u>       <esc>
+tnoremap <silent><nowait>gt          <C-w>gt
+tnoremap <silent><nowait>gT          <C-w>gT
 
-nnoremap <silent><nowait><C-q>       :<C-u>QuickRun -runner terminal<cr>
 nnoremap <silent><nowait><C-s>       :<C-u>Diffy -w<cr>
-nnoremap <silent><nowait><C-f>       :<C-u>execute empty(bufname()) ? 'edit .' : 'edit %:h'<cr>
 nnoremap <silent><nowait><C-n>       :<C-u>cnext<cr>
 nnoremap <silent><nowait><C-p>       :<C-u>cprevious<cr>
 nmap     <silent><nowait>s           <Plug>(operator-replace)
