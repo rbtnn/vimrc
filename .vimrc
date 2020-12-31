@@ -17,6 +17,11 @@ set nobackup nowritebackup noswapfile undofile undodir=$VIMRC_DOTVIM/undofiles//
 set packpath= runtimepath=$VIMRUNTIME,$VIMRC_DOTVIM
 setglobal incsearch hlsearch nowrapscan ignorecase
 
+set wildignore=*.pdb,*.obj,*.dll,*.exe,*.idb,*.ncb,*.ilk,*.plg,*.bsc,*.sbr,*.opt,*.config
+set wildignore+=*.pdf,*.mp3,*.doc,*.docx,*.xls,*.xlsx,*.idx,*.jpg,*.png,*.zip,*.MMF,*.gif
+set wildignore+=*.resX,*.lib,*.resources,*.ico,*.suo,*.cache,*.user,*.myapp,*.dat,*.dat01
+set wildignore+=*.vbe,*.url,*.lnk,NTUSER.DAT*,*.msi
+
 silent! call mkdir(expand('$VIMRC_DOTVIM/undofiles'), 'p')
 silent! source $VIMRC_PLUGDIR/vim-gloaded/plugin/gloaded.vim
 silent! source $VIMRC_ROOT/vim-on-windows/vimbatchfiles/setup.vim
@@ -33,6 +38,7 @@ for s:plug_name in [
 		\ 'kana/vim-operator-user',
 		\ 'rbtnn/vim-diffy',
 		\ 'rbtnn/vim-gloaded',
+		\ 'rbtnn/vim-near',
 		\ 'rbtnn/vim-vimscript_indentexpr',
 		\ 'rbtnn/vim-vimscript_lasterror',
 		\ 'rbtnn/vim-vimscript_tagfunc',
@@ -55,6 +61,7 @@ tnoremap <silent><nowait>gt          <C-w>gt
 tnoremap <silent><nowait>gT          <C-w>gT
 
 nnoremap <silent><nowait><C-s>       :<C-u>Diffy -w<cr>
+nnoremap <silent><nowait><C-f>       :<C-u>Near<cr>
 nnoremap <silent><nowait><C-n>       :<C-u>cnext<cr>
 nnoremap <silent><nowait><C-p>       :<C-u>cprevious<cr>
 nmap     <silent><nowait>s           <Plug>(operator-replace)

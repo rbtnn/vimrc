@@ -1,5 +1,4 @@
 
-.lsfiles.caches
 *.log
 *.swp
 .DS_Store
