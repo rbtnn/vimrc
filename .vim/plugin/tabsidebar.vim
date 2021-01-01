@@ -16,6 +16,9 @@ function! Tabsidebar() abort
 				let x = vimrc#label#string(w.winid)
 			catch
 				let x = bufname(w.bufnr)
+				if filereadable(x)
+					let x = fnamemodify(x, ':t')
+				endif
 			endtry
 			let lines += [printf('  %%#%s#%s', hi, x)]
 		endfor

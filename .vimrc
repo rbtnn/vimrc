@@ -12,7 +12,7 @@ set winaltkeys=yes guioptions=mM mouse=a clipboard=unnamed belloff=all
 set shiftround softtabstop=-1 shiftwidth=4 tabstop=4
 set keywordprg=:help wildmenu cmdheight=3 tags=./tags;
 set list nowrap listchars=tab:\ \ \|,trail:- fileformats=unix,dos
-set showtabline=0 laststatus&
+set showtabline=0 laststatus& statusline=%{win_getid()}
 set nobackup nowritebackup noswapfile undofile undodir=$VIMRC_DOTVIM/undofiles//
 set packpath= runtimepath=$VIMRUNTIME,$VIMRC_DOTVIM
 setglobal incsearch hlsearch nowrapscan ignorecase
@@ -60,8 +60,8 @@ tnoremap <silent><nowait><C-u>       <esc>
 tnoremap <silent><nowait>gt          <C-w>gt
 tnoremap <silent><nowait>gT          <C-w>gT
 
+nnoremap <silent><nowait><space>     :<C-u>Near<cr>
 nnoremap <silent><nowait><C-s>       :<C-u>Diffy -w<cr>
-nnoremap <silent><nowait><C-f>       :<C-u>Near<cr>
 nnoremap <silent><nowait><C-n>       :<C-u>cnext<cr>
 nnoremap <silent><nowait><C-p>       :<C-u>cprevious<cr>
 nmap     <silent><nowait>s           <Plug>(operator-replace)
