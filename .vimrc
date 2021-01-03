@@ -12,7 +12,7 @@ set winaltkeys=yes guioptions=mM mouse=a clipboard=unnamed belloff=all
 set shiftround softtabstop=-1 shiftwidth=4 tabstop=4
 set keywordprg=:help wildmenu cmdheight=3 tags=./tags;
 set list nowrap listchars=tab:\ \ \|,trail:- fileformats=unix,dos
-set showtabline=0 laststatus& statusline=%{win_getid()}
+set showtabline=0 laststatus& statusline&
 set nobackup nowritebackup noswapfile undofile undodir=$VIMRC_DOTVIM/undofiles//
 set packpath= runtimepath=$VIMRUNTIME,$VIMRC_DOTVIM
 setglobal incsearch hlsearch nowrapscan ignorecase
@@ -26,9 +26,7 @@ silent! call mkdir(expand('$VIMRC_DOTVIM/undofiles'), 'p')
 silent! source $VIMRC_PLUGDIR/vim-gloaded/plugin/gloaded.vim
 silent! source $VIMRC_ROOT/vim-on-windows/vimbatchfiles/setup.vim
 
-let g:molder_show_hidden = 1
 let g:plug_url_format = 'https://github.com/%s.git'
-let g:quickrun_no_default_key_mappings = 1
 let g:restart_sessionoptions = 'winpos,winsize,resize,buffers,curdir,tabpages'
 let g:vim_indent_cont = &g:shiftwidth
 
@@ -60,10 +58,10 @@ tnoremap <silent><nowait><C-u>       <esc>
 tnoremap <silent><nowait>gt          <C-w>gt
 tnoremap <silent><nowait>gT          <C-w>gT
 
-nnoremap <silent><nowait><space>     :<C-u>Near<cr>
-nnoremap <silent><nowait><C-s>       :<C-u>Diffy -w<cr>
-nnoremap <silent><nowait><C-n>       :<C-u>cnext<cr>
-nnoremap <silent><nowait><C-p>       :<C-u>cprevious<cr>
+nnoremap <silent><nowait><space>     <Cmd>Near<cr>
+nnoremap <silent><nowait><C-s>       <Cmd>Diffy -w<cr>
+nnoremap <silent><nowait><C-n>       <Cmd>cnext<cr>
+nnoremap <silent><nowait><C-p>       <Cmd>cprevious<cr>
 nmap     <silent><nowait>s           <Plug>(operator-replace)
 
 silent! colorscheme mycolorscheme
