@@ -48,7 +48,7 @@ highlight!      Comment            gui=NONE           cterm=NONE           guifg
 
 highlight!      Error              gui=NONE           cterm=NONE           guifg=#ffffff guibg=#ff0000 ctermbg=NONE
 
-highlight!      Cursor             gui=NONE           cterm=NONE           guifg=#000000 guibg=#cccccc
+highlight!      Cursor             gui=NONE           cterm=NONE           guifg=#ffffff guibg=#ff00ff
 highlight!      CursorIM           gui=NONE           cterm=NONE           guifg=#000000 guibg=#cc0000
 
 highlight!      Pmenu              gui=NONE           cterm=NONE           guifg=#888888 guibg=#1a1a1a
