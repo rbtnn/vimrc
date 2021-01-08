@@ -12,14 +12,21 @@ function! Tabsidebar() abort
 			\ + [repeat('=', &tabsidebarcolumns)]
 		for w in filter(getwininfo(), { i,x -> x.tabnr == g:actual_curtabpage })
 			let hi = (win_getid() == w.winid) ? 'TabSideBarSel' : 'TabSideBar'
-			try
-				let x = vimrc#label#string(w.winid)
-			catch
-				let x = bufname(w.bufnr)
-				if filereadable(x)
-					let x = fnamemodify(x, ':t')
-				endif
-			endtry
+			let x = bufname(w.bufnr)
+			if filereadable(x)
+				let x = printf('%s%s%s', (getbufvar(w.bufnr, '&readonly') ? "[R]" : ""), (getbufvar(w.bufnr, '&modified') ? "[+]" : ""), fnamemodify(x, ':t'))
+			elseif w.quickfix
+				let x = '[Quickfix]'
+			elseif w.loclist
+				let x = '[Loclist]'
+			elseif w.terminal
+				let x = '[Terminal]'
+			elseif !empty(getcmdwintype()) && (w.tabnr == tabpagenr()) && (w.winnr == winnr())
+				let x = '[CmdLineWindow]'
+			else
+				let ft = getbufvar(w.bufnr, '&filetype')
+				let x = printf('[%s]', empty(ft) ? "No Name" : ft)
+			endif
 			let lines += [printf('  %%#%s#%s', hi, x)]
 		endfor
 		return join(lines, "\n")
