@@ -12,7 +12,7 @@ set winaltkeys=yes guioptions=mM mouse=a clipboard=unnamed belloff=all
 set shiftround softtabstop=-1 shiftwidth=4 tabstop=4
 set keywordprg=:help wildmenu cmdheight=3 tags=./tags;
 set list nowrap listchars=tab:\ \ \|,trail:- fileformats=unix,dos
-set showtabline=0 laststatus& statusline&
+set showtabline=0 laststatus=2 statusline&
 set nobackup nowritebackup noswapfile undofile undodir=$VIMRC_DOTVIM/undofiles//
 set packpath= runtimepath=$VIMRUNTIME,$VIMRC_DOTVIM
 setglobal incsearch hlsearch nowrapscan ignorecase
@@ -37,6 +37,7 @@ for s:plug_name in [
 		\ 'rbtnn/vim-diffy',
 		\ 'rbtnn/vim-gloaded',
 		\ 'rbtnn/vim-near',
+		\ 'rbtnn/vim-termfinished',
 		\ 'rbtnn/vim-vimscript_indentexpr',
 		\ 'rbtnn/vim-vimscript_lasterror',
 		\ 'rbtnn/vim-vimscript_tagfunc',
