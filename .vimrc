@@ -41,6 +41,7 @@ for s:plug_name in [
 		\ 'rbtnn/vim-vimscript_indentexpr',
 		\ 'rbtnn/vim-vimscript_lasterror',
 		\ 'rbtnn/vim-vimscript_tagfunc',
+		\ 'rbtnn/vimtweak',
 		\ 'thinca/vim-qfreplace',
 		\ 'tyru/restart.vim',
 		\ ]
