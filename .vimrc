@@ -1,7 +1,4 @@
-if !get(g:, 'encoding_changed', v:false)
-	set encoding=utf-8
-	let g:encoding_changed = v:true
-endif
+set encoding=utf-8
 set makeencoding=char
 scriptencoding utf-8
 
