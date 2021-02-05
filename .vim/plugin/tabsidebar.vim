@@ -7,9 +7,7 @@ endif
 
 function! Tabsidebar() abort
 	try
-		let lines = ['%#TabSideBarTitle#', repeat('=', &tabsidebarcolumns)]
-			\ + [g:actual_curtabpage .. '. ' .. fnamemodify(getcwd(tabpagewinnr(g:actual_curtabpage), g:actual_curtabpage), ':~')]
-			\ + [repeat('=', &tabsidebarcolumns)]
+		let lines = []
 		for w in filter(getwininfo(), { i,x -> x.tabnr == g:actual_curtabpage })
 			let hi = (win_getid() == w.winid) ? 'TabSideBarSel' : 'TabSideBar'
 			let x = bufname(w.bufnr)
@@ -27,7 +25,8 @@ function! Tabsidebar() abort
 				let ft = getbufvar(w.bufnr, '&filetype')
 				let x = printf('[%s]', empty(ft) ? "No Name" : ft)
 			endif
-			let lines += [printf('  %%#%s#%s', hi, x)]
+			let tablabel = (1 == w.winnr) ? '%#TabSideBarTitle#(' .. g:actual_curtabpage .. ') ' : '    '
+			let lines += [printf('%s%%#%s#%s', tablabel, hi, x)]
 		endfor
 		return join(lines, "\n")
 	catch
@@ -53,3 +52,4 @@ augroup tabsidebar
 	autocmd!
 	autocmd VimEnter,VimResized * :call TabsidebarSetting()
 augroup END
+

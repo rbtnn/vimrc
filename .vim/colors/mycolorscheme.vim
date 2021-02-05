@@ -51,12 +51,12 @@ highlight!      Error              gui=NONE           cterm=NONE           guifg
 highlight!      Cursor             gui=NONE           cterm=NONE           guifg=#ffffff guibg=#ff00ff
 highlight!      CursorIM           gui=NONE           cterm=NONE           guifg=#000000 guibg=#cc0000
 
-highlight!      Pmenu              gui=NONE           cterm=NONE           guifg=#888888 guibg=#1a1a1a
-highlight!      PmenuSbar          gui=NONE           cterm=NONE           guifg=#000000 guibg=#1a1a1a
-highlight!      PmenuSel           gui=BOLD           cterm=BOLD           guifg=#04aadd guibg=#1a1a1a
+highlight!      Pmenu              gui=NONE           cterm=NONE           guifg=#888888 guibg=#040410
+highlight!      PmenuSbar          gui=NONE           cterm=NONE           guifg=#000000 guibg=#040410
+highlight!      PmenuSel           gui=BOLD           cterm=BOLD           guifg=#04aadd guibg=#040410
 highlight!      PmenuThumb         gui=NONE           cterm=NONE           guifg=NONE    guibg=#cccccc ctermfg=NONE
 
-highlight!      PopupSelected      gui=BOLD           cterm=BOLD           guifg=#04aadd guibg=#111111
+highlight!      PopupSelected      gui=BOLD           cterm=BOLD           guifg=#04aadd guibg=#12121a
 
 highlight!      StatusLine         gui=NONE           cterm=NONE           guifg=#cccccc guibg=#016699
 highlight!      StatusLineNC       gui=NONE           cterm=NONE           guifg=#cccccc guibg=#01669a
@@ -75,9 +75,9 @@ highlight!      DiffText           gui=BOLD,UNDERLINE cterm=BOLD,UNDERLINE guifg
 
 highlight!      CursorLine         gui=UNDERLINE      cterm=UNDERLINE      guifg=NONE    guibg=NONE    ctermfg=NONE ctermbg=NONE
 highlight!      CursorLineNr       gui=BOLD           cterm=BOLD           guifg=#04aadd guibg=#373737
-highlight!      Terminal           gui=NONE           cterm=NONE           guifg=#e0e0e0 guibg=#111111
-highlight!      Normal             gui=NONE           cterm=NONE           guifg=#ffffff guibg=#111111
-highlight!      EndOfBuffer        gui=NONE           cterm=NONE           guifg=#1f1f1f guibg=#111111
+highlight!      Terminal           gui=NONE           cterm=NONE           guifg=#e0e0e0 guibg=#00000a
+highlight!      Normal             gui=NONE           cterm=NONE           guifg=#ffffff guibg=#00000a
+highlight!      EndOfBuffer        gui=NONE           cterm=NONE           guifg=#1f1f1f guibg=#00000a
 highlight!      Visual             gui=NONE           cterm=NONE           guifg=#aaaaaa guibg=#191919
 highlight!      LineNr             gui=NONE           cterm=NONE           guifg=#888888 guibg=#0a0a0a
 highlight!      QuickFixLine       gui=BOLD,UNDERLINE cterm=BOLD,UNDERLINE guifg=NONE    guibg=NONE    ctermfg=NONE ctermbg=NONE
@@ -96,8 +96,8 @@ if !has('tabsidebar')
 	finish
 endif
 
-highlight!      TabSideBar          gui=NONE          cterm=NONE           guifg=#888888 guibg=#171717
-highlight!      TabSideBarFill      gui=NONE          cterm=NONE           guifg=NONE    guibg=#171717 ctermfg=NONE
-highlight!      TabSideBarSel       gui=BOLD          cterm=BOLD           guifg=#dddddd guibg=#171717
-highlight!      TabSideBarTitle     gui=BOLD          cterm=NONE           guifg=#555588 guibg=#171717
+highlight!      TabSideBar          gui=NONE          cterm=NONE           guifg=#888888 guibg=#080813
+highlight!      TabSideBarFill      gui=NONE          cterm=NONE           guifg=NONE    guibg=#080813 ctermfg=NONE
+highlight!      TabSideBarSel       gui=BOLD          cterm=BOLD           guifg=#dddddd guibg=#080813
+highlight!      TabSideBarTitle     gui=BOLD          cterm=NONE           guifg=#3333aa guibg=#080813
 
