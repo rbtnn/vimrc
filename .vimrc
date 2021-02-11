@@ -37,7 +37,6 @@ for s:plug_name in [
 		\ 'rbtnn/vim-diffy',
 		\ 'rbtnn/vim-gloaded',
 		\ 'rbtnn/vim-near',
-		\ 'rbtnn/vim-termfinished',
 		\ 'rbtnn/vim-vimscript_indentexpr',
 		\ 'rbtnn/vim-vimscript_lasterror',
 		\ 'rbtnn/vim-vimscript_tagfunc',
