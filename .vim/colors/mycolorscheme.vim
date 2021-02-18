@@ -57,7 +57,7 @@ highlight!      TabLine            gui=NONE           cterm=NONE           guifg
 highlight!      TabLineFill        gui=NONE           cterm=NONE           guifg=NONE    guibg=#212121 ctermfg=NONE
 highlight!      TabLineSel         gui=BOLD           cterm=BOLD           guifg=#04aadd guibg=#212121
 
-highlight!      DiffAdd            gui=NONE           cterm=NONE           guifg=#118811 guibg=NONE    ctermbg=NONE
+highlight!      DiffAdd            gui=NONE           cterm=NONE           guifg=#11aa11 guibg=NONE    ctermbg=NONE
 highlight!      DiffChange         gui=BOLD           cterm=BOLD           guifg=#993399 guibg=NONE    ctermbg=NONE
 highlight!      DiffDelete         gui=NONE           cterm=NONE           guifg=#dd2c2c guibg=NONE    ctermbg=NONE
 highlight!      DiffText           gui=BOLD,UNDERLINE cterm=BOLD,UNDERLINE guifg=#993399 guibg=NONE    ctermbg=NONE
@@ -70,7 +70,7 @@ highlight!      EndOfBuffer        gui=NONE           cterm=NONE           guifg
 highlight!      Visual             gui=NONE           cterm=NONE           guifg=NONE    guibg=#253340
 highlight!      LineNr             gui=NONE           cterm=NONE           guifg=#2d3640 guibg=NONE
 highlight!      QuickFixLine       gui=BOLD,UNDERLINE cterm=BOLD,UNDERLINE guifg=NONE    guibg=NONE    ctermfg=NONE ctermbg=NONE
-highlight!      Search             gui=BOLD,UNDERLINE cterm=BOLD,UNDERLINE guifg=NONE    guibg=NONE    ctermfg=NONE ctermbg=NONE
+highlight!      Search             gui=BOLD,UNDERLINE cterm=BOLD,UNDERLINE guifg=#11aa11 guibg=NONE    ctermfg=NONE ctermbg=NONE
 highlight!      SignColumn         gui=NONE           cterm=NONE           guifg=NONE    guibg=NONE    ctermfg=NONE ctermbg=NONE
 highlight!      WildMenu           gui=NONE           cterm=NONE           guifg=#000000 guibg=#55ddf5
 

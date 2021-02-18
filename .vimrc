@@ -30,6 +30,13 @@ let g:plug_url_format = 'https://github.com/%s.git'
 let g:restart_sessionoptions = 'winpos,winsize,resize,buffers,curdir,tabpages'
 let g:vim_indent_cont = &g:shiftwidth
 
+if !has('nvim') && has('win32')
+	" This is the same as stdpath('config') in nvim.
+	let initdir = expand('~/AppData/Local/nvim')
+	call mkdir(initdir, 'p')
+	call writefile(['silent! source ~/.vimrc'], initdir .. '/init.vim')
+endif
+
 silent! call plug#begin($VIMRC_PLUGDIR)
 for s:plug_name in [
 		\ 'kana/vim-operator-replace',
