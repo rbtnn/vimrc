@@ -20,7 +20,7 @@ setglobal incsearch hlsearch nowrapscan ignorecase
 set wildignore=*.pdb,*.obj,*.dll,*.exe,*.idb,*.ncb,*.ilk,*.plg,*.bsc,*.sbr,*.opt,*.config
 set wildignore+=*.pdf,*.mp3,*.doc,*.docx,*.xls,*.xlsx,*.idx,*.jpg,*.png,*.zip,*.MMF,*.gif
 set wildignore+=*.resX,*.lib,*.resources,*.ico,*.suo,*.cache,*.user,*.myapp,*.dat,*.dat01
-set wildignore+=*.vbe,*.url,*.lnk,NTUSER.DAT*,*.msi
+set wildignore+=*.vbe,*.url,*.lnk,NTUSER.DAT*,*.msi,desktop.ini,Thumbs.db
 
 silent! call mkdir(expand('$VIMRC_DOTVIM/undofiles'), 'p')
 silent! source $VIMRC_PLUGDIR/vim-gloaded/plugin/gloaded.vim
@@ -30,11 +30,11 @@ let g:plug_url_format = 'https://github.com/%s.git'
 let g:restart_sessionoptions = 'winpos,winsize,resize,buffers,curdir,tabpages'
 let g:vim_indent_cont = &g:shiftwidth
 
-if !has('nvim') && has('win32')
+if !has('nvim') && has('win32') && !filereadable(expand('~/AppData/Local/nvim/init.vim'))
 	" This is the same as stdpath('config') in nvim.
-	let initdir = expand('~/AppData/Local/nvim')
-	call mkdir(initdir, 'p')
-	call writefile(['silent! source ~/.vimrc'], initdir .. '/init.vim')
+	let s:initdir = expand('~/AppData/Local/nvim')
+	call mkdir(s:initdir, 'p')
+	call writefile(['silent! source ~/.vimrc'], s:initdir .. '/init.vim')
 endif
 
 silent! call plug#begin($VIMRC_PLUGDIR)
@@ -47,7 +47,6 @@ for s:plug_name in [
 		\ 'rbtnn/vim-vimscript_indentexpr',
 		\ 'rbtnn/vim-vimscript_lasterror',
 		\ 'rbtnn/vim-vimscript_tagfunc',
-		\ 'rbtnn/vimtweak',
 		\ 'thinca/vim-qfreplace',
 		\ 'tyru/restart.vim',
 		\ ]
