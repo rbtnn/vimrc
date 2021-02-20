@@ -6,7 +6,6 @@ let $MYVIMRC = resolve($MYVIMRC)
 let $VIMRC_ROOT = expand('<sfile>:h')
 let $VIMRC_DOTVIM = expand('$VIMRC_ROOT/.vim')
 let $VIMRC_PLUGDIR = expand('$VIMRC_ROOT/.vim/plugged')
-let $VIMRC_PLUGVIM = expand('$VIMRC_ROOT/.vim/autoload/plug.vim')
 
 set langmenu=en_gb.latin1
 set winaltkeys=yes guioptions=mM mouse=a clipboard=unnamed belloff=all
@@ -44,7 +43,6 @@ if !has('nvim') && has('win32') && !filereadable(expand('~/AppData/Local/nvim/in
 	call writefile(['silent! source ~/.vimrc'], s:initdir .. '/init.vim')
 endif
 
-if filereadable()
 silent! call plug#begin($VIMRC_PLUGDIR)
 for s:plug_name in [
 		\ 'kana/vim-operator-replace',
@@ -63,7 +61,6 @@ for s:plug_name in [
 endfor
 silent! source ~/.vimrc.local
 call plug#end()
-endif
 
 tnoremap <silent><nowait><C-p>       <up>
 tnoremap <silent><nowait><C-n>       <down>
