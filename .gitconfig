@@ -29,10 +29,6 @@
     lg=log --pretty=oneline --graph --abbrev-commit
     po=push -u origin
     st=status
-    subpull=submodule foreach git pull origin master
-    subst=submodule status
-    subinit=submodule init
-    subup=submodule update
 
 [color]
     diff = true
@@ -48,10 +44,4 @@
 
 [fetch]
     prune = true
-
-# set LESSCHARSET=utf-8
-#[core]
-#    pager = iconv -f cp932 -t utf-8 | less
-#[interactive]
-#    diffFilter = iconv -f cp932 -t utf-8
 
