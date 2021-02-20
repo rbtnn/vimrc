@@ -50,6 +50,7 @@
 .rnd
 .rustup/
 .sh_history
+.ssh/
 .subversion/
 .sudo_as_admin_successful
 .templateengine/
@@ -100,9 +101,12 @@ examples.desktop
 go/
 init.local.cmd
 ntuser.*
+plug.vim.old
+plugged/
 python_games/
 tags
 tags-jp
+undofiles/
 vim-on-windows/
 vimtemp/
 vterm.lib
