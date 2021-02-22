@@ -13,7 +13,7 @@ set keywordprg=:help wildmenu cmdheight=3 tags=./tags;
 set list nowrap listchars=tab:\ \ \|,trail:- fileformats=unix,dos
 set showtabline=0 laststatus=2 statusline& ambiwidth=double
 set nobackup nowritebackup noswapfile undofile undodir=$VIMRC_DOTVIM/undofiles//
-set packpath= runtimepath=$VIMRUNTIME,$VIMRC_DOTVIM foldmethod=indent foldlevelstart=1
+set foldmethod=indent foldlevelstart=1
 setglobal incsearch hlsearch nowrapscan ignorecase
 
 if has('tabsidebar')
@@ -34,10 +34,9 @@ silent! call mkdir(expand('$VIMRC_DOTVIM/undofiles'), 'p')
 silent! source $VIMRC_DOTVIM/pack/my/start/vim-gloaded/plugin/gloaded.vim
 silent! source $VIMRC_ROOT/vim-on-windows/vimbatchfiles/setup.vim
 
+set runtimepath=$VIMRUNTIME
 set packpath=$VIMRC_DOTVIM
 packloadall!
-filetype indent plugin on
-syntax on
 
 if !has('nvim') && has('win32') && !filereadable(expand('~/AppData/Local/nvim/init.vim'))
 	" This is the same as stdpath('config') in nvim.
@@ -63,4 +62,8 @@ nnoremap <silent><nowait><C-p>       <Cmd>cprevious<cr>
 nmap     <silent><nowait>s           <Plug>(operator-replace)
 
 silent! colorscheme badwolf
+
 silent! source ~/.vimrc.local
+
+filetype indent plugin on
+syntax on
