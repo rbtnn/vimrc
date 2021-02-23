@@ -6,11 +6,11 @@ if not exist "%PLUGIN_DIR%" (
    	mkdir "%PLUGIN_DIR%"
 )
 
+call :PLUG vim-denops   denops.vim
+call :PLUG vim-denops   denops-helloworld.vim
 call :PLUG kana    vim-operator-replace
 call :PLUG kana    vim-operator-user
-call :PLUG rbtnn   vim-diffy
 call :PLUG rbtnn   vim-gloaded
-call :PLUG rbtnn   vim-near
 call :PLUG rbtnn   vim-vimscript_indentexpr
 call :PLUG rbtnn   vim-vimscript_lasterror
 call :PLUG rbtnn   vim-vimscript_tagfunc

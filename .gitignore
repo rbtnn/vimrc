@@ -55,7 +55,6 @@
 .sudo_as_admin_successful
 .templateengine/
 .themes/
-.vim/
 .viminfo
 .vimrc.*
 .vuerc
