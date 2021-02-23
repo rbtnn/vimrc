@@ -35,7 +35,7 @@ silent! call mkdir($VIMRC_UNDO, 'p')
 silent! source $VIMRC_DOTVIM/pack/my/start/vim-gloaded/plugin/gloaded.vim
 silent! source $VIMRC_ROOT/vim-on-windows/vimbatchfiles/setup.vim
 
-set runtimepath=$VIMRUNTIME,$VIMRC_DOTVIM
+set runtimepath=$VIMRUNTIME
 set packpath=$VIMRC_DOTVIM
 packloadall!
 
@@ -56,7 +56,8 @@ tnoremap <silent><nowait><C-u>       <esc>
 tnoremap <silent><nowait>gt          <C-w>gt
 tnoremap <silent><nowait>gT          <C-w>gT
 
-nnoremap <silent><nowait><space>     <Cmd>F<cr>
+nnoremap <silent><nowait><space>     <Cmd>Near<cr>
+nnoremap <silent><nowait><C-s>       <Cmd>Diffy -w<cr>
 nnoremap <silent><nowait><C-n>       <Cmd>cnext<cr>
 nnoremap <silent><nowait><C-p>       <Cmd>cprevious<cr>
 nmap     <silent><nowait>s           <Plug>(operator-replace)

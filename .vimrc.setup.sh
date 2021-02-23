@@ -20,7 +20,9 @@ function plug() {
 
 plug kana    vim-operator-replace
 plug kana    vim-operator-user
+plug rbtnn   vim-diffy
 plug rbtnn   vim-gloaded
+plug rbtnn   vim-near
 plug rbtnn   vim-vimscript_indentexpr
 plug rbtnn   vim-vimscript_lasterror
 plug rbtnn   vim-vimscript_tagfunc
