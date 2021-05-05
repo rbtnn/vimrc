@@ -9,16 +9,21 @@ let $VIMRC_UNDO = expand('$VIMRC_DOTVIM/undofiles')
 
 set langmenu=en_gb.latin1
 set winaltkeys=yes guioptions=mM mouse=a clipboard=unnamed belloff=all
-set shiftround softtabstop=-1 shiftwidth=4 tabstop=4
-set keywordprg=:help wildmenu cmdheight=3 tags=./tags;
+set shiftround softtabstop=-1 shiftwidth=2 tabstop=2
+set keywordprg=:help wildmenu cmdheight=1 tags=./tags;
 set list nowrap listchars=tab:\ \ \|,trail:- fileformats=unix,dos
 set showtabline=0 laststatus=2 statusline& ambiwidth=double
 set nobackup nowritebackup noswapfile undofile undodir=$VIMRC_UNDO//
-set foldmethod=indent foldlevelstart=1
+set foldmethod=indent foldlevelstart=1 ruler isfname-==
 setglobal incsearch hlsearch nowrapscan ignorecase
 
+if executable('go-tsgrep')
+	let &grepprg = printf('go-tsgrep -tabstop %d', &tabstop)
+	set grepformat=%f(%l\\,%v):%m
+endif
+
 if has('tabsidebar')
-	set tabsidebar& tabsidebarwrap notabsidebaralign showtabsidebar=2 tabsidebarcolumns=20
+	set tabsidebar& tabsidebarwrap notabsidebaralign showtabsidebar=2 tabsidebarcolumns=16
 endif
 
 set wildignore=*.pdb,*.obj,*.dll,*.exe,*.idb,*.ncb,*.ilk,*.plg,*.bsc,*.sbr,*.opt,*.config
@@ -58,8 +63,8 @@ tnoremap <silent><nowait>gT          <C-w>gT
 
 nnoremap <silent><nowait><space>     <Cmd>Near<cr>
 nnoremap <silent><nowait><C-s>       <Cmd>Diffy -w<cr>
-nnoremap <silent><nowait><C-n>       <Cmd>cnext<cr>
-nnoremap <silent><nowait><C-p>       <Cmd>cprevious<cr>
+nnoremap <silent><nowait><C-n>       <Cmd>cnext \| silent! foldopen!<cr>zz
+nnoremap <silent><nowait><C-p>       <Cmd>cprevious \| silent! foldopen!<cr>zz
 nmap     <silent><nowait>s           <Plug>(operator-replace)
 
 silent! colorscheme badwolf
