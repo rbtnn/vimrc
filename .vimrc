@@ -15,6 +15,7 @@ set list nowrap listchars=tab:\ \ \|,trail:- fileformats=unix,dos
 set showtabline=0 laststatus=2 statusline& ambiwidth=double
 set nobackup nowritebackup noswapfile undofile undodir=$VIMRC_UNDO//
 set foldmethod=indent foldlevelstart=1 ruler isfname-==
+set sessionoptions=winpos,winsize,resize,buffers,curdir,tabpages
 setglobal incsearch hlsearch nowrapscan ignorecase
 
 if executable('go-tsgrep')
@@ -31,7 +32,7 @@ set wildignore+=*.pdf,*.mp3,*.doc,*.docx,*.xls,*.xlsx,*.idx,*.jpg,*.png,*.zip,*.
 set wildignore+=*.resX,*.lib,*.resources,*.ico,*.suo,*.cache,*.user,*.myapp,*.dat,*.dat01
 set wildignore+=*.vbe,*.url,*.lnk,NTUSER.DAT*,*.msi,desktop.ini,Thumbs.db
 
-let g:restart_sessionoptions = 'winpos,winsize,resize,buffers,curdir,tabpages'
+let g:restart_sessionoptions = &sessionoptions
 let g:vim_indent_cont = &g:shiftwidth
 let g:badwolf_tabline = 0
 let g:badwolf_darkgutter = 1
@@ -51,6 +52,9 @@ if !has('nvim') && has('win32') && !filereadable(expand('~/AppData/Local/nvim/in
 	call writefile(['silent! source ~/.vimrc'], s:initdir .. '/init.vim')
 endif
 
+command! -nargs=0 SessionSave :mksession! ~/.vimrc.session
+command! -nargs=0 SessionLoad :source     ~/.vimrc.session
+
 tnoremap <silent><nowait><C-p>       <up>
 tnoremap <silent><nowait><C-n>       <down>
 tnoremap <silent><nowait><C-b>       <left>
@@ -66,6 +70,8 @@ nnoremap <silent><nowait><C-s>       <Cmd>Diffy -w<cr>
 nnoremap <silent><nowait><C-n>       <Cmd>cnext \| silent! foldopen!<cr>zz
 nnoremap <silent><nowait><C-p>       <Cmd>cprevious \| silent! foldopen!<cr>zz
 nmap     <silent><nowait>s           <Plug>(operator-replace)
+
+inoremap <silent><tab>               <C-v><tab>
 
 silent! colorscheme badwolf
 
