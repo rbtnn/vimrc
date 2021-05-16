@@ -62,7 +62,7 @@ nnoremap <silent><nowait><expr><space>
 	\ ? '<Cmd>Fern %:h -drawer<cr>'
 	\ : '<Cmd>Fern .   -drawer<cr>'
 
-nnoremap <silent><nowait><C-s>       <Cmd>Diffy -w<cr>
+nnoremap <silent><nowait><C-s>       <Cmd>Diffy  -w<cr>
 
 nnoremap <silent><nowait><C-n>       <Cmd>cnext     \| silent! foldopen!<cr>zz
 nnoremap <silent><nowait><C-p>       <Cmd>cprevious \| silent! foldopen!<cr>zz
@@ -75,6 +75,15 @@ set background=light
 silent! colorscheme github
 
 silent! source ~/.vimrc.local
+
+" Execute ':helptags ALL' Asynchronously
+if executable(v:progpath) && exists('*job_start') && has('vim_starting')
+	call job_start([
+		\ v:progpath, '-u', 'NONE', '-N',
+		\ '--cmd', ':helptags ALL',
+		\ '--cmd', ':qa!',
+		\ ], {})
+endif
 
 filetype indent plugin on
 syntax on
