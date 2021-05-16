@@ -1,11 +1,10 @@
 
-.android/
-.ghost/
 .CFUserTextEncoding
 .ICEauthority
 .Trash/
 .Xauthority
 .anaconda/
+.android/
 .asoundrc
 .bash_history
 .bash_logout
@@ -26,8 +25,10 @@
 .dotnet/
 .dropbox/
 .electron/
+.fern/
 .gem/
 .ghc/
+.ghost/
 .git-for-windows-updater
 .gitconfig.local
 .gstreamer-0.10/
