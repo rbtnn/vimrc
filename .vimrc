@@ -27,6 +27,7 @@ let g:restart_sessionoptions = &sessionoptions
 let g:vim_indent_cont = &g:shiftwidth
 let g:fern#default_hidden = 1
 let g:github_colors_soft = 0
+let g:grizzly_history = '$VIMRC_DOTVIM/.grizzly_history'
 
 silent! call mkdir($VIMRC_UNDO, 'p')
 silent! source $VIMRC_DOTVIM/pack/my/start/vim-gloaded/plugin/gloaded.vim
@@ -46,26 +47,23 @@ endif
 command! -nargs=0 SessionSave :mksession! ~/.vimrc.session
 command! -nargs=0 SessionLoad :source     ~/.vimrc.session
 
-tnoremap <silent><nowait><C-p>       <up>
-tnoremap <silent><nowait><C-n>       <down>
-tnoremap <silent><nowait><C-b>       <left>
-tnoremap <silent><nowait><C-f>       <right>
-tnoremap <silent><nowait><C-e>       <end>
-tnoremap <silent><nowait><C-a>       <home>
-tnoremap <silent><nowait><C-u>       <esc>
-
-tnoremap <silent><nowait>gt          <C-w>gt
-tnoremap <silent><nowait>gT          <C-w>gT
+if has('win32')
+	tnoremap <silent><nowait><C-b>       <left>
+	tnoremap <silent><nowait><C-f>       <right>
+	tnoremap <silent><nowait><C-e>       <end>
+	tnoremap <silent><nowait><C-a>       <home>
+	tnoremap <silent><nowait><C-u>       <esc>
+endif
 
 nnoremap <silent><nowait><expr><space>
 	\ isdirectory(expand('%:h'))
-	\ ? '<Cmd>Fern %:h -drawer<cr>'
-	\ : '<Cmd>Fern .   -drawer<cr>'
+	\ ? ':<C-u>Fern %:h -drawer<cr>'
+	\ : ':<C-u>Fern .   -drawer<cr>'
 
-nnoremap <silent><nowait><C-s>       <Cmd>Diffy!  -w<cr>
+nnoremap <silent><nowait><C-s>       :<C-u>Diffy!  -w<cr>
 
-nnoremap <silent><nowait><C-n>       <Cmd>cnext     \| silent! foldopen!<cr>zz
-nnoremap <silent><nowait><C-p>       <Cmd>cprevious \| silent! foldopen!<cr>zz
+nnoremap <silent><nowait><C-n>       :<C-u>cnext     \| silent! foldopen!<cr>zz
+nnoremap <silent><nowait><C-p>       :<C-u>cprevious \| silent! foldopen!<cr>zz
 
 nmap     <silent><nowait>s           <Plug>(operator-replace)
 

@@ -24,6 +24,7 @@ plug kana        vim-operator-user
 plug lambdalisue fern.vim
 plug rbtnn       vim-diffy
 plug rbtnn       vim-gloaded
+plug rbtnn       vim-grizzly
 plug rbtnn       vim-vimscript_tagfunc
 plug thinca      vim-qfreplace
 plug tyru        caw.vim

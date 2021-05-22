@@ -12,6 +12,7 @@ call :PLUG kana        vim-operator-user
 call :PLUG lambdalisue fern.vim
 call :PLUG rbtnn       vim-diffy
 call :PLUG rbtnn       vim-gloaded
+call :PLUG rbtnn       vim-grizzly
 call :PLUG rbtnn       vim-vimscript_tagfunc
 call :PLUG thinca      vim-qfreplace
 call :PLUG tyru        caw.vim
