@@ -9,7 +9,7 @@ let $VIMRC_UNDO = expand('$VIMRC_DOTVIM/undofiles')
 
 set langmenu=en_gb.latin1
 set winaltkeys=yes guioptions=mM mouse=a clipboard=unnamed belloff=all
-set shiftround softtabstop=-1 shiftwidth=2 tabstop=2
+set shiftround softtabstop=-1 shiftwidth=4 tabstop=4
 set keywordprg=:help wildmenu cmdheight=1 tags=./tags;
 set list nowrap listchars=tab:\ \ \|,trail:- fileformats=unix,dos
 set showtabline=0 laststatus=2 statusline& ambiwidth=double
@@ -26,8 +26,8 @@ endif
 let g:restart_sessionoptions = &sessionoptions
 let g:vim_indent_cont = &g:shiftwidth
 let g:fern#default_hidden = 1
-let g:github_colors_soft = 0
 let g:grizzly_history = '$VIMRC_DOTVIM/.grizzly_history'
+let g:lightline = { 'colorscheme': 'onedark', }
 
 silent! call mkdir($VIMRC_UNDO, 'p')
 silent! source $VIMRC_DOTVIM/pack/my/start/vim-gloaded/plugin/gloaded.vim
@@ -69,8 +69,8 @@ nmap     <silent><nowait>s           <Plug>(operator-replace)
 
 inoremap <silent><tab>               <C-v><tab>
 
-set background=light
-silent! colorscheme github
+set background=dark
+silent! colorscheme onedark
 
 silent! source ~/.vimrc.local
 
