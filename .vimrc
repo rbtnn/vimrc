@@ -55,6 +55,12 @@ if has('win32')
 	tnoremap <silent><nowait><C-u>       <esc>
 endif
 
+if has('nvim')
+	tnoremap <silent><nowait><esc>       <C-\><C-n>
+else
+	tnoremap <silent><nowait><esc>       <C-w>N
+endif
+
 nnoremap <silent><nowait><expr><space>
 	\ isdirectory(expand('%:h'))
 	\ ? ':<C-u>Fern %:h -drawer<cr>'
