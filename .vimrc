@@ -16,22 +16,16 @@ set showtabline=0 laststatus=2 statusline& ambiwidth=double
 set nobackup nowritebackup noswapfile undofile undodir=$VIMRC_UNDO//
 set foldmethod=indent foldlevelstart=1 ruler isfname-==
 set sessionoptions=winpos,winsize,resize,buffers,curdir,tabpages
-set cursorline
 setglobal incsearch hlsearch nowrapscan ignorecase
 
 if has('tabsidebar')
 	set tabsidebar& tabsidebarwrap notabsidebaralign showtabsidebar=2 tabsidebarcolumns=16
 endif
 
-let g:restart_sessionoptions = &sessionoptions
 let g:vim_indent_cont = &g:shiftwidth
-let g:fern#default_hidden = 1
-let g:grizzly_history = '$VIMRC_DOTVIM/.grizzly_history'
-let g:lightline = { 'colorscheme': 'onedark', }
 
 silent! call mkdir($VIMRC_UNDO, 'p')
 silent! source $VIMRC_DOTVIM/pack/my/start/vim-gloaded/plugin/gloaded.vim
-silent! source $VIMRC_ROOT/vim-on-windows/vimbatchfiles/setup.vim
 
 set runtimepath=$VIMRUNTIME
 set packpath=$VIMRC_DOTVIM
@@ -61,22 +55,14 @@ else
 	tnoremap <silent><nowait><esc>       <C-w>N
 endif
 
-nnoremap <silent><nowait><expr><space>
-	\ isdirectory(expand('%:h'))
-	\ ? ':<C-u>Fern %:h -drawer<cr>'
-	\ : ':<C-u>Fern .   -drawer<cr>'
-
-nnoremap <silent><nowait><C-s>       :<C-u>Diffy!  -w<cr>
-
-nnoremap <silent><nowait><C-n>       :<C-u>cnext     \| silent! foldopen!<cr>zz
-nnoremap <silent><nowait><C-p>       :<C-u>cprevious \| silent! foldopen!<cr>zz
-
-nmap     <silent><nowait>s           <Plug>(operator-replace)
+nnoremap <silent><nowait><Plug>(open-fold-at-center)    :<C-u>silent! foldopen!<cr>zz
+nmap     <silent><nowait><C-n>                          :<C-u>cnext<cr><Plug>(open-fold-at-center)
+nmap     <silent><nowait><C-p>                          :<C-u>cprevious<cr><Plug>(open-fold-at-center)
+nmap     <silent><nowait>n                              n<Plug>(open-fold-at-center)
+nmap     <silent><nowait>N                              N<Plug>(open-fold-at-center)
+nmap     <silent><nowait>*                              *<Plug>(open-fold-at-center)
 
 inoremap <silent><tab>               <C-v><tab>
-
-set background=dark
-silent! colorscheme onedark
 
 silent! source ~/.vimrc.local
 
@@ -91,6 +77,59 @@ if !exists('g:helptags')
 			\ ], {})
 	endif
 endif
+
+
+
+" --------------------------
+" tyru/restart.vim
+" --------------------------
+let g:restart_sessionoptions = 'winpos,winsize,resize'
+
+" --------------------------
+" rbtnn/vim-grizzly
+" --------------------------
+let g:grizzly_history = '$VIMRC_DOTVIM/.grizzly_history'
+
+" --------------------------
+" rbtnn/vim-diffy
+" --------------------------
+nnoremap <silent><nowait><C-s>       :<C-u>Diffy!  -w<cr>
+
+" --------------------------
+" lambdalisue/fern.vim
+" --------------------------
+let g:fern#default_hidden = 1
+let g:fern#disable_default_mappings = 1
+augroup fern-user
+	autocmd!
+	autocmd FileType fern   :nmap <buffer><cr>    <Plug>(fern-action-open)
+	autocmd FileType fern   :nmap <buffer><C-h>   <Plug>(fern-action-leave)
+	autocmd FileType fern   :nmap <buffer>l       <Plug>(fern-action-expand:in)
+	autocmd FileType fern   :nmap <buffer>h       <Plug>(fern-action-collapse)
+	autocmd FileType fern   :nmap <buffer>t       <Plug>(fern-action-terminal:side)
+augroup END
+nnoremap <silent><nowait><expr><space>
+	\ isdirectory(expand('%:h'))
+	\ ? ':<C-u>Fern %:h -drawer<cr>'
+	\ : ':<C-u>Fern .   -drawer<cr>'
+
+" --------------------------
+" kana/vim-operator-replace
+" --------------------------
+nmap     <silent><nowait>s           <Plug>(operator-replace)
+
+" --------------------------
+" joshdick/onedark.vim
+" --------------------------
+set background=dark
+silent! colorscheme onedark
+
+" --------------------------
+" itchyny/lightline.vim
+" --------------------------
+let g:lightline = { 'colorscheme': 'onedark', }
+
+
 
 filetype indent plugin on
 syntax on
