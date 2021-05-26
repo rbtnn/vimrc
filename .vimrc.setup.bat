@@ -15,7 +15,7 @@ call :PLUG rbtnn       vim-grizzly
 call :PLUG rbtnn       vim-near
 call :PLUG rbtnn       vim-vimscript_tagfunc
 call :PLUG thinca      vim-qfreplace
-call :PLUG tomasr      molokai.vim
+call :PLUG tomasr      molokai
 call :PLUG tyru        restart.vim
 
 exit /b

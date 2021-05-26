@@ -19,6 +19,7 @@ set sessionoptions=winpos,winsize,resize,buffers,curdir,tabpages
 setglobal incsearch hlsearch nowrapscan ignorecase
 
 if has('tabsidebar')
+	let g:tabsidebar_vertsplit = 1
 	set tabsidebar& tabsidebarwrap notabsidebaralign showtabsidebar=2 tabsidebarcolumns=16
 endif
 
@@ -106,13 +107,16 @@ nnoremap <silent><nowait><space>     :<C-u>Near<cr>
 nmap     <silent><nowait>s           <Plug>(operator-replace)
 
 " --------------------------
-" tomasr/molokai.vim
+" tomasr/molokai
 " --------------------------
 augroup colorscheme-user
 	autocmd!
 	autocmd ColorScheme   * :highlight SpecialKey gui=NONE
 	autocmd ColorScheme   * :highlight Special    gui=NONE
 augroup END
+if (256 == &t_Co) && has('termguicolors')
+	set termguicolors
+endif
 set background=dark
 silent! colorscheme molokai
 

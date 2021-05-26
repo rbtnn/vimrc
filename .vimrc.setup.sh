@@ -9,6 +9,7 @@ fi
 function plug() {
 	if [ -d ${PLUGIN_DIR}/$2 ]; then
 		pushd ${PLUGIN_DIR}/$2
+		git config pull.ff only
 		git pull
 		popd
 	else
@@ -27,6 +28,6 @@ plug rbtnn       vim-grizzly
 plug rbtnn       vim-near
 plug rbtnn       vim-vimscript_tagfunc
 plug thinca      vim-qfreplace
-plug tomasr      molokai.vim
+plug tomasr      molokai
 plug tyru        restart.vim
 
