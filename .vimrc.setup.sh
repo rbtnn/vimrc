@@ -19,13 +19,14 @@ function plug() {
 }
 
 plug itchyny     lightline.vim
-plug joshdick    onedark.vim
 plug kana        vim-operator-replace
 plug kana        vim-operator-user
-plug lambdalisue fern.vim
 plug rbtnn       vim-diffy
 plug rbtnn       vim-gloaded
 plug rbtnn       vim-grizzly
+plug rbtnn       vim-near
 plug rbtnn       vim-vimscript_tagfunc
 plug thinca      vim-qfreplace
+plug tomasr      molokai.vim
 plug tyru        restart.vim
+

@@ -96,22 +96,9 @@ let g:grizzly_history = '$VIMRC_DOTVIM/.grizzly_history'
 nnoremap <silent><nowait><C-s>       :<C-u>Diffy!  -w<cr>
 
 " --------------------------
-" lambdalisue/fern.vim
+" rbtnn/vim-near
 " --------------------------
-let g:fern#default_hidden = 1
-let g:fern#disable_default_mappings = 1
-augroup fern-user
-	autocmd!
-	autocmd FileType fern   :nmap <buffer><cr>    <Plug>(fern-action-open)
-	autocmd FileType fern   :nmap <buffer><C-h>   <Plug>(fern-action-leave)
-	autocmd FileType fern   :nmap <buffer>l       <Plug>(fern-action-expand:in)
-	autocmd FileType fern   :nmap <buffer>h       <Plug>(fern-action-collapse)
-	autocmd FileType fern   :nmap <buffer>t       <Plug>(fern-action-terminal:side)
-augroup END
-nnoremap <silent><nowait><expr><space>
-	\ isdirectory(expand('%:h'))
-	\ ? ':<C-u>Fern %:h -drawer<cr>'
-	\ : ':<C-u>Fern .   -drawer<cr>'
+nnoremap <silent><nowait><space>     :<C-u>Near<cr>
 
 " --------------------------
 " kana/vim-operator-replace
@@ -119,15 +106,20 @@ nnoremap <silent><nowait><expr><space>
 nmap     <silent><nowait>s           <Plug>(operator-replace)
 
 " --------------------------
-" joshdick/onedark.vim
+" tomasr/molokai.vim
 " --------------------------
+augroup colorscheme-user
+	autocmd!
+	autocmd ColorScheme   * :highlight SpecialKey gui=NONE
+	autocmd ColorScheme   * :highlight Special    gui=NONE
+augroup END
 set background=dark
-silent! colorscheme onedark
+silent! colorscheme molokai
 
 " --------------------------
 " itchyny/lightline.vim
 " --------------------------
-let g:lightline = { 'colorscheme': 'onedark', }
+let g:lightline = { 'colorscheme': 'molokai', }
 
 
 
