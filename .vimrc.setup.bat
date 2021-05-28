@@ -9,7 +9,7 @@ if not exist "%PLUGIN_DIR%" (
 call :PLUG itchyny       lightline.vim
 call :PLUG kana          vim-operator-replace
 call :PLUG kana          vim-operator-user
-call :PLUG rbtnn         vim-Dig
+call :PLUG rbtnn         vim-dig
 call :PLUG rbtnn         vim-gloaded
 call :PLUG rbtnn         vim-grizzly
 call :PLUG rbtnn         vim-vimscript_tagfunc

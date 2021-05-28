@@ -108,6 +108,9 @@ nmap     <silent><nowait>s           <Plug>(operator-replace)
 " itchyny/lightline.vim
 " --------------------------
 let g:lightline = { 'colorscheme': 'srcery', }
+if has('win32') && !has('nvim') && !has('gui_running')
+	call lightline#disable()
+endif
 
 " --------------------------
 " srcery-colors/srcery-vim
