@@ -19,15 +19,14 @@ function plug() {
 	fi
 }
 
-plug itchyny     lightline.vim
-plug kana        vim-operator-replace
-plug kana        vim-operator-user
-plug rbtnn       vim-diffy
-plug rbtnn       vim-gloaded
-plug rbtnn       vim-grizzly
-plug rbtnn       vim-near
-plug rbtnn       vim-vimscript_tagfunc
-plug thinca      vim-qfreplace
-plug tomasr      molokai
-plug tyru        restart.vim
+plug itchyny       lightline.vim
+plug kana          vim-operator-replace
+plug kana          vim-operator-user
+plug rbtnn         vim-dig
+plug rbtnn         vim-gloaded
+plug rbtnn         vim-grizzly
+plug rbtnn         vim-vimscript_tagfunc
+plug srcery-colors srcery-vim
+plug thinca        vim-qfreplace
+plug tyru          restart.vim
 

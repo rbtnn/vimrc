@@ -6,17 +6,16 @@ if not exist "%PLUGIN_DIR%" (
 	mkdir "%PLUGIN_DIR%"
 )
 
-call :PLUG itchyny     lightline.vim
-call :PLUG kana        vim-operator-replace
-call :PLUG kana        vim-operator-user
-call :PLUG rbtnn       vim-diffy
-call :PLUG rbtnn       vim-gloaded
-call :PLUG rbtnn       vim-grizzly
-call :PLUG rbtnn       vim-near
-call :PLUG rbtnn       vim-vimscript_tagfunc
-call :PLUG thinca      vim-qfreplace
-call :PLUG tomasr      molokai
-call :PLUG tyru        restart.vim
+call :PLUG itchyny       lightline.vim
+call :PLUG kana          vim-operator-replace
+call :PLUG kana          vim-operator-user
+call :PLUG rbtnn         vim-Dig
+call :PLUG rbtnn         vim-gloaded
+call :PLUG rbtnn         vim-grizzly
+call :PLUG rbtnn         vim-vimscript_tagfunc
+call :PLUG srcery-colors srcery-vim
+call :PLUG thinca        vim-qfreplace
+call :PLUG tyru          restart.vim
 
 exit /b
 

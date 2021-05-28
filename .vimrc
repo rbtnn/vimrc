@@ -12,9 +12,10 @@ set winaltkeys=yes guioptions=mM mouse=a clipboard=unnamed belloff=all
 set shiftround softtabstop=-1 shiftwidth=4 tabstop=4
 set keywordprg=:help wildmenu cmdheight=1 tags=./tags;
 set list nowrap listchars=tab:\ \ \|,trail:- fileformats=unix,dos
-set showtabline=0 laststatus=2 statusline& ambiwidth=double
+set showtabline=0 laststatus=2 ambiwidth=double statusline&
+set pumheight=5 noshowmode noruler
 set nobackup nowritebackup noswapfile undofile undodir=$VIMRC_UNDO//
-set foldmethod=indent foldlevelstart=1 ruler isfname-==
+set foldmethod=indent foldlevelstart=1 isfname-==
 set sessionoptions=winpos,winsize,resize,buffers,curdir,tabpages
 setglobal incsearch hlsearch nowrapscan ignorecase
 
@@ -67,13 +68,15 @@ inoremap <silent><tab>               <C-v><tab>
 
 silent! source ~/.vimrc.local
 
+
+
 " Execute ':helptags ALL' Asynchronously
 if !exists('g:helptags')
 	if executable(v:progpath) && exists('*job_start') && has('vim_starting')
 		call job_start([
 			\ v:progpath,
 			\ '--cmd', ':let g:helptags = v:true',
-			\ '-c', ':helptags ALL',
+			\ '-c', ':silent! helptags ALL',
 			\ '-c', ':qa!',
 			\ ], {})
 	endif
@@ -92,14 +95,9 @@ let g:restart_sessionoptions = 'winpos,winsize,resize'
 let g:grizzly_history = '$VIMRC_DOTVIM/.grizzly_history'
 
 " --------------------------
-" rbtnn/vim-diffy
+" rbtnn/vim-dig
 " --------------------------
-nnoremap <silent><nowait><C-s>       :<C-u>Diffy!  -w<cr>
-
-" --------------------------
-" rbtnn/vim-near
-" --------------------------
-nnoremap <silent><nowait><space>     :<C-u>Near<cr>
+nnoremap <silent><nowait><space>     :<C-u>Dig<cr>
 
 " --------------------------
 " kana/vim-operator-replace
@@ -107,23 +105,19 @@ nnoremap <silent><nowait><space>     :<C-u>Near<cr>
 nmap     <silent><nowait>s           <Plug>(operator-replace)
 
 " --------------------------
-" tomasr/molokai
+" itchyny/lightline.vim
 " --------------------------
-augroup colorscheme-user
-	autocmd!
-	autocmd ColorScheme   * :highlight SpecialKey gui=NONE
-	autocmd ColorScheme   * :highlight Special    gui=NONE
-augroup END
+let g:lightline = { 'colorscheme': 'srcery', }
+
+" --------------------------
+" srcery-colors/srcery-vim
+" --------------------------
 if (256 == &t_Co) && has('termguicolors')
 	set termguicolors
 endif
+let g:srcery_italic = 0
 set background=dark
-silent! colorscheme molokai
-
-" --------------------------
-" itchyny/lightline.vim
-" --------------------------
-let g:lightline = { 'colorscheme': 'molokai', }
+silent! colorscheme srcery
 
 
 
