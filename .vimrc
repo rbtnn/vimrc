@@ -66,6 +66,11 @@ nmap     <silent><nowait>*                              *<Plug>(open-fold-at-cen
 
 inoremap <silent><tab>               <C-v><tab>
 
+nnoremap <silent><nowait>m           ma
+nnoremap <silent><nowait>M           `a
+
+
+
 silent! source ~/.vimrc.local
 
 
@@ -97,6 +102,7 @@ let g:grizzly_history = '$VIMRC_DOTVIM/.grizzly_history'
 " --------------------------
 " rbtnn/vim-dig
 " --------------------------
+let g:dig_maxwidth = 30
 nnoremap <silent><nowait><space>     :<C-u>Dig<cr>
 
 " --------------------------
@@ -108,14 +114,11 @@ nmap     <silent><nowait>s           <Plug>(operator-replace)
 " itchyny/lightline.vim
 " --------------------------
 let g:lightline = { 'colorscheme': 'srcery', }
-if has('win32') && !has('nvim') && !has('gui_running')
-	call lightline#disable()
-endif
 
 " --------------------------
 " srcery-colors/srcery-vim
 " --------------------------
-if (256 == &t_Co) && has('termguicolors')
+if (has('win32') || (256 == &t_Co)) && has('termguicolors') && !has('gui_running')
 	set termguicolors
 endif
 let g:srcery_italic = 0
