@@ -24,6 +24,10 @@ if has('tabsidebar')
 	set tabsidebar& tabsidebarwrap notabsidebaralign showtabsidebar=2 tabsidebarcolumns=16
 endif
 
+if has('win32')
+	set wildignore+=NTUSER.DAT*,*.dll,*.exe
+endif
+
 let g:vim_indent_cont = &g:shiftwidth
 
 silent! call mkdir($VIMRC_UNDO, 'p')
@@ -98,12 +102,6 @@ let g:restart_sessionoptions = 'winpos,winsize,resize'
 " rbtnn/vim-grizzly
 " --------------------------
 let g:grizzly_history = '$VIMRC_DOTVIM/.grizzly_history'
-
-" --------------------------
-" rbtnn/vim-dig
-" --------------------------
-let g:dig_maxwidth = 30
-nnoremap <silent><nowait><space>     :<C-u>Dig<cr>
 
 " --------------------------
 " kana/vim-operator-replace
