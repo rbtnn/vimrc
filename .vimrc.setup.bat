@@ -12,6 +12,7 @@ call :PLUG kana          vim-operator-user
 call :PLUG rbtnn         vim-dig
 call :PLUG rbtnn         vim-gloaded
 call :PLUG rbtnn         vim-grizzly
+call :PLUG rbtnn         vim-tips
 call :PLUG rbtnn         vim-vimscript_tagfunc
 call :PLUG srcery-colors srcery-vim
 call :PLUG thinca        vim-qfreplace

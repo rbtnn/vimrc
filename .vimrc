@@ -13,7 +13,7 @@ set shiftround softtabstop=-1 shiftwidth=4 tabstop=4
 set keywordprg=:help wildmenu cmdheight=1 tags=./tags;
 set list nowrap listchars=tab:\ \ \|,trail:- fileformats=unix,dos
 set showtabline=0 laststatus=2 ambiwidth=double statusline&
-set pumheight=5 noshowmode noruler
+set pumheight=5 noshowmode noruler nrformats=unsigned
 set nobackup nowritebackup noswapfile undofile undodir=$VIMRC_UNDO//
 set foldmethod=indent foldlevelstart=1 isfname-==
 set sessionoptions=winpos,winsize,resize,buffers,curdir,tabpages
@@ -70,9 +70,6 @@ nmap     <silent><nowait>*                              *<Plug>(open-fold-at-cen
 
 inoremap <silent><tab>               <C-v><tab>
 
-nnoremap <silent><nowait>m           ma
-nnoremap <silent><nowait>M           `a
-
 
 
 silent! source ~/.vimrc.local
@@ -122,6 +119,17 @@ endif
 let g:srcery_italic = 0
 set background=dark
 silent! colorscheme srcery
+
+
+
+augroup vimrc
+	autocmd!
+	autocmd ColorScheme * :highlight CursorIM guifg=NONE guibg=Red
+	autocmd FileType help :command! HelpEdit
+		\ : setlocal list tabstop=8 shiftwidth=8 softtabstop=8
+		\ | setlocal noexpandtab textwidth=78 conceallevel=0
+		\ | setlocal colorcolumn=+1 noreadonly modifiable
+augroup END
 
 
 

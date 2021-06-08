@@ -25,6 +25,7 @@ plug kana          vim-operator-user
 plug rbtnn         vim-dig
 plug rbtnn         vim-gloaded
 plug rbtnn         vim-grizzly
+plug rbtnn         vim-tips
 plug rbtnn         vim-vimscript_tagfunc
 plug srcery-colors srcery-vim
 plug thinca        vim-qfreplace
