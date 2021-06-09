@@ -25,7 +25,7 @@ if has('tabsidebar')
 endif
 
 if has('win32')
-	set wildignore+=NTUSER.DAT*,*.dll,*.exe
+	set wildignore+=NTUSER.DAT*,*.dll,*.exe,desktop.ini
 endif
 
 let g:vim_indent_cont = &g:shiftwidth
@@ -43,9 +43,6 @@ if !has('nvim') && has('win32') && !filereadable(expand('~/AppData/Local/nvim/in
 	call mkdir(s:initdir, 'p')
 	call writefile(['silent! source ~/.vimrc'], s:initdir .. '/init.vim')
 endif
-
-command! -nargs=0 SessionSave :mksession! ~/.vimrc.session
-command! -nargs=0 SessionLoad :source     ~/.vimrc.session
 
 if has('win32')
 	tnoremap <silent><nowait><C-b>       <left>
@@ -93,7 +90,7 @@ endif
 " --------------------------
 " tyru/restart.vim
 " --------------------------
-let g:restart_sessionoptions = 'winpos,winsize,resize'
+let g:restart_sessionoptions = &sessionoptions
 
 " --------------------------
 " rbtnn/vim-grizzly
