@@ -25,7 +25,7 @@ if has('tabsidebar')
 endif
 
 if has('win32')
-	set wildignore+=NTUSER.DAT*,*.dll,*.exe,desktop.ini
+	set wildignore+=NTUSER.DAT*,*.dll,*.exe,desktop.ini,*.lnk
 endif
 
 let g:vim_indent_cont = &g:shiftwidth
@@ -121,6 +121,10 @@ silent! colorscheme srcery
 
 augroup vimrc
 	autocmd!
+	autocmd CmdlineEnter * :silent! delcommand MANPAGER
+	autocmd CmdlineEnter * :silent! delcommand VimFoldh
+	autocmd CmdlineEnter * :silent! call lightline#disable()
+	autocmd CmdlineLeave * :silent! call lightline#enable()
 	autocmd ColorScheme * :highlight CursorIM guifg=NONE guibg=Red
 	autocmd FileType help :command! HelpEdit
 		\ : setlocal list tabstop=8 shiftwidth=8 softtabstop=8
