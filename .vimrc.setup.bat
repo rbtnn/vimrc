@@ -6,7 +6,6 @@ if not exist "%PLUGIN_DIR%" (
 	mkdir "%PLUGIN_DIR%"
 )
 
-call :PLUG itchyny       lightline.vim
 call :PLUG kana          vim-operator-replace
 call :PLUG kana          vim-operator-user
 call :PLUG rbtnn         vim-dig

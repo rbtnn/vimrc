@@ -67,6 +67,10 @@ nmap     <silent><nowait>*                              *<Plug>(open-fold-at-cen
 
 inoremap <silent><tab>               <C-v><tab>
 
+if !has('win32') && executable('sudo')
+	command! -nargs=0 SudoWrite    :w !sudo tee % > /dev/null
+endif
+
 
 
 silent! source ~/.vimrc.local
@@ -101,11 +105,6 @@ let g:grizzly_history = '$VIMRC_DOTVIM/.grizzly_history'
 " kana/vim-operator-replace
 " --------------------------
 nmap     <silent><nowait>s           <Plug>(operator-replace)
-
-" --------------------------
-" itchyny/lightline.vim
-" --------------------------
-let g:lightline = { 'colorscheme': 'srcery', }
 
 " --------------------------
 " srcery-colors/srcery-vim

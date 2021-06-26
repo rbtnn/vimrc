@@ -19,7 +19,6 @@ function plug() {
 	fi
 }
 
-plug itchyny       lightline.vim
 plug kana          vim-operator-replace
 plug kana          vim-operator-user
 plug rbtnn         vim-dig
