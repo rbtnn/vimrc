@@ -107,14 +107,14 @@ let g:grizzly_history = '$VIMRC_DOTVIM/.grizzly_history'
 nmap     <silent><nowait>s           <Plug>(operator-replace)
 
 " --------------------------
-" srcery-colors/srcery-vim
+" rakr/vim-one
 " --------------------------
 if (has('win32') || (256 == &t_Co)) && has('termguicolors') && !has('gui_running')
 	set termguicolors
 endif
-let g:srcery_italic = 0
+let g:one_allow_italics = 0
 set background=dark
-silent! colorscheme srcery
+silent! colorscheme one
 
 
 
@@ -122,9 +122,7 @@ augroup vimrc
 	autocmd!
 	autocmd CmdlineEnter * :silent! delcommand MANPAGER
 	autocmd CmdlineEnter * :silent! delcommand VimFoldh
-	autocmd CmdlineEnter * :silent! call lightline#disable()
-	autocmd CmdlineLeave * :silent! call lightline#enable()
-	autocmd ColorScheme * :highlight CursorIM guifg=NONE guibg=Red
+	autocmd ColorScheme * :highlight CursorIM guifg=NONE guibg=#ff8888
 	autocmd FileType help :command! HelpEdit
 		\ : setlocal list tabstop=8 shiftwidth=8 softtabstop=8
 		\ | setlocal noexpandtab textwidth=78 conceallevel=0

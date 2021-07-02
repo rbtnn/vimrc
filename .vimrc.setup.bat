@@ -15,9 +15,9 @@ call :PLUG rbtnn         vim-tips
 call :PLUG rbtnn         vim-vimscript_indentexpr
 call :PLUG rbtnn         vim-vimscript_lasterror
 call :PLUG rbtnn         vim-vimscript_tagfunc
-call :PLUG srcery-colors srcery-vim
 call :PLUG thinca        vim-qfreplace
 call :PLUG tyru          restart.vim
+call :PLUG rakr          vim-one
 
 exit /b
 

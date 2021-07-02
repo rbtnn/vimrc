@@ -42,6 +42,7 @@
 .mozilla/
 .multirust/
 .netrc
+.ngrok2/
 .node_repl_history
 .npm/
 .oracle_jre_usage/

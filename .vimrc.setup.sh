@@ -28,7 +28,7 @@ plug rbtnn         vim-tips
 plug rbtnn         vim-vimscript_indentexpr
 plug rbtnn         vim-vimscript_lasterror
 plug rbtnn         vim-vimscript_tagfunc
-plug srcery-colors srcery-vim
 plug thinca        vim-qfreplace
 plug tyru          restart.vim
+plug rakr          vim-one
 
