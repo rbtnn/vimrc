@@ -21,7 +21,7 @@ setglobal incsearch hlsearch nowrapscan ignorecase
 
 if has('tabsidebar')
 	let g:tabsidebar_vertsplit = 1
-	set tabsidebar& tabsidebarwrap notabsidebaralign showtabsidebar=2 tabsidebarcolumns=16
+	set tabsidebar=%t tabsidebarwrap notabsidebaralign showtabsidebar=2 tabsidebarcolumns=16
 endif
 
 if has('win32')
@@ -97,6 +97,11 @@ endif
 let g:restart_sessionoptions = &sessionoptions
 
 " --------------------------
+" rbtnn/vim-dig
+" --------------------------
+nnoremap <silent><nowait><space>     :<C-u>Dig<cr>
+
+" --------------------------
 " rbtnn/vim-grizzly
 " --------------------------
 let g:grizzly_history = '$VIMRC_DOTVIM/.grizzly_history'
@@ -107,14 +112,13 @@ let g:grizzly_history = '$VIMRC_DOTVIM/.grizzly_history'
 nmap     <silent><nowait>s           <Plug>(operator-replace)
 
 " --------------------------
-" rakr/vim-one
+" w0ng/vim-hybrid
 " --------------------------
 if (has('win32') || (256 == &t_Co)) && has('termguicolors') && !has('gui_running')
 	set termguicolors
 endif
-let g:one_allow_italics = 0
 set background=dark
-silent! colorscheme one
+silent! colorscheme hybrid
 
 
 

@@ -17,7 +17,7 @@ call :PLUG rbtnn         vim-vimscript_lasterror
 call :PLUG rbtnn         vim-vimscript_tagfunc
 call :PLUG thinca        vim-qfreplace
 call :PLUG tyru          restart.vim
-call :PLUG rakr          vim-one
+call :PLUG w0ng          vim-hybrid
 
 exit /b
 

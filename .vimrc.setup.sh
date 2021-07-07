@@ -30,5 +30,5 @@ plug rbtnn         vim-vimscript_lasterror
 plug rbtnn         vim-vimscript_tagfunc
 plug thinca        vim-qfreplace
 plug tyru          restart.vim
-plug rakr          vim-one
+plug w0ng          vim-hybrid
 
