@@ -6,12 +6,13 @@ if not exist "%PLUGIN_DIR%" (
 	mkdir "%PLUGIN_DIR%"
 )
 
+call :PLUG cocopon       lightline-hybrid.vim
+call :PLUG itchyny       lightline.vim
 call :PLUG kana          vim-operator-replace
 call :PLUG kana          vim-operator-user
 call :PLUG rbtnn         vim-dig
 call :PLUG rbtnn         vim-gloaded
 call :PLUG rbtnn         vim-grizzly
-call :PLUG rbtnn         vim-tips
 call :PLUG rbtnn         vim-vimscript_indentexpr
 call :PLUG rbtnn         vim-vimscript_lasterror
 call :PLUG rbtnn         vim-vimscript_tagfunc

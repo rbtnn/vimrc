@@ -19,12 +19,12 @@ function plug() {
 	fi
 }
 
+plug itchyny       lightline.vim
 plug kana          vim-operator-replace
 plug kana          vim-operator-user
 plug rbtnn         vim-dig
 plug rbtnn         vim-gloaded
 plug rbtnn         vim-grizzly
-plug rbtnn         vim-tips
 plug rbtnn         vim-vimscript_indentexpr
 plug rbtnn         vim-vimscript_lasterror
 plug rbtnn         vim-vimscript_tagfunc

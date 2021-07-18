@@ -21,7 +21,8 @@ setglobal incsearch hlsearch nowrapscan ignorecase
 
 if has('tabsidebar')
 	let g:tabsidebar_vertsplit = 1
-	set tabsidebar=%t tabsidebarwrap notabsidebaralign showtabsidebar=2 tabsidebarcolumns=16
+	set tabsidebar=%{g:actual_curtabpage}.\ %t
+	set tabsidebarwrap notabsidebaralign showtabsidebar=2 tabsidebarcolumns=16
 endif
 
 if has('win32')
@@ -31,7 +32,6 @@ endif
 let g:vim_indent_cont = &g:shiftwidth
 
 silent! call mkdir($VIMRC_UNDO, 'p')
-silent! source $VIMRC_DOTVIM/pack/my/start/vim-gloaded/plugin/gloaded.vim
 
 set runtimepath=$VIMRUNTIME
 set packpath=$VIMRC_DOTVIM
@@ -57,13 +57,6 @@ if has('nvim')
 else
 	tnoremap <silent><nowait><esc>       <C-w>N
 endif
-
-nnoremap <silent><nowait><Plug>(open-fold-at-center)    :<C-u>silent! foldopen!<cr>zz
-nmap     <silent><nowait><C-n>                          :<C-u>cnext<cr><Plug>(open-fold-at-center)
-nmap     <silent><nowait><C-p>                          :<C-u>cprevious<cr><Plug>(open-fold-at-center)
-nmap     <silent><nowait>n                              n<Plug>(open-fold-at-center)
-nmap     <silent><nowait>N                              N<Plug>(open-fold-at-center)
-nmap     <silent><nowait>*                              *<Plug>(open-fold-at-center)
 
 inoremap <silent><tab>               <C-v><tab>
 
@@ -112,6 +105,13 @@ let g:grizzly_history = '$VIMRC_DOTVIM/.grizzly_history'
 nmap     <silent><nowait>s           <Plug>(operator-replace)
 
 " --------------------------
+" itchyny/lightline.vim
+" cocopon/lightline-hybrid.vim
+" --------------------------
+let g:lightline = { 'colorscheme' : 'hybrid', }
+let g:lightline_hybrid_style = 'plain'
+
+" --------------------------
 " w0ng/vim-hybrid
 " --------------------------
 if (has('win32') || (256 == &t_Co)) && has('termguicolors') && !has('gui_running')
@@ -126,7 +126,11 @@ augroup vimrc
 	autocmd!
 	autocmd CmdlineEnter * :silent! delcommand MANPAGER
 	autocmd CmdlineEnter * :silent! delcommand VimFoldh
-	autocmd ColorScheme * :highlight CursorIM guifg=NONE guibg=#ff8888
+	autocmd ColorScheme * :highlight CursorIM       guifg=NONE guibg=#ff8888
+	autocmd ColorScheme * :highlight TabSidebar     guifg=NONE guibg=NONE    gui=NONE
+	autocmd ColorScheme * :highlight TabSidebarSel  guifg=NONE guibg=#282a2e gui=NONE
+	autocmd ColorScheme * :highlight TabSidebarFill guifg=NONE guibg=NONE    gui=NONE
+	autocmd ColorScheme * :highlight PmenuSel       guifg=NONE guibg=#282a2e gui=NONE
 	autocmd FileType help :command! HelpEdit
 		\ : setlocal list tabstop=8 shiftwidth=8 softtabstop=8
 		\ | setlocal noexpandtab textwidth=78 conceallevel=0
