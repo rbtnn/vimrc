@@ -108,7 +108,10 @@ nmap     <silent><nowait>s           <Plug>(operator-replace)
 " itchyny/lightline.vim
 " cocopon/lightline-hybrid.vim
 " --------------------------
-let g:lightline = { 'colorscheme' : 'hybrid', }
+let g:lightline = {
+	\ 'colorscheme': 'hybrid',
+	\ 'separator': { 'left': nr2char(0xe0b0), 'right': nr2char(0xe0b2) },
+	\ }
 let g:lightline_hybrid_style = 'plain'
 
 " --------------------------
