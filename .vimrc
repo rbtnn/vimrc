@@ -10,7 +10,7 @@ let $VIMRC_UNDO = expand('$VIMRC_DOTVIM/undofiles')
 set langmenu=en_gb.latin1
 set winaltkeys=yes guioptions=mM mouse=a clipboard=unnamed belloff=all
 set shiftround softtabstop=-1 shiftwidth=4 tabstop=4
-set keywordprg=:help wildmenu cmdheight=1 tags=./tags;
+set keywordprg=:help wildmenu tags=./tags; cmdwinheight=5 cmdheight=3
 set list nowrap listchars=tab:\ \ \|,trail:- fileformats=unix,dos
 set showtabline=0 laststatus=2 ambiwidth=double statusline&
 set pumheight=5 noshowmode noruler nrformats=unsigned
@@ -32,10 +32,27 @@ endif
 let g:vim_indent_cont = &g:shiftwidth
 
 silent! call mkdir($VIMRC_UNDO, 'p')
+silent! source $VIMRC_DOTVIM/pack/my/start/vim-gloaded/plugin/gloaded.vim
 
-set runtimepath=$VIMRUNTIME
-set packpath=$VIMRC_DOTVIM
-packloadall!
+set runtimepath=$VIMRUNTIME,$VIMRC_DOTVIM
+
+call plug#begin(expand('$VIMRC_DOTVIM/pack/my/start'))
+
+Plug 'cocopon/lightline-hybrid.vim'
+Plug 'itchyny/lightline.vim'
+Plug 'kana/vim-operator-replace'
+Plug 'kana/vim-operator-user'
+Plug 'rbtnn/vim-dig'
+Plug 'rbtnn/vim-gloaded'
+Plug 'rbtnn/vim-grizzly'
+Plug 'rbtnn/vim-vimscript_indentexpr'
+Plug 'rbtnn/vim-vimscript_lasterror'
+Plug 'rbtnn/vim-vimscript_tagfunc'
+Plug 'thinca/vim-qfreplace'
+Plug 'tyru/restart.vim'
+Plug 'w0ng/vim-hybrid'
+
+call plug#end()
 
 if !has('nvim') && has('win32') && !filereadable(expand('~/AppData/Local/nvim/init.vim'))
 	" This is the same as stdpath('config') in nvim.
@@ -92,12 +109,9 @@ let g:restart_sessionoptions = &sessionoptions
 " --------------------------
 " rbtnn/vim-dig
 " --------------------------
-nnoremap <silent><nowait><space>     :<C-u>Dig<cr>
-
-" --------------------------
-" rbtnn/vim-grizzly
-" --------------------------
-let g:grizzly_history = '$VIMRC_DOTVIM/.grizzly_history'
+if !has('nvim')
+	nnoremap <silent><nowait><space>     :<C-u>Dig<cr>
+endif
 
 " --------------------------
 " kana/vim-operator-replace
@@ -133,7 +147,7 @@ augroup vimrc
 	autocmd ColorScheme * :highlight TabSidebar     guifg=NONE guibg=NONE    gui=NONE
 	autocmd ColorScheme * :highlight TabSidebarSel  guifg=NONE guibg=#282a2e gui=NONE
 	autocmd ColorScheme * :highlight TabSidebarFill guifg=NONE guibg=NONE    gui=NONE
-	autocmd ColorScheme * :highlight PmenuSel       guifg=NONE guibg=#282a2e gui=NONE
+	autocmd ColorScheme * :highlight PmenuSel       guifg=NONE guibg=#44484e gui=NONE
 	autocmd FileType help :command! HelpEdit
 		\ : setlocal list tabstop=8 shiftwidth=8 softtabstop=8
 		\ | setlocal noexpandtab textwidth=78 conceallevel=0
