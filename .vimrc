@@ -126,7 +126,6 @@ let g:lightline = {
 	\ 'colorscheme': 'hybrid',
 	\ 'separator': { 'left': nr2char(0xe0b0), 'right': nr2char(0xe0b2) },
 	\ }
-let g:lightline_hybrid_style = 'plain'
 
 " --------------------------
 " w0ng/vim-hybrid
@@ -147,7 +146,7 @@ augroup vimrc
 	autocmd ColorScheme * :highlight TabSidebar     guifg=NONE guibg=NONE    gui=NONE
 	autocmd ColorScheme * :highlight TabSidebarSel  guifg=NONE guibg=#282a2e gui=NONE
 	autocmd ColorScheme * :highlight TabSidebarFill guifg=NONE guibg=NONE    gui=NONE
-	autocmd ColorScheme * :highlight PmenuSel       guifg=NONE guibg=#44484e gui=NONE
+	autocmd ColorScheme * :highlight PmenuSel       guifg=NONE guibg=#44484e gui=NONE cterm=NONE
 	autocmd FileType help :command! HelpEdit
 		\ : setlocal list tabstop=8 shiftwidth=8 softtabstop=8
 		\ | setlocal noexpandtab textwidth=78 conceallevel=0
