@@ -52,6 +52,8 @@ Plug 'thinca/vim-qfreplace'
 Plug 'tyru/restart.vim'
 Plug 'w0ng/vim-hybrid'
 
+silent! source ~/.vimrc.local
+
 call plug#end()
 
 if !has('nvim') && has('win32') && !filereadable(expand('~/AppData/Local/nvim/init.vim'))
@@ -81,25 +83,20 @@ if !has('win32') && executable('sudo')
 	command! -nargs=0 SudoWrite    :w !sudo tee % > /dev/null
 endif
 
-
-
-silent! source ~/.vimrc.local
-
-
-
-" Execute ':helptags ALL' Asynchronously
-if !exists('g:helptags')
-	if executable(v:progpath) && exists('*job_start') && has('vim_starting')
-		call job_start([
-			\ v:progpath,
-			\ '--cmd', ':let g:helptags = v:true',
-			\ '-c', ':silent! helptags ALL',
-			\ '-c', ':qa!',
-			\ ], {})
-	endif
-endif
-
-
+augroup vimrc
+	autocmd!
+	autocmd CmdlineEnter * :silent! delcommand MANPAGER
+	autocmd CmdlineEnter * :silent! delcommand VimFoldh
+	autocmd ColorScheme * :highlight CursorIM       guifg=NONE guibg=#ff8888
+	autocmd ColorScheme * :highlight TabSidebar     guifg=NONE guibg=NONE    gui=NONE
+	autocmd ColorScheme * :highlight TabSidebarSel  guifg=NONE guibg=#282a2e gui=NONE
+	autocmd ColorScheme * :highlight TabSidebarFill guifg=NONE guibg=NONE    gui=NONE
+	autocmd ColorScheme * :highlight PmenuSel       guifg=NONE guibg=#44484e gui=NONE cterm=NONE
+	autocmd FileType help :command! HelpEdit
+		\ : setlocal list tabstop=8 shiftwidth=8 softtabstop=8
+		\ | setlocal noexpandtab textwidth=78 conceallevel=0
+		\ | setlocal colorcolumn=+1 noreadonly modifiable
+augroup END
 
 " --------------------------
 " tyru/restart.vim
@@ -135,25 +132,6 @@ if (has('win32') || (256 == &t_Co)) && has('termguicolors') && !has('gui_running
 endif
 set background=dark
 silent! colorscheme hybrid
-
-
-
-augroup vimrc
-	autocmd!
-	autocmd CmdlineEnter * :silent! delcommand MANPAGER
-	autocmd CmdlineEnter * :silent! delcommand VimFoldh
-	autocmd ColorScheme * :highlight CursorIM       guifg=NONE guibg=#ff8888
-	autocmd ColorScheme * :highlight TabSidebar     guifg=NONE guibg=NONE    gui=NONE
-	autocmd ColorScheme * :highlight TabSidebarSel  guifg=NONE guibg=#282a2e gui=NONE
-	autocmd ColorScheme * :highlight TabSidebarFill guifg=NONE guibg=NONE    gui=NONE
-	autocmd ColorScheme * :highlight PmenuSel       guifg=NONE guibg=#44484e gui=NONE cterm=NONE
-	autocmd FileType help :command! HelpEdit
-		\ : setlocal list tabstop=8 shiftwidth=8 softtabstop=8
-		\ | setlocal noexpandtab textwidth=78 conceallevel=0
-		\ | setlocal colorcolumn=+1 noreadonly modifiable
-augroup END
-
-
 
 filetype indent plugin on
 syntax on
