@@ -17,6 +17,7 @@ set pumheight=5 noshowmode noruler nrformats=unsigned
 set nobackup nowritebackup noswapfile undofile undodir=$VIMRC_UNDO//
 set foldmethod=indent foldlevelstart=1 isfname-==
 set sessionoptions=winpos,winsize,resize,buffers,curdir,tabpages
+set grepprg=internal grepformat&
 setglobal incsearch hlsearch nowrapscan ignorecase
 
 if has('tabsidebar')
@@ -79,8 +80,29 @@ endif
 
 inoremap <silent><tab>               <C-v><tab>
 
+nnoremap <silent><C-n>               <Cmd>cnext<cr>
+nnoremap <silent><C-p>               <Cmd>cprevious<cr>
+
 if !has('win32') && executable('sudo')
 	command! -nargs=0 SudoWrite    :w !sudo tee % > /dev/null
+endif
+
+if executable('git')
+	function! s:gitgrep(q_args)
+		let grepprg = &grepprg
+		let grepformat = &grepformat
+		try
+			set grepprg=git\ --no-pager\ grep\ -I\ --no-color\ -n
+			set grepformat&
+			silent! execute 'grep! ' .. a:q_args
+			copen
+		finally
+			let &grepprg = grepprg
+			let &grepformat = grepformat
+		endtry
+	endfunction
+
+	command! -nargs=* GitGrep    :call s:gitgrep(<q-args>)
 endif
 
 augroup vimrc
@@ -91,11 +113,9 @@ augroup vimrc
 	autocmd ColorScheme * :highlight TabSidebar     guifg=NONE guibg=NONE    gui=NONE
 	autocmd ColorScheme * :highlight TabSidebarSel  guifg=NONE guibg=#282a2e gui=NONE
 	autocmd ColorScheme * :highlight TabSidebarFill guifg=NONE guibg=NONE    gui=NONE
+	autocmd ColorScheme * :highlight CursorLine     guifg=NONE guibg=#282a2e gui=NONE
+	autocmd ColorScheme * :highlight QuickFixLine   guifg=NONE guibg=#282a2e gui=NONE
 	autocmd ColorScheme * :highlight PmenuSel       guifg=NONE guibg=#44484e gui=NONE cterm=NONE
-	autocmd FileType help :command! HelpEdit
-		\ : setlocal list tabstop=8 shiftwidth=8 softtabstop=8
-		\ | setlocal noexpandtab textwidth=78 conceallevel=0
-		\ | setlocal colorcolumn=+1 noreadonly modifiable
 augroup END
 
 " --------------------------
