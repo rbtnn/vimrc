@@ -13,7 +13,7 @@ set shiftround softtabstop=-1 shiftwidth=4 tabstop=4
 set keywordprg=:help wildmenu tags=./tags; cmdwinheight=5 cmdheight=3
 set list nowrap listchars=tab:\ \ \|,trail:- fileformats=unix,dos
 set showtabline=0 laststatus=2 ambiwidth=double statusline&
-set pumheight=5 noshowmode noruler nrformats=unsigned
+set pumheight=10 noshowmode noruler nrformats=unsigned
 set nobackup nowritebackup noswapfile undofile undodir=$VIMRC_UNDO//
 set foldmethod=indent foldlevelstart=1 isfname-==
 set sessionoptions=winpos,winsize,resize,buffers,curdir,tabpages
@@ -109,7 +109,9 @@ let g:restart_sessionoptions = &sessionoptions
 " rbtnn/vim-dig
 " --------------------------
 if !has('nvim')
-	nnoremap <silent><nowait><space>     :<C-u>Dig<cr>
+	nnoremap <silent><nowait><space>   :<C-u>DigFiler<cr>
+	nnoremap <silent><nowait><C-f>     :<C-u>DigGitDiff<cr>
+	nnoremap         <nowait><C-s>     :<C-u>DigGitGrep<space>
 endif
 
 " --------------------------
