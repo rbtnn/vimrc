@@ -87,24 +87,6 @@ if !has('win32') && executable('sudo')
 	command! -nargs=0 SudoWrite    :w !sudo tee % > /dev/null
 endif
 
-if executable('git')
-	function! s:gitgrep(q_args)
-		let grepprg = &grepprg
-		let grepformat = &grepformat
-		try
-			set grepprg=git\ --no-pager\ grep\ -I\ --no-color\ -n
-			set grepformat&
-			silent! execute 'grep! ' .. a:q_args
-			copen
-		finally
-			let &grepprg = grepprg
-			let &grepformat = grepformat
-		endtry
-	endfunction
-
-	command! -nargs=* GitGrep    :call s:gitgrep(<q-args>)
-endif
-
 augroup vimrc
 	autocmd!
 	autocmd CmdlineEnter * :silent! delcommand MANPAGER
@@ -140,8 +122,8 @@ nmap     <silent><nowait>s           <Plug>(operator-replace)
 " cocopon/lightline-hybrid.vim
 " --------------------------
 let g:lightline = {
-	\ 'colorscheme': 'hybrid',
-	\ 'separator': { 'left': nr2char(0xe0b0), 'right': nr2char(0xe0b2) },
+	\   'colorscheme': 'hybrid',
+	\   'separator': { 'left': nr2char(0xe0b0), 'right': nr2char(0xe0b2) },
 	\ }
 
 " --------------------------
