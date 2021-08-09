@@ -2,16 +2,16 @@
 [include]
     path = ~/.gitconfig.local
 
+#[url "git@github.com:"]
+#    pushInsteadOf = git://github.com/
+#    pushInsteadOf = https://github.com/
+
 [user]
     name = rbtnn
     email = naru123456789@gmail.com
 
 [http]
     sslverify = false
-
-[url "git@github.com:"]
-    pushInsteadOf = git://github.com/
-    pushInsteadOf = https://github.com/
 
 [core]
     autocrlf = false

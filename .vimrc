@@ -39,7 +39,7 @@ set runtimepath=$VIMRUNTIME,$VIMRC_DOTVIM
 
 call plug#begin(expand('$VIMRC_DOTVIM/pack/my/start'))
 
-Plug 'cocopon/lightline-hybrid.vim'
+Plug 'Rigellute/rigel'
 Plug 'itchyny/lightline.vim'
 Plug 'kana/vim-operator-replace'
 Plug 'kana/vim-operator-user'
@@ -51,7 +51,6 @@ Plug 'rbtnn/vim-vimscript_lasterror'
 Plug 'rbtnn/vim-vimscript_tagfunc'
 Plug 'thinca/vim-qfreplace'
 Plug 'tyru/restart.vim'
-Plug 'w0ng/vim-hybrid'
 
 silent! source ~/.vimrc.local
 
@@ -91,13 +90,16 @@ augroup vimrc
 	autocmd!
 	autocmd CmdlineEnter * :silent! delcommand MANPAGER
 	autocmd CmdlineEnter * :silent! delcommand VimFoldh
-	autocmd ColorScheme * :highlight CursorIM       guifg=NONE guibg=#ff8888
-	autocmd ColorScheme * :highlight TabSidebar     guifg=NONE guibg=NONE    gui=NONE
-	autocmd ColorScheme * :highlight TabSidebarSel  guifg=NONE guibg=#282a2e gui=NONE
-	autocmd ColorScheme * :highlight TabSidebarFill guifg=NONE guibg=NONE    gui=NONE
-	autocmd ColorScheme * :highlight CursorLine     guifg=NONE guibg=#282a2e gui=NONE
-	autocmd ColorScheme * :highlight QuickFixLine   guifg=NONE guibg=#282a2e gui=NONE
-	autocmd ColorScheme * :highlight PmenuSel       guifg=NONE guibg=#44484e gui=NONE cterm=NONE
+	autocmd ColorScheme * :highlight CursorIM       guifg=NONE    guibg=#ff3333
+	autocmd ColorScheme * :highlight TabSidebar     guifg=NONE    guibg=NONE    gui=NONE
+	autocmd ColorScheme * :highlight TabSidebarSel  guifg=NONE    guibg=#082e3d gui=NONE
+	autocmd ColorScheme * :highlight TabSidebarFill guifg=NONE    guibg=NONE    gui=NONE
+	autocmd ColorScheme * :highlight CursorLine     guifg=NONE    guibg=#082e3d gui=NONE
+	autocmd ColorScheme * :highlight QuickFixLine   guifg=NONE    guibg=#082e3d gui=NONE
+	autocmd ColorScheme * :highlight PmenuSel       guifg=NONE    guibg=#084055 gui=NONE
+	autocmd ColorScheme * :highlight SpecialKey     guifg=#004444 guibg=NONE    gui=NONE
+	autocmd ColorScheme * :highlight DiffAdd                      guibg=NONE
+	autocmd ColorScheme * :highlight DiffDelete                   guibg=NONE
 augroup END
 
 " --------------------------
@@ -109,9 +111,8 @@ let g:restart_sessionoptions = &sessionoptions
 " rbtnn/vim-dig
 " --------------------------
 if !has('nvim')
-	nnoremap <silent><nowait><space>   :<C-u>DigFiler<cr>
+	nnoremap <silent><nowait><space>   :<C-u>DigGitLsFiles<cr>
 	nnoremap <silent><nowait><C-f>     :<C-u>DigGitDiff<cr>
-	nnoremap         <nowait><C-s>     :<C-u>DigGitGrep<space>
 endif
 
 " --------------------------
@@ -121,21 +122,21 @@ nmap     <silent><nowait>s           <Plug>(operator-replace)
 
 " --------------------------
 " itchyny/lightline.vim
-" cocopon/lightline-hybrid.vim
 " --------------------------
-let g:lightline = {
-	\   'colorscheme': 'hybrid',
-	\   'separator': { 'left': nr2char(0xe0b0), 'right': nr2char(0xe0b2) },
-	\ }
+let g:lightline = {}
+let g:lightline['colorscheme'] = 'rigel'
+if has('gui_running')
+	let g:lightline['separator'] = { 'left': nr2char(0xe0b0), 'right': nr2char(0xe0b2) }
+endif
 
 " --------------------------
-" w0ng/vim-hybrid
+" Rigellute/rigel
 " --------------------------
 if (has('win32') || (256 == &t_Co)) && has('termguicolors') && !has('gui_running')
 	set termguicolors
 endif
 set background=dark
-silent! colorscheme hybrid
+silent! colorscheme rigel
 
 filetype indent plugin on
 syntax on
