@@ -102,6 +102,8 @@ augroup vimrc
 	autocmd ColorScheme * :highlight DiffDelete                   guibg=NONE
 augroup END
 
+
+
 " --------------------------
 " tyru/restart.vim
 " --------------------------
@@ -134,6 +136,10 @@ endif
 " --------------------------
 if (has('win32') || (256 == &t_Co)) && has('termguicolors') && !has('gui_running')
 	set termguicolors
+else
+	augroup vimrc
+		autocmd ColorScheme * :highlight PmenuSel       cterm=underline
+	augroup END
 endif
 set background=dark
 silent! colorscheme rigel
