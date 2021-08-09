@@ -96,7 +96,7 @@ augroup vimrc
 	autocmd ColorScheme * :highlight TabSidebarFill guifg=NONE    guibg=NONE    gui=NONE
 	autocmd ColorScheme * :highlight CursorLine     guifg=NONE    guibg=#082e3d gui=NONE
 	autocmd ColorScheme * :highlight QuickFixLine   guifg=NONE    guibg=#082e3d gui=NONE
-	autocmd ColorScheme * :highlight PmenuSel       guifg=NONE    guibg=#084055 gui=NONE
+	autocmd ColorScheme * :highlight PmenuSel       guifg=NONE    guibg=#00384d gui=BOLD,UNDERLINE cterm=BOLD,UNDERLINE
 	autocmd ColorScheme * :highlight SpecialKey     guifg=#004444 guibg=NONE    gui=NONE
 	autocmd ColorScheme * :highlight DiffAdd                      guibg=NONE
 	autocmd ColorScheme * :highlight DiffDelete                   guibg=NONE
@@ -136,10 +136,6 @@ endif
 " --------------------------
 if (has('win32') || (256 == &t_Co)) && has('termguicolors') && !has('gui_running')
 	set termguicolors
-else
-	augroup vimrc
-		autocmd ColorScheme * :highlight PmenuSel       cterm=underline
-	augroup END
 endif
 set background=dark
 silent! colorscheme rigel
