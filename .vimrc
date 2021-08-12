@@ -15,10 +15,19 @@ set list nowrap listchars=tab:\ \ \|,trail:- fileformats=unix,dos
 set showtabline=0 laststatus=2 ambiwidth=double statusline&
 set pumheight=10 noshowmode noruler nrformats=unsigned
 set nobackup nowritebackup noswapfile undofile undodir=$VIMRC_UNDO//
-set foldmethod=indent foldlevelstart=1 isfname-==
+set foldmethod=indent foldlevelstart=999 isfname-==
 set sessionoptions=winpos,winsize,resize,buffers,curdir,tabpages
-set grepprg=internal grepformat&
 setglobal incsearch hlsearch nowrapscan ignorecase
+
+let s:win32_grep_path = 'C:/Program Files/Git/usr/bin/grep.exe'
+if executable('grep')
+	set grepformat& grepprg=grep\ -I\ --line-number
+elseif has('win32') && filereadable(s:win32_grep_path)
+	set grepformat&
+   	let &grepprg = printf('"%s" -I --line-number', s:win32_grep_path)
+else
+	set grepformat& grepprg=internal
+endif
 
 if has('tabsidebar')
 	let g:tabsidebar_vertsplit = 1
@@ -43,12 +52,12 @@ Plug 'Rigellute/rigel'
 Plug 'itchyny/lightline.vim'
 Plug 'kana/vim-operator-replace'
 Plug 'kana/vim-operator-user'
-Plug 'rbtnn/vim-dig'
 Plug 'rbtnn/vim-gloaded'
 Plug 'rbtnn/vim-grizzly'
 Plug 'rbtnn/vim-vimscript_indentexpr'
 Plug 'rbtnn/vim-vimscript_lasterror'
 Plug 'rbtnn/vim-vimscript_tagfunc'
+Plug 'rbtnn/vim9-e'
 Plug 'thinca/vim-qfreplace'
 Plug 'tyru/restart.vim'
 
@@ -88,9 +97,12 @@ endif
 
 augroup vimrc
 	autocmd!
+	autocmd WinEnter     * :verbose pwd
 	autocmd CmdlineEnter * :silent! delcommand MANPAGER
 	autocmd CmdlineEnter * :silent! delcommand VimFoldh
+	autocmd ColorScheme * :highlight Cursor         guifg=NONE    guibg=#ffffff
 	autocmd ColorScheme * :highlight CursorIM       guifg=NONE    guibg=#ff3333
+	autocmd ColorScheme * :highlight Terminal       guifg=#ffffff guibg=#000000
 	autocmd ColorScheme * :highlight TabSidebar     guifg=NONE    guibg=NONE    gui=NONE
 	autocmd ColorScheme * :highlight TabSidebarSel  guifg=NONE    guibg=#082e3d gui=NONE
 	autocmd ColorScheme * :highlight TabSidebarFill guifg=NONE    guibg=NONE    gui=NONE
@@ -102,20 +114,15 @@ augroup vimrc
 	autocmd ColorScheme * :highlight DiffDelete                   guibg=NONE
 augroup END
 
-
-
 " --------------------------
 " tyru/restart.vim
 " --------------------------
 let g:restart_sessionoptions = &sessionoptions
 
 " --------------------------
-" rbtnn/vim-dig
+" rbtnn/vim9-e
 " --------------------------
-if !has('nvim')
-	nnoremap <silent><nowait><space>   :<C-u>DigGitLsFiles<cr>
-	nnoremap <silent><nowait><C-f>     :<C-u>DigGitDiff<cr>
-endif
+nnoremap <silent><nowait><expr><space> isdirectory(expand('%:h')) ? ':<C-u>EFiler %:h<cr>' : ':<C-u>EFiler<cr>'
 
 " --------------------------
 " kana/vim-operator-replace
