@@ -15,16 +15,16 @@ set list nowrap listchars=tab:\ \ \|,trail:- fileformats=unix,dos
 set showtabline=0 laststatus=2 ambiwidth=double statusline&
 set pumheight=10 noshowmode noruler nrformats=unsigned
 set nobackup nowritebackup noswapfile undofile undodir=$VIMRC_UNDO//
-set foldmethod=indent foldlevelstart=999 isfname-==
+set foldmethod=indent foldlevelstart=999 isfname-== complete-=t
 set sessionoptions=winpos,winsize,resize,buffers,curdir,tabpages
 setglobal incsearch hlsearch nowrapscan ignorecase
 
 let s:win32_grep_path = 'C:/Program Files/Git/usr/bin/grep.exe'
 if executable('grep')
-	set grepformat& grepprg=grep\ -I\ --line-number
+	set grepformat& grepprg=grep\ -I\ --line-number\ --with-filename
 elseif has('win32') && filereadable(s:win32_grep_path)
 	set grepformat&
-   	let &grepprg = printf('"%s" -I --line-number', s:win32_grep_path)
+   	let &grepprg = printf('"%s" -I --line-number --with-filename', s:win32_grep_path)
 else
 	set grepformat& grepprg=internal
 endif
@@ -48,8 +48,6 @@ set runtimepath=$VIMRUNTIME,$VIMRC_DOTVIM
 
 call plug#begin(expand('$VIMRC_DOTVIM/pack/my/start'))
 
-Plug 'Rigellute/rigel'
-Plug 'itchyny/lightline.vim'
 Plug 'kana/vim-operator-replace'
 Plug 'kana/vim-operator-user'
 Plug 'rbtnn/vim-gloaded'
@@ -58,8 +56,10 @@ Plug 'rbtnn/vim-vimscript_indentexpr'
 Plug 'rbtnn/vim-vimscript_lasterror'
 Plug 'rbtnn/vim-vimscript_tagfunc'
 Plug 'rbtnn/vim9-e'
+Plug 'rhysd/vim-color-spring-night'
 Plug 'thinca/vim-qfreplace'
 Plug 'tyru/restart.vim'
+Plug 'vim-airline/vim-airline'
 
 silent! source ~/.vimrc.local
 
@@ -97,21 +97,10 @@ endif
 
 augroup vimrc
 	autocmd!
-	autocmd WinEnter     * :verbose pwd
-	autocmd CmdlineEnter * :silent! delcommand MANPAGER
-	autocmd CmdlineEnter * :silent! delcommand VimFoldh
-	autocmd ColorScheme * :highlight Cursor         guifg=NONE    guibg=#ffffff
-	autocmd ColorScheme * :highlight CursorIM       guifg=NONE    guibg=#ff3333
-	autocmd ColorScheme * :highlight Terminal       guifg=#ffffff guibg=#000000
-	autocmd ColorScheme * :highlight TabSidebar     guifg=NONE    guibg=NONE    gui=NONE
-	autocmd ColorScheme * :highlight TabSidebarSel  guifg=NONE    guibg=#082e3d gui=NONE
-	autocmd ColorScheme * :highlight TabSidebarFill guifg=NONE    guibg=NONE    gui=NONE
-	autocmd ColorScheme * :highlight CursorLine     guifg=NONE    guibg=#082e3d gui=NONE
-	autocmd ColorScheme * :highlight QuickFixLine   guifg=NONE    guibg=#082e3d gui=NONE
-	autocmd ColorScheme * :highlight PmenuSel       guifg=NONE    guibg=#00384d gui=BOLD,UNDERLINE cterm=BOLD,UNDERLINE
-	autocmd ColorScheme * :highlight SpecialKey     guifg=#004444 guibg=NONE    gui=NONE
-	autocmd ColorScheme * :highlight DiffAdd                      guibg=NONE
-	autocmd ColorScheme * :highlight DiffDelete                   guibg=NONE
+	autocmd CmdlineEnter     * :silent! delcommand MANPAGER
+	autocmd CmdlineEnter     * :silent! delcommand VimFoldh
+	autocmd ColorScheme      * :highlight Terminal       guifg=#ffffff guibg=#000000
+	autocmd ColorScheme      * :highlight PmenuSel       guifg=NONE    guibg=#3a4b5c gui=BOLD,UNDERLINE cterm=BOLD,UNDERLINE
 augroup END
 
 " --------------------------
@@ -122,7 +111,7 @@ let g:restart_sessionoptions = &sessionoptions
 " --------------------------
 " rbtnn/vim9-e
 " --------------------------
-nnoremap <silent><nowait><expr><space> isdirectory(expand('%:h')) ? ':<C-u>EFiler %:h<cr>' : ':<C-u>EFiler<cr>'
+nnoremap <silent><nowait><space>     :<C-u>EFiler<cr>
 
 " --------------------------
 " kana/vim-operator-replace
@@ -130,22 +119,23 @@ nnoremap <silent><nowait><expr><space> isdirectory(expand('%:h')) ? ':<C-u>EFile
 nmap     <silent><nowait>s           <Plug>(operator-replace)
 
 " --------------------------
-" itchyny/lightline.vim
+" vim-airline/vim-airline
 " --------------------------
-let g:lightline = {}
-let g:lightline['colorscheme'] = 'rigel'
+let g:airline_theme = 'spring_night'
 if has('gui_running')
-	let g:lightline['separator'] = { 'left': nr2char(0xe0b0), 'right': nr2char(0xe0b2) }
+	let g:airline_left_sep = nr2char(0xe0b0)
+	let g:airline_right_sep = nr2char(0xe0b2)
 endif
 
 " --------------------------
-" Rigellute/rigel
+" rhysd/vim-color-spring-night
 " --------------------------
 if (has('win32') || (256 == &t_Co)) && has('termguicolors') && !has('gui_running')
 	set termguicolors
 endif
+let g:spring_night_kill_italic = 1
 set background=dark
-silent! colorscheme rigel
+silent! colorscheme spring-night
 
 filetype indent plugin on
 syntax on
