@@ -122,6 +122,7 @@ nmap     <silent><nowait>s           <Plug>(operator-replace)
 " vim-airline/vim-airline
 " --------------------------
 let g:airline_theme = 'spring_night'
+let g:airline#extensions#default#layout = [ [ 'a', 'c'], [ 'x', 'y' ]]
 if has('gui_running')
 	let g:airline_left_sep = nr2char(0xe0b0)
 	let g:airline_right_sep = nr2char(0xe0b2)
