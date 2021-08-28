@@ -57,6 +57,7 @@ Plug 'rbtnn/vim-vimscript_lasterror'
 Plug 'rbtnn/vim-vimscript_tagfunc'
 Plug 'rbtnn/vim9-e'
 Plug 'rhysd/vim-color-spring-night'
+Plug 'thinca/vim-prettyprint'
 Plug 'thinca/vim-qfreplace'
 Plug 'tyru/restart.vim'
 Plug 'vim-airline/vim-airline'
@@ -91,16 +92,31 @@ inoremap <silent><tab>               <C-v><tab>
 nnoremap <silent><C-n>               <Cmd>cnext<cr>
 nnoremap <silent><C-p>               <Cmd>cprevious<cr>
 
+nnoremap <silent><C-j>               <Cmd>tabnext<cr>
+tnoremap <silent><C-j>               <Cmd>tabnext<cr>
+nnoremap <silent><C-k>               <Cmd>tabprevious<cr>
+tnoremap <silent><C-k>               <Cmd>tabprevious<cr>
+
 if !has('win32') && executable('sudo')
 	command! -nargs=0 SudoWrite    :w !sudo tee % > /dev/null
 endif
 
 augroup vimrc
 	autocmd!
-	autocmd CmdlineEnter     * :silent! delcommand MANPAGER
-	autocmd CmdlineEnter     * :silent! delcommand VimFoldh
-	autocmd ColorScheme      * :highlight Terminal       guifg=#ffffff guibg=#000000
-	autocmd ColorScheme      * :highlight PmenuSel       guifg=NONE    guibg=#3a4b5c gui=BOLD,UNDERLINE cterm=BOLD,UNDERLINE
+	autocmd CmdlineEnter     * {
+		silent! delcommand MANPAGER
+		silent! delcommand VimFoldh
+	}
+	autocmd ColorScheme      * {
+		highlight Pmenu          guifg=#ffffff guibg=#000000
+		highlight PmenuSel       guifg=#a9dd9d guibg=#000000 gui=BOLD,UNDERLINE cterm=BOLD,UNDERLINE
+		highlight SpecialKey     guifg=#203040
+		highlight TabLine        guifg=#fffeeb guibg=#132132 gui=NONE
+		highlight TabLineFill    guifg=#132132 guibg=NONE
+		highlight TabLineSel     guifg=#fedf81 guibg=#132132
+		highlight Terminal       guifg=#ffffff guibg=#000000
+		highlight VertSplit      guifg=#132132 guibg=#536273
+	}
 augroup END
 
 " --------------------------
@@ -122,7 +138,7 @@ nmap     <silent><nowait>s           <Plug>(operator-replace)
 " vim-airline/vim-airline
 " --------------------------
 let g:airline_theme = 'spring_night'
-let g:airline#extensions#default#layout = [ [ 'a', 'c'], [ 'x', 'y' ]]
+let g:airline#extensions#default#layout = [['a', 'c'], ['x', 'y']]
 if has('gui_running')
 	let g:airline_left_sep = nr2char(0xe0b0)
 	let g:airline_right_sep = nr2char(0xe0b2)
@@ -134,6 +150,7 @@ endif
 if (has('win32') || (256 == &t_Co)) && has('termguicolors') && !has('gui_running')
 	set termguicolors
 endif
+let g:spring_night_high_contrast = 1
 let g:spring_night_kill_italic = 1
 set background=dark
 silent! colorscheme spring-night
