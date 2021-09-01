@@ -48,6 +48,7 @@ set runtimepath=$VIMRUNTIME,$VIMRC_DOTVIM
 
 call plug#begin(expand('$VIMRC_DOTVIM/pack/my/start'))
 
+Plug 'itchyny/lightline.vim'
 Plug 'kana/vim-operator-replace'
 Plug 'kana/vim-operator-user'
 Plug 'rbtnn/vim-gloaded'
@@ -60,7 +61,6 @@ Plug 'rhysd/vim-color-spring-night'
 Plug 'thinca/vim-prettyprint'
 Plug 'thinca/vim-qfreplace'
 Plug 'tyru/restart.vim'
-Plug 'vim-airline/vim-airline'
 
 silent! source ~/.vimrc.local
 
@@ -103,6 +103,7 @@ endif
 
 augroup vimrc
 	autocmd!
+	autocmd QuickFixCmdPost  * :copen
 	autocmd CmdlineEnter     * {
 		silent! delcommand MANPAGER
 		silent! delcommand VimFoldh
@@ -135,13 +136,12 @@ nnoremap <silent><nowait><space>     :<C-u>EFiler<cr>
 nmap     <silent><nowait>s           <Plug>(operator-replace)
 
 " --------------------------
-" vim-airline/vim-airline
+" itchyny/lightline.vim
 " --------------------------
-let g:airline_theme = 'spring_night'
-let g:airline#extensions#default#layout = [['a', 'c'], ['x', 'y']]
+let g:lightline = {}
+let g:lightline['colorscheme'] = 'simpleblack'
 if has('gui_running')
-	let g:airline_left_sep = nr2char(0xe0b0)
-	let g:airline_right_sep = nr2char(0xe0b2)
+	let g:lightline['separator'] = { 'left': nr2char(0xe0b0), 'right': nr2char(0xe0b2) }
 endif
 
 " --------------------------
