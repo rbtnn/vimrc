@@ -189,9 +189,19 @@ function! s:system_for_gitdiff(cmd, cwd) abort
 				let lines[i] = iconv(lines[i], 'utf-8', &encoding)
 			endif
 		else
-			let xs = s:iconv(lines[i], enc_from)
-			let lines[i] = xs[0]
-			let enc_from = xs[1]
+			if empty(enc_from)
+				" check if the line contains a multibyte-character.
+				if 0 < len(filter(split(lines[i], '\zs'), { _, x -> 0x80 < char2nr(x) }))
+					if s:is_utf8(lines[i])
+						let enc_from = 'utf-8'
+					else
+						let enc_from = 'shift_jis'
+					endif
+				endif
+			endif
+			if !empty(enc_from) && (enc_from != &encoding)
+				let lines[i] = iconv(lines[i], enc_from, &encoding)
+			endif
 		endif
 	endfor
 	return lines
@@ -205,25 +215,6 @@ function! s:system_for_gitoutput(cmd, cwd) abort
 		endfor
 	endif
 	return lines
-endfunction
-
-function! s:iconv(line, enc_from) abort
-	let e = a:enc_from
-	if empty(e)
-		" check if the line contains a multibyte-character.
-		"if 0 < len(filter(split(a:line, '\zs'), { _, x -> 0x80 < char2nr(x) }))
-		if s:is_utf8(a:line)
-			let e = 'utf-8'
-		else
-			let e = 'shift_jis'
-		endif
-		"endif
-	endif
-	if empty(e) || (e == &encoding)
-		return [a:line, e]
-	else
-		return [iconv(a:line, e, &encoding), e]
-	endif
 endfunction
 
 function s:system_onevnet(d, job, data, event) abort

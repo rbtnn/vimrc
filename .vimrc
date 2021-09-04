@@ -102,12 +102,12 @@ if !has('win32') && executable('sudo')
 	command! -nargs=0 SudoWrite    :w !sudo tee % > /dev/null
 endif
 
-function! s:cmdlineenter() abort
+function! s:autocmd_cmdlineenter() abort
 	silent! delcommand MANPAGER
 	silent! delcommand VimFoldh
 endfunction
 
-function! s:colorscheme() abort
+function! s:autocmd_colorscheme() abort
 	highlight Pmenu        guifg=#d6d6d6 guibg=NONE
 	highlight PmenuSel     guifg=#a9dd9d guibg=NONE    gui=BOLD,UNDERLINE cterm=BOLD,UNDERLINE
 	highlight PmenuSbar    guibg=#202020 guifg=#000000 gui=NONE
@@ -125,8 +125,8 @@ endfunction
 augroup vimrc
 	autocmd!
 	autocmd QuickFixCmdPost  * :copen
-	autocmd CmdlineEnter     * :call s:cmdlineenter()
-	autocmd ColorScheme      * :call s:colorscheme()
+	autocmd CmdlineEnter     * :call s:autocmd_cmdlineenter()
+	autocmd ColorScheme      * :call s:autocmd_colorscheme()
 augroup END
 
 " --------------------------
