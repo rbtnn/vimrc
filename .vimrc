@@ -48,6 +48,7 @@ set runtimepath=$VIMRUNTIME,$VIMRC_DOTVIM
 
 call plug#begin(expand('$VIMRC_DOTVIM/pack/my/start'))
 
+Plug 'danilo-augusto/vim-afterglow'
 Plug 'itchyny/lightline.vim'
 Plug 'kana/vim-operator-replace'
 Plug 'kana/vim-operator-user'
@@ -56,8 +57,6 @@ Plug 'rbtnn/vim-grizzly'
 Plug 'rbtnn/vim-vimscript_indentexpr'
 Plug 'rbtnn/vim-vimscript_lasterror'
 Plug 'rbtnn/vim-vimscript_tagfunc'
-Plug 'rbtnn/vim9-e'
-Plug 'rhysd/vim-color-spring-night'
 Plug 'thinca/vim-prettyprint'
 Plug 'thinca/vim-qfreplace'
 Plug 'tyru/restart.vim'
@@ -89,6 +88,8 @@ endif
 
 inoremap <silent><tab>               <C-v><tab>
 
+nnoremap <silent><space>             <Cmd>GitDiff<cr>
+
 nnoremap <silent><C-n>               <Cmd>cnext<cr>
 nnoremap <silent><C-p>               <Cmd>cprevious<cr>
 
@@ -101,23 +102,31 @@ if !has('win32') && executable('sudo')
 	command! -nargs=0 SudoWrite    :w !sudo tee % > /dev/null
 endif
 
+function! s:cmdlineenter() abort
+	silent! delcommand MANPAGER
+	silent! delcommand VimFoldh
+endfunction
+
+function! s:colorscheme() abort
+	highlight Pmenu        guifg=#d6d6d6 guibg=NONE
+	highlight PmenuSel     guifg=#a9dd9d guibg=NONE    gui=BOLD,UNDERLINE cterm=BOLD,UNDERLINE
+	highlight PmenuSbar    guibg=#202020 guifg=#000000 gui=NONE
+	highlight PmenuThumb   guibg=#606060 guifg=#000000 gui=NONE
+	highlight SpecialKey   guifg=#1a242e
+	highlight StatusLine   guifg=#d6d6d6 guibg=#000000 gui=NONE           cterm=NONE
+	highlight TabLine      guifg=#d6d6d6 guibg=NONE    gui=NONE           cterm=NONE
+	highlight TabLineFill  guifg=#1a1a1a guibg=NONE    gui=NONE           cterm=NONE
+	highlight TabLineSel   guifg=#a9dd9d guibg=NONE    gui=NONE           cterm=NONE
+	highlight Terminal     guifg=#d6d6d6 guibg=#000000 gui=NONE           cterm=NONE
+	highlight VertSplit    guifg=#5a647e guibg=NONE
+	highlight WildMenu     guifg=#a9dd9d guibg=#000000 gui=NONE           cterm=NONE
+endfunction
+
 augroup vimrc
 	autocmd!
 	autocmd QuickFixCmdPost  * :copen
-	autocmd CmdlineEnter     * {
-		silent! delcommand MANPAGER
-		silent! delcommand VimFoldh
-	}
-	autocmd ColorScheme      * {
-		highlight Pmenu          guifg=#ffffff guibg=#000000
-		highlight PmenuSel       guifg=#a9dd9d guibg=#000000 gui=BOLD,UNDERLINE cterm=BOLD,UNDERLINE
-		highlight SpecialKey     guifg=#203040
-		highlight TabLine        guifg=#fffeeb guibg=#132132 gui=NONE
-		highlight TabLineFill    guifg=#132132 guibg=NONE
-		highlight TabLineSel     guifg=#fedf81 guibg=#132132
-		highlight Terminal       guifg=#ffffff guibg=#000000
-		highlight VertSplit      guifg=#132132 guibg=#536273
-	}
+	autocmd CmdlineEnter     * :call s:cmdlineenter()
+	autocmd ColorScheme      * :call s:colorscheme()
 augroup END
 
 " --------------------------
@@ -126,14 +135,9 @@ augroup END
 let g:restart_sessionoptions = &sessionoptions
 
 " --------------------------
-" rbtnn/vim9-e
-" --------------------------
-nnoremap <silent><nowait><space>     :<C-u>EFiler<cr>
-
-" --------------------------
 " kana/vim-operator-replace
 " --------------------------
-nmap     <silent><nowait>s           <Plug>(operator-replace)
+nmap     <silent><nowait>s   <Plug>(operator-replace)
 
 " --------------------------
 " itchyny/lightline.vim
@@ -145,15 +149,12 @@ if has('gui_running')
 endif
 
 " --------------------------
-" rhysd/vim-color-spring-night
+" danilo-augusto/vim-afterglow
 " --------------------------
 if (has('win32') || (256 == &t_Co)) && has('termguicolors') && !has('gui_running')
 	set termguicolors
 endif
-let g:spring_night_high_contrast = 1
-let g:spring_night_kill_italic = 1
-set background=dark
-silent! colorscheme spring-night
+silent! colorscheme afterglow
 
 filetype indent plugin on
 syntax on
