@@ -113,6 +113,7 @@ function! s:autocmd_colorscheme() abort
 	highlight PmenuSbar    guibg=#202020 guifg=#000000 gui=NONE
 	highlight PmenuThumb   guibg=#606060 guifg=#000000 gui=NONE
 	highlight SpecialKey   guifg=#1a242e
+	highlight NonText      guifg=#1a242e
 	highlight StatusLine   guifg=#d6d6d6 guibg=#000000 gui=NONE           cterm=NONE
 	highlight TabLine      guifg=#d6d6d6 guibg=NONE    gui=NONE           cterm=NONE
 	highlight TabLineFill  guifg=#1a1a1a guibg=NONE    gui=NONE           cterm=NONE
@@ -144,7 +145,7 @@ nmap     <silent><nowait>s   <Plug>(operator-replace)
 " --------------------------
 let g:lightline = {}
 let g:lightline['colorscheme'] = 'simpleblack'
-if has('gui_running')
+if &guifont =~# 'Cica'
 	let g:lightline['separator'] = { 'left': nr2char(0xe0b0), 'right': nr2char(0xe0b2) }
 endif
 
