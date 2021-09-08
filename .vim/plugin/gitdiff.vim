@@ -1,6 +1,9 @@
 
 let g:loaded_gitdiff = 1
 
+let s:TYPE_NUMSTAT = 'TYPE_NUMSTAT'
+let s:TYPE_SHOWDIFF = 'TYPE_SHOWDIFF'
+
 command! -nargs=* GitDiff  :call s:gitdiffnumstat_open(<q-args>)
 
 let s:this_script_id = expand('<SID>')
@@ -12,7 +15,7 @@ function! s:gitdiffnumstat_open(q_args) abort
 	elseif empty(rootdir)
 		call s:errormsg('current directory is not a git repository.')
 	else
-		new
+		call s:open_window(s:TYPE_NUMSTAT)
 		call s:gitdiffnumstat_setlines(rootdir, split(a:q_args, '\s\+'))
 	endif
 endfunction
@@ -43,7 +46,7 @@ function! s:gitdiffshowdiff_open(rootdir, args_list) abort
 	if !empty(line)
 		let m = matchlist(line, '^\s*+\d\+\s\+-\d\+\s\+\(.*\)$')
 		if !empty(m)
-			new
+			call s:open_window(s:TYPE_SHOWDIFF)
 			call s:gitdiffshowdiff_setlines(a:rootdir, a:args_list, s:fixpath(a:rootdir .. '/' .. m[1]))
 		endif
 	endif
@@ -60,8 +63,24 @@ function! s:gitdiffshowdiff_setlines(rootdir, args_list, fullpath) abort
 	call winrestview(view)
 endfunction
 
+function! s:open_window(t) abort
+	let exists = v:false
+	for w in filter(getwininfo(), { _, x -> x['tabnr'] == tabpagenr() })
+		let x = getbufvar(w['bufnr'], 'gitdiff', {})
+		if get(x, 'type', '') == a:t
+			execute printf('%dwincmd w', w['winnr'])
+			let exists = v:true
+			break
+		endif
+	endfor
+	if !exists
+		new
+		let b:gitdiff = { 'type': a:t, }
+	endif
+endfunction
+
 function! s:buffer_nnoremap(lhs, funcname, args) abort
-	let format = 'nnoremap <buffer>%s <Cmd>call %s%s(' .. join(repeat(['%s'], len(a:args)), ',') .. ')<cr>'
+	let format = 'nnoremap <silent><buffer>%s :<C-u>call %s%s(' .. join(repeat(['%s'], len(a:args)), ',') .. ')<cr>'
 	let args = [format, a:lhs, s:this_script_id, a:funcname] + map(a:args, { i, x -> string(x) })
 	execute call('printf', args)
 endfunction
