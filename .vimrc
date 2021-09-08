@@ -115,7 +115,7 @@ function! s:autocmd_vimenter() abort
 	endif
 
 	silent! colorscheme afterglow
-	if g:colors_name == 'afterglow'
+	if get(g:, 'colors_name', '') == 'afterglow'
 		highlight Pmenu        guifg=#d6d6d6 guibg=NONE
 		highlight PmenuSel     guifg=#a9dd9d guibg=NONE    gui=BOLD,UNDERLINE cterm=BOLD,UNDERLINE
 		highlight PmenuSbar    guibg=#202020 guifg=#000000 gui=NONE
