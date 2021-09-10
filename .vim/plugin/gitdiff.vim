@@ -38,6 +38,7 @@ function! s:gitdiffnumstat_setlines(rootdir, args_list) abort
 	call s:buffer_nnoremap('<cr>', 'gitdiffshowdiff_open', [a:rootdir, a:args_list])
 	call s:buffer_nnoremap('<space>', 'gitdiffshowdiff_open', [a:rootdir, a:args_list])
 	call s:buffer_nnoremap('w', 'gitdiffnumstat_setlines', [a:rootdir, s:toggle_w(a:args_list)])
+	call s:buffer_nnoremap('r', 'gitdiffnumstat_setlines', [a:rootdir, a:args_list])
 	call winrestview(view)
 endfunction
 
@@ -60,6 +61,7 @@ function! s:gitdiffshowdiff_setlines(rootdir, args_list, fullpath) abort
 	call s:buffer_nnoremap('<cr>', 'gitdiff_jumpdiffline', [a:fullpath])
 	call s:buffer_nnoremap('<space>', 'gitdiff_jumpdiffline', [a:fullpath])
 	call s:buffer_nnoremap('w', 'gitdiffshowdiff_setlines', [a:rootdir, s:toggle_w(a:args_list), a:fullpath])
+	call s:buffer_nnoremap('r', 'gitdiffshowdiff_setlines', [a:rootdir, a:args_list, a:fullpath])
 	call winrestview(view)
 endfunction
 
@@ -89,6 +91,7 @@ function! s:setlines(rootdir, cmd, lines, ft) abort
 	setlocal modifiable noreadonly
 	silent! call deletebufline(bufnr(), 1, '$')
 	call setbufline(bufnr(), 1, [
+		\ '# ' .. (strftime('%c')),
 		\ '# ' .. a:rootdir,
 		\ '# ' .. join(a:cmd)
 		\ ] + a:lines)
@@ -97,12 +100,13 @@ function! s:setlines(rootdir, cmd, lines, ft) abort
 endfunction
 
 function! s:toggle_w(args_list) abort
-	if -1 != index(a:args_list, '-w')
-		call remove(a:args_list, '-w')
+	let args_list = deepcopy(a:args_list)
+	if -1 != index(args_list, '-w')
+		call remove(args_list, '-w')
 	else
-		call insert(a:args_list, '-w')
+		call insert(args_list, '-w')
 	endif
-	return a:args_list
+	return args_list
 endfunction
 
 function! s:gitdiff_jumpdiffline(fullpath) abort
