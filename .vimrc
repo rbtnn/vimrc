@@ -23,7 +23,7 @@ set tabstop=4
 
 " cmdline
 set cmdwinheight=5
-set cmdheight=1
+set cmdheight=2
 
 " backup/swap/undo
 set nobackup
@@ -36,8 +36,9 @@ set undodir=$VIMRC_UNDO//
 set laststatus=2
 set statusline&
 set showtabline=0
-set noshowmode
-set noruler
+set showmode
+set ruler
+set rulerformat=%16(%{&ft}/%{&ff}/%{&fileencoding}%)
 
 " complete
 set pumheight=10
@@ -106,7 +107,6 @@ set runtimepath=$VIMRUNTIME,$VIMRC_DOTVIM
 call plug#begin(expand('$VIMRC_DOTVIM/pack/my/start'))
 
 call plug#('danilo-augusto/vim-afterglow')
-call plug#('itchyny/lightline.vim')
 call plug#('kana/vim-operator-replace')
 call plug#('kana/vim-operator-user')
 call plug#('rbtnn/vim-gloaded')
@@ -163,7 +163,7 @@ tnoremap <silent><nowait><C-k>           <Cmd>tabprevious<cr>
 
 " normal keymappings
 nmap     <silent><nowait>s               <Plug>(operator-replace)
-nnoremap <silent><nowait><space>         <Cmd>GitDiff<cr>
+nnoremap <silent><nowait><space>         <Cmd>FocusTerminal<cr>
 nnoremap <silent><nowait><C-n>           <Cmd>cnext<cr>
 nnoremap <silent><nowait><C-p>           <Cmd>cprevious<cr>
 nnoremap <silent><nowait><C-j>           <Cmd>tabnext<cr>
@@ -185,12 +185,6 @@ endif
 
 let g:vim_indent_cont = &g:shiftwidth
 let g:restart_sessionoptions = &sessionoptions
-
-let g:lightline = {}
-let g:lightline['colorscheme'] = 'simpleblack'
-if (&guifont =~# 'Cica') && (&encoding == 'utf-8')
-	let g:lightline['separator'] = { 'left': nr2char(0xe0b0), 'right': nr2char(0xe0b2) }
-endif
 
 if (has('win32') || (256 == &t_Co)) && has('termguicolors') && !has('gui_running')
 	set termguicolors
