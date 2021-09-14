@@ -104,6 +104,10 @@ silent! source $VIMRC_DOTVIM/pack/my/start/vim-gloaded/plugin/gloaded.vim
 
 set runtimepath=$VIMRUNTIME,$VIMRC_DOTVIM
 
+let g:vim_indent_cont = &g:shiftwidth
+let g:plug_url_format = 'https://github.com/%s.git'
+let g:restart_sessionoptions = &sessionoptions
+
 call plug#begin(expand('$VIMRC_DOTVIM/pack/my/start'))
 
 call plug#('danilo-augusto/vim-afterglow')
@@ -123,7 +127,7 @@ call plug#end()
 
 augroup vimrc
 	autocmd!
-	autocmd QuickFixCmdPost  * :copen
+	autocmd QuickFixCmdPost  * :QfIconv | copen
 	autocmd CmdlineEnter     *
 		\ : for s:cmdname in ['MANPAGER', 'VimFoldh', 'Plug', 'PlugDiff', 'PlugInstall', 'PlugSnapshot', 'PlugStatus', 'PlugUpgrade']
 		\ | 	execute printf('silent! delcommand %s', s:cmdname)
@@ -177,14 +181,12 @@ cnoremap         <nowait><C-b>           <left>
 cnoremap         <nowait><C-f>           <right>
 cnoremap         <nowait><C-e>           <end>
 cnoremap         <nowait><C-a>           <home>
+cnoremap         <nowait><C-q>           <C-f>
 cnoremap   <expr><nowait><space>         wildmenumode() ? '<space><bs>' : '<space>'
 
 if !has('win32') && executable('sudo')
 	command! -nargs=0 SudoWrite    :w !sudo tee % > /dev/null
 endif
-
-let g:vim_indent_cont = &g:shiftwidth
-let g:restart_sessionoptions = &sessionoptions
 
 if (has('win32') || (256 == &t_Co)) && has('termguicolors') && !has('gui_running')
 	set termguicolors
