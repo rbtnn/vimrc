@@ -83,12 +83,17 @@ if has('win32')
 endif
 
 let s:win32_grep_path = 'C:/Program Files/Git/usr/bin/grep.exe'
-set grepformat&
-if executable('grep')
+if executable('rg')
+	set grepformat=%f:%l:%c:%m
+	set grepprg=rg\ --vimgrep\ --hidden
+elseif executable('grep')
+	set grepformat&
 	set grepprg=grep\ -I\ --line-number\ --with-filename
 elseif has('win32') && filereadable(s:win32_grep_path)
+	set grepformat&
 	let &grepprg = printf('"%s" -I --line-number --with-filename', s:win32_grep_path)
 else
+	set grepformat&
 	set grepprg=internal
 endif
 
