@@ -4,7 +4,6 @@ scriptencoding utf-8
 let $MYVIMRC = resolve($MYVIMRC)
 let $VIMRC_ROOT = expand('<sfile>:h')
 let $VIMRC_DOTVIM = expand('$VIMRC_ROOT/.vim')
-let $VIMRC_UNDO = expand('$VIMRC_DOTVIM/undofiles')
 
 " system
 set langmenu=en_gb.latin1
@@ -25,12 +24,20 @@ set tabstop=4
 set cmdwinheight=5
 set cmdheight=2
 
-" backup/swap/undo
+" backup/swap
 set nobackup
 set nowritebackup
 set noswapfile
+
+" undo
+if has('nvim')
+	let $VIMRC_UNDO = expand('$VIMRC_DOTVIM/undofiles/neovim')
+else
+	let $VIMRC_UNDO = expand('$VIMRC_DOTVIM/undofiles/vim')
+endif
 set undofile
 set undodir=$VIMRC_UNDO//
+silent! call mkdir($VIMRC_UNDO, 'p')
 
 " statusline/tabline/ruler/mode
 set laststatus=2
@@ -104,7 +111,6 @@ if !has('nvim') && has('win32') && !filereadable(expand('~/AppData/Local/nvim/in
 	call writefile(['silent! source ~/.vimrc'], s:initdir .. '/init.vim')
 endif
 
-silent! call mkdir($VIMRC_UNDO, 'p')
 silent! source $VIMRC_DOTVIM/pack/my/start/vim-gloaded/plugin/gloaded.vim
 
 set runtimepath=$VIMRUNTIME,$VIMRC_DOTVIM
@@ -112,12 +118,14 @@ set runtimepath=$VIMRUNTIME,$VIMRC_DOTVIM
 let g:vim_indent_cont = &g:shiftwidth
 let g:plug_url_format = 'https://github.com/%s.git'
 let g:restart_sessionoptions = &sessionoptions
+let g:molder_show_hidden = 1
 
 call plug#begin(expand('$VIMRC_DOTVIM/pack/my/start'))
 
 call plug#('danilo-augusto/vim-afterglow')
 call plug#('kana/vim-operator-replace')
 call plug#('kana/vim-operator-user')
+call plug#('mattn/vim-molder')
 call plug#('rbtnn/vim-gloaded')
 call plug#('rbtnn/vim-grizzly')
 call plug#('rbtnn/vim-vimscript_indentexpr')
@@ -132,7 +140,11 @@ call plug#end()
 
 augroup vimrc
 	autocmd!
-	autocmd QuickFixCmdPost  * :QfIconv | copen
+	autocmd QuickFixCmdPost  *
+		\ :copen
+	autocmd FileType         molder
+		\ :nnoremap <silent><buffer>l   :<c-u>call molder#open()<cr>
+		\ |nnoremap <silent><buffer>h   :<c-u>call molder#up()<cr>
 	autocmd CmdlineEnter     *
 		\ : for s:cmdname in ['MANPAGER', 'VimFoldh', 'Plug', 'PlugDiff', 'PlugInstall', 'PlugSnapshot', 'PlugStatus', 'PlugUpgrade']
 		\ | 	execute printf('silent! delcommand %s', s:cmdname)
@@ -172,7 +184,6 @@ tnoremap <silent><nowait><C-k>           <Cmd>tabprevious<cr>
 
 " normal keymappings
 nmap     <silent><nowait>s               <Plug>(operator-replace)
-nnoremap <silent><nowait><space>         <Cmd>FocusTerminal<cr>
 nnoremap <silent><nowait><C-n>           <Cmd>cnext<cr>
 nnoremap <silent><nowait><C-p>           <Cmd>cprevious<cr>
 nnoremap <silent><nowait><C-j>           <Cmd>tabnext<cr>
