@@ -239,7 +239,7 @@ function! s:system_for_gitoutput(cmd, cwd) abort
 	return lines
 endfunction
 
-function s:system_onevnet(d, job, data, event) abort
+function s:system_onevent(d, job, data, event) abort
 	let a:d['lines'] += a:data
 endfunction
 
@@ -248,8 +248,8 @@ function s:system(cmd, cwd) abort
 	if has('nvim')
 		let job = jobstart(a:cmd, {
 			\ 'cwd': a:cwd,
-			\ 'on_stdout': function('s:system_onevnet', [{ 'lines': lines, }]),
-			\ 'on_stderr': function('s:system_onevnet', [{ 'lines': lines, }]),
+			\ 'on_stdout': function('s:system_onevent', [{ 'lines': lines, }]),
+			\ 'on_stderr': function('s:system_onevent', [{ 'lines': lines, }]),
 			\ })
 		call jobwait([job])
 	else

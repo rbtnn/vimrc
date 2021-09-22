@@ -89,16 +89,9 @@ if has('win32')
 	set wildignore+=NTUSER.DAT*,*.dll,*.exe,desktop.ini,*.lnk
 endif
 
-let s:win32_grep_path = 'C:/Program Files/Git/usr/bin/grep.exe'
 if executable('rg')
 	set grepformat=%f:%l:%c:%m
-	set grepprg=rg\ --vimgrep\ --hidden
-elseif executable('grep')
-	set grepformat&
-	set grepprg=grep\ -I\ --line-number\ --with-filename
-elseif has('win32') && filereadable(s:win32_grep_path)
-	set grepformat&
-	let &grepprg = printf('"%s" -I --line-number --with-filename', s:win32_grep_path)
+	set grepprg=rg\ --vimgrep
 else
 	set grepformat&
 	set grepprg=internal
@@ -128,6 +121,7 @@ call plug#('kana/vim-operator-user')
 call plug#('mattn/vim-molder')
 call plug#('rbtnn/vim-gloaded')
 call plug#('rbtnn/vim-grizzly')
+call plug#('rbtnn/vim-mrw')
 call plug#('rbtnn/vim-vimscript_indentexpr')
 call plug#('rbtnn/vim-vimscript_lasterror')
 call plug#('rbtnn/vim-vimscript_tagfunc')
@@ -188,6 +182,7 @@ nnoremap <silent><nowait><C-n>           <Cmd>cnext<cr>
 nnoremap <silent><nowait><C-p>           <Cmd>cprevious<cr>
 nnoremap <silent><nowait><C-j>           <Cmd>tabnext<cr>
 nnoremap <silent><nowait><C-k>           <Cmd>tabprevious<cr>
+nnoremap <silent><nowait><space>         <Cmd>MRW<cr>
 
 " insert keymappings
 inoremap <silent><nowait><tab>           <C-v><tab>
