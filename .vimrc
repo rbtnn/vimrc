@@ -67,6 +67,10 @@ set hlsearch
 set nowrapscan
 set ignorecase
 
+" vimgrep
+set grepformat&
+set grepprg=internal
+
 " others
 set autoread
 set keywordprg=:help
@@ -89,14 +93,6 @@ if has('win32')
 	set wildignore+=NTUSER.DAT*,*.dll,*.exe,desktop.ini,*.lnk
 endif
 
-if executable('rg')
-	set grepformat=%f:%l:%c:%m
-	set grepprg=rg\ --vimgrep
-else
-	set grepformat&
-	set grepprg=internal
-endif
-
 if !has('nvim') && has('win32') && !filereadable(expand('~/AppData/Local/nvim/init.vim'))
 	" This is the same as stdpath('config') in nvim.
 	let s:initdir = expand('~/AppData/Local/nvim')
@@ -110,8 +106,6 @@ set runtimepath=$VIMRUNTIME,$VIMRC_DOTVIM
 
 let g:vim_indent_cont = &g:shiftwidth
 let g:plug_url_format = 'https://github.com/%s.git'
-let g:restart_sessionoptions = &sessionoptions
-let g:molder_show_hidden = 1
 
 call plug#begin(expand('$VIMRC_DOTVIM/pack/my/start'))
 
@@ -119,6 +113,7 @@ call plug#('danilo-augusto/vim-afterglow')
 call plug#('kana/vim-operator-replace')
 call plug#('kana/vim-operator-user')
 call plug#('mattn/vim-molder')
+call plug#('obcat/vim-highlightedput')
 call plug#('rbtnn/vim-gloaded')
 call plug#('rbtnn/vim-grizzly')
 call plug#('rbtnn/vim-mrw')
@@ -126,7 +121,9 @@ call plug#('rbtnn/vim-vimscript_indentexpr')
 call plug#('rbtnn/vim-vimscript_lasterror')
 call plug#('rbtnn/vim-vimscript_tagfunc')
 call plug#('thinca/vim-qfreplace')
-call plug#('tyru/restart.vim')
+if !has('nvim')
+	call plug#('tyru/restart.vim')
+endif
 
 silent! source ~/.vimrc.local
 
@@ -136,9 +133,6 @@ augroup vimrc
 	autocmd!
 	autocmd QuickFixCmdPost  *
 		\ :copen
-	autocmd FileType         molder
-		\ :nnoremap <silent><buffer>l   :<c-u>call molder#open()<cr>
-		\ |nnoremap <silent><buffer>h   :<c-u>call molder#up()<cr>
 	autocmd CmdlineEnter     *
 		\ : for s:cmdname in ['MANPAGER', 'VimFoldh', 'Plug', 'PlugDiff', 'PlugInstall', 'PlugSnapshot', 'PlugStatus', 'PlugUpgrade']
 		\ | 	execute printf('silent! delcommand %s', s:cmdname)
@@ -157,7 +151,7 @@ augroup vimrc
 		\ | highlight TabLineSel   guifg=#a9dd9d guibg=NONE    gui=NONE           cterm=NONE
 		\ | highlight Terminal     guifg=#d6d6d6 guibg=#000000 gui=NONE           cterm=NONE
 		\ | highlight VertSplit    guifg=#5a647e guibg=NONE
-		\ | highlight WildMenu     guifg=#a9dd9d guibg=#000000 gui=NONE           cterm=NONE
+		\ | highlight WildMenu     guifg=#a9dd9d guibg=#000000 gui=BOLD,UNDERLINE cterm=BOLD,UNDERLINE
 augroup END
 
 " terminal keymappings
@@ -177,12 +171,10 @@ tnoremap <silent><nowait><C-j>           <Cmd>tabnext<cr>
 tnoremap <silent><nowait><C-k>           <Cmd>tabprevious<cr>
 
 " normal keymappings
-nmap     <silent><nowait>s               <Plug>(operator-replace)
 nnoremap <silent><nowait><C-n>           <Cmd>cnext<cr>
 nnoremap <silent><nowait><C-p>           <Cmd>cprevious<cr>
 nnoremap <silent><nowait><C-j>           <Cmd>tabnext<cr>
 nnoremap <silent><nowait><C-k>           <Cmd>tabprevious<cr>
-nnoremap <silent><nowait><space>         <Cmd>MRW<cr>
 
 " insert keymappings
 inoremap <silent><nowait><tab>           <C-v><tab>
@@ -199,9 +191,42 @@ if !has('win32') && executable('sudo')
 	command! -nargs=0 SudoWrite    :w !sudo tee % > /dev/null
 endif
 
+if has_key(g:plugs, 'vim-highlightedput')
+	nmap p <Plug>(highlightedput-p)
+	xmap p <Plug>(highlightedput-p)
+	nmap P <Plug>(highlightedput-P)
+	xmap P <Plug>(highlightedput-P)
+	let g:highlightedput_highlight_duration = 100
+	augroup vimrc
+		autocmd ColorScheme      * : highlight link HighlightedputRegion  Search
+	augroup END
+endif
+
+if has_key(g:plugs, 'vim-mrw')
+	nnoremap <silent><nowait><space>         <Cmd>MRW<cr>
+endif
+
+if has_key(g:plugs, 'vim-operator-replace')
+	nmap     <silent><nowait>s               <Plug>(operator-replace)
+endif
+
+if has_key(g:plugs, 'restart.vim')
+	let g:restart_sessionoptions = &sessionoptions
+endif
+
+if has_key(g:plugs, 'vim-molder')
+	let g:molder_show_hidden = 1
+	augroup vimrc
+		autocmd FileType         molder
+			\ :nnoremap <silent><buffer>l   :<c-u>call molder#open()<cr>
+			\ |nnoremap <silent><buffer>h   :<c-u>call molder#up()<cr>
+	augroup END
+endif
+
 if (has('win32') || (256 == &t_Co)) && has('termguicolors') && !has('gui_running')
 	set termguicolors
 endif
+
 if has_key(g:plugs, 'vim-afterglow')
 	silent! colorscheme afterglow
 endif
