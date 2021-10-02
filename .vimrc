@@ -106,6 +106,9 @@ set runtimepath=$VIMRUNTIME,$VIMRC_DOTVIM
 
 let g:vim_indent_cont = &g:shiftwidth
 let g:plug_url_format = 'https://github.com/%s.git'
+if has('nvim')
+	let g:loaded_restart = 1
+endif
 
 call plug#begin(expand('$VIMRC_DOTVIM/pack/my/start'))
 
@@ -121,9 +124,7 @@ call plug#('rbtnn/vim-vimscript_indentexpr')
 call plug#('rbtnn/vim-vimscript_lasterror')
 call plug#('rbtnn/vim-vimscript_tagfunc')
 call plug#('thinca/vim-qfreplace')
-if !has('nvim')
-	call plug#('tyru/restart.vim')
-endif
+call plug#('tyru/restart.vim')
 
 silent! source ~/.vimrc.local
 
