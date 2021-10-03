@@ -117,6 +117,7 @@ call plug#('kana/vim-operator-replace')
 call plug#('kana/vim-operator-user')
 call plug#('mattn/vim-molder')
 call plug#('obcat/vim-highlightedput')
+call plug#('rbtnn/vim-find')
 call plug#('rbtnn/vim-gloaded')
 call plug#('rbtnn/vim-grizzly')
 call plug#('rbtnn/vim-mrw')
@@ -186,7 +187,7 @@ cnoremap         <nowait><C-f>           <right>
 cnoremap         <nowait><C-e>           <end>
 cnoremap         <nowait><C-a>           <home>
 cnoremap         <nowait><C-q>           <C-f>
-cnoremap   <expr><nowait><space>         wildmenumode() ? '<space><bs>' : '<space>'
+cnoremap   <expr><nowait><space>         (wildmenumode() && (getcmdline() =~# '^[tl]\?cd ')) ? '<space><bs>' : '<space>'
 
 if !has('win32') && executable('sudo')
 	command! -nargs=0 SudoWrite    :w !sudo tee % > /dev/null

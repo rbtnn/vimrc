@@ -1,11 +1,4 @@
 
-[include]
-    path = ~/.gitconfig.local
-
-#[url "git@github.com:"]
-#    pushInsteadOf = git://github.com/
-#    pushInsteadOf = https://github.com/
-
 [user]
     name = rbtnn
     email = naru123456789@gmail.com
@@ -39,9 +32,16 @@
 [help]
     format = man
 
-[credential]
-    helper = wincred
-
 [fetch]
     prune = true
+
+[include]
+    path = ~/.gitconfig.local
+
+#[url "git@github.com:"]
+#    pushInsteadOf = git://github.com/
+#    pushInsteadOf = https://github.com/
+#
+#[credential]
+#    helper = wincred
 
