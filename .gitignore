@@ -26,6 +26,7 @@
 .dropbox/
 .electron/
 .fern/
+.find/
 .gem/
 .ghc/
 .ghost/

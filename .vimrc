@@ -81,8 +81,34 @@ set nrformats=unsigned
 set sessionoptions=winpos,winsize,resize,buffers,curdir,tabpages
 
 if has('tabsidebar')
+	function! Tabsidebar() abort
+		let xs = ['%#TabSideBar#' .. '(' .. g:actual_curtabpage .. ')' .. '%#TabSideBar#']
+		for x in filter(getwininfo(), { i, x -> g:actual_curtabpage == x['tabnr']})
+			let s = bufname(x['bufnr'])
+			if filereadable(s)
+				let s = fnamemodify(s, ':t')
+			elseif x['terminal']
+				let s = '[Terminal]'
+			elseif x['quickfix']
+				let s = '[Quickfix]'
+			elseif x['loclist']
+				let s = '[Loclist]'
+			elseif getbufvar(x['bufnr'], '&buftype') == 'nofile'
+				let s = '[Scratch]'
+			elseif empty(s)
+				let s = '[No Name]'
+			endif
+			let xs += [
+				\ (x['winid'] == win_getid() ? '%#TabSideBarSel#' : '%#TabSideBar#')
+				\ .. ' ' .. s .. ' '
+				\ .. (getbufvar(x['bufnr'], '&modified') ? '[+]' : '')
+				\ .. (getbufvar(x['bufnr'], '&readonly') ? '[RO]' : '')
+				\ ]
+		endfor
+		return join(xs, "\n")
+	endfunction
 	let g:tabsidebar_vertsplit = 1
-	set tabsidebar=%{g:actual_curtabpage}.\ %t
+	set tabsidebar=%!Tabsidebar()
 	set tabsidebarwrap
 	set notabsidebaralign
 	set showtabsidebar=2
@@ -133,8 +159,6 @@ call plug#end()
 
 augroup vimrc
 	autocmd!
-	autocmd QuickFixCmdPost  *
-		\ :copen
 	autocmd CmdlineEnter     *
 		\ : for s:cmdname in ['MANPAGER', 'VimFoldh', 'Plug', 'PlugDiff', 'PlugInstall', 'PlugSnapshot', 'PlugStatus', 'PlugUpgrade']
 		\ | 	execute printf('silent! delcommand %s', s:cmdname)
@@ -154,6 +178,7 @@ augroup vimrc
 		\ | highlight Terminal     guifg=#d6d6d6 guibg=#000000 gui=NONE           cterm=NONE
 		\ | highlight VertSplit    guifg=#5a647e guibg=NONE
 		\ | highlight WildMenu     guifg=#a9dd9d guibg=#000000 gui=BOLD,UNDERLINE cterm=BOLD,UNDERLINE
+		\ | highlight CursorIM     guifg=NONE    guibg=#ff00ff
 augroup END
 
 " terminal keymappings
@@ -206,6 +231,10 @@ endif
 
 if has_key(g:plugs, 'vim-mrw')
 	nnoremap <silent><nowait><space>         <Cmd>MRW<cr>
+endif
+
+if has_key(g:plugs, 'vim-find')
+	nnoremap <silent><nowait><C-f>           <Cmd>Find<cr>
 endif
 
 if has_key(g:plugs, 'vim-operator-replace')
