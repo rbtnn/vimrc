@@ -142,7 +142,6 @@ call plug#('danilo-augusto/vim-afterglow')
 call plug#('kana/vim-operator-replace')
 call plug#('kana/vim-operator-user')
 call plug#('mattn/vim-molder')
-call plug#('obcat/vim-highlightedput')
 call plug#('rbtnn/vim-find')
 call plug#('rbtnn/vim-gloaded')
 call plug#('rbtnn/vim-grizzly')
@@ -160,6 +159,7 @@ call plug#end()
 
 augroup vimrc
 	autocmd!
+	autocmd FileType     help :setlocal colorcolumn=78
 	autocmd CmdlineEnter     *
 		\ : for s:cmdname in ['MANPAGER', 'VimFoldh', 'Plug', 'PlugDiff', 'PlugInstall', 'PlugSnapshot', 'PlugStatus', 'PlugUpgrade']
 		\ | 	execute printf('silent! delcommand %s', s:cmdname)
@@ -217,17 +217,6 @@ cnoremap   <expr><nowait><space>         (wildmenumode() && (getcmdline() =~# '^
 
 if !has('win32') && executable('sudo')
 	command! -nargs=0 SudoWrite    :w !sudo tee % > /dev/null
-endif
-
-if has_key(g:plugs, 'vim-highlightedput')
-	nmap p <Plug>(highlightedput-p)
-	xmap p <Plug>(highlightedput-p)
-	nmap P <Plug>(highlightedput-P)
-	xmap P <Plug>(highlightedput-P)
-	let g:highlightedput_highlight_duration = 100
-	augroup vimrc
-		autocmd ColorScheme      * : highlight link HighlightedputRegion  Search
-	augroup END
 endif
 
 if has_key(g:plugs, 'vim-mrw')
