@@ -78,7 +78,7 @@ set tags=./tags;
 set nowrap
 set fileformats=unix,dos
 set nrformats=unsigned
-set sessionoptions=winpos,winsize,resize,buffers,curdir,tabpages
+set sessionoptions=winpos,resize
 
 if has('tabsidebar')
 	function! Tabsidebar() abort
@@ -101,7 +101,7 @@ if has('tabsidebar')
 			let xs += [
 				\ (x['winid'] == win_getid() ? '%#TabSideBarSel#' : '%#TabSideBar#')
 				\ .. ' ' .. s .. ' '
-				\ .. (getbufvar(x['bufnr'], '&modified') ? '[+]' : '')
+				\ .. (getbufvar(x['bufnr'], '&modified') && (!x['terminal']) ? '[+]' : '')
 				\ .. (getbufvar(x['bufnr'], '&readonly') ? '[RO]' : '')
 				\ ]
 		endfor
