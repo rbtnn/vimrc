@@ -37,8 +37,8 @@ function! s:gitdiffnumstat_setlines(rootdir, args_list) abort
 	call s:setlines(a:rootdir, cmd, lines, 'gitdiff')
 	call s:buffer_nnoremap('<cr>', 'gitdiffshowdiff_open', [a:rootdir, a:args_list])
 	call s:buffer_nnoremap('<space>', 'gitdiffshowdiff_open', [a:rootdir, a:args_list])
-	call s:buffer_nnoremap('w', 'gitdiffnumstat_setlines', [a:rootdir, s:toggle_w(a:args_list)])
-	call s:buffer_nnoremap('r', 'gitdiffnumstat_setlines', [a:rootdir, a:args_list])
+	call s:buffer_nnoremap('W', 'gitdiffnumstat_setlines', [a:rootdir, s:toggle_w(a:args_list)])
+	call s:buffer_nnoremap('R', 'gitdiffnumstat_setlines', [a:rootdir, a:args_list])
 	call winrestview(view)
 endfunction
 
@@ -60,8 +60,8 @@ function! s:gitdiffshowdiff_setlines(rootdir, args_list, fullpath) abort
 	call s:setlines(a:rootdir, cmd, lines, 'diff')
 	call s:buffer_nnoremap('<cr>', 'gitdiff_jumpdiffline', [a:fullpath])
 	call s:buffer_nnoremap('<space>', 'gitdiff_jumpdiffline', [a:fullpath])
-	call s:buffer_nnoremap('w', 'gitdiffshowdiff_setlines', [a:rootdir, s:toggle_w(a:args_list), a:fullpath])
-	call s:buffer_nnoremap('r', 'gitdiffshowdiff_setlines', [a:rootdir, a:args_list, a:fullpath])
+	call s:buffer_nnoremap('W', 'gitdiffshowdiff_setlines', [a:rootdir, s:toggle_w(a:args_list), a:fullpath])
+	call s:buffer_nnoremap('R', 'gitdiffshowdiff_setlines', [a:rootdir, a:args_list, a:fullpath])
 	call winrestview(view)
 endfunction
 
@@ -93,7 +93,8 @@ function! s:setlines(rootdir, cmd, lines, ft) abort
 	call setbufline(bufnr(), 1, [
 		\ '# ' .. (strftime('%c')),
 		\ '# ' .. a:rootdir,
-		\ '# ' .. join(a:cmd)
+		\ '# ' .. join(a:cmd),
+		\ '# R: reload, W: toggle -w option'
 		\ ] + a:lines)
 	setlocal buftype=nofile nomodifiable readonly
 	execute 'setfiletype' a:ft

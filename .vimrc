@@ -6,7 +6,7 @@ let $VIMRC_ROOT = expand('<sfile>:h')
 let $VIMRC_DOTVIM = expand('$VIMRC_ROOT/.vim')
 
 " system
-set langmenu=en_gb.latin1
+language message C
 set winaltkeys=yes
 set guioptions=mM
 set mouse=a
@@ -73,12 +73,13 @@ set grepprg=internal
 
 " others
 set autoread
-set keywordprg=:help
-set tags=./tags;
-set nowrap
 set fileformats=unix,dos
+set keywordprg=:help
+set nowrap
 set nrformats=unsigned
 set sessionoptions=winpos,resize
+set tags=./tags;
+set updatetime=1000
 
 if has('tabsidebar')
 	function! Tabsidebar() abort
@@ -128,6 +129,7 @@ endif
 
 silent! source $VIMRC_DOTVIM/pack/my/start/vim-gloaded/plugin/gloaded.vim
 
+set packpath=
 set runtimepath=$VIMRUNTIME,$VIMRC_DOTVIM
 
 let g:vim_indent_cont = &g:shiftwidth
@@ -213,7 +215,7 @@ cnoremap         <nowait><C-f>           <right>
 cnoremap         <nowait><C-e>           <end>
 cnoremap         <nowait><C-a>           <home>
 cnoremap         <nowait><C-q>           <C-f>
-cnoremap   <expr><nowait><space>         (wildmenumode() && (getcmdline() =~# '^[tl]\?cd ')) ? '<space><bs>' : '<space>'
+cnoremap   <expr><nowait><space>         (wildmenumode() && (getcmdline() =~# '[\/]$')) ? '<space><bs>' : '<space>'
 
 if !has('win32') && executable('sudo')
 	command! -nargs=0 SudoWrite    :w !sudo tee % > /dev/null
