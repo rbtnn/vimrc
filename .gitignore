@@ -1,5 +1,4 @@
 
-layout.json
 .CFUserTextEncoding
 .ICEauthority
 .Trash/
@@ -71,6 +70,7 @@ layout.json
 .xinputrc
 .xsession-errors
 .xsession-errors.old
+.yarnrc
 3D Objects/
 Anaconda3/
 AppData/
@@ -109,10 +109,13 @@ _viminfo
 examples.desktop
 go/
 init.local.cmd
+layout.json
+node_modules/
 ntuser.*
 python_games/
 tags
 tags-jp
 vim-on-windows/
 vterm.lib
+yarn.lock
 スタート メニュー/

@@ -143,7 +143,6 @@ call plug#begin(expand('$VIMRC_DOTVIM/pack/my/start'))
 call plug#('danilo-augusto/vim-afterglow')
 call plug#('kana/vim-operator-replace')
 call plug#('kana/vim-operator-user')
-call plug#('mattn/vim-molder')
 call plug#('rbtnn/vim-find')
 call plug#('rbtnn/vim-gloaded')
 call plug#('rbtnn/vim-grizzly')
@@ -235,15 +234,6 @@ endif
 
 if has_key(g:plugs, 'restart.vim')
 	let g:restart_sessionoptions = &sessionoptions
-endif
-
-if has_key(g:plugs, 'vim-molder')
-	let g:molder_show_hidden = 1
-	augroup vimrc
-		autocmd FileType         molder
-			\ :nnoremap <silent><buffer>l   :<c-u>call molder#open()<cr>
-			\ |nnoremap <silent><buffer>h   :<c-u>call molder#up()<cr>
-	augroup END
 endif
 
 if (has('win32') || (256 == &t_Co)) && has('termguicolors') && !has('gui_running')
