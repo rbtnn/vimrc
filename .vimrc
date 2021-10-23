@@ -71,6 +71,11 @@ set hlsearch
 set nowrapscan
 set ignorecase
 
+" matchpairs
+set showmatch
+set matchtime=1
+set matchpairs+=<:>
+
 " vimgrep
 set grepformat&
 set grepprg=internal
@@ -81,6 +86,7 @@ set fileformats=unix,dos
 set keywordprg=:help
 set nowrap
 set nrformats=unsigned
+set scrolloff=5
 set sessionoptions=winpos,resize
 set tags=./tags;
 set updatetime=1000
@@ -174,6 +180,7 @@ if isdirectory($VIMRC_DOTVIM)
 	call plug#('rbtnn/vim-vimscript_indentexpr')
 	call plug#('rbtnn/vim-vimscript_lasterror')
 	call plug#('rbtnn/vim-vimscript_tagfunc')
+	call plug#('rbtnn/vimtweak')
 	call plug#('thinca/vim-qfreplace')
 	call plug#('tyru/restart.vim')
 
@@ -204,6 +211,7 @@ if isdirectory($VIMRC_DOTVIM)
 			\ | highlight VertSplit    guifg=#5a647e guibg=NONE
 			\ | highlight WildMenu     guifg=#a9dd9d guibg=#000000 gui=BOLD,UNDERLINE cterm=BOLD,UNDERLINE
 			\ | highlight CursorIM     guifg=NONE    guibg=#ff00ff
+			\ | highlight Terminal     guifg=NONE    guibg=#111111
 	augroup END
 
 	if has_key(g:plugs, 'vim-find')
@@ -216,6 +224,12 @@ if isdirectory($VIMRC_DOTVIM)
 
 	if has_key(g:plugs, 'restart.vim')
 		let g:restart_sessionoptions = &sessionoptions
+	endif
+
+	if has_key(g:plugs, 'vimtweak')
+		augroup vimrc
+			autocmd VimEnter     * :VimTweakSetAlpha 240
+		augroup END
 	endif
 
 	if (has('win32') || (256 == &t_Co)) && has('termguicolors') && !has('gui_running')
