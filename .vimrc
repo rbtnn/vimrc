@@ -188,6 +188,14 @@ if isdirectory($VIMRC_DOTVIM)
 
 	call plug#end()
 
+	function! s:is_installed(name) abort
+		if has_key(g:plugs, a:name)
+			return isdirectory(g:plugs[a:name]['dir'])
+		else
+			return v:false
+		endif
+	endfunction
+
 	augroup vimrc
 		autocmd!
 		autocmd FileType     help :setlocal colorcolumn=78
@@ -214,29 +222,31 @@ if isdirectory($VIMRC_DOTVIM)
 			\ | highlight Terminal     guifg=NONE    guibg=#111111
 	augroup END
 
-	if has_key(g:plugs, 'vim-find')
+	if s:is_installed('vim-find')
 		nnoremap <silent><nowait><space>         <Cmd>Find<cr>
 	endif
 
-	if has_key(g:plugs, 'vim-operator-replace')
+	if s:is_installed('vim-operator-replace')
 		nmap     <silent><nowait>s               <Plug>(operator-replace)
 	endif
 
-	if has_key(g:plugs, 'restart.vim')
+	if s:is_installed('restart.vim')
 		let g:restart_sessionoptions = &sessionoptions
 	endif
 
-	if has_key(g:plugs, 'vimtweak')
-		augroup vimrc
-			autocmd VimEnter     * :VimTweakSetAlpha 240
-		augroup END
+	if s:is_installed('vimtweak')
+		if has('gui_running') && has('win32')
+			augroup vimrc
+				autocmd VimEnter     * :VimTweakSetAlpha 240
+			augroup END
+		endif
 	endif
 
 	if (has('win32') || (256 == &t_Co)) && has('termguicolors') && !has('gui_running')
 		set termguicolors
 	endif
 
-	if has_key(g:plugs, 'vim-afterglow')
+	if s:is_installed('vim-afterglow')
 		silent! colorscheme afterglow
 	endif
 endif
