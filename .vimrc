@@ -223,7 +223,7 @@ if isdirectory($VIMRC_DOTVIM)
 	augroup END
 
 	if s:is_installed('vim-find')
-		nnoremap <silent><nowait><space>         <Cmd>Find<cr>
+		nnoremap <silent><nowait><space>         <Cmd>FindHistory<cr>
 	endif
 
 	if s:is_installed('vim-operator-replace')
