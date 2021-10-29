@@ -4,40 +4,33 @@
 
 let g:loaded_rg = 1
 
-let s:TYPE_SEARCH = 1
-let s:TYPE_KILL = 2
-
 let s:job_id = get(s:, 'job_id', v:null)
-let s:cmd_type = get(s:, 'cmd_type', s:TYPE_SEARCH)
 
-command! -nargs=* RgSearch  :call s:rg_exec(s:TYPE_SEARCH, <q-args>)
-command! -nargs=0 RgKill    :call s:rg_exec(s:TYPE_KILL, '')
+command! -bang -nargs=* Rg     :call s:rg_exec(<q-bang>, <q-args>)
 
-function! s:rg_exec(cmd_type, q_args) abort
-	let s:cmd_type = a:cmd_type
-
-	if !executable('rg')
-		echo "[rg] Could not find the 'rg' file."
-		return
-	endif
-
-	if v:null != s:job_id
-		if has('nvim')
-			call jobstop(s:job_id)
-		else
-			call job_stop(s:job_id, 'kill')
+function! s:rg_exec(q_bang, q_args) abort
+	try
+		if !executable('rg')
+			throw "Could not find the 'rg' file."
 		endif
-		if s:TYPE_KILL == a:cmd_type
-			echo '[rg] Killed the process.'
-		endif
-		let s:job_id = v:null
-	else
-		if s:TYPE_KILL == a:cmd_type
-			echo '[rg] There was nothing to kill.'
-		endif
-	endif
 
-	if s:TYPE_SEARCH == a:cmd_type
+		if v:null != s:job_id
+			if a:q_bang == '!'
+				if has('nvim')
+					call jobstop(s:job_id)
+				else
+					call job_stop(s:job_id, 'kill')
+				endif
+				let s:job_id = v:null
+			else
+				throw "Rg is running now. If you want to search again, please specify with '!'."
+			endif
+		endif
+
+		if empty(a:q_args)
+			throw "Please give a search text!"
+		endif
+
 		let cmd = printf('rg --vimgrep --line-buffered %s .', a:q_args)
 		call setqflist([], ' ', { 'title': cmd, })
 		if has('nvim')
@@ -54,7 +47,11 @@ function! s:rg_exec(cmd_type, q_args) abort
 				\ 'exit_cb': function('s:vim_exit_cb'),
 				\ })
 		endif
-	endif
+	catch
+		echohl Error
+		echo printf('[rg] %s', v:exception)
+		echohl None
+	endtry
 endfunction
 
 function! s:vim_out_cb(channel, msg) abort
@@ -75,9 +72,7 @@ function! s:vim_out_cb(channel, msg) abort
 endfunction
 
 function! s:vim_exit_cb(job, status) abort
-	if s:cmd_type == s:TYPE_SEARCH
-		echo '[rg] The search has been completed! Please open the quickfix window.'
-	endif
+	echo '[rg] The search has been completed! Please open the quickfix window.'
 	let s:job_id = v:null
 endfunction
 

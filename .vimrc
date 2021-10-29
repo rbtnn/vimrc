@@ -91,6 +91,170 @@ set sessionoptions=winpos,resize
 set tags=./tags;
 set updatetime=1000
 
+if !has('nvim') && has('win32') && !filereadable(expand('~/AppData/Local/nvim/init.vim'))
+	" This is the same as stdpath('config') in nvim.
+	let s:initdir = expand('~/AppData/Local/nvim')
+	call mkdir(s:initdir, 'p')
+	call writefile(['silent! source ~/.vimrc'], s:initdir .. '/init.vim')
+endif
+
+set packpath=
+set runtimepath=$VIMRUNTIME
+
+if isdirectory($VIMRC_DOTVIM)
+	silent! source $VIMRC_DOTVIM/pack/my/start/vim-gloaded/plugin/gloaded.vim
+
+	set runtimepath+=$VIMRC_DOTVIM
+
+	let g:vim_indent_cont = &g:shiftwidth
+	let g:plug_url_format = 'https://github.com/%s.git'
+	if has('nvim')
+		let g:loaded_restart = 1
+	endif
+
+	call plug#begin(expand('$VIMRC_DOTVIM/pack/my/start'))
+
+	call plug#('KabbAmine/yowish.vim')
+	call plug#('kana/vim-operator-replace')
+	call plug#('kana/vim-operator-user')
+	call plug#('rbtnn/vim-find')
+	call plug#('rbtnn/vim-gloaded')
+	call plug#('rbtnn/vim-mrw')
+	call plug#('rbtnn/vim-vimscript_indentexpr')
+	call plug#('rbtnn/vim-vimscript_lasterror')
+	call plug#('rbtnn/vim-vimscript_tagfunc')
+	call plug#('thinca/vim-qfreplace')
+
+	if has('win32')
+		call plug#('rbtnn/vim-grizzly')
+		call plug#('rbtnn/vimtweak')
+		call plug#('tyru/restart.vim')
+	endif
+
+	if executable('cargo')
+		call plug#('rust-lang/rust.vim')
+	endif
+
+	silent! source ~/.vimrc.local
+
+	call plug#end()
+
+	function! s:is_installed(name) abort
+		if has_key(g:plugs, a:name)
+			return isdirectory(g:plugs[a:name]['dir'])
+		else
+			return v:false
+		endif
+	endfunction
+
+	augroup vimrc
+		autocmd!
+		autocmd CmdlineEnter     *
+			\ : for s:cmdname in filter(getcompletion('*', 'command'), { i,x -> x =~# '^[A-Z]' })
+			\ | 	if -1 == index([
+			\ 			'PlugClean', 'PlugUpdate', 'Rg', 'GitDiff', 'VimscriptLastError',
+			\ 			'Restart', 'FindFiles', 'FindHistory', 'MRW', 'Qfreplace', 'QfIconv',
+			\ 			'VimTweakSetAlpha', 'Cargo',
+			\ 			], s:cmdname)
+			\ | 		execute printf('silent! delcommand %s', s:cmdname)
+			\ | 	endif
+			\ | endfor
+		autocmd FileType     help :setlocal colorcolumn=78
+
+		if s:is_installed('yowish.vim')
+			autocmd ColorScheme      *
+				\ : highlight!       TabLine          guifg=#d6d6d6 guibg=NONE    gui=NONE           cterm=NONE
+				\ | highlight!       TabLineFill      guifg=#1a1a1a guibg=NONE    gui=NONE           cterm=NONE
+				\ | highlight!       TabLineSel       guifg=#a9dd9d guibg=NONE    gui=NONE           cterm=NONE
+				\ | highlight!       Pmenu            guifg=#d6d6d6 guibg=NONE
+				\ | highlight!       PmenuSel         guifg=#a9dd9d guibg=NONE    gui=BOLD,UNDERLINE cterm=BOLD,UNDERLINE
+				\ | highlight!       PmenuSbar        guifg=#000000 guibg=#202020 gui=NONE
+				\ | highlight!       PmenuThumb       guifg=#000000 guibg=#606060 gui=NONE
+				\ | highlight! link  diffAdded        String
+				\ | highlight! link  diffRemoved      Constant
+				\ | highlight!       CursorIM         guifg=NONE    guibg=#ff00ff
+		endif
+	augroup END
+
+	if s:is_installed('vim-find')
+		nnoremap <silent><nowait><space>         <Cmd>FindHistory<cr>
+	endif
+
+	if s:is_installed('vim-operator-replace')
+		nmap     <silent><nowait>s               <Plug>(operator-replace)
+	endif
+
+	if s:is_installed('restart.vim')
+		let g:restart_sessionoptions = &sessionoptions
+	endif
+
+	if s:is_installed('vimtweak')
+		if has('gui_running') && has('win32')
+			augroup vimrc
+				autocmd VimEnter     * :VimTweakSetAlpha 240
+			augroup END
+		endif
+	endif
+
+	if (has('win32') || (256 == &t_Co)) && has('termguicolors') && !has('gui_running')
+		set termguicolors
+	endif
+
+	if s:is_installed('yowish.vim')
+		silent! colorscheme yowish
+	endif
+endif
+
+" -------------------------
+" terminal keymappings
+" -------------------------
+if has('win32')
+	tnoremap <silent><nowait><C-b>       <left>
+	tnoremap <silent><nowait><C-f>       <right>
+	tnoremap <silent><nowait><C-e>       <end>
+	tnoremap <silent><nowait><C-a>       <home>
+	tnoremap <silent><nowait><C-u>       <esc>
+endif
+if has('nvim')
+	tnoremap <silent><nowait><esc>       <C-\><C-n>
+else
+	tnoremap <silent><nowait><esc>       <C-w>N
+endif
+tnoremap <silent><nowait><C-j>           <Cmd>tabnext<cr>
+tnoremap <silent><nowait><C-k>           <Cmd>tabprevious<cr>
+
+" -------------------------
+" normal keymappings
+" -------------------------
+nnoremap <silent><nowait><C-n>           <Cmd>cnext<cr>
+nnoremap <silent><nowait><C-p>           <Cmd>cprevious<cr>
+nnoremap <silent><nowait><C-j>           <Cmd>tabnext<cr>
+nnoremap <silent><nowait><C-k>           <Cmd>tabprevious<cr>
+
+" I use Ctrl-u and Ctrl-d to scroll. Others are disabled.
+nnoremap <silent><nowait><C-e>           <nop>
+nnoremap <silent><nowait><C-y>           <nop>
+nnoremap <silent><nowait><C-f>           <nop>
+nnoremap <silent><nowait><C-b>           <nop>
+
+" -------------------------
+" insert keymappings
+" -------------------------
+inoremap <silent><nowait><tab>           <C-v><tab>
+
+" -------------------------
+" cmdline keymappings
+" -------------------------
+cnoremap         <nowait><C-b>           <left>
+cnoremap         <nowait><C-f>           <right>
+cnoremap         <nowait><C-e>           <end>
+cnoremap         <nowait><C-a>           <home>
+cnoremap         <nowait><C-q>           <C-f>
+cnoremap   <expr><nowait><space>         (wildmenumode() && (getcmdline() =~# '[\/]$')) ? '<space><bs>' : '<space>'
+
+filetype indent plugin on
+syntax on
+
 if has('tabsidebar')
 	function! Tabsidebar() abort
 		let xs = ['%#TabSideBar#' .. '--- ' .. g:actual_curtabpage .. ' ---' .. '%#TabSideBar#']
@@ -143,160 +307,3 @@ if has('tabsidebar')
 	set tabsidebarcolumns=16
 endif
 
-if has('win32')
-	set wildignore+=NTUSER.DAT*,*.dll,*.exe,desktop.ini,*.lnk
-endif
-
-if !has('nvim') && has('win32') && !filereadable(expand('~/AppData/Local/nvim/init.vim'))
-	" This is the same as stdpath('config') in nvim.
-	let s:initdir = expand('~/AppData/Local/nvim')
-	call mkdir(s:initdir, 'p')
-	call writefile(['silent! source ~/.vimrc'], s:initdir .. '/init.vim')
-endif
-
-set packpath=
-set runtimepath=$VIMRUNTIME
-
-if isdirectory($VIMRC_DOTVIM)
-	silent! source $VIMRC_DOTVIM/pack/my/start/vim-gloaded/plugin/gloaded.vim
-
-	set runtimepath+=$VIMRC_DOTVIM
-
-	let g:vim_indent_cont = &g:shiftwidth
-	let g:plug_url_format = 'https://github.com/%s.git'
-	if has('nvim')
-		let g:loaded_restart = 1
-	endif
-
-	call plug#begin(expand('$VIMRC_DOTVIM/pack/my/start'))
-
-	call plug#('danilo-augusto/vim-afterglow')
-	call plug#('kana/vim-operator-replace')
-	call plug#('kana/vim-operator-user')
-	call plug#('rbtnn/vim-find')
-	call plug#('rbtnn/vim-gloaded')
-	call plug#('rbtnn/vim-grizzly')
-	call plug#('rbtnn/vim-mrw')
-	call plug#('rbtnn/vim-vimscript_indentexpr')
-	call plug#('rbtnn/vim-vimscript_lasterror')
-	call plug#('rbtnn/vim-vimscript_tagfunc')
-	call plug#('rbtnn/vimtweak')
-	call plug#('thinca/vim-qfreplace')
-	call plug#('tyru/restart.vim')
-
-	silent! source ~/.vimrc.local
-
-	call plug#end()
-
-	function! s:is_installed(name) abort
-		if has_key(g:plugs, a:name)
-			return isdirectory(g:plugs[a:name]['dir'])
-		else
-			return v:false
-		endif
-	endfunction
-
-	augroup vimrc
-		autocmd!
-		autocmd FileType     help :setlocal colorcolumn=78
-		autocmd CmdlineEnter     *
-			\ : for s:cmdname in ['MANPAGER', 'VimFoldh', 'Plug', 'PlugDiff', 'PlugInstall', 'PlugSnapshot', 'PlugStatus', 'PlugUpgrade']
-			\ | 	execute printf('silent! delcommand %s', s:cmdname)
-			\ | endfor
-		autocmd ColorScheme      *
-			\ : highlight Pmenu        guifg=#d6d6d6 guibg=NONE
-			\ | highlight PmenuSel     guifg=#a9dd9d guibg=NONE    gui=BOLD,UNDERLINE cterm=BOLD,UNDERLINE
-			\ | highlight PmenuSbar    guibg=#202020 guifg=#000000 gui=NONE
-			\ | highlight PmenuThumb   guibg=#606060 guifg=#000000 gui=NONE
-			\ | highlight SpecialKey   guifg=#1a242e
-			\ | highlight NonText      guifg=#1a242e
-			\ | highlight DiffLine                                 gui=NONE           cterm=NONE
-			\ | highlight StatusLine   guifg=#d6d6d6 guibg=#000000 gui=NONE           cterm=NONE
-			\ | highlight TabLine      guifg=#d6d6d6 guibg=NONE    gui=NONE           cterm=NONE
-			\ | highlight TabLineFill  guifg=#1a1a1a guibg=NONE    gui=NONE           cterm=NONE
-			\ | highlight TabLineSel   guifg=#a9dd9d guibg=NONE    gui=NONE           cterm=NONE
-			\ | highlight Terminal     guifg=#d6d6d6 guibg=#000000 gui=NONE           cterm=NONE
-			\ | highlight VertSplit    guifg=#5a647e guibg=NONE
-			\ | highlight WildMenu     guifg=#a9dd9d guibg=#000000 gui=BOLD,UNDERLINE cterm=BOLD,UNDERLINE
-			\ | highlight CursorIM     guifg=NONE    guibg=#ff00ff
-			\ | highlight Terminal     guifg=NONE    guibg=#111111
-	augroup END
-
-	if s:is_installed('vim-find')
-		nnoremap <silent><nowait><space>         <Cmd>FindHistory<cr>
-	endif
-
-	if s:is_installed('vim-operator-replace')
-		nmap     <silent><nowait>s               <Plug>(operator-replace)
-	endif
-
-	if s:is_installed('restart.vim')
-		let g:restart_sessionoptions = &sessionoptions
-	endif
-
-	if s:is_installed('vimtweak')
-		if has('gui_running') && has('win32')
-			augroup vimrc
-				autocmd VimEnter     * :VimTweakSetAlpha 240
-			augroup END
-		endif
-	endif
-
-	if (has('win32') || (256 == &t_Co)) && has('termguicolors') && !has('gui_running')
-		set termguicolors
-	endif
-
-	if s:is_installed('vim-afterglow')
-		silent! colorscheme afterglow
-	endif
-endif
-
-" -------------------------
-" terminal keymappings
-" -------------------------
-if has('win32')
-	tnoremap <silent><nowait><C-b>       <left>
-	tnoremap <silent><nowait><C-f>       <right>
-	tnoremap <silent><nowait><C-e>       <end>
-	tnoremap <silent><nowait><C-a>       <home>
-	tnoremap <silent><nowait><C-u>       <esc>
-endif
-if has('nvim')
-	tnoremap <silent><nowait><esc>       <C-\><C-n>
-else
-	tnoremap <silent><nowait><esc>       <C-w>N
-endif
-tnoremap <silent><nowait><C-j>           <Cmd>tabnext<cr>
-tnoremap <silent><nowait><C-k>           <Cmd>tabprevious<cr>
-
-" -------------------------
-" normal keymappings
-" -------------------------
-nnoremap <silent><nowait><C-n>           <Cmd>cnext<cr>
-nnoremap <silent><nowait><C-p>           <Cmd>cprevious<cr>
-nnoremap <silent><nowait><C-j>           <Cmd>tabnext<cr>
-nnoremap <silent><nowait><C-k>           <Cmd>tabprevious<cr>
-
-" I use Ctrl-y and Ctrl-d to scroll. Others are disabled.
-nnoremap <silent><nowait><C-e>           <nop>
-nnoremap <silent><nowait><C-y>           <nop>
-nnoremap <silent><nowait><C-f>           <nop>
-nnoremap <silent><nowait><C-b>           <nop>
-
-" -------------------------
-" insert keymappings
-" -------------------------
-inoremap <silent><nowait><tab>           <C-v><tab>
-
-" -------------------------
-" cmdline keymappings
-" -------------------------
-cnoremap         <nowait><C-b>           <left>
-cnoremap         <nowait><C-f>           <right>
-cnoremap         <nowait><C-e>           <end>
-cnoremap         <nowait><C-a>           <home>
-cnoremap         <nowait><C-q>           <C-f>
-cnoremap   <expr><nowait><space>         (wildmenumode() && (getcmdline() =~# '[\/]$')) ? '<space><bs>' : '<space>'
-
-filetype indent plugin on
-syntax on
