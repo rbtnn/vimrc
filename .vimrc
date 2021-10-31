@@ -31,6 +31,7 @@ set noswapfile
 
 " undo
 if isdirectory($VIMRC_DOTVIM)
+	" https://github.com/neovim/neovim/commit/6995fad260e3e7c49e4f9dc4b63de03989411c7b
 	if has('nvim')
 		let $VIMRC_UNDO = expand('$VIMRC_DOTVIM/undofiles/neovim')
 	else
@@ -87,30 +88,25 @@ set keywordprg=:help
 set nowrap
 set nrformats=unsigned
 set scrolloff=5
-set sessionoptions=winpos,resize
+set sessionoptions=winpos,resize,tabpages,curdir,help
 set tags=./tags;
 set updatetime=1000
 
-if !has('nvim') && has('win32') && !filereadable(expand('~/AppData/Local/nvim/init.vim'))
+let s:nvim_initpath = expand('~/AppData/Local/nvim/init.vim')
+if !has('nvim') && has('win32') && !filereadable(s:nvim_initpath)
 	" This is the same as stdpath('config') in nvim.
-	let s:initdir = expand('~/AppData/Local/nvim')
-	call mkdir(s:initdir, 'p')
-	call writefile(['silent! source ~/.vimrc'], s:initdir .. '/init.vim')
+	call mkdir(fnamemodify(s:nvim_initpath, ':h'), 'p')
+	call writefile(['silent! source ~/.vimrc'], s:nvim_initpath)
 endif
 
 set packpath=
 set runtimepath=$VIMRUNTIME
 
 if isdirectory($VIMRC_DOTVIM)
-	silent! source $VIMRC_DOTVIM/pack/my/start/vim-gloaded/plugin/gloaded.vim
-
 	set runtimepath+=$VIMRC_DOTVIM
 
 	let g:vim_indent_cont = &g:shiftwidth
 	let g:plug_url_format = 'https://github.com/%s.git'
-	if has('nvim')
-		let g:loaded_restart = 1
-	endif
 
 	call plug#begin(expand('$VIMRC_DOTVIM/pack/my/start'))
 
@@ -128,7 +124,9 @@ if isdirectory($VIMRC_DOTVIM)
 	if has('win32')
 		call plug#('rbtnn/vim-grizzly')
 		call plug#('rbtnn/vimtweak')
-		call plug#('tyru/restart.vim')
+		if !has('nvim')
+			call plug#('tyru/restart.vim')
+		endif
 	endif
 
 	if executable('cargo')
@@ -150,17 +148,18 @@ if isdirectory($VIMRC_DOTVIM)
 	augroup vimrc
 		autocmd!
 		autocmd CmdlineEnter     *
-			\ : for s:cmdname in filter(getcompletion('*', 'command'), { i,x -> x =~# '^[A-Z]' })
-			\ | 	if -1 == index([
-			\ 			'PlugClean', 'PlugUpdate', 'Rg', 'GitDiff', 'VimscriptLastError',
-			\ 			'Restart', 'FindFiles', 'FindHistory', 'MRW', 'Qfreplace', 'QfIconv',
-			\ 			'VimTweakSetAlpha', 'Cargo',
-			\ 			], s:cmdname)
-			\ | 		execute printf('silent! delcommand %s', s:cmdname)
-			\ | 	endif
+			\ : for s:cmdname in [
+			\		'MANPAGER', 'VimFoldh', 'VimTweakDisableCaption', 'VimTweakDisableMaximize',
+			\		'VimTweakDisableTopMost', 'VimTweakEnableCaption', 'VimTweakEnableMaximize',
+			\		'VimTweakEnableTopMost', 'Plug', 'PlugDiff', 'PlugInstall', 'PlugSnapshot',
+			\		'PlugStatus', 'PlugUpgrade',
+			\		'Cbench', 'Cbuild', 'Ccheck', 'Cclean', 'Cdoc',
+			\		'Cinit', 'Cinstall', 'Cnew', 'Cpublish', 'Crun',
+			\		'Cruntarget', 'Csearch', 'Ctest', 'Cupdate',
+			\		]
+			\ | 	execute printf('silent! delcommand %s', s:cmdname)
 			\ | endfor
 		autocmd FileType     help :setlocal colorcolumn=78
-
 		if s:is_installed('yowish.vim')
 			autocmd ColorScheme      *
 				\ : highlight!       TabLine          guifg=#d6d6d6 guibg=NONE    gui=NONE           cterm=NONE
@@ -175,6 +174,10 @@ if isdirectory($VIMRC_DOTVIM)
 				\ | highlight!       CursorIM         guifg=NONE    guibg=#ff00ff
 		endif
 	augroup END
+
+	if s:is_installed('vim-gloaded')
+		source $VIMRC_DOTVIM/pack/my/start/vim-gloaded/plugin/gloaded.vim
+	endif
 
 	if s:is_installed('vim-find')
 		nnoremap <silent><nowait><space>         <Cmd>FindHistory<cr>
@@ -203,6 +206,9 @@ if isdirectory($VIMRC_DOTVIM)
 	if s:is_installed('yowish.vim')
 		silent! colorscheme yowish
 	endif
+else
+	filetype indent plugin on
+	syntax on
 endif
 
 " -------------------------
@@ -252,46 +258,43 @@ cnoremap         <nowait><C-a>           <home>
 cnoremap         <nowait><C-q>           <C-f>
 cnoremap   <expr><nowait><space>         (wildmenumode() && (getcmdline() =~# '[\/]$')) ? '<space><bs>' : '<space>'
 
-filetype indent plugin on
-syntax on
-
 if has('tabsidebar')
 	function! Tabsidebar() abort
 		let xs = ['%#TabSideBar#' .. '--- ' .. g:actual_curtabpage .. ' ---' .. '%#TabSideBar#']
 		for x in filter(getwininfo(), { i, x -> g:actual_curtabpage == x['tabnr']})
 			let ft = getbufvar(x['bufnr'], '&filetype')
 			let bt = getbufvar(x['bufnr'], '&buftype')
-			let s = bufname(x['bufnr'])
+			let text = bufname(x['bufnr'])
 			let m = v:true
 			let r = v:true
 			if ft == 'help'
-				let s = '[help]'
+				let text = '[help]'
 				let m = v:false
 				let r = v:false
-			elseif filereadable(s)
-				let s = fnamemodify(s, ':t')
+			elseif filereadable(text)
+				let text = fnamemodify(text, ':t')
 			elseif x['terminal']
-				let s = '[Terminal]'
+				let text = '[Terminal]'
 				let m = v:false
 				let r = v:false
 			elseif x['quickfix']
-				let s = '[Quickfix]'
+				let text = '[Quickfix]'
 			elseif x['loclist']
-				let s = '[Loclist]'
+				let text = '[Loclist]'
 			elseif bt == 'nofile'
 				if !empty(ft)
-					let s = printf('[%s]', ft)
+					let text = printf('[%s]', ft)
 					let m = v:false
 					let r = v:false
 				else
-					let s = '[Scratch]'
+					let text = '[Scratch]'
 				endif
-			elseif empty(s)
-				let s = '[No Name]'
+			elseif empty(text)
+				let text = '[No Name]'
 			endif
 			let xs += [
 				\ (x['winid'] == win_getid() ? '%#TabSideBarSel#' : '%#TabSideBar#')
-				\ .. ' ' .. s .. ' '
+				\ .. ' ' .. text .. ' '
 				\ .. (getbufvar(x['bufnr'], '&modified') && m ? '[+]' : '')
 				\ .. (getbufvar(x['bufnr'], '&readonly') && r ? '[RO]' : '')
 				\ ]
