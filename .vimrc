@@ -130,6 +130,7 @@ if isdirectory($VIMRC_DOTVIM)
 	endif
 
 	if executable('cargo')
+		call plug#('rhysd/rust-doc.vim')
 		call plug#('rust-lang/rust.vim')
 	endif
 
@@ -185,6 +186,10 @@ if isdirectory($VIMRC_DOTVIM)
 
 	if s:is_installed('vim-operator-replace')
 		nmap     <silent><nowait>s               <Plug>(operator-replace)
+	endif
+
+	if s:is_installed('rust-doc.vim')
+		let g:rust_doc#downloaded_rust_doc_dir = expand('~/.rustup/toolchains/stable-x86_64-pc-windows-msvc')
 	endif
 
 	if s:is_installed('restart.vim')
