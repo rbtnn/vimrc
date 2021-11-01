@@ -174,10 +174,22 @@ if isdirectory($VIMRC_DOTVIM)
 				\ | highlight! link  diffRemoved      Constant
 				\ | highlight!       CursorIM         guifg=NONE    guibg=#ff00ff
 		endif
+		if !has('nvim') && has('win32') && (&shell =~# '\<cmd\.exe$')
+			" https://docs.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2012-R2-and-2012/cc725943(v=ws.11)
+			" https://gist.github.com/fnky/458719343aabd01cfb17a3a4f7296797
+			autocmd TerminalWinOpen     *
+				\ :call term_sendkeys(bufnr(), (windowsversion() == '10.0' ? 'prompt $e[0;32m$$$e[0m' : 'prompt $$') .. "\rcls\r")
+		endif
 	augroup END
 
 	if s:is_installed('vim-gloaded')
 		source $VIMRC_DOTVIM/pack/my/start/vim-gloaded/plugin/gloaded.vim
+	endif
+
+	if s:is_installed('vim-grizzly')
+		if !has('nvim') && has('win32') && (&shell =~# '\<cmd\.exe$')
+			let g:grizzly_prompt_pattern = '^$\zs.*'
+		endif
 	endif
 
 	if s:is_installed('vim-find')
