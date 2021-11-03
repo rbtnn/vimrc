@@ -4,6 +4,7 @@ scriptencoding utf-8
 let $MYVIMRC = resolve($MYVIMRC)
 let $VIMRC_ROOT = expand('<sfile>:h')
 let $VIMRC_DOTVIM = expand('$VIMRC_ROOT/vim')
+let $VIMRC_PACKSTART = expand('$VIMRC_DOTVIM/pack/my/start')
 
 " system
 language message C
@@ -22,7 +23,7 @@ set tabstop=4
 
 " cmdline
 set cmdwinheight=5
-set cmdheight=2
+set cmdheight=1
 
 " backup/swap
 set nobackup
@@ -46,11 +47,11 @@ endif
 
 " statusline/tabline/ruler/mode
 set laststatus=2
-set statusline&
-set showtabline=0
-set showmode
+set noshowmode
 set ruler
 set rulerformat=%16(%{&ft}/%{&ff}/%{&fileencoding}%)
+set showtabline=0
+set statusline&
 
 " complete
 set pumheight=10
@@ -90,7 +91,7 @@ set nrformats=unsigned
 set scrolloff=5
 set sessionoptions=winpos,resize,tabpages,curdir,help
 set tags=./tags;
-set updatetime=1000
+set updatetime=100
 
 let s:nvim_initpath = expand('~/AppData/Local/nvim/init.vim')
 if !has('nvim') && has('win32') && !filereadable(s:nvim_initpath)
@@ -99,16 +100,19 @@ if !has('nvim') && has('win32') && !filereadable(s:nvim_initpath)
 	call writefile(['silent! source ~/.vimrc'], s:nvim_initpath)
 endif
 
-set packpath=
-set runtimepath=$VIMRUNTIME
+let g:vim_indent_cont = &g:shiftwidth
 
-if isdirectory($VIMRC_DOTVIM)
-	set runtimepath+=$VIMRC_DOTVIM
+if !filereadable($VIMRC_DOTVIM .. '/autoload/plug.vim') && executable('curl') && has('vim_starting')
+	call system(printf('curl -o "%s" https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim', expand('~/vim/autoload/plug.vim')))
+endif
 
-	let g:vim_indent_cont = &g:shiftwidth
+if filereadable($VIMRC_DOTVIM .. '/autoload/plug.vim')
+	set runtimepath=$VIMRUNTIME,$VIMRC_DOTVIM
+	set packpath=
+
 	let g:plug_url_format = 'https://github.com/%s.git'
 
-	call plug#begin(expand('$VIMRC_DOTVIM/pack/my/start'))
+	call plug#begin($VIMRC_PACKSTART)
 
 	call plug#('KabbAmine/yowish.vim')
 	call plug#('kana/vim-operator-replace')
@@ -129,103 +133,95 @@ if isdirectory($VIMRC_DOTVIM)
 		endif
 	endif
 
-	if executable('cargo')
-		call plug#('rhysd/rust-doc.vim')
-		call plug#('rust-lang/rust.vim')
-	endif
-
 	silent! source ~/.vimrc.local
 
 	call plug#end()
-
-	function! s:is_installed(name) abort
-		if has_key(g:plugs, a:name)
-			return isdirectory(g:plugs[a:name]['dir'])
-		else
-			return v:false
-		endif
-	endfunction
-
-	augroup vimrc
-		autocmd!
-		autocmd CmdlineEnter     *
-			\ : for s:cmdname in [
-			\		'MANPAGER', 'VimFoldh', 'VimTweakDisableCaption', 'VimTweakDisableMaximize',
-			\		'VimTweakDisableTopMost', 'VimTweakEnableCaption', 'VimTweakEnableMaximize',
-			\		'VimTweakEnableTopMost', 'Plug', 'PlugDiff', 'PlugInstall', 'PlugSnapshot',
-			\		'PlugStatus', 'PlugUpgrade',
-			\		'Cbench', 'Cbuild', 'Ccheck', 'Cclean', 'Cdoc',
-			\		'Cinit', 'Cinstall', 'Cnew', 'Cpublish', 'Crun',
-			\		'Cruntarget', 'Csearch', 'Ctest', 'Cupdate',
-			\		]
-			\ | 	execute printf('silent! delcommand %s', s:cmdname)
-			\ | endfor
-		autocmd FileType     help :setlocal colorcolumn=78
-		if s:is_installed('yowish.vim')
-			autocmd ColorScheme      *
-				\ : highlight!       TabLine          guifg=#d6d6d6 guibg=NONE    gui=NONE           cterm=NONE
-				\ | highlight!       TabLineFill      guifg=#1a1a1a guibg=NONE    gui=NONE           cterm=NONE
-				\ | highlight!       TabLineSel       guifg=#a9dd9d guibg=NONE    gui=NONE           cterm=NONE
-				\ | highlight!       Pmenu            guifg=#d6d6d6 guibg=NONE
-				\ | highlight!       PmenuSel         guifg=#a9dd9d guibg=NONE    gui=BOLD,UNDERLINE cterm=BOLD,UNDERLINE
-				\ | highlight!       PmenuSbar        guifg=#000000 guibg=#202020 gui=NONE
-				\ | highlight!       PmenuThumb       guifg=#000000 guibg=#606060 gui=NONE
-				\ | highlight! link  diffAdded        String
-				\ | highlight! link  diffRemoved      Constant
-				\ | highlight!       CursorIM         guifg=NONE    guibg=#ff00ff
-		endif
-		if !has('nvim') && has('win32') && (&shell =~# '\<cmd\.exe$')
-			" https://docs.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2012-R2-and-2012/cc725943(v=ws.11)
-			" https://gist.github.com/fnky/458719343aabd01cfb17a3a4f7296797
-			autocmd TerminalWinOpen     *
-				\ :call term_sendkeys(bufnr(), (windowsversion() == '10.0' ? 'prompt $e[0;32m$$$e[0m' : 'prompt $$') .. "\rcls\r")
-		endif
-	augroup END
-
-	if s:is_installed('vim-gloaded')
-		source $VIMRC_DOTVIM/pack/my/start/vim-gloaded/plugin/gloaded.vim
-	endif
-
-	if s:is_installed('vim-grizzly')
-		if !has('nvim') && has('win32') && (&shell =~# '\<cmd\.exe$')
-			let g:grizzly_prompt_pattern = '^$\zs.*'
-		endif
-	endif
-
-	if s:is_installed('vim-find')
-		nnoremap <silent><nowait><space>         <Cmd>FindHistory<cr>
-	endif
-
-	if s:is_installed('vim-operator-replace')
-		nmap     <silent><nowait>s               <Plug>(operator-replace)
-	endif
-
-	if s:is_installed('rust-doc.vim')
-		let g:rust_doc#downloaded_rust_doc_dir = expand('~/.rustup/toolchains/stable-x86_64-pc-windows-msvc')
-	endif
-
-	if s:is_installed('restart.vim')
-		let g:restart_sessionoptions = &sessionoptions
-	endif
-
-	if s:is_installed('vimtweak')
-		if has('gui_running') && has('win32')
-			augroup vimrc
-				autocmd VimEnter     * :VimTweakSetAlpha 240
-			augroup END
-		endif
-	endif
-
-	if (has('win32') || (256 == &t_Co)) && has('termguicolors') && !has('gui_running')
-		set termguicolors
-	endif
-
-	if s:is_installed('yowish.vim')
-		silent! colorscheme yowish
-	endif
 else
+	set runtimepath=$VIMRUNTIME
+	set packpath=$VIMRC_DOTVIM
+	silent! source ~/.vimrc.local
+	packloadall!
 	filetype indent plugin on
 	syntax on
+endif
+
+function! s:is_installed(name) abort
+	return isdirectory($VIMRC_PACKSTART .. '/' .. a:name)
+endfunction
+
+augroup vimrc
+	autocmd!
+	" Delete unused commands, because it's an obstacle on cmdline-completion.
+	autocmd CmdlineEnter     *
+				\ : for s:cmdname in [
+					\		'MANPAGER', 'VimFoldh', 'VimTweakDisableCaption', 'VimTweakDisableMaximize',
+					\		'VimTweakDisableTopMost', 'VimTweakEnableCaption', 'VimTweakEnableMaximize',
+					\		'VimTweakEnableTopMost', 'Plug', 'PlugDiff', 'PlugInstall', 'PlugSnapshot',
+					\		'PlugStatus', 'PlugUpgrade',
+					\		]
+					\ | 	execute printf('silent! delcommand %s', s:cmdname)
+					\ | endfor
+	autocmd FileType     help :setlocal colorcolumn=78
+	if s:is_installed('yowish.vim')
+		autocmd ColorScheme      *
+					\ : highlight!       TabLine          guifg=#d6d6d6 guibg=NONE    gui=NONE           cterm=NONE
+					\ | highlight!       TabLineFill      guifg=#1a1a1a guibg=NONE    gui=NONE           cterm=NONE
+					\ | highlight!       TabLineSel       guifg=#a9dd9d guibg=NONE    gui=NONE           cterm=NONE
+					\ | highlight!       Pmenu            guifg=#d6d6d6 guibg=NONE
+					\ | highlight!       PmenuSel         guifg=#a9dd9d guibg=NONE    gui=BOLD,UNDERLINE cterm=BOLD,UNDERLINE
+					\ | highlight!       PmenuSbar        guifg=#000000 guibg=#202020 gui=NONE
+					\ | highlight!       PmenuThumb       guifg=#000000 guibg=#606060 gui=NONE
+					\ | highlight! link  diffAdded        String
+					\ | highlight! link  diffRemoved      Constant
+					\ | highlight!       CursorIM         guifg=NONE    guibg=#ff00ff
+	endif
+	if !has('nvim') && has('win32') && (&shell =~# '\<cmd\.exe$')
+		" https://docs.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2012-R2-and-2012/cc725943(v=ws.11)
+		" https://gist.github.com/fnky/458719343aabd01cfb17a3a4f7296797
+		autocmd TerminalWinOpen     *
+			\ :call term_sendkeys(bufnr(), join([
+			\	(windowsversion() == '10.0' ? 'prompt $e[0;32m$$$e[0m' : 'prompt $$'),
+			\	'doskey rm=del /q', 'doskey mv=move /y', 'doskey copy=copy /y', 'doskey pwd=cd', 'cls', ''
+			\ ], "\r"))
+	endif
+augroup END
+
+if s:is_installed('vim-gloaded')
+	source $VIMRC_DOTVIM/pack/my/start/vim-gloaded/plugin/gloaded.vim
+endif
+
+if s:is_installed('vim-grizzly')
+	if !has('nvim') && has('win32') && (&shell =~# '\<cmd\.exe$')
+		let g:grizzly_prompt_pattern = '^$\zs.*'
+	endif
+endif
+
+if s:is_installed('vim-find')
+	nnoremap <silent><nowait><space>         <Cmd>FindHistory<cr>
+endif
+
+if s:is_installed('vim-operator-replace')
+	nmap     <silent><nowait>s               <Plug>(operator-replace)
+endif
+
+if s:is_installed('restart.vim')
+	let g:restart_sessionoptions = &sessionoptions
+endif
+
+if s:is_installed('vimtweak')
+	if has('gui_running') && has('win32')
+		augroup vimrc
+			autocmd VimEnter     * :VimTweakSetAlpha 240
+		augroup END
+	endif
+endif
+
+if (has('win32') || (256 == &t_Co)) && has('termguicolors') && !has('gui_running')
+	set termguicolors
+endif
+
+if s:is_installed('yowish.vim')
+	silent! colorscheme yowish
 endif
 
 " -------------------------
@@ -277,7 +273,7 @@ cnoremap   <expr><nowait><space>         (wildmenumode() && (getcmdline() =~# '[
 
 if has('tabsidebar')
 	function! Tabsidebar() abort
-		let xs = ['%#TabSideBar#' .. '--- ' .. g:actual_curtabpage .. ' ---' .. '%#TabSideBar#']
+		let xs = ['%#Label#' .. '--- ' .. g:actual_curtabpage .. ' ---' .. '%#TabSideBar#']
 		for x in filter(getwininfo(), { i, x -> g:actual_curtabpage == x['tabnr']})
 			let ft = getbufvar(x['bufnr'], '&filetype')
 			let bt = getbufvar(x['bufnr'], '&buftype')
