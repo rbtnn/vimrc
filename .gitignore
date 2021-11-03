@@ -71,6 +71,7 @@
 .xsession-errors
 .xsession-errors.old
 .yarnrc
+.zshenv
 3D Objects/
 Anaconda3/
 AppData/

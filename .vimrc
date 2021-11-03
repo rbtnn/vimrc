@@ -102,18 +102,15 @@ endif
 
 let g:vim_indent_cont = &g:shiftwidth
 
-if !filereadable($VIMRC_DOTVIM .. '/autoload/plug.vim') && executable('curl') && has('vim_starting')
-	call system(printf('curl -o "%s" https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim', expand('~/vim/autoload/plug.vim')))
+let s:plugvim_path = expand('$VIMRC_DOTVIM/autoload/plug.vim')
+if !filereadable(s:plugvim_path) && executable('curl') && has('vim_starting')
+	call system(printf('curl -o "%s" https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim', s:plugvim_path))
 endif
-
-if filereadable($VIMRC_DOTVIM .. '/autoload/plug.vim')
+if filereadable(s:plugvim_path)
 	set runtimepath=$VIMRUNTIME,$VIMRC_DOTVIM
 	set packpath=
-
 	let g:plug_url_format = 'https://github.com/%s.git'
-
 	call plug#begin($VIMRC_PACKSTART)
-
 	call plug#('KabbAmine/yowish.vim')
 	call plug#('kana/vim-operator-replace')
 	call plug#('kana/vim-operator-user')
@@ -124,7 +121,6 @@ if filereadable($VIMRC_DOTVIM .. '/autoload/plug.vim')
 	call plug#('rbtnn/vim-vimscript_lasterror')
 	call plug#('rbtnn/vim-vimscript_tagfunc')
 	call plug#('thinca/vim-qfreplace')
-
 	if has('win32')
 		call plug#('rbtnn/vim-grizzly')
 		call plug#('rbtnn/vimtweak')
@@ -132,9 +128,7 @@ if filereadable($VIMRC_DOTVIM .. '/autoload/plug.vim')
 			call plug#('tyru/restart.vim')
 		endif
 	endif
-
 	silent! source ~/.vimrc.local
-
 	call plug#end()
 else
 	set runtimepath=$VIMRUNTIME
@@ -153,27 +147,27 @@ augroup vimrc
 	autocmd!
 	" Delete unused commands, because it's an obstacle on cmdline-completion.
 	autocmd CmdlineEnter     *
-				\ : for s:cmdname in [
-					\		'MANPAGER', 'VimFoldh', 'VimTweakDisableCaption', 'VimTweakDisableMaximize',
-					\		'VimTweakDisableTopMost', 'VimTweakEnableCaption', 'VimTweakEnableMaximize',
-					\		'VimTweakEnableTopMost', 'Plug', 'PlugDiff', 'PlugInstall', 'PlugSnapshot',
-					\		'PlugStatus', 'PlugUpgrade',
-					\		]
-					\ | 	execute printf('silent! delcommand %s', s:cmdname)
-					\ | endfor
+		\ : for s:cmdname in [
+		\		'MANPAGER', 'VimFoldh', 'VimTweakDisableCaption', 'VimTweakDisableMaximize',
+		\		'VimTweakDisableTopMost', 'VimTweakEnableCaption', 'VimTweakEnableMaximize',
+		\		'VimTweakEnableTopMost', 'Plug', 'PlugDiff', 'PlugInstall', 'PlugSnapshot',
+		\		'PlugStatus', 'PlugUpgrade',
+		\		]
+		\ | 	execute printf('silent! delcommand %s', s:cmdname)
+		\ | endfor
 	autocmd FileType     help :setlocal colorcolumn=78
 	if s:is_installed('yowish.vim')
 		autocmd ColorScheme      *
-					\ : highlight!       TabLine          guifg=#d6d6d6 guibg=NONE    gui=NONE           cterm=NONE
-					\ | highlight!       TabLineFill      guifg=#1a1a1a guibg=NONE    gui=NONE           cterm=NONE
-					\ | highlight!       TabLineSel       guifg=#a9dd9d guibg=NONE    gui=NONE           cterm=NONE
-					\ | highlight!       Pmenu            guifg=#d6d6d6 guibg=NONE
-					\ | highlight!       PmenuSel         guifg=#a9dd9d guibg=NONE    gui=BOLD,UNDERLINE cterm=BOLD,UNDERLINE
-					\ | highlight!       PmenuSbar        guifg=#000000 guibg=#202020 gui=NONE
-					\ | highlight!       PmenuThumb       guifg=#000000 guibg=#606060 gui=NONE
-					\ | highlight! link  diffAdded        String
-					\ | highlight! link  diffRemoved      Constant
-					\ | highlight!       CursorIM         guifg=NONE    guibg=#ff00ff
+			\ : highlight!       TabLine          guifg=#d6d6d6 guibg=NONE    gui=NONE           cterm=NONE
+			\ | highlight!       TabLineFill      guifg=#1a1a1a guibg=NONE    gui=NONE           cterm=NONE
+			\ | highlight!       TabLineSel       guifg=#a9dd9d guibg=NONE    gui=NONE           cterm=NONE
+			\ | highlight!       Pmenu            guifg=#d6d6d6 guibg=NONE
+			\ | highlight!       PmenuSel         guifg=#a9dd9d guibg=NONE    gui=BOLD,UNDERLINE cterm=BOLD,UNDERLINE
+			\ | highlight!       PmenuSbar        guifg=#000000 guibg=#202020 gui=NONE
+			\ | highlight!       PmenuThumb       guifg=#000000 guibg=#606060 gui=NONE
+			\ | highlight! link  diffAdded        String
+			\ | highlight! link  diffRemoved      Constant
+			\ | highlight!       CursorIM         guifg=NONE    guibg=#ff00ff
 	endif
 	if !has('nvim') && has('win32') && (&shell =~# '\<cmd\.exe$')
 		" https://docs.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2012-R2-and-2012/cc725943(v=ws.11)
@@ -224,9 +218,7 @@ if s:is_installed('yowish.vim')
 	silent! colorscheme yowish
 endif
 
-" -------------------------
-" terminal keymappings
-" -------------------------
+" Emacs key mappings
 if has('win32')
 	tnoremap <silent><nowait><C-b>       <left>
 	tnoremap <silent><nowait><C-f>       <right>
@@ -234,42 +226,41 @@ if has('win32')
 	tnoremap <silent><nowait><C-a>       <home>
 	tnoremap <silent><nowait><C-u>       <esc>
 endif
+cnoremap         <nowait><C-b>           <left>
+cnoremap         <nowait><C-f>           <right>
+cnoremap         <nowait><C-e>           <end>
+cnoremap         <nowait><C-a>           <home>
+cnoremap         <nowait><C-q>           <C-f>
+
+" Escape from Terminal mode.
 if has('nvim')
 	tnoremap <silent><nowait><esc>       <C-\><C-n>
 else
 	tnoremap <silent><nowait><esc>       <C-w>N
 endif
+
+" Move the next/previous error in quickfix.
+nnoremap <silent><nowait><C-n>           <Cmd>cnext<cr>
+nnoremap <silent><nowait><C-p>           <Cmd>cprevious<cr>
+
+" Move the next/previous tabpage.
+nnoremap <silent><nowait><C-j>           <Cmd>tabnext<cr>
+nnoremap <silent><nowait><C-k>           <Cmd>tabprevious<cr>
 tnoremap <silent><nowait><C-j>           <Cmd>tabnext<cr>
 tnoremap <silent><nowait><C-k>           <Cmd>tabprevious<cr>
 
-" -------------------------
-" normal keymappings
-" -------------------------
-nnoremap <silent><nowait><C-n>           <Cmd>cnext<cr>
-nnoremap <silent><nowait><C-p>           <Cmd>cprevious<cr>
-nnoremap <silent><nowait><C-j>           <Cmd>tabnext<cr>
-nnoremap <silent><nowait><C-k>           <Cmd>tabprevious<cr>
+" Go to the alternate window.
+tnoremap <silent><nowait><C-s>           <Cmd>execute (winnr('#') .. 'wincmd w')<cr>
+nnoremap <silent><nowait><C-s>           <Cmd>execute (winnr('#') .. 'wincmd w')<cr>
+
+" Smart space on wildmenu
+cnoremap   <expr><nowait><space>         (wildmenumode() && (getcmdline() =~# '[\/]$')) ? '<space><bs>' : '<space>'
 
 " I use Ctrl-u and Ctrl-d to scroll. Others are disabled.
 nnoremap <silent><nowait><C-e>           <nop>
 nnoremap <silent><nowait><C-y>           <nop>
 nnoremap <silent><nowait><C-f>           <nop>
 nnoremap <silent><nowait><C-b>           <nop>
-
-" -------------------------
-" insert keymappings
-" -------------------------
-inoremap <silent><nowait><tab>           <C-v><tab>
-
-" -------------------------
-" cmdline keymappings
-" -------------------------
-cnoremap         <nowait><C-b>           <left>
-cnoremap         <nowait><C-f>           <right>
-cnoremap         <nowait><C-e>           <end>
-cnoremap         <nowait><C-a>           <home>
-cnoremap         <nowait><C-q>           <C-f>
-cnoremap   <expr><nowait><space>         (wildmenumode() && (getcmdline() =~# '[\/]$')) ? '<space><bs>' : '<space>'
 
 if has('tabsidebar')
 	function! Tabsidebar() abort
