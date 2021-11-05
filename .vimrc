@@ -170,13 +170,23 @@ augroup vimrc
 			\ | highlight!       CursorIM         guifg=NONE    guibg=#ff00ff
 	endif
 	if !has('nvim') && has('win32') && (&shell =~# '\<cmd\.exe$')
-		" https://docs.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2012-R2-and-2012/cc725943(v=ws.11)
-		" https://gist.github.com/fnky/458719343aabd01cfb17a3a4f7296797
-		autocmd TerminalWinOpen     *
-			\ :call term_sendkeys(bufnr(), join([
-			\	(windowsversion() == '10.0' ? 'prompt $e[0;32m$$$e[0m' : 'prompt $$'),
-			\	'doskey rm=del /q', 'doskey mv=move /y', 'doskey copy=copy /y', 'doskey pwd=cd', 'cls', ''
-			\ ], "\r"))
+		let s:initcmd_path = get(s:, 'initcmd_path', tempname() .. '.cmd')
+		function! s:term_win_open() abort
+			" https://docs.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2012-R2-and-2012/cc725943(v=ws.11)
+			" https://gist.github.com/fnky/458719343aabd01cfb17a3a4f7296797
+			call writefile(map([
+				\	'@echo off', 'cls',
+				\	(windowsversion() == '10.0' ? 'prompt $e[0;32m$$$e[0m' : 'prompt $$'),
+				\	'doskey ls=dir /b $*',
+				\	'doskey rm=del /q $*',
+				\	'doskey mv=move /y $*',
+				\	'doskey cp=copy /y $*',
+				\	'doskey pwd=cd',
+				\ ], { i,x -> x .. "\r" }), s:initcmd_path)
+			call term_sendkeys(bufnr(), printf("call %s\r", s:initcmd_path))
+		endfunction
+		autocmd TerminalWinOpen     * :silent! call s:term_win_open()
+		autocmd VimLeave            * :silent! call delete(s:initcmd_path)
 	endif
 augroup END
 
@@ -230,6 +240,8 @@ cnoremap         <nowait><C-b>           <left>
 cnoremap         <nowait><C-f>           <right>
 cnoremap         <nowait><C-e>           <end>
 cnoremap         <nowait><C-a>           <home>
+
+" Enter Command-line window from Command-line.
 cnoremap         <nowait><C-q>           <C-f>
 
 " Escape from Terminal mode.
