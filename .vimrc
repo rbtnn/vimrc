@@ -153,10 +153,6 @@ else
 	syntax on
 endif
 
-function! s:is_installed(name) abort
-	return isdirectory($VIMRC_PACKSTART .. '/' .. a:name)
-endfunction
-
 " Delete unused commands, because it's an obstacle on cmdline-completion.
 autocmd vimrc CmdlineEnter     *
 	\ : for s:cmdname in [
@@ -169,20 +165,6 @@ autocmd vimrc CmdlineEnter     *
 	\ | endfor
 
 autocmd vimrc FileType     help :setlocal colorcolumn=78
-
-if s:is_installed('yowish.vim')
-	autocmd vimrc ColorScheme      *
-		\ : highlight!       TabLine          guifg=#d6d6d6 guibg=NONE    gui=NONE           cterm=NONE
-		\ | highlight!       TabLineFill      guifg=#1a1a1a guibg=NONE    gui=NONE           cterm=NONE
-		\ | highlight!       TabLineSel       guifg=#a9dd9d guibg=NONE    gui=NONE           cterm=NONE
-		\ | highlight!       Pmenu            guifg=#d6d6d6 guibg=NONE
-		\ | highlight!       PmenuSel         guifg=#a9dd9d guibg=NONE    gui=BOLD,UNDERLINE cterm=BOLD,UNDERLINE
-		\ | highlight!       PmenuSbar        guifg=#000000 guibg=#202020 gui=NONE
-		\ | highlight!       PmenuThumb       guifg=#000000 guibg=#606060 gui=NONE
-		\ | highlight! link  diffAdded        String
-		\ | highlight! link  diffRemoved      Constant
-		\ | highlight!       CursorIM         guifg=NONE    guibg=#ff00ff
-endif
 
 if !has('nvim') && has('win32') && (&shell =~# '\<cmd\.exe$')
 	let s:initcmd_path = get(s:, 'initcmd_path', tempname() .. '.cmd')
@@ -203,6 +185,14 @@ if !has('nvim') && has('win32') && (&shell =~# '\<cmd\.exe$')
 	autocmd vimrc TerminalWinOpen     * :silent! call s:term_win_open()
 	autocmd vimrc VimLeave            * :silent! call delete(s:initcmd_path)
 endif
+
+if (has('win32') || (256 == &t_Co)) && has('termguicolors') && !has('gui_running')
+	set termguicolors
+endif
+
+function! s:is_installed(name) abort
+	return isdirectory($VIMRC_PACKSTART .. '/' .. a:name)
+endfunction
 
 if s:is_installed('vim-gloaded')
 	source $VIMRC_DOTVIM/pack/my/start/vim-gloaded/plugin/gloaded.vim
@@ -232,11 +222,18 @@ if s:is_installed('vimtweak')
 	endif
 endif
 
-if (has('win32') || (256 == &t_Co)) && has('termguicolors') && !has('gui_running')
-	set termguicolors
-endif
-
 if s:is_installed('yowish.vim')
+	autocmd vimrc ColorScheme      *
+		\ : highlight!       TabLine          guifg=#d6d6d6 guibg=NONE    gui=NONE           cterm=NONE
+		\ | highlight!       TabLineFill      guifg=#1a1a1a guibg=NONE    gui=NONE           cterm=NONE
+		\ | highlight!       TabLineSel       guifg=#a9dd9d guibg=NONE    gui=NONE           cterm=NONE
+		\ | highlight!       Pmenu            guifg=#d6d6d6 guibg=NONE
+		\ | highlight!       PmenuSel         guifg=#a9dd9d guibg=NONE    gui=BOLD,UNDERLINE cterm=BOLD,UNDERLINE
+		\ | highlight!       PmenuSbar        guifg=#000000 guibg=#202020 gui=NONE
+		\ | highlight!       PmenuThumb       guifg=#000000 guibg=#606060 gui=NONE
+		\ | highlight! link  diffAdded        String
+		\ | highlight! link  diffRemoved      Constant
+		\ | highlight!       CursorIM         guifg=NONE    guibg=#ff00ff
 	silent! colorscheme yowish
 endif
 
