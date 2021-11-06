@@ -6,6 +6,10 @@ let $VIMRC_ROOT = expand('<sfile>:h')
 let $VIMRC_DOTVIM = expand('$VIMRC_ROOT/vim')
 let $VIMRC_PACKSTART = expand('$VIMRC_DOTVIM/pack/my/start')
 
+augroup vimrc
+	autocmd!
+augroup END
+
 " system
 language message C
 set winaltkeys=yes
@@ -20,6 +24,7 @@ set shiftround
 set softtabstop=-1
 set shiftwidth=4
 set tabstop=4
+let g:vim_indent_cont = &g:shiftwidth
 
 " cmdline
 set cmdwinheight=5
@@ -46,10 +51,10 @@ else
 endif
 
 " statusline/tabline/ruler/mode
-set laststatus=2
-set noshowmode
+set laststatus=0
 set ruler
 set rulerformat=%16(%{&ft}/%{&ff}/%{&fileencoding}%)
+set showmode
 set showtabline=0
 set statusline&
 
@@ -93,14 +98,23 @@ set sessionoptions=winpos,resize,tabpages,curdir,help
 set tags=./tags;
 set updatetime=100
 
-let s:nvim_initpath = expand('~/AppData/Local/nvim/init.vim')
-if !has('nvim') && has('win32') && !filereadable(s:nvim_initpath)
-	" This is the same as stdpath('config') in nvim.
-	call mkdir(fnamemodify(s:nvim_initpath, ':h'), 'p')
-	call writefile(['silent! source ~/.vimrc'], s:nvim_initpath)
+" for Neovim
+if has('nvim')
+	if has('win32')
+		" Running nvim-qt.exe on Windows OS, never use GUI popupmenu.
+		call rpcnotify(0, 'Gui', 'Option', 'Popupmenu', 0)
+	endif
+	set pumblend=20
+else
+	if has('win32')
+		" This is the same as stdpath('config') in nvim on Windows OS.
+		let s:nvim_initpath = expand('~/AppData/Local/nvim/init.vim')
+		if !filereadable(s:nvim_initpath)
+			call mkdir(fnamemodify(s:nvim_initpath, ':h'), 'p')
+			call writefile(['silent! source ~/.vimrc'], s:nvim_initpath)
+		endif
+	endif
 endif
-
-let g:vim_indent_cont = &g:shiftwidth
 
 let s:plugvim_path = expand('$VIMRC_DOTVIM/autoload/plug.vim')
 if !filereadable(s:plugvim_path) && executable('curl') && has('vim_starting')
@@ -143,52 +157,52 @@ function! s:is_installed(name) abort
 	return isdirectory($VIMRC_PACKSTART .. '/' .. a:name)
 endfunction
 
-augroup vimrc
-	autocmd!
-	" Delete unused commands, because it's an obstacle on cmdline-completion.
-	autocmd CmdlineEnter     *
-		\ : for s:cmdname in [
-		\		'MANPAGER', 'VimFoldh', 'VimTweakDisableCaption', 'VimTweakDisableMaximize',
-		\		'VimTweakDisableTopMost', 'VimTweakEnableCaption', 'VimTweakEnableMaximize',
-		\		'VimTweakEnableTopMost', 'Plug', 'PlugDiff', 'PlugInstall', 'PlugSnapshot',
-		\		'PlugStatus', 'PlugUpgrade',
-		\		]
-		\ | 	execute printf('silent! delcommand %s', s:cmdname)
-		\ | endfor
-	autocmd FileType     help :setlocal colorcolumn=78
-	if s:is_installed('yowish.vim')
-		autocmd ColorScheme      *
-			\ : highlight!       TabLine          guifg=#d6d6d6 guibg=NONE    gui=NONE           cterm=NONE
-			\ | highlight!       TabLineFill      guifg=#1a1a1a guibg=NONE    gui=NONE           cterm=NONE
-			\ | highlight!       TabLineSel       guifg=#a9dd9d guibg=NONE    gui=NONE           cterm=NONE
-			\ | highlight!       Pmenu            guifg=#d6d6d6 guibg=NONE
-			\ | highlight!       PmenuSel         guifg=#a9dd9d guibg=NONE    gui=BOLD,UNDERLINE cterm=BOLD,UNDERLINE
-			\ | highlight!       PmenuSbar        guifg=#000000 guibg=#202020 gui=NONE
-			\ | highlight!       PmenuThumb       guifg=#000000 guibg=#606060 gui=NONE
-			\ | highlight! link  diffAdded        String
-			\ | highlight! link  diffRemoved      Constant
-			\ | highlight!       CursorIM         guifg=NONE    guibg=#ff00ff
-	endif
-	if !has('nvim') && has('win32') && (&shell =~# '\<cmd\.exe$')
-		let s:initcmd_path = get(s:, 'initcmd_path', tempname() .. '.cmd')
-		function! s:term_win_open() abort
-			" https://docs.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2012-R2-and-2012/cc725943(v=ws.11)
-			" https://gist.github.com/fnky/458719343aabd01cfb17a3a4f7296797
-			call writefile(map([
-				\	'@echo off', 'cls',
-				\	(windowsversion() == '10.0' ? 'prompt $e[0;32m$$$e[0m' : 'prompt $$'),
-				\	'doskey ls=dir /b $*',
-				\	'doskey rm=del /q $*',
-				\	'doskey mv=move /y $*',
-				\	'doskey cp=copy /y $*',
-				\	'doskey pwd=cd',
-				\ ], { i,x -> x .. "\r" }), s:initcmd_path)
-			call term_sendkeys(bufnr(), printf("call %s\r", s:initcmd_path))
-		endfunction
-		autocmd TerminalWinOpen     * :silent! call s:term_win_open()
-		autocmd VimLeave            * :silent! call delete(s:initcmd_path)
-	endif
-augroup END
+" Delete unused commands, because it's an obstacle on cmdline-completion.
+autocmd vimrc CmdlineEnter     *
+	\ : for s:cmdname in [
+	\		'MANPAGER', 'VimFoldh', 'VimTweakDisableCaption', 'VimTweakDisableMaximize',
+	\		'VimTweakDisableTopMost', 'VimTweakEnableCaption', 'VimTweakEnableMaximize',
+	\		'VimTweakEnableTopMost', 'Plug', 'PlugDiff', 'PlugInstall', 'PlugSnapshot',
+	\		'PlugStatus', 'PlugUpgrade',
+	\		]
+	\ | 	execute printf('silent! delcommand %s', s:cmdname)
+	\ | endfor
+
+autocmd vimrc FileType     help :setlocal colorcolumn=78
+
+if s:is_installed('yowish.vim')
+	autocmd vimrc ColorScheme      *
+		\ : highlight!       TabLine          guifg=#d6d6d6 guibg=NONE    gui=NONE           cterm=NONE
+		\ | highlight!       TabLineFill      guifg=#1a1a1a guibg=NONE    gui=NONE           cterm=NONE
+		\ | highlight!       TabLineSel       guifg=#a9dd9d guibg=NONE    gui=NONE           cterm=NONE
+		\ | highlight!       Pmenu            guifg=#d6d6d6 guibg=NONE
+		\ | highlight!       PmenuSel         guifg=#a9dd9d guibg=NONE    gui=BOLD,UNDERLINE cterm=BOLD,UNDERLINE
+		\ | highlight!       PmenuSbar        guifg=#000000 guibg=#202020 gui=NONE
+		\ | highlight!       PmenuThumb       guifg=#000000 guibg=#606060 gui=NONE
+		\ | highlight! link  diffAdded        String
+		\ | highlight! link  diffRemoved      Constant
+		\ | highlight!       CursorIM         guifg=NONE    guibg=#ff00ff
+endif
+
+if !has('nvim') && has('win32') && (&shell =~# '\<cmd\.exe$')
+	let s:initcmd_path = get(s:, 'initcmd_path', tempname() .. '.cmd')
+	function! s:term_win_open() abort
+		" https://docs.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2012-R2-and-2012/cc725943(v=ws.11)
+		" https://gist.github.com/fnky/458719343aabd01cfb17a3a4f7296797
+		call writefile(map([
+			\	'@echo off', 'cls',
+			\	(windowsversion() == '10.0' ? 'prompt $e[0;32m$$$e[0m' : 'prompt $$'),
+			\	'doskey ls=dir /b $*',
+			\	'doskey rm=del /q $*',
+			\	'doskey mv=move /y $*',
+			\	'doskey cp=copy /y $*',
+			\	'doskey pwd=cd',
+			\ ], { i,x -> x .. "\r" }), s:initcmd_path)
+		call term_sendkeys(bufnr(), printf("call %s\r", s:initcmd_path))
+	endfunction
+	autocmd vimrc TerminalWinOpen     * :silent! call s:term_win_open()
+	autocmd vimrc VimLeave            * :silent! call delete(s:initcmd_path)
+endif
 
 if s:is_installed('vim-gloaded')
 	source $VIMRC_DOTVIM/pack/my/start/vim-gloaded/plugin/gloaded.vim
@@ -214,9 +228,7 @@ endif
 
 if s:is_installed('vimtweak')
 	if has('gui_running') && has('win32')
-		augroup vimrc
-			autocmd VimEnter     * :VimTweakSetAlpha 240
-		augroup END
+		autocmd vimrc VimEnter     * :VimTweakSetAlpha 240
 	endif
 endif
 
@@ -276,56 +288,32 @@ nnoremap <silent><nowait><C-b>           <nop>
 
 if has('tabsidebar')
 	function! Tabsidebar() abort
-		let xs = ['%#Label#' .. '--- ' .. g:actual_curtabpage .. ' ---' .. '%#TabSideBar#']
-		for x in filter(getwininfo(), { i, x -> g:actual_curtabpage == x['tabnr']})
-			let ft = getbufvar(x['bufnr'], '&filetype')
-			let bt = getbufvar(x['bufnr'], '&buftype')
-			let text = bufname(x['bufnr'])
-			let m = v:true
-			let r = v:true
-			if ft == 'help'
-				let text = '[help]'
-				let m = v:false
-				let r = v:false
-			elseif filereadable(text)
-				let text = fnamemodify(text, ':t')
-			elseif x['terminal']
-				let text = '[Terminal]'
-				let m = v:false
-				let r = v:false
-			elseif x['quickfix']
-				let text = '[Quickfix]'
-			elseif x['loclist']
-				let text = '[Loclist]'
-			elseif bt == 'nofile'
-				if !empty(ft)
-					let text = printf('[%s]', ft)
-					let m = v:false
-					let r = v:false
-				else
-					let text = '[Scratch]'
-				endif
-			elseif empty(text)
-				let text = '[No Name]'
-			endif
-			let prefix = ''
-			if g:actual_curtabpage == tabpagenr()
-				if x['winnr'] == winnr()
-					let prefix = prefix .. '%#TabSideBarSel#*'
-				endif
-				if x['winnr'] == winnr('#')
-					let prefix = prefix .. '%#Preproc##'
-				endif
-			endif
-			let prefix = prefix .. repeat(' ', 3 - len(split(prefix, '%', v:true)))
-			let xs += [
-				\ printf('%s%%#TabSideBar# %s', prefix, text)
-				\ .. (getbufvar(x['bufnr'], '&modified') && m ? '%#Comment#[+]' : '')
-				\ .. (getbufvar(x['bufnr'], '&readonly') && r ? '%#Comment#[RO]' : '')
-				\ ]
-		endfor
-		let xs += ['']
-		return join(xs, "\n")
+		try
+			let xs = ['', '%#Label#' .. '--- ' .. g:actual_curtabpage .. ' ---' .. '%#TabSideBar#']
+			for x in filter(getwininfo(), { i, x -> g:actual_curtabpage == x['tabnr']})
+				let ft = getbufvar(x['bufnr'], '&filetype')
+				let bt = getbufvar(x['bufnr'], '&buftype')
+				let mo = getbufvar(x['bufnr'], '&modified')
+				let re = getbufvar(x['bufnr'], '&readonly')
+				let name = bufname(x['bufnr'])
+				let curr = g:actual_curtabpage == tabpagenr()
+				let text = !empty(bt)
+					\ ? printf('[%s]', bt == 'nofile' ? ft : bt)
+					\ : (empty(name) ? '[No Name]' : fnamemodify(name, ':t'))
+				let xs += [
+					\ ' '
+					\ .. '%#TabSideBarSel#' .. (curr && x['winnr'] == winnr() ? '%%' : ' ')
+					\ .. '%#Preproc#' .. (curr && x['winnr'] == winnr('#') ? '#' : ' ')
+					\ .. ' '
+					\ .. '%#TabSideBar#' .. text
+					\ .. '%#Comment#' .. (empty(bt) && mo ? '[+]' : '')
+					\ .. '%#Comment#' .. (empty(bt) && re ? '[RO]' : '')
+					\ ]
+			endfor
+			return join(xs, "\n")
+		catch
+			return v:exception
+		endtry
 	endfunction
 	let g:tabsidebar_vertsplit = 1
 	set notabsidebaralign
