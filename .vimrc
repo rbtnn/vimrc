@@ -201,7 +201,7 @@ if s:is_installed('vim-grizzly')
 endif
 
 if s:is_installed('vim-find')
-	nnoremap <silent><nowait><space>         <Cmd>FindHistory<cr>
+	nnoremap <silent><nowait><space>         <Cmd>FindFiles<cr>
 endif
 
 if s:is_installed('vim-operator-replace')
@@ -261,9 +261,9 @@ nnoremap <silent><nowait><C-k>           <Cmd>tabprevious<cr>
 tnoremap <silent><nowait><C-j>           <Cmd>tabnext<cr>
 tnoremap <silent><nowait><C-k>           <Cmd>tabprevious<cr>
 
-" Go to the alternate window.
-tnoremap <silent><nowait><C-s>           <Cmd>execute (winnr('#') .. 'wincmd w')<cr>
-nnoremap <silent><nowait><C-s>           <Cmd>execute (winnr('#') .. 'wincmd w')<cr>
+" Go to the last accessed window.
+tnoremap <silent><nowait><C-s>           <C-w>p
+nnoremap <silent><nowait><C-s>           <C-w>p
 
 " Smart space on wildmenu
 cnoremap   <expr><nowait><space>         (wildmenumode() && (getcmdline() =~# '[\/]$')) ? '<space><bs>' : '<space>'
@@ -308,11 +308,20 @@ if has('tabsidebar')
 			elseif empty(text)
 				let text = '[No Name]'
 			endif
+			let prefix = ''
+			if g:actual_curtabpage == tabpagenr()
+				if x['winnr'] == winnr()
+					let prefix = prefix .. '%#TabSideBarSel#*'
+				endif
+				if x['winnr'] == winnr('#')
+					let prefix = prefix .. '%#Preproc##'
+				endif
+			endif
+			let prefix = prefix .. repeat(' ', 3 - len(split(prefix, '%', v:true)))
 			let xs += [
-				\ (x['winid'] == win_getid() ? '%#TabSideBarSel#' : '%#TabSideBar#')
-				\ .. ' ' .. text .. ' '
-				\ .. (getbufvar(x['bufnr'], '&modified') && m ? '[+]' : '')
-				\ .. (getbufvar(x['bufnr'], '&readonly') && r ? '[RO]' : '')
+				\ printf('%s%%#TabSideBar# %s', prefix, text)
+				\ .. (getbufvar(x['bufnr'], '&modified') && m ? '%#Comment#[+]' : '')
+				\ .. (getbufvar(x['bufnr'], '&readonly') && r ? '%#Comment#[RO]' : '')
 				\ ]
 		endfor
 		let xs += ['']
