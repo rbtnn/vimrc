@@ -50,13 +50,68 @@ else
 	set noundofile
 endif
 
-" statusline/tabline/ruler/mode
-set laststatus=0
+" ruler
 set ruler
 set rulerformat=%16(%{&ft}/%{&ff}/%{&fileencoding}%)
-set showmode
-set showtabline=0
+
+" statusline
+set laststatus=0
 set statusline&
+
+" tabline
+set showtabline=0
+set tabline&
+
+" title
+function! TitleString(bnr, is_tabsidebar) abort
+	let ft = getbufvar(a:bnr, '&filetype')
+	let bt = getbufvar(a:bnr, '&buftype')
+	let mo = getbufvar(a:bnr, '&modified')
+	let re = getbufvar(a:bnr, '&readonly')
+	let name = bufname(a:bnr)
+	return (a:is_tabsidebar ? '%#TabSideBar#' : '')
+		\ .. (!empty(bt)
+		\          ? printf('[%s]', bt == 'nofile' ? ft : bt)
+		\          : (empty(name) ? '[No Name]' : fnamemodify(name, a:is_tabsidebar ? ':t' : ':p'))
+		\    )
+		\ .. (a:is_tabsidebar ? '%#Comment#'    : '') .. (empty(bt) && mo ? '[+]' : '')
+		\ .. (a:is_tabsidebar ? '%#Comment#'    : '') .. (empty(bt) && re ? '[RO]' : '')
+endfunction
+
+if has('win32')
+	set title
+	set titlestring=%{TitleString(bufnr(),v:false)}
+else
+	set notitle
+endif
+
+" tabsidebar
+if has('tabsidebar')
+	function! Tabsidebar() abort
+		try
+			let xs = ['', '%#Label#' .. '--- ' .. g:actual_curtabpage .. ' ---' .. '%#TabSideBar#']
+			for x in filter(getwininfo(), { i, x -> g:actual_curtabpage == x['tabnr']})
+				let curr = g:actual_curtabpage == tabpagenr()
+				let xs += [
+					\ ' '
+					\ .. '%#TabSideBarSel#' .. (curr && x['winnr'] == winnr() ? '%%' : ' ')
+					\ .. '%#Preproc#' .. (curr && x['winnr'] == winnr('#') ? '#' : ' ')
+					\ .. ' '
+					\ .. TitleString(x['bufnr'], v:true)
+					\ ]
+			endfor
+			return join(xs, "\n")
+		catch
+			return v:exception
+		endtry
+	endfunction
+	let g:tabsidebar_vertsplit = 1
+	set notabsidebaralign
+	set notabsidebarwrap
+	set showtabsidebar=2
+	set tabsidebar=%!Tabsidebar()
+	set tabsidebarcolumns=16
+endif
 
 " complete
 set pumheight=10
@@ -95,6 +150,7 @@ set nowrap
 set nrformats=unsigned
 set scrolloff=5
 set sessionoptions=winpos,resize,tabpages,curdir,help
+set showmode
 set tags=./tags;
 set updatetime=100
 
@@ -224,9 +280,9 @@ endif
 
 if s:is_installed('yowish.vim')
 	autocmd vimrc ColorScheme      *
-		\ : highlight!       TabLine          guifg=#d6d6d6 guibg=NONE    gui=NONE           cterm=NONE
-		\ | highlight!       TabLineFill      guifg=#1a1a1a guibg=NONE    gui=NONE           cterm=NONE
-		\ | highlight!       TabLineSel       guifg=#a9dd9d guibg=NONE    gui=NONE           cterm=NONE
+		\ : highlight!       TabSideBar       guifg=#d6d6d6 guibg=NONE    gui=NONE           cterm=NONE
+		\ | highlight!       TabSideBarFill   guifg=#1a1a1a guibg=NONE    gui=NONE           cterm=NONE
+		\ | highlight!       TabSideBarSel    guifg=#a9dd9d guibg=NONE    gui=NONE           cterm=NONE
 		\ | highlight!       Pmenu            guifg=#d6d6d6 guibg=NONE
 		\ | highlight!       PmenuSel         guifg=#a9dd9d guibg=NONE    gui=BOLD,UNDERLINE cterm=BOLD,UNDERLINE
 		\ | highlight!       PmenuSbar        guifg=#000000 guibg=#202020 gui=NONE
@@ -282,41 +338,4 @@ nnoremap <silent><nowait><C-e>           <nop>
 nnoremap <silent><nowait><C-y>           <nop>
 nnoremap <silent><nowait><C-f>           <nop>
 nnoremap <silent><nowait><C-b>           <nop>
-
-if has('tabsidebar')
-	function! Tabsidebar() abort
-		try
-			let xs = ['', '%#Label#' .. '--- ' .. g:actual_curtabpage .. ' ---' .. '%#TabSideBar#']
-			for x in filter(getwininfo(), { i, x -> g:actual_curtabpage == x['tabnr']})
-				let ft = getbufvar(x['bufnr'], '&filetype')
-				let bt = getbufvar(x['bufnr'], '&buftype')
-				let mo = getbufvar(x['bufnr'], '&modified')
-				let re = getbufvar(x['bufnr'], '&readonly')
-				let name = bufname(x['bufnr'])
-				let curr = g:actual_curtabpage == tabpagenr()
-				let text = !empty(bt)
-					\ ? printf('[%s]', bt == 'nofile' ? ft : bt)
-					\ : (empty(name) ? '[No Name]' : fnamemodify(name, ':t'))
-				let xs += [
-					\ ' '
-					\ .. '%#TabSideBarSel#' .. (curr && x['winnr'] == winnr() ? '%%' : ' ')
-					\ .. '%#Preproc#' .. (curr && x['winnr'] == winnr('#') ? '#' : ' ')
-					\ .. ' '
-					\ .. '%#TabSideBar#' .. text
-					\ .. '%#Comment#' .. (empty(bt) && mo ? '[+]' : '')
-					\ .. '%#Comment#' .. (empty(bt) && re ? '[RO]' : '')
-					\ ]
-			endfor
-			return join(xs, "\n")
-		catch
-			return v:exception
-		endtry
-	endfunction
-	let g:tabsidebar_vertsplit = 1
-	set notabsidebaralign
-	set notabsidebarwrap
-	set showtabsidebar=2
-	set tabsidebar=%!Tabsidebar()
-	set tabsidebarcolumns=16
-endif
 
