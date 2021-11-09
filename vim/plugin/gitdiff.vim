@@ -171,7 +171,8 @@ function! s:get_gitrootdir(path) abort
 	let xs = split(a:path, '[\/]')
 	let prefix = (has('mac') || has('linux')) ? '/' : ''
 	while !empty(xs)
-		if isdirectory(prefix .. join(xs + ['.git'], '/'))
+		let path = prefix .. join(xs + ['.git'], '/')
+		if isdirectory(path) || filereadable(path)
 			return s:fixpath(prefix .. join(xs, '/'))
 		endif
 		call remove(xs, -1)
