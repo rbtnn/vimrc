@@ -157,8 +157,9 @@ set updatetime=100
 " for Neovim
 if has('nvim')
 	if has('win32')
-		" Running nvim-qt.exe on Windows OS, never use GUI popupmenu.
+		" Running nvim-qt.exe on Windows OS, never use GUI popupmenu and tabline.
 		call rpcnotify(0, 'Gui', 'Option', 'Popupmenu', 0)
+		call rpcnotify(0, 'Gui', 'Option', 'Tabline', 0)
 	endif
 	set pumblend=20
 else
@@ -187,6 +188,7 @@ if filereadable(s:plugvim_path)
 	call plug#('rbtnn/vim-find')
 	call plug#('rbtnn/vim-gloaded')
 	call plug#('rbtnn/vim-mrw')
+	call plug#('rbtnn/vim-qfprediction')
 	call plug#('rbtnn/vim-vimscript_indentexpr')
 	call plug#('rbtnn/vim-vimscript_lasterror')
 	call plug#('rbtnn/vim-vimscript_tagfunc')
@@ -278,6 +280,31 @@ if s:is_installed('vimtweak')
 	endif
 endif
 
+if s:is_installed('vim-qfprediction')
+	function! TabLine() abort
+		try
+			let x = qfprediction#get()
+			let debug_msg = get(x, 'debug', '')
+			if !empty(debug_msg)
+				let debug_msg = ':' .. debug_msg
+			endif
+			if has_key(x, 'tabnr') && has_key(x, 'winnr')
+				return printf('[qfprediction%s] Will open a file of the error at the window of tabnr:%d and winnr:%d.', debug_msg, x['tabnr'], x['winnr'])
+			elseif has_key(x, 'split')
+				return printf('[qfprediction%s] Will open a file of the error at new window.', debug_msg)
+			else
+				return printf('[qfprediction%s] Could not predict a window!', debug_msg)
+			endif
+		catch
+			return string(v:throwpoint) .. string(v:exception)
+		endtry
+	endfunction
+	set showtabline=2
+	set tabline=%!TabLine()
+	autocmd vimrc WinEnter * :redrawtabline
+endif
+
+autocmd vimrc WinEnter * :redrawtabline
 if s:is_installed('yowish.vim')
 	autocmd vimrc ColorScheme      *
 		\ : highlight!       TabSideBar       guifg=#d6d6d6 guibg=NONE    gui=NONE           cterm=NONE
@@ -287,6 +314,9 @@ if s:is_installed('yowish.vim')
 		\ | highlight!       PmenuSel         guifg=#a9dd9d guibg=NONE    gui=BOLD,UNDERLINE cterm=BOLD,UNDERLINE
 		\ | highlight!       PmenuSbar        guifg=#000000 guibg=#202020 gui=NONE
 		\ | highlight!       PmenuThumb       guifg=#000000 guibg=#606060 gui=NONE
+		\ | highlight! link  TabLine          StatusLine
+		\ | highlight! link  TabLineSel       StatusLine
+		\ | highlight! link  TabLineFill      StatusLine
 		\ | highlight! link  diffAdded        String
 		\ | highlight! link  diffRemoved      Constant
 		\ | highlight!       CursorIM         guifg=NONE    guibg=#ff00ff
