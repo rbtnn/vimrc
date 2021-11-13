@@ -251,7 +251,7 @@ function! s:is_installed(name) abort
 endfunction
 
 if s:is_installed('vim-gloaded')
-	source $VIMRC_VIM/pack/my/start/vim-gloaded/plugin/gloaded.vim
+	source $VIMRC_PACKSTART/vim-gloaded/plugin/gloaded.vim
 endif
 
 if s:is_installed('vim-grizzly')
