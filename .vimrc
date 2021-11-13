@@ -3,8 +3,8 @@ scriptencoding utf-8
 
 let $MYVIMRC = resolve($MYVIMRC)
 let $VIMRC_ROOT = expand('<sfile>:h')
-let $VIMRC_DOTVIM = expand('$VIMRC_ROOT/vim')
-let $VIMRC_PACKSTART = expand('$VIMRC_DOTVIM/pack/my/start')
+let $VIMRC_VIM = expand('$VIMRC_ROOT/vim')
+let $VIMRC_PACKSTART = expand('$VIMRC_VIM/pack/my/start')
 
 augroup vimrc
 	autocmd!
@@ -36,12 +36,12 @@ set nowritebackup
 set noswapfile
 
 " undo
-if isdirectory($VIMRC_DOTVIM)
+if isdirectory($VIMRC_VIM)
 	" https://github.com/neovim/neovim/commit/6995fad260e3e7c49e4f9dc4b63de03989411c7b
 	if has('nvim')
-		let $VIMRC_UNDO = expand('$VIMRC_DOTVIM/undofiles/neovim')
+		let $VIMRC_UNDO = expand('$VIMRC_VIM/undofiles/neovim')
 	else
-		let $VIMRC_UNDO = expand('$VIMRC_DOTVIM/undofiles/vim')
+		let $VIMRC_UNDO = expand('$VIMRC_VIM/undofiles/vim')
 	endif
 	set undofile
 	set undodir=$VIMRC_UNDO//
@@ -63,24 +63,9 @@ set showtabline=0
 set tabline&
 
 " title
-function! TitleString(bnr, is_tabsidebar) abort
-	let ft = getbufvar(a:bnr, '&filetype')
-	let bt = getbufvar(a:bnr, '&buftype')
-	let mo = getbufvar(a:bnr, '&modified')
-	let re = getbufvar(a:bnr, '&readonly')
-	let name = bufname(a:bnr)
-	return (a:is_tabsidebar ? '%#TabSideBar#' : '')
-		\ .. (!empty(bt)
-		\          ? printf('[%s]', bt == 'nofile' ? ft : bt)
-		\          : (empty(name) ? '[No Name]' : fnamemodify(name, a:is_tabsidebar ? ':t' : ':p'))
-		\    )
-		\ .. (a:is_tabsidebar ? '%#Comment#'    : '') .. (empty(bt) && mo ? '[+]' : '')
-		\ .. (a:is_tabsidebar ? '%#Comment#'    : '') .. (empty(bt) && re ? '[RO]' : '')
-endfunction
-
 if has('win32')
 	set title
-	set titlestring=%{TitleString(bufnr(),v:false)}
+	set titlestring&
 else
 	set notitle
 endif
@@ -91,14 +76,27 @@ if has('tabsidebar')
 		try
 			let xs = ['', '%#Label#' .. '--- ' .. g:actual_curtabpage .. ' ---' .. '%#TabSideBar#']
 			for x in filter(getwininfo(), { i, x -> g:actual_curtabpage == x['tabnr']})
-				let curr = g:actual_curtabpage == tabpagenr()
-				let xs += [
-					\ ' '
-					\ .. '%#TabSideBarSel#' .. (curr && x['winnr'] == winnr() ? '%%' : ' ')
-					\ .. '%#Preproc#' .. (curr && x['winnr'] == winnr('#') ? '#' : ' ')
+				let ft = getbufvar(x['bufnr'], '&filetype')
+				let bt = getbufvar(x['bufnr'], '&buftype')
+				let mo = getbufvar(x['bufnr'], '&modified')
+				let re = getbufvar(x['bufnr'], '&readonly')
+				let name = (!empty(bt)
+					\ ? printf('[%s]', bt == 'nofile' ? ft : bt)
+					\ : (empty(bufname(x['bufnr'])) ? '[No Name]' : fnamemodify(bufname(x['bufnr']), ':t')))
+				let is_curwin = (g:actual_curtabpage == tabpagenr()) && (x['winnr'] == winnr())
+				let is_altwin = (g:actual_curtabpage == tabpagenr()) && (x['winnr'] == winnr('#'))
+				let text =
+					\ (is_curwin
+					\   ? '%#TabSideBarSel#(%%)'
+					\   : (is_altwin
+					\       ? '%#PreProc#(#)'
+					\       : ('%#TabSideBar#(' .. x['winnr'] .. ')')))
 					\ .. ' '
-					\ .. TitleString(x['bufnr'], v:true)
-					\ ]
+					\ .. name
+					\ .. '%#Comment#'
+					\ .. (empty(bt) && mo ? '[+]' : '')
+					\ .. (empty(bt) && re ? '[RO]' : '')
+				let xs += [text]
 			endfor
 			return join(xs, "\n")
 		catch
@@ -110,7 +108,7 @@ if has('tabsidebar')
 	set notabsidebarwrap
 	set showtabsidebar=2
 	set tabsidebar=%!Tabsidebar()
-	set tabsidebarcolumns=16
+	set tabsidebarcolumns=20
 endif
 
 " complete
@@ -173,12 +171,12 @@ else
 	endif
 endif
 
-let s:plugvim_path = expand('$VIMRC_DOTVIM/autoload/plug.vim')
+let s:plugvim_path = expand('$VIMRC_VIM/autoload/plug.vim')
 if !filereadable(s:plugvim_path) && executable('curl') && has('vim_starting')
 	call system(printf('curl -o "%s" https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim', s:plugvim_path))
 endif
 if filereadable(s:plugvim_path)
-	set runtimepath=$VIMRUNTIME,$VIMRC_DOTVIM
+	set runtimepath=$VIMRUNTIME,$VIMRC_VIM
 	set packpath=
 	let g:plug_url_format = 'https://github.com/%s.git'
 	call plug#begin($VIMRC_PACKSTART)
@@ -204,7 +202,7 @@ if filereadable(s:plugvim_path)
 	call plug#end()
 else
 	set runtimepath=$VIMRUNTIME
-	set packpath=$VIMRC_DOTVIM
+	set packpath=$VIMRC_VIM
 	silent! source ~/.vimrc.local
 	packloadall!
 	filetype indent plugin on
@@ -253,7 +251,7 @@ function! s:is_installed(name) abort
 endfunction
 
 if s:is_installed('vim-gloaded')
-	source $VIMRC_DOTVIM/pack/my/start/vim-gloaded/plugin/gloaded.vim
+	source $VIMRC_VIM/pack/my/start/vim-gloaded/plugin/gloaded.vim
 endif
 
 if s:is_installed('vim-grizzly')
@@ -283,18 +281,23 @@ endif
 if s:is_installed('vim-qfprediction')
 	function! TabLine() abort
 		try
-			let x = qfprediction#get()
-			let debug_msg = get(x, 'debug', '')
-			if !empty(debug_msg)
-				let debug_msg = ':' .. debug_msg
-			endif
-			if has_key(x, 'tabnr') && has_key(x, 'winnr')
-				return printf('[qfprediction%s] Will open a file of the error at the window of tabnr:%d and winnr:%d.', debug_msg, x['tabnr'], x['winnr'])
-			elseif has_key(x, 'split')
-				return printf('[qfprediction%s] Will open a file of the error at new window.', debug_msg)
-			else
-				return printf('[qfprediction%s] Could not predict a window!', debug_msg)
-			endif
+			let args = [['select', qfprediction#get()], ['cnext', qfprediction#get(1)], ['cprev', qfprediction#get(-1)]]
+			for i in range(0, len(args) - 1)
+				let label = args[i][0]
+				let x = args[i][1]
+				if has_key(x, 'tabnr') && has_key(x, 'winnr')
+					if tabpagenr() == x['tabnr']
+						let args[i] = printf('%s:win(%d)', label, x['winnr'])
+					else
+						let args[i] = printf('%s:win(%d) of tab(%d)', label, x['winnr'], x['tabnr'])
+					endif
+				elseif has_key(x, 'split')
+					let args[i] = printf('%s:split', label)
+				else
+					let args[i] = printf('%s:?', label)
+				endif
+			endfor
+			return '%#Qfprediction#[qfprediction] ' .. join(args, ', ')
 		catch
 			return string(v:throwpoint) .. string(v:exception)
 		endtry
@@ -304,7 +307,6 @@ if s:is_installed('vim-qfprediction')
 	autocmd vimrc WinEnter * :redrawtabline
 endif
 
-autocmd vimrc WinEnter * :redrawtabline
 if s:is_installed('yowish.vim')
 	autocmd vimrc ColorScheme      *
 		\ : highlight!       TabSideBar       guifg=#d6d6d6 guibg=NONE    gui=NONE           cterm=NONE
@@ -314,13 +316,11 @@ if s:is_installed('yowish.vim')
 		\ | highlight!       PmenuSel         guifg=#a9dd9d guibg=NONE    gui=BOLD,UNDERLINE cterm=BOLD,UNDERLINE
 		\ | highlight!       PmenuSbar        guifg=#000000 guibg=#202020 gui=NONE
 		\ | highlight!       PmenuThumb       guifg=#000000 guibg=#606060 gui=NONE
-		\ | highlight! link  TabLine          StatusLine
-		\ | highlight! link  TabLineSel       StatusLine
-		\ | highlight! link  TabLineFill      StatusLine
+		\ | highlight! link  Qfprediction     StatusLineNC
 		\ | highlight! link  diffAdded        String
 		\ | highlight! link  diffRemoved      Constant
 		\ | highlight!       CursorIM         guifg=NONE    guibg=#ff00ff
-	silent! colorscheme yowish
+	colorscheme yowish
 endif
 
 " Emacs key mappings
