@@ -51,11 +51,11 @@ else
 endif
 
 " ruler
-set ruler
-set rulerformat=%16(%{&ft}/%{&ff}/%{&fileencoding}%)
+set noruler
+set rulerformat&
 
 " statusline
-set laststatus=0
+set laststatus=2
 set statusline&
 
 " tabline
@@ -78,11 +78,6 @@ if has('tabsidebar')
 			for x in filter(getwininfo(), { i, x -> g:actual_curtabpage == x['tabnr']})
 				let ft = getbufvar(x['bufnr'], '&filetype')
 				let bt = getbufvar(x['bufnr'], '&buftype')
-				let mo = getbufvar(x['bufnr'], '&modified')
-				let re = getbufvar(x['bufnr'], '&readonly')
-				let name = (!empty(bt)
-					\ ? printf('[%s]', bt == 'nofile' ? ft : bt)
-					\ : (empty(bufname(x['bufnr'])) ? '[No Name]' : fnamemodify(bufname(x['bufnr']), ':t')))
 				let is_curwin = (g:actual_curtabpage == tabpagenr()) && (x['winnr'] == winnr())
 				let is_altwin = (g:actual_curtabpage == tabpagenr()) && (x['winnr'] == winnr('#'))
 				let text =
@@ -92,10 +87,11 @@ if has('tabsidebar')
 					\       ? '%#PreProc#(#)'
 					\       : ('%#TabSideBar#(' .. x['winnr'] .. ')')))
 					\ .. ' '
-					\ .. name
-					\ .. '%#Comment#'
-					\ .. (empty(bt) && mo ? '[+]' : '')
-					\ .. (empty(bt) && re ? '[RO]' : '')
+					\ .. (!empty(bt)
+					\      ? printf('[%s]', bt == 'nofile' ? ft : bt)
+					\      : (empty(bufname(x['bufnr']))
+					\          ? '[No Name]'
+					\          : fnamemodify(bufname(x['bufnr']), ':t')))
 				let xs += [text]
 			endfor
 			return join(xs, "\n")
@@ -145,7 +141,9 @@ set autoread
 set fileformats=unix,dos
 set keywordprg=:help
 set nowrap
-set nrformats=unsigned
+if has('patch-8.2.0860')
+	set nrformats=unsigned
+endif
 set scrolloff=5
 set sessionoptions=winpos,resize,tabpages,curdir,help
 set showmode
@@ -279,47 +277,50 @@ if s:is_installed('vimtweak')
 endif
 
 if s:is_installed('vim-qfprediction')
-	function! TabLine() abort
+	function! StatusLine() abort
 		try
-			let args = [['select', qfprediction#get()], ['cnext', qfprediction#get(1)], ['cprev', qfprediction#get(-1)]]
-			for i in range(0, len(args) - 1)
-				let label = args[i][0]
-				let x = args[i][1]
-				if has_key(x, 'tabnr') && has_key(x, 'winnr')
-					if tabpagenr() == x['tabnr']
-						let args[i] = printf('%s:win(%d)', label, x['winnr'])
-					else
-						let args[i] = printf('%s:win(%d) of tab(%d)', label, x['winnr'], x['tabnr'])
-					endif
-				elseif has_key(x, 'split')
-					let args[i] = printf('%s:split', label)
-				else
-					let args[i] = printf('%s:?', label)
+			let twnr = win_id2tabwin(g:statusline_winid)
+			let bnr = winbufnr(g:statusline_winid)
+			let bt = getbufvar(bnr, '&buftype')
+			let qf_labels = []
+			for x in [
+				\ ['[qf-sel]', qfprediction#get()],
+				\ ['[qf-cnext]', qfprediction#get(1)],
+				\ ['[qf-cprev]', qfprediction#get(-1)],
+				\ ]
+				if get(x[1], 'tabnr', -1) == twnr[0] && get(x[1], 'winnr', -1) == twnr[1]
+					let qf_labels += [x[0]]
 				endif
 			endfor
-			return '%#Qfprediction#[qfprediction] ' .. join(args, ', ')
+			let s = ''
+			if empty(bt)
+				let ff = getbufvar(bnr, '&fileformat')
+				let ft = getbufvar(bnr, '&filetype')
+				let fe = getbufvar(bnr, '&fileencoding')
+				let f = join(filter([ft, ff, fe], { i,x -> !empty(x) }), '/')
+				let s = '%m%r' .. (empty(f) ? '' : '[' .. f .. ']')
+			endif
+			return '%t ' .. s .. join(qf_labels, '')
 		catch
 			return string(v:throwpoint) .. string(v:exception)
 		endtry
 	endfunction
-	set showtabline=2
-	set tabline=%!TabLine()
-	autocmd vimrc WinEnter * :redrawtabline
+	set statusline=%!StatusLine()
+	autocmd vimrc QuickfixCmdPost,WinEnter * :redrawstatus!
 endif
 
 if s:is_installed('yowish.vim')
 	autocmd vimrc ColorScheme      *
-		\ : highlight!       TabSideBar       guifg=#d6d6d6 guibg=NONE    gui=NONE           cterm=NONE
-		\ | highlight!       TabSideBarFill   guifg=#1a1a1a guibg=NONE    gui=NONE           cterm=NONE
-		\ | highlight!       TabSideBarSel    guifg=#a9dd9d guibg=NONE    gui=NONE           cterm=NONE
-		\ | highlight!       Pmenu            guifg=#d6d6d6 guibg=NONE
-		\ | highlight!       PmenuSel         guifg=#a9dd9d guibg=NONE    gui=BOLD,UNDERLINE cterm=BOLD,UNDERLINE
-		\ | highlight!       PmenuSbar        guifg=#000000 guibg=#202020 gui=NONE
-		\ | highlight!       PmenuThumb       guifg=#000000 guibg=#606060 gui=NONE
-		\ | highlight! link  Qfprediction     StatusLineNC
-		\ | highlight! link  diffAdded        String
-		\ | highlight! link  diffRemoved      Constant
-		\ | highlight!       CursorIM         guifg=NONE    guibg=#ff00ff
+		\ : highlight!       TabSideBar      guifg=#d6d6d6 guibg=NONE    gui=NONE           cterm=NONE
+		\ | highlight!       TabSideBarFill  guifg=#1a1a1a guibg=NONE    gui=NONE           cterm=NONE
+		\ | highlight!       TabSideBarSel   guifg=#a9dd9d guibg=NONE    gui=NONE           cterm=NONE
+		\ | highlight!       Pmenu           guifg=#d6d6d6 guibg=NONE
+		\ | highlight!       PmenuSel        guifg=#a9dd9d guibg=NONE    gui=BOLD,UNDERLINE cterm=BOLD,UNDERLINE
+		\ | highlight!       PmenuSbar       guifg=#000000 guibg=#202020 gui=NONE
+		\ | highlight!       PmenuThumb      guifg=#000000 guibg=#606060 gui=NONE
+		\ | highlight! link  diffAdded       String
+		\ | highlight! link  diffRemoved     Constant
+		\ | highlight!       CursorIM        guifg=NONE    guibg=#ff00ff
 	colorscheme yowish
 endif
 
