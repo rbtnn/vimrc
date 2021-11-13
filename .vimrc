@@ -74,7 +74,7 @@ endif
 if has('tabsidebar')
 	function! Tabsidebar() abort
 		try
-			let xs = ['', '%#Label#' .. '--- ' .. g:actual_curtabpage .. ' ---' .. '%#TabSideBar#']
+			let lines = ['', '%#Label#' .. '--- ' .. g:actual_curtabpage .. ' ---' .. '%#TabSideBar#']
 			for x in filter(getwininfo(), { i, x -> g:actual_curtabpage == x['tabnr']})
 				let ft = getbufvar(x['bufnr'], '&filetype')
 				let bt = getbufvar(x['bufnr'], '&buftype')
@@ -92,11 +92,13 @@ if has('tabsidebar')
 					\      : (empty(bufname(x['bufnr']))
 					\          ? '[No Name]'
 					\          : fnamemodify(bufname(x['bufnr']), ':t')))
-				let xs += [text]
+				let lines += [text]
 			endfor
-			return join(xs, "\n")
+			return join(lines, "\n")
 		catch
-			return v:exception
+			let g:tsb_throwpoint = v:throwpoint
+			let g:tsb_exception = v:exception
+			return 'Error! Please see g:tsb_throwpoint and g:tsb_exception.'
 		endtry
 	endfunction
 	let g:tabsidebar_vertsplit = 1
@@ -302,7 +304,9 @@ if s:is_installed('vim-qfprediction')
 			endif
 			return '%t ' .. s .. join(qf_labels, '')
 		catch
-			return string(v:throwpoint) .. string(v:exception)
+			let g:st_throwpoint = v:throwpoint
+			let g:st_exception = v:exception
+			return 'Error! Please see g:st_throwpoint and g:st_exception.'
 		endtry
 	endfunction
 	set statusline=%!StatusLine()
