@@ -1,10 +1,21 @@
 set makeencoding=char
 scriptencoding utf-8
 
+" https://github.com/vim/vim/commit/957cf67d50516ba98716f59c9e1cb6412ec1535d
+let s:vimpatch_cmdtag = has('patch-8.2.1978') || has('nvim')
+" https://github.com/vim/vim/commit/aaad995f8384a77a64efba6846c9c4ac99de0953
+let s:vimpatch_unsigned = has('patch-8.2.0860') || has('nvim')
+
 let $MYVIMRC = resolve($MYVIMRC)
 let $VIMRC_ROOT = expand('<sfile>:h')
 let $VIMRC_VIM = expand('$VIMRC_ROOT/vim')
 let $VIMRC_PACKSTART = expand('$VIMRC_VIM/pack/my/start')
+" https://github.com/neovim/neovim/commit/6995fad260e3e7c49e4f9dc4b63de03989411c7b
+if has('nvim')
+	let $VIMRC_UNDO = expand('$VIMRC_VIM/undofiles/neovim')
+else
+	let $VIMRC_UNDO = expand('$VIMRC_VIM/undofiles/vim')
+endif
 
 augroup vimrc
 	autocmd!
@@ -35,78 +46,12 @@ set nobackup
 set nowritebackup
 set noswapfile
 
-" undo
-if isdirectory($VIMRC_VIM)
-	" https://github.com/neovim/neovim/commit/6995fad260e3e7c49e4f9dc4b63de03989411c7b
-	if has('nvim')
-		let $VIMRC_UNDO = expand('$VIMRC_VIM/undofiles/neovim')
-	else
-		let $VIMRC_UNDO = expand('$VIMRC_VIM/undofiles/vim')
-	endif
-	set undofile
-	set undodir=$VIMRC_UNDO//
-	silent! call mkdir($VIMRC_UNDO, 'p')
-else
-	set noundofile
-endif
-
-" ruler
-set noruler
-set rulerformat&
-
-" statusline
-set laststatus=2
-set statusline&
-
-" tabline
-set showtabline=0
-set tabline&
-
 " title
 if has('win32')
 	set title
 	set titlestring&
 else
 	set notitle
-endif
-
-" tabsidebar
-if has('tabsidebar')
-	function! Tabsidebar() abort
-		try
-			let lines = ['', '%#Label#' .. '--- ' .. g:actual_curtabpage .. ' ---' .. '%#TabSideBar#']
-			for x in filter(getwininfo(), { i, x -> g:actual_curtabpage == x['tabnr']})
-				let ft = getbufvar(x['bufnr'], '&filetype')
-				let bt = getbufvar(x['bufnr'], '&buftype')
-				let is_curwin = (g:actual_curtabpage == tabpagenr()) && (x['winnr'] == winnr())
-				let is_altwin = (g:actual_curtabpage == tabpagenr()) && (x['winnr'] == winnr('#'))
-				let text =
-					\ (is_curwin
-					\   ? '%#TabSideBarSel#(%%)'
-					\   : (is_altwin
-					\       ? '%#PreProc#(#)'
-					\       : ('%#TabSideBar#(' .. x['winnr'] .. ')')))
-					\ .. ' '
-					\ .. (!empty(bt)
-					\      ? printf('[%s]', bt == 'nofile' ? ft : bt)
-					\      : (empty(bufname(x['bufnr']))
-					\          ? '[No Name]'
-					\          : fnamemodify(bufname(x['bufnr']), ':t')))
-				let lines += [text]
-			endfor
-			return join(lines, "\n")
-		catch
-			let g:tsb_throwpoint = v:throwpoint
-			let g:tsb_exception = v:exception
-			return 'Error! Please see g:tsb_throwpoint and g:tsb_exception.'
-		endtry
-	endfunction
-	let g:tabsidebar_vertsplit = 1
-	set notabsidebaralign
-	set notabsidebarwrap
-	set showtabsidebar=2
-	set tabsidebar=%!Tabsidebar()
-	set tabsidebarcolumns=20
 endif
 
 " complete
@@ -138,19 +83,100 @@ set matchpairs+=<:>
 set grepformat&
 set grepprg=internal
 
+" ruler
+set noruler
+set rulerformat&
+
+" statusline
+set laststatus=0
+set statusline&
+
+" undo
+if isdirectory($VIMRC_VIM)
+	set undofile
+	set undodir=$VIMRC_UNDO//
+	silent! call mkdir($VIMRC_UNDO, 'p')
+else
+	set noundofile
+endif
+
 " others
 set autoread
 set fileformats=unix,dos
 set keywordprg=:help
 set nowrap
-if has('patch-8.2.0860')
-	set nrformats=unsigned
+set nrformats&
+if s:vimpatch_unsigned
+	set nrformats+=unsigned
 endif
 set scrolloff=5
 set sessionoptions=winpos,resize,tabpages,curdir,help
 set showmode
 set tags=./tags;
 set updatetime=100
+
+" tabline/tabsidebar
+function! Tabpages(is_tabsidebar) abort
+	try
+		let hl_lbl = a:is_tabsidebar ? '%#Label#' : ''
+		let hl_sel = a:is_tabsidebar ? '%#TabSideBarSel#' : '%#TabLineSel#'
+		let hl_def = a:is_tabsidebar ? '%#TabSideBar#' : '%#TabLine#'
+		let hl_fil = a:is_tabsidebar ? '%#TabSideBarFill#' : '%#TabLineFill#'
+		let hl_alt = a:is_tabsidebar ? '%#PreProc#' : ''
+		let lines = []
+		for tnr in range(1, tabpagenr('$'))
+			if a:is_tabsidebar && (tnr != get(g:, 'actual_curtabpage', tabpagenr()))
+				continue
+			endif
+			if a:is_tabsidebar
+				let lines += ['', hl_lbl .. '--- ' .. tnr .. ' ---' .. hl_def]
+			else
+				let lines += [(tnr == tabpagenr() ? hl_sel : hl_def) .. '<Tab.' .. tnr .. '> ']
+			endif
+			for x in filter(getwininfo(), { i, x -> tnr == x['tabnr']})
+				let ft = getbufvar(x['bufnr'], '&filetype')
+				let bt = getbufvar(x['bufnr'], '&buftype')
+				let is_curwin = (tnr == tabpagenr()) && (x['winnr'] == winnr())
+				let is_altwin = (tnr == tabpagenr()) && (x['winnr'] == winnr('#'))
+				let text =
+					\ (is_curwin
+					\   ? hl_sel .. '(%%)'
+					\   : (is_altwin
+					\       ? hl_alt .. '(#)'
+					\       : (hl_def .. '(' .. x['winnr'] .. ')')))
+					\ .. ' '
+					\ .. (!empty(bt)
+					\      ? printf('[%s]', bt == 'nofile' ? ft : bt)
+					\      : (empty(bufname(x['bufnr']))
+					\          ? '[No Name]'
+					\          : fnamemodify(bufname(x['bufnr']), ':t')))
+				let lines += [text]
+			endfor
+		endfor
+		if !a:is_tabsidebar
+			let lines += [hl_fil]
+		endif
+		return join(lines, a:is_tabsidebar ? "\n" : ' ')
+	catch
+		let g:tab_throwpoint = v:throwpoint
+		let g:tab_exception = v:exception
+		return 'Error! Please see g:tab_throwpoint and g:tab_exception.'
+	endtry
+endfunction
+
+if has('tabsidebar')
+	let g:tabsidebar_vertsplit = 1
+	set notabsidebaralign
+	set notabsidebarwrap
+	set showtabsidebar=2
+	set tabsidebar=%!Tabpages(v:true)
+	set tabsidebarcolumns=20
+	set showtabline=0
+	set tabline&
+else
+	set showtabline=2
+	set tabline=%!Tabpages(v:false)
+endif
 
 " for Neovim
 if has('nvim')
@@ -261,7 +287,11 @@ if s:is_installed('vim-grizzly')
 endif
 
 if s:is_installed('vim-find')
-	nnoremap <silent><nowait><space>         <Cmd>FindFiles<cr>
+	if s:vimpatch_cmdtag
+		nnoremap <silent><nowait><space>         <Cmd>FindFiles<cr>
+	else
+		nnoremap <silent><nowait><space>         :<C-u>FindFiles<cr>
+	endif
 endif
 
 if s:is_installed('vim-operator-replace')
@@ -309,6 +339,7 @@ if s:is_installed('vim-qfprediction')
 			return 'Error! Please see g:st_throwpoint and g:st_exception.'
 		endtry
 	endfunction
+	set laststatus=2
 	set statusline=%!StatusLine()
 	autocmd vimrc QuickfixCmdPost,WinEnter * :redrawstatus!
 endif
@@ -352,14 +383,24 @@ else
 endif
 
 " Move the next/previous error in quickfix.
-nnoremap <silent><nowait><C-n>           <Cmd>cnext<cr>
-nnoremap <silent><nowait><C-p>           <Cmd>cprevious<cr>
+if s:vimpatch_cmdtag
+	nnoremap <silent><nowait><C-n>           <Cmd>cnext<cr>
+	nnoremap <silent><nowait><C-p>           <Cmd>cprevious<cr>
+else
+	nnoremap <silent><nowait><C-n>           :<C-u>cnext<cr>
+	nnoremap <silent><nowait><C-p>           :<C-u>cprevious<cr>
+endif
 
 " Move the next/previous tabpage.
-nnoremap <silent><nowait><C-j>           <Cmd>tabnext<cr>
-nnoremap <silent><nowait><C-k>           <Cmd>tabprevious<cr>
-tnoremap <silent><nowait><C-j>           <Cmd>tabnext<cr>
-tnoremap <silent><nowait><C-k>           <Cmd>tabprevious<cr>
+nnoremap <silent><nowait><C-j>           gt
+nnoremap <silent><nowait><C-k>           gT
+if s:vimpatch_cmdtag
+	tnoremap <silent><nowait><C-j>           <Cmd>tabnext<cr>
+	tnoremap <silent><nowait><C-k>           <Cmd>tabprevious<cr>
+else
+	tnoremap <silent><nowait><C-j>           <C-w>:<C-u>tabnext<cr>
+	tnoremap <silent><nowait><C-k>           <C-w>:<C-u>tabprevious<cr>
+endif
 
 " Go to the last accessed window.
 tnoremap <silent><nowait><C-s>           <C-w>p
