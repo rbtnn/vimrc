@@ -287,11 +287,7 @@ if s:is_installed('vim-grizzly')
 endif
 
 if s:is_installed('vim-find')
-	if s:vimpatch_cmdtag
-		nnoremap <silent><nowait><space>         <Cmd>FindFiles<cr>
-	else
-		nnoremap <silent><nowait><space>         :<C-u>FindFiles<cr>
-	endif
+	nnoremap <silent><nowait><space>         :<C-u>FindFiles<cr>
 endif
 
 if s:is_installed('vim-operator-replace')
@@ -383,23 +379,18 @@ else
 endif
 
 " Move the next/previous error in quickfix.
-if s:vimpatch_cmdtag
-	nnoremap <silent><nowait><C-n>           <Cmd>cnext<cr>
-	nnoremap <silent><nowait><C-p>           <Cmd>cprevious<cr>
-else
-	nnoremap <silent><nowait><C-n>           :<C-u>cnext<cr>
-	nnoremap <silent><nowait><C-p>           :<C-u>cprevious<cr>
-endif
+nnoremap <silent><nowait><C-n>           :<C-u>cnext<cr>
+nnoremap <silent><nowait><C-p>           :<C-u>cprevious<cr>
 
 " Move the next/previous tabpage.
 nnoremap <silent><nowait><C-j>           gt
 nnoremap <silent><nowait><C-k>           gT
 if s:vimpatch_cmdtag
-	tnoremap <silent><nowait><C-j>           <Cmd>tabnext<cr>
-	tnoremap <silent><nowait><C-k>           <Cmd>tabprevious<cr>
+	tnoremap <silent><nowait><C-j>       <Cmd>tabnext<cr>
+	tnoremap <silent><nowait><C-k>       <Cmd>tabprevious<cr>
 else
-	tnoremap <silent><nowait><C-j>           <C-w>:<C-u>tabnext<cr>
-	tnoremap <silent><nowait><C-k>           <C-w>:<C-u>tabprevious<cr>
+	tnoremap <silent><nowait><C-j>       <C-w>:<C-u>tabnext<cr>
+	tnoremap <silent><nowait><C-k>       <C-w>:<C-u>tabprevious<cr>
 endif
 
 " Go to the last accessed window.
