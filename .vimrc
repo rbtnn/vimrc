@@ -10,6 +10,7 @@ let $MYVIMRC = resolve($MYVIMRC)
 let $VIMRC_ROOT = expand('<sfile>:h')
 let $VIMRC_VIM = expand('$VIMRC_ROOT/vim')
 let $VIMRC_PACKSTART = expand('$VIMRC_VIM/pack/my/start')
+
 " https://github.com/neovim/neovim/commit/6995fad260e3e7c49e4f9dc4b63de03989411c7b
 if has('nvim')
 	let $VIMRC_UNDO = expand('$VIMRC_VIM/undofiles/neovim')
@@ -28,7 +29,13 @@ set guioptions=mM
 set mouse=a
 set belloff=all
 set clipboard=unnamed
+
+" display
 set ambiwidth=double
+set nonumber
+set norelativenumber
+set nowrap
+set scrolloff=5
 
 " indent size
 set shiftround
@@ -92,7 +99,7 @@ set laststatus=0
 set statusline&
 
 " undo
-if isdirectory($VIMRC_VIM)
+if has('persistent_undo')
 	set undofile
 	set undodir=$VIMRC_UNDO//
 	silent! call mkdir($VIMRC_UNDO, 'p')
@@ -104,12 +111,10 @@ endif
 set autoread
 set fileformats=unix,dos
 set keywordprg=:help
-set nowrap
 set nrformats&
 if s:vimpatch_unsigned
 	set nrformats+=unsigned
 endif
-set scrolloff=5
 set sessionoptions=winpos,resize,tabpages,curdir,help
 set showmode
 set tags=./tags;
@@ -201,12 +206,13 @@ let s:plugvim_path = expand('$VIMRC_VIM/autoload/plug.vim')
 if !filereadable(s:plugvim_path) && executable('curl') && has('vim_starting')
 	call system(printf('curl -o "%s" https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim', s:plugvim_path))
 endif
+
 if filereadable(s:plugvim_path)
 	set runtimepath=$VIMRUNTIME,$VIMRC_VIM
 	set packpath=
 	let g:plug_url_format = 'https://github.com/%s.git'
 	call plug#begin($VIMRC_PACKSTART)
-	call plug#('KabbAmine/yowish.vim')
+	call plug#('cormacrelf/vim-colors-github')
 	call plug#('kana/vim-operator-replace')
 	call plug#('kana/vim-operator-user')
 	call plug#('rbtnn/vim-find')
@@ -235,6 +241,16 @@ else
 	syntax on
 endif
 
+if !empty(filter(split(execute('scriptnames'), "\n"), { i,x -> x =~# 'plug.vim$' }))
+	function! s:is_installed(name) abort
+		return isdirectory($VIMRC_PACKSTART .. '/' .. a:name) && (-1 != index(keys(g:plugs), a:name))
+	endfunction
+else
+	function! s:is_installed(name) abort
+		return isdirectory($VIMRC_PACKSTART .. '/' .. a:name)
+	endfunction
+endif
+
 " Delete unused commands, because it's an obstacle on cmdline-completion.
 autocmd vimrc CmdlineEnter     *
 	\ : for s:cmdname in [
@@ -248,33 +264,45 @@ autocmd vimrc CmdlineEnter     *
 
 autocmd vimrc FileType     help :setlocal colorcolumn=78
 
-if !has('nvim') && has('win32') && (&shell =~# '\<cmd\.exe$')
+if has('win32') && (&shell =~# '\<cmd\.exe$')
 	let s:initcmd_path = get(s:, 'initcmd_path', tempname() .. '.cmd')
+	let s:windows_build_number = -1
+	let s:win10_anniversary_update = v:false
 	function! s:term_win_open() abort
+		" https://en.wikipedia.org/wiki/Windows_10_version_history
 		" https://docs.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2012-R2-and-2012/cc725943(v=ws.11)
 		" https://gist.github.com/fnky/458719343aabd01cfb17a3a4f7296797
+		if has('win32') && executable('wmic') && (-1 == s:windows_build_number)
+			let s:windows_build_number = str2nr(join(filter(split(system('wmic os get BuildNumber'), '\zs'), { i,x -> (0x30 <= char2nr(x)) && (char2nr(x) <= 0x39) }), ''))
+			let s:win10_anniversary_update = 14393 <= s:windows_build_number
+		endif
 		call writefile(map([
 			\	'@echo off', 'cls',
-			\	(windowsversion() == '10.0' ? 'prompt $e[0;32m$$$e[0m' : 'prompt $$'),
+			\	(s:win10_anniversary_update ? 'prompt $e[0;31m$$$e[0m' : 'prompt $$'),
 			\	'doskey ls=dir /b $*',
 			\	'doskey rm=del /q $*',
 			\	'doskey mv=move /y $*',
 			\	'doskey cp=copy /y $*',
 			\	'doskey pwd=cd',
 			\ ], { i,x -> x .. "\r" }), s:initcmd_path)
-		call term_sendkeys(bufnr(), printf("call %s\r", s:initcmd_path))
+		if has('nvim')
+			startinsert
+			call jobsend(b:terminal_job_id, printf("call %s\r", s:initcmd_path))
+		else
+			call term_sendkeys(bufnr(), printf("call %s\r", s:initcmd_path))
+		endif
 	endfunction
-	autocmd vimrc TerminalWinOpen     * :silent! call s:term_win_open()
-	autocmd vimrc VimLeave            * :silent! call delete(s:initcmd_path)
+	if has('nvim')
+		autocmd vimrc TermOpen           * :silent! call s:term_win_open()
+	else
+		autocmd vimrc TerminalWinOpen    * :silent! call s:term_win_open()
+	endif
+	autocmd vimrc VimLeave               * :silent! call delete(s:initcmd_path)
 endif
 
 if (has('win32') || (256 == &t_Co)) && has('termguicolors') && !has('gui_running')
 	set termguicolors
 endif
-
-function! s:is_installed(name) abort
-	return isdirectory($VIMRC_PACKSTART .. '/' .. a:name)
-endfunction
 
 if s:is_installed('vim-gloaded')
 	source $VIMRC_PACKSTART/vim-gloaded/plugin/gloaded.vim
@@ -340,19 +368,14 @@ if s:is_installed('vim-qfprediction')
 	autocmd vimrc QuickfixCmdPost,WinEnter * :redrawstatus!
 endif
 
-if s:is_installed('yowish.vim')
+if s:is_installed('vim-colors-github')
 	autocmd vimrc ColorScheme      *
-		\ : highlight!       TabSideBar      guifg=#d6d6d6 guibg=NONE    gui=NONE           cterm=NONE
+		\ : highlight!       TabSideBar      guifg=#76787b guibg=NONE    gui=NONE           cterm=NONE
 		\ | highlight!       TabSideBarFill  guifg=#1a1a1a guibg=NONE    gui=NONE           cterm=NONE
-		\ | highlight!       TabSideBarSel   guifg=#a9dd9d guibg=NONE    gui=NONE           cterm=NONE
-		\ | highlight!       Pmenu           guifg=#d6d6d6 guibg=NONE
-		\ | highlight!       PmenuSel        guifg=#a9dd9d guibg=NONE    gui=BOLD,UNDERLINE cterm=BOLD,UNDERLINE
-		\ | highlight!       PmenuSbar       guifg=#000000 guibg=#202020 gui=NONE
-		\ | highlight!       PmenuThumb      guifg=#000000 guibg=#606060 gui=NONE
-		\ | highlight! link  diffAdded       String
-		\ | highlight! link  diffRemoved     Constant
-		\ | highlight!       CursorIM        guifg=NONE    guibg=#ff00ff
-	colorscheme yowish
+		\ | highlight!       TabSideBarSel   guifg=#22863a guibg=NONE    gui=NONE           cterm=NONE
+		\ | highlight!       CursorIM        guifg=NONE    guibg=#aa00aa
+	set background=light
+	colorscheme github
 endif
 
 " Emacs key mappings
@@ -394,7 +417,11 @@ else
 endif
 
 " Go to the last accessed window.
-tnoremap <silent><nowait><C-s>           <C-w>p
+if has('nvim')
+	tnoremap <silent><nowait><C-s>           <Cmd>wincmd p<cr>
+else
+	tnoremap <silent><nowait><C-s>           <C-w>p
+endif
 nnoremap <silent><nowait><C-s>           <C-w>p
 
 " Smart space on wildmenu

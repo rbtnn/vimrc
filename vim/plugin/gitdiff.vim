@@ -155,6 +155,7 @@ function! s:gitdiff_jumpdiffline(fullpath) abort
 							call s:open_file(a:fullpath, lnum)
 						endif
 					endif
+					normal! zz
 					let ok = v:true
 					break
 				endif
