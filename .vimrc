@@ -230,6 +230,9 @@ if filereadable(s:plugvim_path)
 	endif
 	silent! source ~/.vimrc.local
 	call plug#end()
+	function! s:is_installed(name) abort
+		return isdirectory($VIMRC_PACKSTART .. '/' .. a:name) && (-1 != index(keys(g:plugs), a:name))
+	endfunction
 else
 	set runtimepath=$VIMRUNTIME
 	set packpath=$VIMRC_VIM
@@ -237,13 +240,6 @@ else
 	packloadall!
 	filetype indent plugin on
 	syntax on
-endif
-
-if !empty(filter(split(execute('scriptnames'), "\n"), { i,x -> x =~# '\<plug.vim$' }))
-	function! s:is_installed(name) abort
-		return isdirectory($VIMRC_PACKSTART .. '/' .. a:name) && (-1 != index(keys(g:plugs), a:name))
-	endfunction
-else
 	function! s:is_installed(name) abort
 		return isdirectory($VIMRC_PACKSTART .. '/' .. a:name)
 	endfunction
@@ -252,10 +248,10 @@ endif
 " Delete unused commands, because it's an obstacle on cmdline-completion.
 autocmd vimrc CmdlineEnter     *
 	\ : for s:cmdname in [
-	\		'MANPAGER', 'VimFoldh', 'VimTweakDisableCaption', 'VimTweakDisableMaximize',
+	\		'MANPAGER', 'Man', 'Tutor', 'VimFoldh', 'VimTweakDisableCaption', 'VimTweakDisableMaximize',
 	\		'VimTweakDisableTopMost', 'VimTweakEnableCaption', 'VimTweakEnableMaximize',
 	\		'VimTweakEnableTopMost', 'Plug', 'PlugDiff', 'PlugInstall', 'PlugSnapshot',
-	\		'PlugStatus', 'PlugUpgrade',
+	\		'PlugStatus', 'PlugUpgrade', 'UpdateRemotePlugins',
 	\		]
 	\ | 	execute printf('silent! delcommand %s', s:cmdname)
 	\ | endfor
@@ -270,7 +266,7 @@ if has('win32') && (&shell =~# '\<cmd\.exe$')
 		" https://en.wikipedia.org/wiki/Windows_10_version_history
 		" https://docs.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2012-R2-and-2012/cc725943(v=ws.11)
 		" https://gist.github.com/fnky/458719343aabd01cfb17a3a4f7296797
-		if has('win32') && executable('wmic') && (-1 == s:windows_build_number)
+		if executable('wmic') && (-1 == s:windows_build_number)
 			let s:windows_build_number = str2nr(join(filter(split(system('wmic os get BuildNumber'), '\zs'), { i,x -> (0x30 <= char2nr(x)) && (char2nr(x) <= 0x39) }), ''))
 			let s:win10_anniversary_update = 14393 <= s:windows_build_number
 		endif
