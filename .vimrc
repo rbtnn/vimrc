@@ -223,12 +223,10 @@ if filereadable(s:plugvim_path)
 	call plug#('rbtnn/vim-vimscript_lasterror')
 	call plug#('rbtnn/vim-vimscript_tagfunc')
 	call plug#('thinca/vim-qfreplace')
-	if has('win32')
+	if !has('nvim') && has('win32')
 		call plug#('rbtnn/vim-grizzly')
 		call plug#('rbtnn/vimtweak')
-		if !has('nvim')
-			call plug#('tyru/restart.vim')
-		endif
+		call plug#('tyru/restart.vim')
 	endif
 	silent! source ~/.vimrc.local
 	call plug#end()
@@ -241,7 +239,7 @@ else
 	syntax on
 endif
 
-if !empty(filter(split(execute('scriptnames'), "\n"), { i,x -> x =~# 'plug.vim$' }))
+if !empty(filter(split(execute('scriptnames'), "\n"), { i,x -> x =~# '\<plug.vim$' }))
 	function! s:is_installed(name) abort
 		return isdirectory($VIMRC_PACKSTART .. '/' .. a:name) && (-1 != index(keys(g:plugs), a:name))
 	endfunction
@@ -417,10 +415,10 @@ else
 endif
 
 " Go to the last accessed window.
-if has('nvim')
-	tnoremap <silent><nowait><C-s>           <Cmd>wincmd p<cr>
+if s:vimpatch_cmdtag
+	tnoremap <silent><nowait><C-s>       <Cmd>wincmd p<cr>
 else
-	tnoremap <silent><nowait><C-s>           <C-w>p
+	tnoremap <silent><nowait><C-s>       <C-w>p
 endif
 nnoremap <silent><nowait><C-s>           <C-w>p
 
