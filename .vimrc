@@ -266,8 +266,8 @@ autocmd vimrc FileType     help :setlocal colorcolumn=78
 
 if has('win32') && (&shell =~# '\<cmd\.exe$')
 	let s:initcmd_path = get(s:, 'initcmd_path', tempname() .. '.cmd')
-	let s:windows_build_number = -1
-	let s:win10_anniversary_update = v:false
+	let s:windows_build_number = get(s:, 'windows_build_number', -1)
+	let s:win10_anniversary_update = get(s:, 'win10_anniversary_update', v:false)
 	function! s:term_win_open() abort
 		" https://en.wikipedia.org/wiki/Windows_10_version_history
 		" https://docs.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2012-R2-and-2012/cc725943(v=ws.11)
