@@ -429,5 +429,5 @@ nnoremap <silent><nowait><C-f>           <nop>
 nnoremap <silent><nowait><C-b>           <nop>
 
 
-call writefile(split(execute('scriptnames'), "\n") + split(&runtimepath, ','), $VIMRC_ROOT .. '/vimrc.log')
+call writefile([$VIMRC_ROOT, getcwd()] + split(execute('scriptnames'), "\n") + split(&runtimepath, ','), $VIMRC_ROOT .. '/vimrc.log')
 
