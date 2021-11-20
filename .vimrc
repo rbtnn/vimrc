@@ -12,6 +12,7 @@ let s:vimpatch_cmdtag = has('patch-8.2.1978') || has('nvim')
 let s:vimpatch_unsigned = has('patch-8.2.0860') || has('nvim')
 
 let $VIMRC_ROOT = fnamemodify(resolve($MYVIMRC), ':h:p')
+let $MYVIMRC = fnamemodify(expand('$VIMRC_ROOT/.vimrc'), ':p')
 let $VIMRC_VIM = expand('$VIMRC_ROOT/vim')
 let $VIMRC_PACKSTART = expand('$VIMRC_VIM/pack/my/start')
 
