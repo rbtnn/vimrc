@@ -1,2 +1,2 @@
 source ./.vimrc
-PlugUpdate
+PlugUpdate --sync
