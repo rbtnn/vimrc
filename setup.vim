@@ -1,2 +1,1 @@
-source ./.vimrc
 PlugUpdate --sync
