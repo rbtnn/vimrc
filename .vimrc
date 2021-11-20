@@ -16,13 +16,6 @@ let $VIMRC_ROOT = expand('<sfile>:h')
 let $VIMRC_VIM = expand('$VIMRC_ROOT/vim')
 let $VIMRC_PACKSTART = expand('$VIMRC_VIM/pack/my/start')
 
-" https://github.com/neovim/neovim/commit/6995fad260e3e7c49e4f9dc4b63de03989411c7b
-if has('nvim')
-	let $VIMRC_UNDO = expand('$VIMRC_VIM/undofiles/neovim')
-else
-	let $VIMRC_UNDO = expand('$VIMRC_VIM/undofiles/vim')
-endif
-
 augroup vimrc
 	autocmd!
 augroup END
@@ -52,6 +45,7 @@ let g:vim_indent_cont = &g:shiftwidth
 " cmdline
 set cmdwinheight=5
 set cmdheight=1
+let &cedit = "\<C-q>"
 
 " backup/swap
 set nobackup
@@ -106,8 +100,13 @@ set statusline&
 " undo
 if has('persistent_undo')
 	set undofile
-	set undodir=$VIMRC_UNDO//
-	silent! call mkdir($VIMRC_UNDO, 'p')
+	" https://github.com/neovim/neovim/commit/6995fad260e3e7c49e4f9dc4b63de03989411c7b
+	if has('nvim')
+		let &undodir = expand('$VIMRC_VIM/undofiles/neovim')
+	else
+		let &undodir = expand('$VIMRC_VIM/undofiles/vim')
+	endif
+	silent! call mkdir(&undodir, 'p')
 else
 	set noundofile
 endif
@@ -389,9 +388,6 @@ cnoremap         <nowait><C-b>           <left>
 cnoremap         <nowait><C-f>           <right>
 cnoremap         <nowait><C-e>           <end>
 cnoremap         <nowait><C-a>           <home>
-
-" Enter Command-line window from Command-line.
-cnoremap         <nowait><C-q>           <C-f>
 
 " Escape from Terminal mode.
 if has('nvim')
