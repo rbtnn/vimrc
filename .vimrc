@@ -1,3 +1,8 @@
+
+if &compatible
+	set nocompatible
+endif
+
 set makeencoding=char
 scriptencoding utf-8
 
