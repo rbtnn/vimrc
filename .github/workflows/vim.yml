@@ -17,17 +17,3 @@ jobs:
       - run: ls -al
       - run: cat plugs.log
 
-      - uses: actions/upload-artifact@v1
-        with:
-          name: version.log
-          path: version.log
-
-      - uses: actions/upload-artifact@v1
-        with:
-          name: startuptime.log
-          path: startuptime.log
-
-      - uses: actions/upload-artifact@v1
-        with:
-          name: plugs.log
-          path: plugs.log
