@@ -1,6 +1,6 @@
 let s:lines = [$MYVIMRC, $VIMRC_ROOT, $VIMRC_VIM, $VIMRC_PACKSTART]
 try
-  source ./.vimrc
+  "source ./.vimrc
   PlugUpdate --sync
   function! s:is_installed(name) abort
     return isdirectory($VIMRC_PACKSTART .. '/' .. a:name) && (-1 != index(keys(g:plugs), a:name))
