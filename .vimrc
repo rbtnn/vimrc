@@ -11,8 +11,8 @@ let s:vimpatch_cmdtag = has('patch-8.2.1978') || has('nvim')
 " https://github.com/vim/vim/commit/aaad995f8384a77a64efba6846c9c4ac99de0953
 let s:vimpatch_unsigned = has('patch-8.2.0860') || has('nvim')
 
-let $VIMRC_ROOT = fnamemodify(resolve($MYVIMRC), ':h:p')
-let $MYVIMRC = fnamemodify(expand('$VIMRC_ROOT/.vimrc'), ':p')
+let $VIMRC_ROOT = fnamemodify(resolve($MYVIMRC), ':h')
+let $MYVIMRC = expand('$VIMRC_ROOT/.vimrc')
 let $VIMRC_VIM = expand('$VIMRC_ROOT/vim')
 let $VIMRC_PACKSTART = expand('$VIMRC_VIM/pack/my/start')
 
