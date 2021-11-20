@@ -214,7 +214,7 @@ endif
 if filereadable(s:plugvim_path)
 	set runtimepath=$VIMRUNTIME,$VIMRC_VIM
 	set packpath=
-	let g:plug_url_format = 'https://github.com/%s.git'
+	"let g:plug_url_format = 'https://github.com/%s.git'
 	call plug#begin($VIMRC_PACKSTART)
 	call plug#('cormacrelf/vim-colors-github')
 	call plug#('kana/vim-operator-replace')
