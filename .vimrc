@@ -11,8 +11,7 @@ let s:vimpatch_cmdtag = has('patch-8.2.1978') || has('nvim')
 " https://github.com/vim/vim/commit/aaad995f8384a77a64efba6846c9c4ac99de0953
 let s:vimpatch_unsigned = has('patch-8.2.0860') || has('nvim')
 
-let $VIMRC_ROOT = fnamemodify(resolve($MYVIMRC), ':h')
-let $MYVIMRC = fnamemodify($VIMRC_ROOT .. '/.vimrc', ':p')
+let $VIMRC_ROOT = fnamemodify(resolve($MYVIMRC), ':h:p')
 let $VIMRC_VIM = expand('$VIMRC_ROOT/vim')
 let $VIMRC_PACKSTART = expand('$VIMRC_VIM/pack/my/start')
 
@@ -238,7 +237,7 @@ if filereadable(s:plugvim_path)
 	function! s:is_installed(name) abort
 		return isdirectory($VIMRC_PACKSTART .. '/' .. a:name) && (-1 != index(keys(g:plugs), a:name))
 	endfunction
-	let s:lines = [$MYVIMRC, $VIMRC_ROOT, $VIMRC_VIM, $VIMRC_PACKSTART]
+	let s:lines = [$VIMRC_ROOT, $VIMRC_VIM, $VIMRC_PACKSTART]
 	for s:key in keys(g:plugs)
 		let s:lines += [string(g:plugs[s:key]), s:is_installed(s:key)]
 	endfor
