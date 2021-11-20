@@ -295,7 +295,7 @@ if has('win32') && (&shell =~# '\<cmd\.exe$')
 endif
 
 if (has('win32') || (256 == &t_Co)) && has('termguicolors') && !has('gui_running')
-	set termguicolors
+	silent! set termguicolors
 endif
 
 if s:is_installed('vim-gloaded')
