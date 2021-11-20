@@ -429,5 +429,21 @@ nnoremap <silent><nowait><C-f>           <nop>
 nnoremap <silent><nowait><C-b>           <nop>
 
 
-call writefile(split(execute('command'), "\n") + split(&runtimepath, ','), $VIMRC_ROOT .. '/vimrc.log')
+function! s:main() abort
+	let lines = []
+	let lines += [printf('%s: %s', '$MYVIMRC', string($MYVIMRC))]
+	let lines += [printf('%s: %s', '$VIMRC_ROOT', string($VIMRC_ROOT))]
+	let lines += [printf('%s: %s', '$VIMRC_VIM', string($VIMRC_VIM))]
+	let lines += [printf('%s: %s', '$VIMRC_PACKSTART', string($VIMRC_PACKSTART))]
+	let lines += ['']
+	let lines += split(execute('scriptnames'), "\n")
+	let lines += ['']
+	let lines += split(&runtimepath, ',')
+	let lines += ['']
+	for name in keys(get(g:, 'plugs', []))
+		let lines += [printf('%s(%d): %s', name, isdirectory($VIMRC_PACKSTART .. '/' .. name), string(g:plugs[name]))]
+	endfor
+	call writefile(lines, $VIMRC_ROOT .. '/vimrc.log')
+endfunction
 
+call s:main()

@@ -14,4 +14,7 @@ jobs:
 
       - uses: rbtnn/action-startuptime-vim@main
 
+      - run: pwd
+      - run: ls -al
+      - run: ls -al vim/pack/my/start
       - run: cat vimrc.log
