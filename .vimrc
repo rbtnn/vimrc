@@ -431,6 +431,13 @@ nnoremap <silent><nowait><C-b>           <nop>
 
 function! s:main() abort
 	let lines = []
+
+	let xs = split('/home/runner/work/vimrc/vimrc/vim/pack/my/start/vim-find', '/')
+	let s = '/'
+	for x in xs
+		let s = s .. x .. '/'
+		let lines += [printf('%s: %d', s, isdirectory(s))]
+	endfor
 	let lines += [printf('%s: %s', '$MYVIMRC', string($MYVIMRC))]
 	let lines += [printf('%s: %s', '$VIMRC_ROOT', string($VIMRC_ROOT))]
 	let lines += [printf('%s: %s', '$VIMRC_VIM', string($VIMRC_VIM))]
