@@ -21,5 +21,10 @@ jobs:
 
       - uses: actions/upload-artifact@v1
         with:
-          name: vim.log
-          path: vim.log
+          name: startuptime.log
+          path: startuptime.log
+
+      - uses: actions/upload-artifact@v1
+        with:
+          name: plugs.log
+          path: plugs.log
