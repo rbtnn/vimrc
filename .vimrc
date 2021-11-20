@@ -200,7 +200,7 @@ else
 		" This is the same as stdpath('config') in nvim on Windows OS.
 		let s:nvim_initpath = expand('~/AppData/Local/nvim/init.vim')
 		if !filereadable(s:nvim_initpath)
-			call mkdir(fnamemodify(s:nvim_initpath, ':h'), 'p')
+			silent! call mkdir(fnamemodify(s:nvim_initpath, ':h'), 'p')
 			call writefile(['silent! source ~/.vimrc'], s:nvim_initpath)
 		endif
 	endif
@@ -208,6 +208,7 @@ endif
 
 let s:plugvim_path = expand('$VIMRC_VIM/autoload/plug.vim')
 if !filereadable(s:plugvim_path) && executable('curl') && has('vim_starting')
+	silent! call mkdir($VIMRC_PACKSTART, 'p')
 	call system(printf('curl -o "%s" https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim', s:plugvim_path))
 endif
 
