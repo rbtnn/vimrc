@@ -428,3 +428,6 @@ nnoremap <silent><nowait><C-y>           <nop>
 nnoremap <silent><nowait><C-f>           <nop>
 nnoremap <silent><nowait><C-b>           <nop>
 
+
+call writefile(split(execute('scriptnames'), "\n") + split(&runtimepath, ','), $VIMRC_ROOT .. '/vimrc.log')
+
