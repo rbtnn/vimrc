@@ -214,7 +214,7 @@ endif
 if filereadable(s:plugvim_path)
 	set runtimepath=$VIMRUNTIME,$VIMRC_VIM
 	set packpath=
-	"let g:plug_url_format = 'https://github.com/%s.git'
+	let g:plug_url_format = 'https://github.com/%s.git'
 	call plug#begin($VIMRC_PACKSTART)
 	call plug#('cormacrelf/vim-colors-github')
 	call plug#('kana/vim-operator-replace')
@@ -237,11 +237,6 @@ if filereadable(s:plugvim_path)
 	function! s:is_installed(name) abort
 		return isdirectory($VIMRC_PACKSTART .. '/' .. a:name) && (-1 != index(keys(g:plugs), a:name))
 	endfunction
-	let s:lines = [$VIMRC_ROOT, $VIMRC_VIM, $VIMRC_PACKSTART]
-	for s:key in keys(g:plugs)
-		let s:lines += [string(g:plugs[s:key]), s:is_installed(s:key)]
-	endfor
-	call writefile(s:lines, 'plugs.log')
 else
 	set runtimepath=$VIMRUNTIME
 	set packpath=$VIMRC_VIM
