@@ -441,7 +441,7 @@ function! s:main() abort
 	let lines += split(&runtimepath, ',')
 	let lines += ['']
 	for name in keys(get(g:, 'plugs', []))
-		let lines += [printf('%s(%d): %s', name, isdirectory($VIMRC_PACKSTART .. '/' .. name), string(g:plugs[name]))]
+		let lines += [printf('%s(%d): %s', name, isdirectory(g:plugs[name]['dir']), string(g:plugs[name]))]
 	endfor
 	call writefile(lines, $VIMRC_ROOT .. '/vimrc.log')
 endfunction
