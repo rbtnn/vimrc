@@ -229,8 +229,6 @@ if filereadable(s:plugvim_path)
 	call plug#('rbtnn/vim-vimscript_tagfunc')
 	call plug#('thinca/vim-qfreplace')
 	if !has('nvim') && has('win32')
-		call plug#('rbtnn/vim-grizzly')
-		call plug#('rbtnn/vimtweak')
 		call plug#('tyru/restart.vim')
 	endif
 	silent! source ~/.vimrc.local
@@ -253,9 +251,8 @@ endif
 " Delete unused commands, because it's an obstacle on cmdline-completion.
 autocmd vimrc CmdlineEnter     *
 	\ : for s:cmdname in [
-	\		'MANPAGER', 'Man', 'Tutor', 'VimFoldh', 'VimTweakDisableCaption', 'VimTweakDisableMaximize',
-	\		'VimTweakDisableTopMost', 'VimTweakEnableCaption', 'VimTweakEnableMaximize',
-	\		'VimTweakEnableTopMost', 'Plug', 'PlugDiff', 'PlugInstall', 'PlugSnapshot',
+	\		'MANPAGER', 'Man', 'Tutor', 'VimFoldh',
+	\		'Plug', 'PlugDiff', 'PlugInstall', 'PlugSnapshot',
 	\		'PlugStatus', 'PlugUpgrade', 'UpdateRemotePlugins',
 	\		]
 	\ | 	execute printf('silent! delcommand %s', s:cmdname)
@@ -307,12 +304,6 @@ if s:is_installed('vim-gloaded')
 	source $VIMRC_PACKSTART/vim-gloaded/plugin/gloaded.vim
 endif
 
-if s:is_installed('vim-grizzly')
-	if !has('nvim') && has('win32') && (&shell =~# '\<cmd\.exe$')
-		let g:grizzly_prompt_pattern = '^$\zs.*'
-	endif
-endif
-
 if s:is_installed('vim-find')
 	nnoremap <silent><nowait><space>         :<C-u>FindFiles<cr>
 endif
@@ -323,12 +314,6 @@ endif
 
 if s:is_installed('restart.vim')
 	let g:restart_sessionoptions = &sessionoptions
-endif
-
-if s:is_installed('vimtweak')
-	if has('gui_running') && has('win32')
-		autocmd vimrc VimEnter     * :VimTweakSetAlpha 240
-	endif
 endif
 
 if s:is_installed('vim-qfprediction')
@@ -374,11 +359,14 @@ if s:is_installed('vim-colors-github')
 		\ | highlight!       TabSideBarSel   guifg=#22863a guibg=NONE    gui=NONE           cterm=NONE
 		\ | highlight!       CursorIM        guifg=NONE    guibg=#aa00aa
 	set background=light
+	let g:github_colors_soft = 1
 	colorscheme github
 endif
 
 " Emacs key mappings
-if has('win32')
+if has('win32') && (&shell =~# '\<cmd\.exe$')
+	tnoremap <silent><nowait><C-p>       <up>
+	tnoremap <silent><nowait><C-n>       <down>
 	tnoremap <silent><nowait><C-b>       <left>
 	tnoremap <silent><nowait><C-f>       <right>
 	tnoremap <silent><nowait><C-e>       <end>
@@ -392,9 +380,9 @@ cnoremap         <nowait><C-a>           <home>
 
 " Escape from Terminal mode.
 if has('nvim')
-	tnoremap <silent><nowait><esc>       <C-\><C-n>
+	tnoremap <silent><nowait><C-s>       <C-\><C-n>
 else
-	tnoremap <silent><nowait><esc>       <C-w>N
+	tnoremap <silent><nowait><C-s>       <C-w>N
 endif
 
 " Move the next/previous error in quickfix.
@@ -411,14 +399,6 @@ else
 	tnoremap <silent><nowait><C-j>       <C-w>:<C-u>tabnext<cr>
 	tnoremap <silent><nowait><C-k>       <C-w>:<C-u>tabprevious<cr>
 endif
-
-" Go to the last accessed window.
-if s:vimpatch_cmdtag
-	tnoremap <silent><nowait><C-s>       <Cmd>wincmd p<cr>
-else
-	tnoremap <silent><nowait><C-s>       <C-w>p
-endif
-nnoremap <silent><nowait><C-s>           <C-w>p
 
 " Smart space on wildmenu
 cnoremap   <expr><nowait><space>         (wildmenumode() && (getcmdline() =~# '[\/]$')) ? '<space><bs>' : '<space>'
