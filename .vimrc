@@ -378,7 +378,8 @@ cnoremap         <nowait><C-f>           <right>
 cnoremap         <nowait><C-e>           <end>
 cnoremap         <nowait><C-a>           <home>
 
-" Escape from Terminal mode.
+" Escape from Terminal mode or Insert mode.
+inoremap <silent><nowait><C-s>           <Esc>
 if has('nvim')
 	tnoremap <silent><nowait><C-s>       <C-\><C-n>
 else

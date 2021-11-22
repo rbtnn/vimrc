@@ -53,6 +53,31 @@ function! s:gitdiffshowdiff_open(rootdir, args_list) abort
 	endif
 endfunction
 
+function! s:gitdiffshowdiff_revert(rootdir, args_list, fullpath) abort
+	let line = getline('.')
+	if line =~# '^[+-]'
+		if s:gitdiff_jumpdiffline(a:fullpath)
+			if &modified
+				call s:errormsg('the buffer is already modified! please write.')
+				wincmd p
+			elseif &readonly
+				call s:errormsg('the buffer is readonly! please unset readonly.')
+				wincmd p
+			else
+				let lnum = line('.')
+				if line =~# '^-'
+					call append(lnum, line[1:])
+				elseif line =~# '^+'
+					call deletebufline(bufnr(), lnum)
+				endif
+				write
+				wincmd p
+				call s:gitdiffshowdiff_setlines(a:rootdir, a:args_list, a:fullpath)
+			endif
+		endif
+	endif
+endfunction
+
 function! s:gitdiffshowdiff_setlines(rootdir, args_list, fullpath) abort
 	let view = winsaveview()
 	let cmd = ['git', '--no-pager', 'diff'] + a:args_list + ['--', a:fullpath]
@@ -62,6 +87,7 @@ function! s:gitdiffshowdiff_setlines(rootdir, args_list, fullpath) abort
 	call s:buffer_nnoremap('<space>', 'gitdiff_jumpdiffline', [a:fullpath])
 	call s:buffer_nnoremap('W', 'gitdiffshowdiff_setlines', [a:rootdir, s:toggle_w(a:args_list), a:fullpath])
 	call s:buffer_nnoremap('R', 'gitdiffshowdiff_setlines', [a:rootdir, a:args_list, a:fullpath])
+	call s:buffer_nnoremap('S', 'gitdiffshowdiff_revert', [a:rootdir, a:args_list, a:fullpath])
 	call winrestview(view)
 endfunction
 
@@ -92,10 +118,14 @@ function! s:setlines(rootdir, cmd, lines, ft) abort
 	silent! call deletebufline(bufnr(), 1, '$')
 	call setbufline(bufnr(), 1, [
 		\ '# ' .. (strftime('%c')),
-		\ '# ' .. a:rootdir,
-		\ '# ' .. join(a:cmd),
-		\ '# R: reload, W: toggle -w option'
-		\ ] + a:lines)
+		\ '# [Git Directory]',
+		\ '#   ' .. a:rootdir,
+		\ '# [Command]',
+		\ '#   ' .. join(a:cmd),
+		\ '# [Keys]',
+		\ '#   R: reload',
+		\ '#   W: toggle -w option',
+		\ ] + (a:ft == 'diff' ? ['#   S: revert the line'] : []) + a:lines)
 	setlocal buftype=nofile nomodifiable readonly
 	execute 'setfiletype' a:ft
 endfunction
@@ -166,6 +196,8 @@ function! s:gitdiff_jumpdiffline(fullpath) abort
 	if !ok
 		call s:errormsg('can not jump this!')
 	endif
+
+	return ok
 endfunction
 
 function! s:get_gitrootdir(path) abort
@@ -200,7 +232,7 @@ function! s:fixpath(path) abort
 endfunction
 
 function! s:errormsg(text) abort
-	echohl Error
+	echohl ErrorMsg
 	echo '[gitdiff]' a:text
 	echohl None
 endfunction
