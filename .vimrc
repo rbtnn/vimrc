@@ -260,32 +260,34 @@ autocmd vimrc CmdlineEnter     *
 
 autocmd vimrc FileType     help :setlocal colorcolumn=78
 
-if has('win32') && (&shell =~# '\<cmd\.exe$')
+if has('win32')
 	let s:initcmd_path = get(s:, 'initcmd_path', tempname() .. '.cmd')
 	let s:windows_build_number = get(s:, 'windows_build_number', -1)
 	let s:win10_anniversary_update = get(s:, 'win10_anniversary_update', v:false)
 	function! s:term_win_open() abort
-		" https://en.wikipedia.org/wiki/Windows_10_version_history
-		" https://docs.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2012-R2-and-2012/cc725943(v=ws.11)
-		" https://gist.github.com/fnky/458719343aabd01cfb17a3a4f7296797
-		if executable('wmic') && (-1 == s:windows_build_number)
-			let s:windows_build_number = str2nr(join(filter(split(system('wmic os get BuildNumber'), '\zs'), { i,x -> (0x30 <= char2nr(x)) && (char2nr(x) <= 0x39) }), ''))
-			let s:win10_anniversary_update = 14393 <= s:windows_build_number
-		endif
-		call writefile(map([
-			\	'@echo off', 'cls',
-			\	(s:win10_anniversary_update ? 'prompt $e[0;31m$$$e[0m' : 'prompt $$'),
-			\	'doskey ls=dir /b $*',
-			\	'doskey rm=del /q $*',
-			\	'doskey mv=move /y $*',
-			\	'doskey cp=copy /y $*',
-			\	'doskey pwd=cd',
-			\ ], { i,x -> x .. "\r" }), s:initcmd_path)
+		let bnr = bufnr()
 		if has('nvim')
-			startinsert
-			call jobsend(b:terminal_job_id, printf("call %s\r", s:initcmd_path))
-		else
-			call term_sendkeys(bufnr(), printf("call %s\r", s:initcmd_path))
+			let bnr = b:terminal_job_id
+		endif
+		let bname = bufname(bnr)
+		if bname =~# '\<cmd\.exe$'
+			" https://en.wikipedia.org/wiki/Windows_10_version_history
+			" https://docs.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2012-R2-and-2012/cc725943(v=ws.11)
+			" https://gist.github.com/fnky/458719343aabd01cfb17a3a4f7296797
+			if executable('wmic') && (-1 == s:windows_build_number)
+				let s:windows_build_number = str2nr(join(filter(split(system('wmic os get BuildNumber'), '\zs'), { i,x -> (0x30 <= char2nr(x)) && (char2nr(x) <= 0x39) }), ''))
+				let s:win10_anniversary_update = 14393 <= s:windows_build_number
+			endif
+			call writefile(map([
+				\	'@echo off', 'cls',
+				\	(s:win10_anniversary_update ? 'prompt $e[0;31m$$$e[0m' : 'prompt $$'),
+				\	'doskey ls=dir /b $*',
+				\	'doskey rm=del /q $*',
+				\	'doskey mv=move /y $*',
+				\	'doskey cp=copy /y $*',
+				\	'doskey pwd=cd',
+				\ ], { i,x -> x .. "\r" }), s:initcmd_path)
+			call term_sendkeys(bnr, printf("call %s\r", s:initcmd_path))
 		endif
 	endfunction
 	if has('nvim')
