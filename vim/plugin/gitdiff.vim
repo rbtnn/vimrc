@@ -56,22 +56,23 @@ endfunction
 function! s:gitdiffshowdiff_revert(rootdir, args_list, fullpath) abort
 	let line = getline('.')
 	if line =~# '^[+-]'
-		if s:gitdiff_jumpdiffline(a:fullpath)
-			if &modified
+		let x = s:calc_lnum()
+		if !empty(x)
+			let bnr = bufadd(a:fullpath)
+			call bufload(bnr)
+			if getbufvar(bnr, '&modified', v:false)
 				call s:errormsg('the buffer is already modified! please write.')
-				wincmd p
-			elseif &readonly
+			elseif getbufvar(bnr, '&readonly', v:false)
 				call s:errormsg('the buffer is readonly! please unset readonly.')
-				wincmd p
 			else
-				let lnum = line('.')
 				if line =~# '^-'
-					call append(lnum, line[1:])
+					call appendbufline(bnr, x['lnum'], line[1:])
 				elseif line =~# '^+'
-					call deletebufline(bufnr(), lnum)
+					call deletebufline(bnr, x['lnum'])
 				endif
-				write
-				wincmd p
+				new
+				execute printf('%dbufdo :write', bnr)
+				close
 				call s:gitdiffshowdiff_setlines(a:rootdir, a:args_list, a:fullpath)
 			endif
 		endif
@@ -140,10 +141,9 @@ function! s:toggle_w(args_list) abort
 	return args_list
 endfunction
 
-function! s:gitdiff_jumpdiffline(fullpath) abort
+function! s:calc_lnum() abort
 	let lines = getbufline(bufnr(), 1, '$')
 	let curr_lnum = line('.')
-	let ok = v:false
 	let lnum = -1
 
 	for m in range(curr_lnum, 1, -1)
@@ -176,28 +176,31 @@ function! s:gitdiff_jumpdiffline(fullpath) abort
 		if !empty(m)
 			for i in [1, 3, 5]
 				if '+' == m[i]
-					if filereadable(a:fullpath)
-						let lnum = str2nr(m[i + 1]) + n1 + n3
-						if s:find_window_by_path(a:fullpath)
-							execute printf(':%d', lnum)
-						else
-							new
-							call s:open_file(a:fullpath, lnum)
-						endif
-					endif
-					normal! zz
-					let ok = v:true
-					break
+					let lnum = str2nr(m[i + 1]) + n1 + n3
+					return { 'lnum': lnum, }
 				endif
 			endfor
 		endif
 	endif
 
-	if !ok
+	return {}
+endfunction
+
+function! s:gitdiff_jumpdiffline(fullpath) abort
+	let x = s:calc_lnum()
+	if !empty(x)
+		if filereadable(a:fullpath)
+			if s:find_window_by_path(a:fullpath)
+				execute printf(':%d', x['lnum'])
+			else
+				new
+				call s:open_file(a:fullpath, x['lnum'])
+			endif
+		endif
+		normal! zz
+	else
 		call s:errormsg('can not jump this!')
 	endif
-
-	return ok
 endfunction
 
 function! s:get_gitrootdir(path) abort

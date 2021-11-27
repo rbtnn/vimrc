@@ -319,7 +319,7 @@ if s:is_installed('lightline.vim')
 	let g:lightline['active'] = {
 		\   'left': [
 		\     ['mode'],
-		\     ['fileformat', 'fileencoding', 'filetype'],
+		\     ['fileformat', 'fileencoding', 'filetype', 'modified', 'readonly'],
 		\     ['filename'],
 		\   ],
 		\   'right': [
