@@ -218,12 +218,15 @@ if filereadable(s:plugvim_path)
 	let g:plug_url_format = 'https://github.com/%s.git'
 	call plug#begin($VIMRC_PACKSTART)
 	call plug#('cormacrelf/vim-colors-github')
+	call plug#('itchyny/lightline.vim')
+	call plug#('itchyny/vim-gitbranch')
 	call plug#('kana/vim-operator-replace')
 	call plug#('kana/vim-operator-user')
+	call plug#('kana/vim-textobj-user')
+	call plug#('machakann/vim-textobj-functioncall')
 	call plug#('rbtnn/vim-find')
 	call plug#('rbtnn/vim-gloaded')
 	call plug#('rbtnn/vim-mrw')
-	call plug#('rbtnn/vim-qfprediction')
 	call plug#('rbtnn/vim-vimscript_indentexpr')
 	call plug#('rbtnn/vim-vimscript_lasterror')
 	call plug#('rbtnn/vim-vimscript_tagfunc')
@@ -265,12 +268,7 @@ if has('win32')
 	let s:windows_build_number = get(s:, 'windows_build_number', -1)
 	let s:win10_anniversary_update = get(s:, 'win10_anniversary_update', v:false)
 	function! s:term_win_open() abort
-		let bnr = bufnr()
-		if has('nvim')
-			let bnr = b:terminal_job_id
-		endif
-		let bname = bufname(bnr)
-		if bname =~# '\<cmd\.exe$'
+		if bufname() =~# '\<cmd\.exe$'
 			" https://en.wikipedia.org/wiki/Windows_10_version_history
 			" https://docs.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2012-R2-and-2012/cc725943(v=ws.11)
 			" https://gist.github.com/fnky/458719343aabd01cfb17a3a4f7296797
@@ -287,7 +285,12 @@ if has('win32')
 				\	'doskey cp=copy /y $*',
 				\	'doskey pwd=cd',
 				\ ], { i,x -> x .. "\r" }), s:initcmd_path)
-			call term_sendkeys(bnr, printf("call %s\r", s:initcmd_path))
+			if has('nvim')
+				startinsert
+				call jobsend(b:terminal_job_id, printf("call %s\r", s:initcmd_path))
+			else
+				call term_sendkeys(bufnr(), printf("call %s\r", s:initcmd_path))
+			endif
 		endif
 	endfunction
 	if has('nvim')
@@ -306,8 +309,37 @@ if s:is_installed('vim-gloaded')
 	source $VIMRC_PACKSTART/vim-gloaded/plugin/gloaded.vim
 endif
 
-if s:is_installed('vim-find')
-	nnoremap <silent><nowait><space>         :<C-u>FindFiles<cr>
+if s:is_installed('lightline.vim')
+	let g:lightline = {}
+	let g:lightline['enable'] = { 'statusline': 1, 'tabline': 0, }
+	let g:lightline['colorscheme'] = 'PaperColor'
+	let g:lightline['component_function'] = {
+		\   'gitbranch': 'gitbranch#name',
+		\ }
+	let g:lightline['active'] = {
+		\   'left': [
+		\     ['mode'],
+		\     ['fileformat', 'fileencoding', 'filetype'],
+		\     ['filename'],
+		\   ],
+		\   'right': [
+		\     ['gitbranch'],
+		\   ]
+		\ }
+	let g:lightline['inactive'] = g:lightline['active']
+	set laststatus=2
+endif
+
+if s:is_installed('machakann/vim-textobj-functioncall')
+	let g:textobj_functioncall_generics_patterns = [{ 'header': '\<\h\k*', 'bra': '<', 'ket': '>', 'footer': '', }]
+	onoremap <silent>    <Plug>(textobj-functioncall-generics-i) :<C-u>call textobj#functioncall#ip('o', g:textobj_functioncall_generics_patterns)<cr>
+	xnoremap <silent>    <Plug>(textobj-functioncall-generics-i) :<C-u>call textobj#functioncall#ip('x', g:textobj_functioncall_generics_patterns)<cr>
+	onoremap <silent>    <Plug>(textobj-functioncall-generics-a) :<C-u>call textobj#functioncall#i('o', g:textobj_functioncall_generics_patterns)<cr>
+	xnoremap <silent>    <Plug>(textobj-functioncall-generics-a) :<C-u>call textobj#functioncall#i('x', g:textobj_functioncall_generics_patterns)<cr>
+	omap     <silent> ig <Plug>(textobj-functioncall-generics-i)
+	xmap     <silent> ig <Plug>(textobj-functioncall-generics-i)
+	omap     <silent> ag <Plug>(textobj-functioncall-generics-a)
+	xmap     <silent> ag <Plug>(textobj-functioncall-generics-a)
 endif
 
 if s:is_installed('vim-operator-replace')
@@ -318,42 +350,6 @@ if s:is_installed('restart.vim')
 	let g:restart_sessionoptions = &sessionoptions
 endif
 
-if s:is_installed('vim-qfprediction')
-	function! StatusLine() abort
-		try
-			let twnr = win_id2tabwin(g:statusline_winid)
-			let bnr = winbufnr(g:statusline_winid)
-			let bt = getbufvar(bnr, '&buftype')
-			let qf_labels = []
-			for x in [
-				\ ['[qf-sel]', qfprediction#get()],
-				\ ['[qf-cnext]', qfprediction#get(1)],
-				\ ['[qf-cprev]', qfprediction#get(-1)],
-				\ ]
-				if get(x[1], 'tabnr', -1) == twnr[0] && get(x[1], 'winnr', -1) == twnr[1]
-					let qf_labels += [x[0]]
-				endif
-			endfor
-			let s = ''
-			if empty(bt)
-				let ff = getbufvar(bnr, '&fileformat')
-				let ft = getbufvar(bnr, '&filetype')
-				let fe = getbufvar(bnr, '&fileencoding')
-				let f = join(filter([ft, ff, fe], { i,x -> !empty(x) }), '/')
-				let s = '%m%r' .. (empty(f) ? '' : '[' .. f .. ']')
-			endif
-			return '%t ' .. s .. join(qf_labels, '')
-		catch
-			let g:st_throwpoint = v:throwpoint
-			let g:st_exception = v:exception
-			return 'Error! Please see g:st_throwpoint and g:st_exception.'
-		endtry
-	endfunction
-	set laststatus=2
-	set statusline=%!StatusLine()
-	autocmd vimrc QuickfixCmdPost,WinEnter * :redrawstatus!
-endif
-
 if s:is_installed('vim-colors-github')
 	autocmd vimrc ColorScheme      *
 		\ : highlight!       TabSideBar      guifg=#76787b guibg=NONE    gui=NONE           cterm=NONE
@@ -361,7 +357,6 @@ if s:is_installed('vim-colors-github')
 		\ | highlight!       TabSideBarSel   guifg=#22863a guibg=NONE    gui=NONE           cterm=NONE
 		\ | highlight!       CursorIM        guifg=NONE    guibg=#aa00aa
 	set background=light
-	let g:github_colors_soft = 1
 	colorscheme github
 endif
 
@@ -381,11 +376,8 @@ cnoremap         <nowait><C-e>           <end>
 cnoremap         <nowait><C-a>           <home>
 
 " Escape from Terminal mode or Insert mode.
-inoremap <silent><nowait><C-s>           <Esc>
 if has('nvim')
-	tnoremap <silent><nowait><C-s>       <C-\><C-n>
-else
-	tnoremap <silent><nowait><C-s>       <C-w>N
+	tnoremap <silent><nowait><C-w>N       <C-\><C-n>
 endif
 
 " Move the next/previous error in quickfix.
