@@ -330,7 +330,7 @@ if s:is_installed('lightline.vim')
 	set laststatus=2
 endif
 
-if s:is_installed('machakann/vim-textobj-functioncall')
+if s:is_installed('vim-textobj-functioncall')
 	let g:textobj_functioncall_generics_patterns = [{ 'header': '\<\h\k*', 'bra': '<', 'ket': '>', 'footer': '', }]
 	onoremap <silent>    <Plug>(textobj-functioncall-generics-i) :<C-u>call textobj#functioncall#ip('o', g:textobj_functioncall_generics_patterns)<cr>
 	xnoremap <silent>    <Plug>(textobj-functioncall-generics-i) :<C-u>call textobj#functioncall#ip('x', g:textobj_functioncall_generics_patterns)<cr>
@@ -375,7 +375,7 @@ cnoremap         <nowait><C-f>           <right>
 cnoremap         <nowait><C-e>           <end>
 cnoremap         <nowait><C-a>           <home>
 
-" Escape from Terminal mode or Insert mode.
+" Escape from Terminal mode.
 if has('nvim')
 	tnoremap <silent><nowait><C-w>N       <C-\><C-n>
 endif
