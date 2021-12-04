@@ -267,46 +267,57 @@ autocmd vimrc CmdlineEnter     *
 
 autocmd vimrc FileType     help :setlocal colorcolumn=78
 
-if has('win32')
-	let s:initcmd_path = get(s:, 'initcmd_path', tempname() .. '.cmd')
-	let s:windows_build_number = get(s:, 'windows_build_number', -1)
-	let s:win10_anniversary_update = get(s:, 'win10_anniversary_update', v:false)
-	function! s:term_win_open() abort
-		if bufname() =~# '\<cmd\.exe$'
-			" https://en.wikipedia.org/wiki/Windows_10_version_history
-			" https://docs.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2012-R2-and-2012/cc725943(v=ws.11)
-			" https://gist.github.com/fnky/458719343aabd01cfb17a3a4f7296797
-			if executable('wmic') && (-1 == s:windows_build_number)
-				let s:windows_build_number = str2nr(join(filter(split(system('wmic os get BuildNumber'), '\zs'), { i,x -> (0x30 <= char2nr(x)) && (char2nr(x) <= 0x39) }), ''))
-				let s:win10_anniversary_update = 14393 <= s:windows_build_number
-			endif
-			call writefile(map([
-				\	'@echo off', 'cls',
-				\	(s:win10_anniversary_update ? 'prompt $e[0;31m$$$e[0m' : 'prompt $$'),
-				\	'doskey ls=dir /b $*',
-				\	'doskey rm=del /q $*',
-				\	'doskey mv=move /y $*',
-				\	'doskey cp=copy /y $*',
-				\	'doskey pwd=cd',
-				\ ], { i,x -> x .. "\r" }), s:initcmd_path)
-			if has('nvim')
-				startinsert
-				call jobsend(b:terminal_job_id, printf("call %s\r", s:initcmd_path))
-			else
-				call term_sendkeys(bufnr(), printf("call %s\r", s:initcmd_path))
-			endif
+function! s:term_win_open() abort
+	if (bufname() =~# '\<cmd\.exe$') && has('win32')
+		" https://en.wikipedia.org/wiki/Windows_10_version_history
+		" https://docs.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2012-R2-and-2012/cc725943(v=ws.11)
+		" https://gist.github.com/fnky/458719343aabd01cfb17a3a4f7296797
+		let s:initcmd_path = get(s:, 'initcmd_path', tempname() .. '.cmd')
+		let s:windows_build_number = get(s:, 'windows_build_number', -1)
+		let s:win10_anniversary_update = get(s:, 'win10_anniversary_update', v:false)
+		if executable('wmic') && (-1 == s:windows_build_number)
+			let s:windows_build_number = str2nr(join(filter(split(system('wmic os get BuildNumber'), '\zs'), { i,x -> (0x30 <= char2nr(x)) && (char2nr(x) <= 0x39) }), ''))
+			let s:win10_anniversary_update = 14393 <= s:windows_build_number
 		endif
-	endfunction
-	if has('nvim')
-		autocmd vimrc TermOpen           * :silent! call s:term_win_open()
-	else
-		autocmd vimrc TerminalWinOpen    * :silent! call s:term_win_open()
+		call writefile(map([
+			\	'@echo off', 'cls',
+			\	(s:win10_anniversary_update ? 'prompt $e[0;31m$$$e[0m' : 'prompt $$'),
+			\	'doskey ls=dir /b $*',
+			\	'doskey rm=del /q $*',
+			\	'doskey mv=move /y $*',
+			\	'doskey cp=copy /y $*',
+			\	'doskey pwd=cd',
+			\ ], { i,x -> x .. "\r" }), s:initcmd_path)
+		if has('nvim')
+			startinsert
+			call jobsend(b:terminal_job_id, printf("call %s\r", s:initcmd_path))
+		else
+			call term_sendkeys(bufnr(), printf("call %s\r", s:initcmd_path))
+		endif
 	endif
-	autocmd vimrc VimLeave               * :silent! call delete(s:initcmd_path)
+	if bufname() =~# '\<bash\>'
+		let cmd = join(['export PS1="\[\e[0;31m\]$\[\e[0m\]"', 'clear', ''], "\r")
+		if has('nvim')
+			startinsert
+			call jobsend(b:terminal_job_id, cmd)
+		else
+			call term_sendkeys(bufnr(), cmd)
+		endif
+	endif
+endfunction
+if has('nvim')
+	autocmd vimrc TermOpen           * :silent! call s:term_win_open()
+else
+	autocmd vimrc TerminalWinOpen    * :silent! call s:term_win_open()
+endif
+if (bufname() =~# '\<cmd\.exe$') && has('win32')
+	autocmd vimrc VimLeave           * :silent! call delete(s:initcmd_path)
 endif
 
-if (has('win32') || (256 == &t_Co)) && has('termguicolors') && !has('gui_running')
-	silent! set termguicolors
+if has('vim_starting')
+	if (has('win32') || (256 == &t_Co)) && has('termguicolors') && !has('gui_running')
+		silent! set termguicolors
+	endif
 endif
 
 if s:is_installed('vim-gloaded')
@@ -318,6 +329,7 @@ if s:is_installed('onehalf')
 		\ : highlight!       TabSideBar      guifg=#76787b guibg=NONE    gui=NONE           cterm=NONE
 		\ | highlight!       TabSideBarFill  guifg=#1a1a1a guibg=NONE    gui=NONE           cterm=NONE
 		\ | highlight!       TabSideBarSel   guifg=#22863a guibg=NONE    gui=NONE           cterm=NONE
+		\ | highlight!       Cursor          guifg=NONE    guibg=#0011aa
 		\ | highlight!       CursorIM        guifg=NONE    guibg=#aa00aa
 		\ | highlight!       Comment                                     gui=NONE           cterm=NONE
 		\ | highlight!       SpecialKey      guifg=#eeeeee
@@ -362,6 +374,10 @@ endif
 
 if s:is_installed('vim-operator-replace')
 	nmap     <silent><nowait>s               <Plug>(operator-replace)
+endif
+
+if s:is_installed('vim-find')
+	nnoremap     <silent><nowait><space>     :<C-u>FindFiles<cr>
 endif
 
 if s:is_installed('restart.vim')
