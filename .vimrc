@@ -29,7 +29,9 @@ set belloff=all
 set clipboard=unnamed
 
 " display
-set ambiwidth=double
+if has('vim_starting')
+	set ambiwidth=double
+endif
 set nonumber
 set norelativenumber
 set nowrap
@@ -217,7 +219,6 @@ if filereadable(s:plugvim_path)
 	set packpath=
 	let g:plug_url_format = 'https://github.com/%s.git'
 	call plug#begin($VIMRC_PACKSTART)
-	call plug#('cormacrelf/vim-colors-github')
 	call plug#('itchyny/lightline.vim')
 	call plug#('itchyny/vim-gitbranch')
 	call plug#('kana/vim-operator-replace')
@@ -230,6 +231,7 @@ if filereadable(s:plugvim_path)
 	call plug#('rbtnn/vim-vimscript_indentexpr')
 	call plug#('rbtnn/vim-vimscript_lasterror')
 	call plug#('rbtnn/vim-vimscript_tagfunc')
+	call plug#('sonph/onehalf', {'rtp': 'vim/'})
 	call plug#('thinca/vim-qfreplace')
 	if !has('nvim') && has('win32')
 		call plug#('tyru/restart.vim')
@@ -309,10 +311,24 @@ if s:is_installed('vim-gloaded')
 	source $VIMRC_PACKSTART/vim-gloaded/plugin/gloaded.vim
 endif
 
+if s:is_installed('onehalf')
+	autocmd vimrc ColorScheme      *
+		\ : highlight!       TabSideBar      guifg=#76787b guibg=NONE    gui=NONE           cterm=NONE
+		\ | highlight!       TabSideBarFill  guifg=#1a1a1a guibg=NONE    gui=NONE           cterm=NONE
+		\ | highlight!       TabSideBarSel   guifg=#22863a guibg=NONE    gui=NONE           cterm=NONE
+		\ | highlight!       CursorIM        guifg=NONE    guibg=#aa00aa
+		\ | highlight!       Comment                                     gui=NONE           cterm=NONE
+		\ | highlight!       SpecialKey      guifg=#eeeeee
+	if has('vim_starting')
+		set background=light
+		colorscheme onehalflight
+	endif
+endif
+
 if s:is_installed('lightline.vim')
 	let g:lightline = {}
 	let g:lightline['enable'] = { 'statusline': 1, 'tabline': 0, }
-	let g:lightline['colorscheme'] = 'PaperColor'
+	let g:lightline['colorscheme'] = 'onehalfdark'
 	let g:lightline['component_function'] = {
 		\   'gitbranch': 'gitbranch#name',
 		\ }
@@ -350,16 +366,6 @@ if s:is_installed('restart.vim')
 	let g:restart_sessionoptions = &sessionoptions
 endif
 
-if s:is_installed('vim-colors-github')
-	autocmd vimrc ColorScheme      *
-		\ : highlight!       TabSideBar      guifg=#76787b guibg=NONE    gui=NONE           cterm=NONE
-		\ | highlight!       TabSideBarFill  guifg=#1a1a1a guibg=NONE    gui=NONE           cterm=NONE
-		\ | highlight!       TabSideBarSel   guifg=#22863a guibg=NONE    gui=NONE           cterm=NONE
-		\ | highlight!       CursorIM        guifg=NONE    guibg=#aa00aa
-	set background=light
-	colorscheme github
-endif
-
 " Emacs key mappings
 if has('win32') && (&shell =~# '\<cmd\.exe$')
 	tnoremap <silent><nowait><C-p>       <up>
@@ -381,19 +387,8 @@ if has('nvim')
 endif
 
 " Move the next/previous error in quickfix.
-nnoremap <silent><nowait><C-n>           :<C-u>cnext<cr>
-nnoremap <silent><nowait><C-p>           :<C-u>cprevious<cr>
-
-" Move the next/previous tabpage.
-nnoremap <silent><nowait><C-j>           gt
-nnoremap <silent><nowait><C-k>           gT
-if s:vimpatch_cmdtag
-	tnoremap <silent><nowait><C-j>       <Cmd>tabnext<cr>
-	tnoremap <silent><nowait><C-k>       <Cmd>tabprevious<cr>
-else
-	tnoremap <silent><nowait><C-j>       <C-w>:<C-u>tabnext<cr>
-	tnoremap <silent><nowait><C-k>       <C-w>:<C-u>tabprevious<cr>
-endif
+nnoremap <silent><nowait><C-j>           :<C-u>cnext<cr>
+nnoremap <silent><nowait><C-k>           :<C-u>cprevious<cr>
 
 " Smart space on wildmenu
 cnoremap   <expr><nowait><space>         (wildmenumode() && (getcmdline() =~# '[\/]$')) ? '<space><bs>' : '<space>'
@@ -404,3 +399,10 @@ nnoremap <silent><nowait><C-y>           <nop>
 nnoremap <silent><nowait><C-f>           <nop>
 nnoremap <silent><nowait><C-b>           <nop>
 
+" Save script variables for debugging purposes.
+let g:vimrc_scriptvars = s:
+
+if !has('vim_starting')
+	" Check whether echo-messages are not disappeared when .vimrc is read.
+	echo '.vimrc has just read!'
+endif
