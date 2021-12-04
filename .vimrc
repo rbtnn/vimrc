@@ -193,8 +193,10 @@ endif
 if has('nvim')
 	if has('win32')
 		" Running nvim-qt.exe on Windows OS, never use GUI popupmenu and tabline.
-		call rpcnotify(0, 'Gui', 'Option', 'Popupmenu', 0)
-		call rpcnotify(0, 'Gui', 'Option', 'Tabline', 0)
+		if has('vim_starting')
+			call rpcnotify(0, 'Gui', 'Option', 'Popupmenu', 0)
+			call rpcnotify(0, 'Gui', 'Option', 'Tabline', 0)
+		endif
 	endif
 	set pumblend=20
 else
