@@ -268,10 +268,21 @@ autocmd vimrc CmdlineEnter     *
 autocmd vimrc FileType     help :setlocal colorcolumn=78
 
 function! s:term_win_open() abort
-	if (bufname() =~# '\<cmd\.exe$') && has('win32')
+	if (bufname() =~# '\<cmd\.exe\>') && has('win32')
 		" https://en.wikipedia.org/wiki/Windows_10_version_history
 		" https://docs.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2012-R2-and-2012/cc725943(v=ws.11)
 		" https://gist.github.com/fnky/458719343aabd01cfb17a3a4f7296797
+		let s:vcvarsall_path = ''
+		if empty(s:vcvarsall_path)
+			for path in [
+				\ 'C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvarsall.bat',
+				\ ]
+				if filereadable(path)
+					let s:vcvarsall_path = path
+					break
+				endif
+			endfor
+		endif
 		let s:initcmd_path = get(s:, 'initcmd_path', tempname() .. '.cmd')
 		let s:windows_build_number = get(s:, 'windows_build_number', -1)
 		let s:win10_anniversary_update = get(s:, 'win10_anniversary_update', v:false)
@@ -282,6 +293,7 @@ function! s:term_win_open() abort
 		call writefile(map([
 			\	'@echo off', 'cls',
 			\	(s:win10_anniversary_update ? 'prompt $e[0;31m$$$e[0m' : 'prompt $$'),
+			\	'doskey vc=call "' .. s:vcvarsall_path .. '" $*',
 			\	'doskey ls=dir /b $*',
 			\	'doskey rm=del /q $*',
 			\	'doskey mv=move /y $*',
