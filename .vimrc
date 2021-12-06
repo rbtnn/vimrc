@@ -272,17 +272,7 @@ function! s:term_win_open() abort
 		" https://en.wikipedia.org/wiki/Windows_10_version_history
 		" https://docs.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2012-R2-and-2012/cc725943(v=ws.11)
 		" https://gist.github.com/fnky/458719343aabd01cfb17a3a4f7296797
-		let s:vcvarsall_path = ''
-		if empty(s:vcvarsall_path)
-			for path in [
-				\ 'C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvarsall.bat',
-				\ ]
-				if filereadable(path)
-					let s:vcvarsall_path = path
-					break
-				endif
-			endfor
-		endif
+		let s:vcvarsall_path = glob('C:\Program Files (x86)\Microsoft Visual Studio\2019\*\VC\Auxiliary\Build\vcvarsall.bat')
 		let s:initcmd_path = get(s:, 'initcmd_path', tempname() .. '.cmd')
 		let s:windows_build_number = get(s:, 'windows_build_number', -1)
 		let s:win10_anniversary_update = get(s:, 'win10_anniversary_update', v:false)
@@ -292,7 +282,7 @@ function! s:term_win_open() abort
 		endif
 		call writefile(map([
 			\	'@echo off', 'cls',
-			\	(s:win10_anniversary_update ? 'prompt $e[0;31m$$$e[0m' : 'prompt $$'),
+			\	(s:win10_anniversary_update ? 'prompt $e[0;32m$$$e[0m' : 'prompt $$'),
 			\	'doskey vc=call "' .. s:vcvarsall_path .. '" $*',
 			\	'doskey ls=dir /b $*',
 			\	'doskey rm=del /q $*',
@@ -308,7 +298,7 @@ function! s:term_win_open() abort
 		endif
 	endif
 	if bufname() =~# '\<bash\>'
-		let cmd = join(['export PS1="\[\e[0;31m\]$\[\e[0m\]"', 'clear', ''], "\r")
+		let cmd = join(['export PS1="\[\e[0;32m\]$\[\e[0m\]"', 'clear', ''], "\r")
 		if has('nvim')
 			startinsert
 			call jobsend(b:terminal_job_id, cmd)
@@ -341,10 +331,11 @@ if s:is_installed('onehalf')
 		\ : highlight!       TabSideBar      guifg=#76787b guibg=NONE    gui=NONE           cterm=NONE
 		\ | highlight!       TabSideBarFill  guifg=#1a1a1a guibg=NONE    gui=NONE           cterm=NONE
 		\ | highlight!       TabSideBarSel   guifg=#22863a guibg=NONE    gui=NONE           cterm=NONE
-		\ | highlight!       Cursor          guifg=NONE    guibg=#0011aa
-		\ | highlight!       CursorIM        guifg=NONE    guibg=#aa00aa
+		\ | highlight!       Cursor          guifg=NONE    guibg=#aaaaaa
+		\ | highlight!       CursorIM        guifg=NONE    guibg=#aa0000
 		\ | highlight!       Comment                                     gui=NONE           cterm=NONE
 		\ | highlight!       SpecialKey      guifg=#eeeeee
+		\ | highlight!       Terminal        guifg=#eeeeee guibg=#000000
 	if has('vim_starting')
 		set background=light
 		colorscheme onehalflight
