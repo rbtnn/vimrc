@@ -70,10 +70,15 @@ function! s:gitdiffshowdiff_revert(rootdir, args_list, fullpath) abort
 				elseif line =~# '^+'
 					call deletebufline(bnr, x['lnum'])
 				endif
-				tabnew
-				execute printf('%dbuffer', bnr)
-				write
-				tabclose
+				try
+					tabnew
+					execute printf('%dbuffer', bnr)
+					write
+				catch
+					call s:errormsg(v:exception)
+				finally
+					tabclose
+				endtry
 				call s:gitdiffshowdiff_setlines(a:rootdir, a:args_list, a:fullpath)
 			endif
 		endif
