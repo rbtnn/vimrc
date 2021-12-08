@@ -71,7 +71,8 @@ function! s:gitdiffshowdiff_revert(rootdir, args_list, fullpath) abort
 					call deletebufline(bnr, x['lnum'])
 				endif
 				tabnew
-				execute printf('%dbufdo :write', bnr)
+				execute printf('%dbuffer', bnr)
+				write
 				tabclose
 				call s:gitdiffshowdiff_setlines(a:rootdir, a:args_list, a:fullpath)
 			endif

@@ -119,6 +119,7 @@ set fileformats=unix,dos
 set keywordprg=:help
 set nrformats&
 if s:vimpatch_unsigned
+	set nrformats-=octal
 	set nrformats+=unsigned
 endif
 set sessionoptions=winpos,resize,tabpages,curdir,help
