@@ -4,9 +4,31 @@ let g:loaded_gitdiff = 1
 let s:TYPE_NUMSTAT = 'TYPE_NUMSTAT'
 let s:TYPE_SHOWDIFF = 'TYPE_SHOWDIFF'
 
-command! -nargs=* GitDiff  :call s:gitdiffnumstat_open(<q-args>)
+command! -nargs=* GitDiff        :call s:gitdiffnumstat_open(<q-args>)
+command! -nargs=0 GitGotoRootDir :call s:gitgoto_rootdir()
 
 let s:this_script_id = expand('<SID>')
+
+function! s:gitgoto_rootdir() abort
+	let cwd = getcwd()
+	if filereadable(expand('%:p'))
+		let cwd = fnamemodify(expand('%:p'), ':h')
+	endif
+	let xs = split(cwd, '[\/]')
+	let prefix = (has('mac') || has('linux')) ? '/' : ''
+	while !empty(xs)
+		let path = prefix .. join(xs + ['.git'], '/')
+		if isdirectory(path) || filereadable(path)
+			if !empty(path)
+				execute 'lcd' (prefix .. join(xs, '/'))
+				verbose pwd
+			endif
+			return 
+		endif
+		call remove(xs, -1)
+	endwhile
+	call s:errormsg('Could not find any root directory under git control.')
+endfunction
 
 function! s:gitdiffnumstat_open(q_args) abort
 	let rootdir = s:get_gitrootdir(s:fixpath(fnamemodify('.', ':p')))
@@ -242,7 +264,7 @@ endfunction
 
 function! s:errormsg(text) abort
 	echohl ErrorMsg
-	echo '[gitdiff]' a:text
+	echo '[git]' a:text
 	echohl None
 endfunction
 

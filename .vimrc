@@ -222,13 +222,8 @@ if filereadable(s:plugvim_path)
 	set packpath=
 	let g:plug_url_format = 'https://github.com/%s.git'
 	call plug#begin($VIMRC_PACKSTART)
-	call plug#('itchyny/lightline.vim')
-	call plug#('itchyny/vim-gitbranch')
 	call plug#('kana/vim-operator-replace')
 	call plug#('kana/vim-operator-user')
-	call plug#('kana/vim-textobj-user')
-	call plug#('machakann/vim-textobj-functioncall')
-	call plug#('rbtnn/vim-find')
 	call plug#('rbtnn/vim-gloaded')
 	call plug#('rbtnn/vim-mrw')
 	call plug#('rbtnn/vim-vimscript_indentexpr')
@@ -343,45 +338,12 @@ if s:is_installed('onehalf')
 	endif
 endif
 
-if s:is_installed('lightline.vim')
-	let g:lightline = {}
-	let g:lightline['enable'] = { 'statusline': 1, 'tabline': 0, }
-	let g:lightline['colorscheme'] = 'onehalfdark'
-	let g:lightline['component_function'] = {
-		\   'gitbranch': 'gitbranch#name',
-		\ }
-	let g:lightline['active'] = {
-		\   'left': [
-		\     ['mode'],
-		\     ['fileformat', 'fileencoding', 'filetype', 'modified', 'readonly'],
-		\     ['filename'],
-		\   ],
-		\   'right': [
-		\     ['gitbranch'],
-		\   ]
-		\ }
-	let g:lightline['inactive'] = g:lightline['active']
-	set laststatus=2
-endif
-
-if s:is_installed('vim-textobj-functioncall')
-	let g:textobj_functioncall_generics_patterns = [{ 'header': '\<\h\k*', 'bra': '<', 'ket': '>', 'footer': '', }]
-	onoremap <silent>    <Plug>(textobj-functioncall-generics-i) :<C-u>call textobj#functioncall#ip('o', g:textobj_functioncall_generics_patterns)<cr>
-	xnoremap <silent>    <Plug>(textobj-functioncall-generics-i) :<C-u>call textobj#functioncall#ip('x', g:textobj_functioncall_generics_patterns)<cr>
-	onoremap <silent>    <Plug>(textobj-functioncall-generics-a) :<C-u>call textobj#functioncall#i('o', g:textobj_functioncall_generics_patterns)<cr>
-	xnoremap <silent>    <Plug>(textobj-functioncall-generics-a) :<C-u>call textobj#functioncall#i('x', g:textobj_functioncall_generics_patterns)<cr>
-	omap     <silent> ig <Plug>(textobj-functioncall-generics-i)
-	xmap     <silent> ig <Plug>(textobj-functioncall-generics-i)
-	omap     <silent> ag <Plug>(textobj-functioncall-generics-a)
-	xmap     <silent> ag <Plug>(textobj-functioncall-generics-a)
-endif
-
 if s:is_installed('vim-operator-replace')
 	nmap     <silent><nowait>s               <Plug>(operator-replace)
 endif
 
-if s:is_installed('vim-find')
-	nnoremap     <silent><nowait><space>     :<C-u>FindFiles<cr>
+if s:is_installed('vim-mrw')
+	nnoremap     <silent><nowait><space>     :<C-u>MRW<cr>
 endif
 
 if s:is_installed('restart.vim')
