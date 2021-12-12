@@ -212,24 +212,26 @@ else
 endif
 
 let s:plugvim_path = expand('$VIMRC_VIM/autoload/plug.vim')
+
 if !filereadable(s:plugvim_path) && executable('curl') && has('vim_starting')
 	silent! call mkdir($VIMRC_PACKSTART, 'p')
 	call system(printf('curl -o "%s" https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim', s:plugvim_path))
 endif
 
-if filereadable(s:plugvim_path)
+if filereadable(s:plugvim_path) && (get(readfile(s:plugvim_path, '', 1), 0, '') != '404: Not Found')
 	set runtimepath=$VIMRUNTIME,$VIMRC_VIM
 	set packpath=
 	let g:plug_url_format = 'https://github.com/%s.git'
 	call plug#begin($VIMRC_PACKSTART)
 	call plug#('kana/vim-operator-replace')
 	call plug#('kana/vim-operator-user')
+	call plug#('rakr/vim-one')
+	call plug#('rbtnn/vim-find')
 	call plug#('rbtnn/vim-gloaded')
 	call plug#('rbtnn/vim-mrw')
 	call plug#('rbtnn/vim-vimscript_indentexpr')
 	call plug#('rbtnn/vim-vimscript_lasterror')
 	call plug#('rbtnn/vim-vimscript_tagfunc')
-	call plug#('sonph/onehalf', {'rtp': 'vim/'})
 	call plug#('thinca/vim-qfreplace')
 	if !has('nvim') && has('win32')
 		call plug#('tyru/restart.vim')
@@ -240,7 +242,7 @@ if filereadable(s:plugvim_path)
 		return isdirectory($VIMRC_PACKSTART .. '/' .. a:name) && (-1 != index(keys(g:plugs), a:name))
 	endfunction
 else
-	set runtimepath=$VIMRUNTIME
+	set runtimepath=$VIMRUNTIME,$VIMRC_VIM
 	set packpath=$VIMRC_VIM
 	silent! source ~/.vimrc.local
 	packloadall!
@@ -322,7 +324,7 @@ if s:is_installed('vim-gloaded')
 	source $VIMRC_PACKSTART/vim-gloaded/plugin/gloaded.vim
 endif
 
-if s:is_installed('onehalf')
+if s:is_installed('vim-one')
 	autocmd vimrc ColorScheme      *
 		\ : highlight!       TabSideBar      guifg=#76787b guibg=NONE    gui=NONE           cterm=NONE
 		\ | highlight!       TabSideBarFill  guifg=#1a1a1a guibg=NONE    gui=NONE           cterm=NONE
@@ -330,11 +332,16 @@ if s:is_installed('onehalf')
 		\ | highlight!       Cursor          guifg=NONE    guibg=#aaaaaa
 		\ | highlight!       CursorIM        guifg=NONE    guibg=#aa0000
 		\ | highlight!       Comment                                     gui=NONE           cterm=NONE
+		\ | highlight!       DiffLine                      guibg=NONE
+		\ | highlight!       DiffFile                      guibg=NONE
+		\ | highlight!       DiffNewFile                   guibg=NONE
+		\ | highlight!       DiffAdded                     guibg=NONE
+		\ | highlight!       DiffRemoved                   guibg=NONE
 		\ | highlight!       SpecialKey      guifg=#eeeeee
 		\ | highlight!       Terminal        guifg=#eeeeee guibg=#000000
 	if has('vim_starting')
 		set background=light
-		colorscheme onehalflight
+		colorscheme one
 	endif
 endif
 
@@ -342,8 +349,8 @@ if s:is_installed('vim-operator-replace')
 	nmap     <silent><nowait>s               <Plug>(operator-replace)
 endif
 
-if s:is_installed('vim-mrw')
-	nnoremap     <silent><nowait><space>     :<C-u>MRW<cr>
+if s:is_installed('vim-find')
+	nnoremap     <silent><nowait><space>     :<C-u>FindFiles<cr>
 endif
 
 if s:is_installed('restart.vim')
@@ -376,12 +383,6 @@ nnoremap <silent><nowait><C-k>           :<C-u>cprevious<cr>
 
 " Smart space on wildmenu
 cnoremap   <expr><nowait><space>         (wildmenumode() && (getcmdline() =~# '[\/]$')) ? '<space><bs>' : '<space>'
-
-" I use Ctrl-u and Ctrl-d to scroll. Others are disabled.
-nnoremap <silent><nowait><C-e>           <nop>
-nnoremap <silent><nowait><C-y>           <nop>
-nnoremap <silent><nowait><C-f>           <nop>
-nnoremap <silent><nowait><C-b>           <nop>
 
 " Save script variables for debugging purposes.
 let g:vimrc_scriptvars = s:

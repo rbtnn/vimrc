@@ -1,8 +1,8 @@
 
 let g:loaded_gitdiff = 1
 
-let s:TYPE_NUMSTAT = 'TYPE_NUMSTAT'
-let s:TYPE_SHOWDIFF = 'TYPE_SHOWDIFF'
+let s:TYPE_GITNUMSTAT = 'gitnumstat'
+let s:TYPE_DIFF = 'diff'
 
 command! -nargs=* GitDiff        :call s:gitdiffnumstat_open(<q-args>)
 command! -nargs=0 GitGotoRootDir :call s:gitgoto_rootdir()
@@ -37,7 +37,7 @@ function! s:gitdiffnumstat_open(q_args) abort
 	elseif empty(rootdir)
 		call s:errormsg('current directory is not a git repository.')
 	else
-		call s:open_window(s:TYPE_NUMSTAT)
+		call s:open_window(s:TYPE_GITNUMSTAT)
 		call s:gitdiffnumstat_setlines(rootdir, split(a:q_args, '\s\+'))
 	endif
 endfunction
@@ -56,9 +56,8 @@ function! s:gitdiffnumstat_setlines(rootdir, args_list) abort
 			let lines += [line]
 		endif
 	endfor
-	call s:setlines(a:rootdir, cmd, lines, 'gitdiff')
+	call s:setlines(a:rootdir, cmd, lines, s:TYPE_GITNUMSTAT)
 	call s:buffer_nnoremap('<cr>', 'gitdiffshowdiff_open', [a:rootdir, a:args_list])
-	call s:buffer_nnoremap('<space>', 'gitdiffshowdiff_open', [a:rootdir, a:args_list])
 	call s:buffer_nnoremap('W', 'gitdiffnumstat_setlines', [a:rootdir, s:toggle_w(a:args_list)])
 	call s:buffer_nnoremap('R', 'gitdiffnumstat_setlines', [a:rootdir, a:args_list])
 	call winrestview(view)
@@ -69,40 +68,8 @@ function! s:gitdiffshowdiff_open(rootdir, args_list) abort
 	if !empty(line)
 		let m = matchlist(line, '^\s*+\d\+\s\+-\d\+\s\+\(.*\)$')
 		if !empty(m)
-			call s:open_window(s:TYPE_SHOWDIFF)
+			call s:open_window(s:TYPE_DIFF)
 			call s:gitdiffshowdiff_setlines(a:rootdir, a:args_list, s:fixpath(a:rootdir .. '/' .. m[1]))
-		endif
-	endif
-endfunction
-
-function! s:gitdiffshowdiff_revert(rootdir, args_list, fullpath) abort
-	let line = getline('.')
-	if line =~# '^[+-]'
-		let x = s:calc_lnum()
-		if !empty(x)
-			let bnr = bufadd(a:fullpath)
-			call bufload(bnr)
-			if getbufvar(bnr, '&modified', v:false)
-				call s:errormsg('the buffer is already modified! please write.')
-			elseif getbufvar(bnr, '&readonly', v:false)
-				call s:errormsg('the buffer is readonly! please unset readonly.')
-			else
-				if line =~# '^-'
-					call appendbufline(bnr, x['lnum'], line[1:])
-				elseif line =~# '^+'
-					call deletebufline(bnr, x['lnum'])
-				endif
-				try
-					tabnew
-					execute printf('%dbuffer', bnr)
-					write
-				catch
-					call s:errormsg(v:exception)
-				finally
-					tabclose
-				endtry
-				call s:gitdiffshowdiff_setlines(a:rootdir, a:args_list, a:fullpath)
-			endif
 		endif
 	endif
 endfunction
@@ -111,20 +78,17 @@ function! s:gitdiffshowdiff_setlines(rootdir, args_list, fullpath) abort
 	let view = winsaveview()
 	let cmd = ['git', '--no-pager', 'diff'] + a:args_list + ['--', a:fullpath]
 	let lines = s:system_for_gitdiff(cmd, a:rootdir)
-	call s:setlines(a:rootdir, cmd, lines, 'diff')
+	call s:setlines(a:rootdir, cmd, lines, s:TYPE_DIFF)
 	call s:buffer_nnoremap('<cr>', 'gitdiff_jumpdiffline', [a:fullpath])
-	call s:buffer_nnoremap('<space>', 'gitdiff_jumpdiffline', [a:fullpath])
 	call s:buffer_nnoremap('W', 'gitdiffshowdiff_setlines', [a:rootdir, s:toggle_w(a:args_list), a:fullpath])
 	call s:buffer_nnoremap('R', 'gitdiffshowdiff_setlines', [a:rootdir, a:args_list, a:fullpath])
-	call s:buffer_nnoremap('S', 'gitdiffshowdiff_revert', [a:rootdir, a:args_list, a:fullpath])
 	call winrestview(view)
 endfunction
 
-function! s:open_window(t) abort
+function! s:open_window(ft) abort
 	let exists = v:false
 	for w in filter(getwininfo(), { _, x -> x['tabnr'] == tabpagenr() })
-		let x = getbufvar(w['bufnr'], 'gitdiff', {})
-		if get(x, 'type', '') == a:t
+		if getbufvar(w['bufnr'], '&filetype', '') == a:ft
 			execute printf('%dwincmd w', w['winnr'])
 			let exists = v:true
 			break
@@ -132,7 +96,7 @@ function! s:open_window(t) abort
 	endfor
 	if !exists
 		new
-		let b:gitdiff = { 'type': a:t, }
+		execute 'setfiletype' a:ft
 	endif
 endfunction
 
@@ -143,20 +107,21 @@ function! s:buffer_nnoremap(lhs, funcname, args) abort
 endfunction
 
 function! s:setlines(rootdir, cmd, lines, ft) abort
-	setlocal modifiable noreadonly
-	silent! call deletebufline(bufnr(), 1, '$')
-	call setbufline(bufnr(), 1, [
-		\ '# ' .. (strftime('%c')),
-		\ '# [Git Directory]',
-		\ '#   ' .. a:rootdir,
-		\ '# [Command]',
-		\ '#   ' .. join(a:cmd),
-		\ '# [Keys]',
-		\ '#   R: reload',
-		\ '#   W: toggle -w option',
-		\ ] + (a:ft == 'diff' ? ['#   S: revert the line'] : []) + a:lines)
-	setlocal buftype=nofile nomodifiable readonly
-	execute 'setfiletype' a:ft
+	if &filetype == a:ft
+		setlocal modifiable noreadonly
+		silent! call deletebufline(bufnr(), 1, '$')
+		call setbufline(bufnr(), 1, [
+			\ '# ' .. (strftime('%c')),
+			\ '# [Git Directory]',
+			\ '#   ' .. a:rootdir,
+			\ '# [Command]',
+			\ '#   ' .. join(a:cmd),
+			\ '# [Keys]',
+			\ '#   R: reload',
+			\ '#   W: toggle -w option',
+			\ ] + a:lines)
+		setlocal buftype=nofile nomodifiable readonly
+	endif
 endfunction
 
 function! s:toggle_w(args_list) abort
