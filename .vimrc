@@ -46,7 +46,7 @@ let g:vim_indent_cont = &g:shiftwidth
 
 " cmdline
 set cmdwinheight=5
-set cmdheight=1
+set cmdheight=3
 let &cedit = "\<C-q>"
 
 " backup/swap
@@ -233,6 +233,9 @@ if filereadable(s:plugvim_path) && (get(readfile(s:plugvim_path, '', 1), 0, '') 
 	call plug#('rbtnn/vim-vimscript_lasterror')
 	call plug#('rbtnn/vim-vimscript_tagfunc')
 	call plug#('thinca/vim-qfreplace')
+	if executable('deno')
+		call plug#('vim-denops/denops.vim')
+	endif
 	if !has('nvim') && has('win32')
 		call plug#('tyru/restart.vim')
 	endif
@@ -355,6 +358,12 @@ endif
 
 if s:is_installed('restart.vim')
 	let g:restart_sessionoptions = &sessionoptions
+endif
+
+if s:is_installed('denops.vim')
+	command! -nargs=0 DenoRestart
+		\ : let g:denops#debug = 1
+		\ | call denops#server#restart()
 endif
 
 " Emacs key mappings
