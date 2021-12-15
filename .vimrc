@@ -223,6 +223,7 @@ if filereadable(s:plugvim_path) && (get(readfile(s:plugvim_path, '', 1), 0, '') 
 	set packpath=
 	let g:plug_url_format = 'https://github.com/%s.git'
 	call plug#begin($VIMRC_PACKSTART)
+	call plug#('easymotion/vim-easymotion')
 	call plug#('kana/vim-operator-replace')
 	call plug#('kana/vim-operator-user')
 	call plug#('rakr/vim-one')
@@ -233,9 +234,6 @@ if filereadable(s:plugvim_path) && (get(readfile(s:plugvim_path, '', 1), 0, '') 
 	call plug#('rbtnn/vim-vimscript_lasterror')
 	call plug#('rbtnn/vim-vimscript_tagfunc')
 	call plug#('thinca/vim-qfreplace')
-	if executable('deno')
-		call plug#('vim-denops/denops.vim')
-	endif
 	if !has('nvim') && has('win32')
 		call plug#('tyru/restart.vim')
 	endif
@@ -353,11 +351,17 @@ if s:is_installed('vim-operator-replace')
 endif
 
 if s:is_installed('vim-find')
-	nnoremap     <silent><nowait><space>     :<C-u>FindFiles<cr>
+	nnoremap     <silent><nowait><C-f>       :<C-u>FindFiles<cr>
 endif
 
 if s:is_installed('restart.vim')
 	let g:restart_sessionoptions = &sessionoptions
+endif
+
+if s:is_installed('vim-easymotion')
+	let g:EasyMotion_do_mapping = 0
+	let g:EasyMotion_keys = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
+	nmap <nowait><space>     <Plug>(easymotion-bd-jk)
 endif
 
 if s:is_installed('denops.vim')
@@ -400,3 +404,4 @@ if !has('vim_starting')
 	" Check whether echo-messages are not disappeared when .vimrc is read.
 	echo '.vimrc has just read!'
 endif
+
