@@ -223,7 +223,6 @@ if filereadable(s:plugvim_path) && (get(readfile(s:plugvim_path, '', 1), 0, '') 
 	set packpath=
 	let g:plug_url_format = 'https://github.com/%s.git'
 	call plug#begin($VIMRC_PACKSTART)
-	call plug#('easymotion/vim-easymotion')
 	call plug#('kana/vim-operator-replace')
 	call plug#('kana/vim-operator-user')
 	call plug#('rakr/vim-one')
@@ -263,6 +262,7 @@ autocmd vimrc CmdlineEnter     *
 	\		]
 	\ | 	execute printf('silent! delcommand %s', s:cmdname)
 	\ | endfor
+	\ | unlet s:cmdname
 
 autocmd vimrc FileType     help :setlocal colorcolumn=78
 
@@ -326,21 +326,21 @@ if s:is_installed('vim-gloaded')
 endif
 
 if s:is_installed('vim-one')
-	autocmd vimrc ColorScheme      *
-		\ : highlight!       TabSideBar      guifg=#76787b guibg=NONE    gui=NONE           cterm=NONE
-		\ | highlight!       TabSideBarFill  guifg=#1a1a1a guibg=NONE    gui=NONE           cterm=NONE
-		\ | highlight!       TabSideBarSel   guifg=#22863a guibg=NONE    gui=NONE           cterm=NONE
-		\ | highlight!       Cursor          guifg=NONE    guibg=#aaaaaa
-		\ | highlight!       CursorIM        guifg=NONE    guibg=#aa0000
-		\ | highlight!       Comment                                     gui=NONE           cterm=NONE
-		\ | highlight!       DiffLine                      guibg=NONE
-		\ | highlight!       DiffFile                      guibg=NONE
-		\ | highlight!       DiffNewFile                   guibg=NONE
-		\ | highlight!       DiffAdded                     guibg=NONE
-		\ | highlight!       DiffRemoved                   guibg=NONE
-		\ | highlight!       SpecialKey      guifg=#eeeeee
-		\ | highlight!       Terminal        guifg=#eeeeee guibg=#000000
 	if has('vim_starting')
+		autocmd vimrc ColorScheme      *
+			\ : highlight!       TabSideBar      guifg=#76787b guibg=NONE    gui=NONE           cterm=NONE
+			\ | highlight!       TabSideBarFill  guifg=#1a1a1a guibg=NONE    gui=NONE           cterm=NONE
+			\ | highlight!       TabSideBarSel   guifg=#22863a guibg=NONE    gui=NONE           cterm=NONE
+			\ | highlight!       Cursor          guifg=NONE    guibg=#aaaaaa
+			\ | highlight!       CursorIM        guifg=NONE    guibg=#aa0000
+			\ | highlight!       Comment                                     gui=NONE           cterm=NONE
+			\ | highlight!       DiffLine                      guibg=NONE
+			\ | highlight!       DiffFile                      guibg=NONE
+			\ | highlight!       DiffNewFile                   guibg=NONE
+			\ | highlight!       DiffAdded                     guibg=NONE
+			\ | highlight!       DiffRemoved                   guibg=NONE
+			\ | highlight!       SpecialKey      guifg=#eeeeee
+			\ | highlight!       Terminal        guifg=#eeeeee guibg=#000000
 		set background=light
 		colorscheme one
 	endif
@@ -356,12 +356,6 @@ endif
 
 if s:is_installed('restart.vim')
 	let g:restart_sessionoptions = &sessionoptions
-endif
-
-if s:is_installed('vim-easymotion')
-	let g:EasyMotion_do_mapping = 0
-	let g:EasyMotion_keys = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
-	nmap <nowait><space>     <Plug>(easymotion-bd-jk)
 endif
 
 if s:is_installed('denops.vim')
