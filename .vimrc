@@ -350,10 +350,6 @@ if s:is_installed('vim-operator-replace')
 	nmap     <silent><nowait>s               <Plug>(operator-replace)
 endif
 
-if s:is_installed('vim-find')
-	nnoremap     <silent><nowait><C-f>       :<C-u>FindFiles<cr>
-endif
-
 if s:is_installed('restart.vim')
 	let g:restart_sessionoptions = &sessionoptions
 endif
@@ -383,6 +379,8 @@ cnoremap         <nowait><C-a>           <home>
 if has('nvim')
 	tnoremap <silent><nowait><C-w>N       <C-\><C-n>
 endif
+
+nnoremap <silent><nowait><C-f>           :<C-u>GitDiff -w<cr>
 
 " Move the next/previous error in quickfix.
 nnoremap <silent><nowait><C-j>           :<C-u>cnext<cr>
