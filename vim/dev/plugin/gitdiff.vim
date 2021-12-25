@@ -1,4 +1,8 @@
 
+if !executable('git')
+	finish
+endif
+	
 let g:loaded_gitdiff = 1
 
 let s:TYPE_GITNUMSTAT = 'gitnumstat'
@@ -10,10 +14,8 @@ let s:this_script_id = expand('<SID>')
 let s:recently_args = get(s:, 'recently_args', [])
 
 function! s:gitdiffnumstat_open(q_bang, q_args) abort
-	let rootdir = s:get_gitrootdir(s:fixpath(fnamemodify('.', ':p')))
-	if !executable('git')
-		call s:errormsg('git is not executable.')
-	elseif empty(rootdir)
+	let rootdir = vimrc#git#get_rootdir('.')
+	if empty(rootdir)
 		call s:errormsg('current directory is not a git repository.')
 	else
 		if !empty(a:q_args)
@@ -58,7 +60,7 @@ endfunction
 
 function! s:set_popupwinopts(winid, rootdir, args_list) abort
 	call popup_setoptions(a:winid, {
-		\ 'title': printf(' [%s] args: %s ', s:TYPE_GITNUMSTAT, string(join(a:args_list))),
+		\ 'title': printf(' [%s] %s ', s:TYPE_GITNUMSTAT, join(a:args_list)),
 		\ 'cursorline': 1,
 		\ 'padding': [1, 3, 1, 3],
 		\ 'minheight': 3,
@@ -118,7 +120,7 @@ endfunction
 function! s:gitdiffshowdiff_setlines(rootdir, args_list, path) abort
 	let view = winsaveview()
 	let cmd = ['git', '--no-pager', 'diff'] + a:args_list
-	let m = matchlist(a:path, '^\(.*\){\(.\+\) => \(.\+\)}\(.*\)$')
+	let m = matchlist(a:path, '^\(.*\){\(.*\) => \(.*\)}\(.*\)$')
 	if !empty(m)
 		let fullpath = m[1] .. m[3] .. m[4]
 		let cmd += ['--', (m[1] .. m[2] .. m[4]), fullpath]
@@ -245,19 +247,6 @@ function! s:gitdiff_jumpdiffline(fullpath) abort
 	endif
 endfunction
 
-function! s:get_gitrootdir(path) abort
-	let xs = split(a:path, '[\/]')
-	let prefix = (has('mac') || has('linux')) ? '/' : ''
-	while !empty(xs)
-		let path = prefix .. join(xs + ['.git'], '/')
-		if isdirectory(path) || filereadable(path)
-			return s:fixpath(prefix .. join(xs, '/'))
-		endif
-		call remove(xs, -1)
-	endwhile
-	return ''
-endfunction
-
 function! s:fixpath(path) abort
 	let xs = []
 	for x in split(a:path, '[\/]\+')
@@ -283,7 +272,7 @@ function! s:errormsg(text) abort
 endfunction
 
 function! s:system_for_gitdiff(cmd, cwd) abort
-	let lines = s:system(a:cmd, a:cwd)
+	let lines = vimrc#io#system(a:cmd, a:cwd)
 	let enc_from = ''
 	for i in range(0, len(lines) - 1)
 		" The encoding of top 4 lines('diff -...', 'index ...', '--- a/...', '+++ b/...') is always utf-8.
@@ -293,8 +282,8 @@ function! s:system_for_gitdiff(cmd, cwd) abort
 			endif
 		else
 			if empty(enc_from)
-				if encoding#contains_multichar(lines[i])
-					if encoding#is_utf8(lines[i])
+				if vimrc#encoding#contains_multichar(lines[i])
+					if vimrc#encoding#is_utf8(lines[i])
 						let enc_from = 'utf-8'
 					else
 						let enc_from = 'shift_jis'
@@ -310,50 +299,11 @@ function! s:system_for_gitdiff(cmd, cwd) abort
 endfunction
 
 function! s:system_for_gitoutput(cmd, cwd) abort
-	let lines = s:system(a:cmd, a:cwd)
+	let lines = vimrc#io#system(a:cmd, a:cwd)
 	if 'utf-8' != &encoding
 		for i in range(0, len(lines) - 1)
 			let lines[i] = iconv(lines[i], 'utf-8', &encoding)
 		endfor
-	endif
-	return lines
-endfunction
-
-function s:system_onevent(d, job, data, event) abort
-	let a:d['lines'] += a:data
-endfunction
-
-function s:system(cmd, cwd) abort
-	let lines = []
-	if has('nvim')
-		let job = jobstart(a:cmd, {
-			\ 'cwd': a:cwd,
-			\ 'on_stdout': function('s:system_onevent', [{ 'lines': lines, }]),
-			\ 'on_stderr': function('s:system_onevent', [{ 'lines': lines, }]),
-			\ })
-		call jobwait([job])
-	else
-		let path = tempname()
-		try
-			if filereadable(path)
-				let lines = readfile(path)
-			endif
-			let job = job_start(a:cmd, {
-				\ 'cwd': a:cwd,
-				\ 'out_io': 'file',
-				\ 'out_name': path,
-				\ 'err_io': 'out',
-				\ })
-			while 'run' == job_status(job)
-			endwhile
-			if filereadable(path)
-				let lines = readfile(path)
-			endif
-		finally
-			if filereadable(path)
-				call delete(path)
-			endif
-		endtry
 	endif
 	return lines
 endfunction

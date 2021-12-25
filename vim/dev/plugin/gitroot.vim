@@ -8,20 +8,13 @@ function! s:gitgoto_rootdir() abort
 	if filereadable(expand('%:p'))
 		let cwd = fnamemodify(expand('%:p'), ':h')
 	endif
-	let xs = split(cwd, '[\/]')
-	let prefix = (has('mac') || has('linux')) ? '/' : ''
-	while !empty(xs)
-		let path = prefix .. join(xs + ['.git'], '/')
-		if isdirectory(path) || filereadable(path)
-			if !empty(path)
-				execute 'lcd' (prefix .. join(xs, '/'))
-				verbose pwd
-			endif
-			return 
-		endif
-		call remove(xs, -1)
-	endwhile
-	call s:errormsg('Could not find any root directory under git control.')
+	let path = vimrc#git#get_rootdir(cwd)
+	if !empty(path)
+		execute 'lcd' path
+		verbose pwd
+	else
+		call s:errormsg('Could not find any root directory under git control.')
+	endif
 endfunction
 
 function! s:errormsg(text) abort

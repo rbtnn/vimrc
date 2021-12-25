@@ -8,8 +8,8 @@ function! s:qficonv() abort
 	if enc_from != &encoding
 		let xs = getqflist()
 		for x in xs
-			if encoding#contains_multichar(x['text'])
-				if !encoding#is_utf8(x['text'])
+			if vimrc#encoding#contains_multichar(x['text'])
+				if !vimrc#encoding#is_utf8(x['text'])
 					let x['text'] = iconv(x['text'], enc_from, &encoding)
 				endif
 			endif

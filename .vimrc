@@ -224,6 +224,7 @@ if filereadable(s:plugvim_path) && (get(readfile(s:plugvim_path, '', 1), 0, '') 
 	set packpath=
 	let g:plug_url_format = 'https://github.com/%s.git'
 	call plug#begin($VIMRC_PACKSTART)
+	call plug#('itchyny/vim-cursorword')
 	call plug#('kana/vim-operator-replace')
 	call plug#('kana/vim-operator-user')
 	call plug#('rakr/vim-one')

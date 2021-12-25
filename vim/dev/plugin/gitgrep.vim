@@ -1,17 +1,15 @@
-"
-" https://github.com/BurntSushi/ripgrep
-"
-if !executable('rg')
+
+if !executable('git')
 	finish
 endif
 
-let g:loaded_rg = 1
+let g:loaded_gitgrep = 1
+
+command! -bang -nargs=* GitGrep     :call s:gitgrep_exec(<q-bang>, <q-args>)
 
 let s:job_id = get(s:, 'job_id', v:null)
 
-command! -bang -nargs=* Rg     :call s:rg_exec(<q-bang>, <q-args>)
-
-function! s:rg_exec(q_bang, q_args) abort
+function! s:gitgrep_exec(q_bang, q_args) abort
 	try
 		if v:null != s:job_id
 			if a:q_bang == '!'
@@ -22,7 +20,7 @@ function! s:rg_exec(q_bang, q_args) abort
 				endif
 				let s:job_id = v:null
 			else
-				throw "Rg is running now. If you want to search again, please specify with '!'."
+				throw "gitgrep is running now. If you want to search again, please specify with '!'."
 			endif
 		endif
 
@@ -30,7 +28,7 @@ function! s:rg_exec(q_bang, q_args) abort
 			throw "Please give a search text!"
 		endif
 
-		let cmd = printf('rg --vimgrep --line-buffered %s .', a:q_args)
+		let cmd = printf('git --no-pager grep -n %s .', a:q_args)
 		call setqflist([], ' ', { 'title': cmd, })
 		if has('nvim')
 			let s:job_id = jobstart(cmd, {
@@ -48,7 +46,7 @@ function! s:rg_exec(q_bang, q_args) abort
 		endif
 	catch
 		echohl Error
-		echo printf('[rg] %s', v:exception)
+		echo printf('[gitgrep] %s', v:exception)
 		echohl None
 	endtry
 endfunction
@@ -56,13 +54,12 @@ endfunction
 function! s:vim_out_cb(channel, msg) abort
 	let line = a:msg
 	if !empty(line)
-		let m = matchlist(line, '^\([^:]\+\):\(\d\+\):\(\d\+\):\(.*\)$')
+		let m = matchlist(line, '^\([^:]\+\):\(\d\+\):\(.*\)$')
 		if !empty(m)
 			call setqflist([{
 				\ 'filename': m[1],
 				\ 'lnum': m[2],
-				\ 'col': m[3],
-				\ 'text': m[4],
+				\ 'text': m[3],
 				\ }], 'a')
 		else
 			call setqflist([{ 'text': line, }], 'a')
@@ -71,7 +68,7 @@ function! s:vim_out_cb(channel, msg) abort
 endfunction
 
 function! s:vim_exit_cb(job, status) abort
-	echo '[rg] The search has been completed! Please open the quickfix window.'
+	echo '[gitgrep] The search has been completed! Please open the quickfix window.'
 	let s:job_id = v:null
 endfunction
 
