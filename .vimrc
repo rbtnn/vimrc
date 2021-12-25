@@ -14,6 +14,7 @@ let s:vimpatch_unsigned = has('patch-8.2.0860') || has('nvim')
 let $MYVIMRC = resolve($MYVIMRC)
 let $VIMRC_ROOT = expand('<sfile>:h')
 let $VIMRC_VIM = expand('$VIMRC_ROOT/vim')
+let $VIMRC_DEV = expand('$VIMRC_VIM/dev')
 let $VIMRC_PACKSTART = expand('$VIMRC_VIM/pack/my/start')
 
 augroup vimrc
@@ -211,7 +212,7 @@ else
 	endif
 endif
 
-let s:plugvim_path = expand('$VIMRC_VIM/autoload/plug.vim')
+let s:plugvim_path = expand('$VIMRC_DEV/autoload/plug.vim')
 
 if !filereadable(s:plugvim_path) && executable('curl') && has('vim_starting')
 	silent! call mkdir($VIMRC_PACKSTART, 'p')
@@ -219,7 +220,7 @@ if !filereadable(s:plugvim_path) && executable('curl') && has('vim_starting')
 endif
 
 if filereadable(s:plugvim_path) && (get(readfile(s:plugvim_path, '', 1), 0, '') != '404: Not Found')
-	set runtimepath=$VIMRUNTIME,$VIMRC_VIM
+	set runtimepath=$VIMRUNTIME,$VIMRC_DEV
 	set packpath=
 	let g:plug_url_format = 'https://github.com/%s.git'
 	call plug#begin($VIMRC_PACKSTART)
@@ -242,7 +243,7 @@ if filereadable(s:plugvim_path) && (get(readfile(s:plugvim_path, '', 1), 0, '') 
 		return isdirectory($VIMRC_PACKSTART .. '/' .. a:name) && (-1 != index(keys(g:plugs), a:name))
 	endfunction
 else
-	set runtimepath=$VIMRUNTIME,$VIMRC_VIM
+	set runtimepath=$VIMRUNTIME,$VIMRC_DEV
 	set packpath=$VIMRC_VIM
 	silent! source ~/.vimrc.local
 	packloadall!
@@ -325,6 +326,10 @@ if s:is_installed('vim-gloaded')
 	source $VIMRC_PACKSTART/vim-gloaded/plugin/gloaded.vim
 endif
 
+if s:is_installed('vim-find')
+	nnoremap <silent><nowait><C-f>           :<C-u>FindFiles<cr>
+endif
+
 if s:is_installed('vim-one')
 	if has('vim_starting')
 		autocmd vimrc ColorScheme      *
@@ -380,7 +385,7 @@ if has('nvim')
 	tnoremap <silent><nowait><C-w>N       <C-\><C-n>
 endif
 
-nnoremap <silent><nowait><C-f>           :<C-u>GitDiff -w<cr>
+nnoremap <silent><nowait><C-g>           :<C-u>GitDiff<cr>
 
 " Move the next/previous error in quickfix.
 nnoremap <silent><nowait><C-j>           :<C-u>cnext<cr>
