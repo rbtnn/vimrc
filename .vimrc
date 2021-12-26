@@ -327,12 +327,19 @@ if s:is_installed('vim-gloaded')
 	source $VIMRC_PACKSTART/vim-gloaded/plugin/gloaded.vim
 endif
 
+nnoremap <silent><nowait><C-g>           :<C-u>GitDiff<cr>
+
 if s:is_installed('vim-find')
 	nnoremap <silent><nowait><C-f>           :<C-u>FindFiles<cr>
 endif
 
+if s:is_installed('vim-mrw')
+	nnoremap <silent><nowait><C-s>           :<C-u>MRW<cr>
+endif
+
 if s:is_installed('vim-one')
 	if has('vim_starting')
+		set background=dark
 		autocmd vimrc ColorScheme      *
 			\ : highlight!       TabSideBar      guifg=#76787b guibg=NONE    gui=NONE           cterm=NONE
 			\ | highlight!       TabSideBarFill  guifg=#1a1a1a guibg=NONE    gui=NONE           cterm=NONE
@@ -345,9 +352,14 @@ if s:is_installed('vim-one')
 			\ | highlight!       DiffNewFile                   guibg=NONE
 			\ | highlight!       DiffAdded                     guibg=NONE
 			\ | highlight!       DiffRemoved                   guibg=NONE
-			\ | highlight!       SpecialKey      guifg=#eeeeee
 			\ | highlight!       Terminal        guifg=#eeeeee guibg=#000000
-		set background=light
+		if &background == 'dark'
+			autocmd vimrc ColorScheme      *
+				\ : highlight!       SpecialKey      guifg=#383c44
+		else
+			autocmd vimrc ColorScheme      *
+				\ : highlight!       SpecialKey      guifg=#eeeeee
+		endif
 		colorscheme one
 	endif
 endif
@@ -386,7 +398,11 @@ if has('nvim')
 	tnoremap <silent><nowait><C-w>N       <C-\><C-n>
 endif
 
-nnoremap <silent><nowait><C-g>           :<C-u>GitDiff<cr>
+" Move the next/previous tabpage.
+if s:vimpatch_cmdtag
+	tnoremap <silent><nowait>gt              <Cmd>tabnext<cr>
+	tnoremap <silent><nowait>gT              <Cmd>tabprevious<cr>
+endif
 
 " Move the next/previous error in quickfix.
 nnoremap <silent><nowait><C-j>           :<C-u>cnext<cr>

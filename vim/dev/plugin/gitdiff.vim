@@ -2,7 +2,7 @@
 if !executable('git')
 	finish
 endif
-	
+
 let g:loaded_gitdiff = 1
 
 let s:TYPE_GITNUMSTAT = 'gitnumstat'
@@ -45,13 +45,13 @@ function! s:gitdiffnumstat_makelines(rootdir, args_list) abort
 			let lines += [line]
 		endif
 	endfor
-	return lines
+	return { 'lines': lines, 'cmd': cmd, }
 endfunction
 
 function! s:gitdiffnumstat_popupwin(rootdir, args_list) abort
-	let lines = s:gitdiffnumstat_makelines(a:rootdir, a:args_list)
-	if !empty(lines)
-		let winid = popup_menu(lines, {})
+	let x = s:gitdiffnumstat_makelines(a:rootdir, a:args_list)
+	if !empty(x['lines'])
+		let winid = popup_menu(x['lines'], {})
 		call s:set_popupwinopts(winid, a:rootdir, a:args_list)
 	else
 		call s:errormsg('nothing changed')
@@ -73,8 +73,8 @@ endfunction
 
 function! s:filter(rootdir, args_list, winid, key) abort
 	if a:key == 'W'
-		let lines = s:gitdiffnumstat_makelines(a:rootdir, s:toggle_w(a:args_list))
-		call popup_settext(a:winid, lines)
+		let x = s:gitdiffnumstat_makelines(a:rootdir, s:toggle_w(a:args_list))
+		call popup_settext(a:winid, x['lines'])
 		call s:set_popupwinopts(a:winid, a:rootdir, s:toggle_w(a:args_list))
 		return v:true
 	else
@@ -98,8 +98,8 @@ endfunction
 
 function! s:gitdiffnumstat_setlines(rootdir, args_list) abort
 	let view = winsaveview()
-	let lines = s:gitdiffnumstat_makelines(a:rootdir, a:args_list)
-	call s:setlines(a:rootdir, cmd, lines, s:TYPE_GITNUMSTAT)
+	let x = s:gitdiffnumstat_makelines(a:rootdir, a:args_list)
+	call s:setlines(a:rootdir, x['cmd'], x['lines'], s:TYPE_GITNUMSTAT)
 	call s:buffer_nnoremap('<cr>', 'gitdiffshowdiff_open', [a:rootdir, a:args_list])
 	call s:buffer_nnoremap('W', 'gitdiffnumstat_setlines', [a:rootdir, s:toggle_w(a:args_list)])
 	call s:buffer_nnoremap('R', 'gitdiffnumstat_setlines', [a:rootdir, a:args_list])
