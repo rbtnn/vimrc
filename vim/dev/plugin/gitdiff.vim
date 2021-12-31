@@ -64,6 +64,7 @@ function! s:set_popupwinopts(winid, rootdir, args_list) abort
 		\ 'cursorline': 1,
 		\ 'padding': [1, 3, 1, 3],
 		\ 'minheight': 3,
+		\ 'maxheight': &lines / 2,
 		\ 'borderchars': repeat([' '], 8),
 		\ 'filter': function('s:filter', [a:rootdir, a:args_list]),
 		\ 'callback': function('s:callback', [a:rootdir, a:args_list]),

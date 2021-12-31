@@ -231,6 +231,7 @@ if filereadable(s:plugvim_path) && (get(readfile(s:plugvim_path, '', 1), 0, '') 
 	call plug#('rbtnn/vim-find')
 	call plug#('rbtnn/vim-gloaded')
 	call plug#('rbtnn/vim-mrw')
+	call plug#('rbtnn/vim-testing-for-tabsidebar')
 	call plug#('rbtnn/vim-vimscript_indentexpr')
 	call plug#('rbtnn/vim-vimscript_lasterror')
 	call plug#('rbtnn/vim-vimscript_tagfunc')
@@ -330,11 +331,11 @@ endif
 nnoremap <silent><nowait><C-g>           :<C-u>GitDiff<cr>
 
 if s:is_installed('vim-find')
-	nnoremap <silent><nowait><C-f>           :<C-u>FindFiles<cr>
+	nnoremap <silent><nowait><C-f>       :<C-u>FindFiles<cr>
 endif
 
 if s:is_installed('vim-mrw')
-	nnoremap <silent><nowait><C-s>           :<C-u>MRW<cr>
+	nnoremap <silent><nowait><C-s>       :<C-u>MRW<cr>
 endif
 
 if s:is_installed('vim-one')
