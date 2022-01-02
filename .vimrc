@@ -224,11 +224,10 @@ if filereadable(s:plugvim_path) && (get(readfile(s:plugvim_path, '', 1), 0, '') 
 	set packpath=
 	let g:plug_url_format = 'https://github.com/%s.git'
 	call plug#begin($VIMRC_PACKSTART)
-	call plug#('itchyny/vim-cursorword')
 	call plug#('kana/vim-operator-replace')
 	call plug#('kana/vim-operator-user')
+	call plug#('lambdalisue/fern.vim')
 	call plug#('rakr/vim-one')
-	call plug#('rbtnn/vim-find')
 	call plug#('rbtnn/vim-gloaded')
 	call plug#('rbtnn/vim-mrw')
 	call plug#('rbtnn/vim-testing-for-tabsidebar')
@@ -328,14 +327,21 @@ if s:is_installed('vim-gloaded')
 	source $VIMRC_PACKSTART/vim-gloaded/plugin/gloaded.vim
 endif
 
-nnoremap <silent><nowait><C-g>           :<C-u>GitDiff<cr>
-
-if s:is_installed('vim-find')
-	nnoremap <silent><nowait><C-f>       :<C-u>FindFiles<cr>
-endif
+nnoremap <silent><C-g>           :<C-u>GitDiff<cr>
 
 if s:is_installed('vim-mrw')
-	nnoremap <silent><nowait><C-s>       :<C-u>MRW<cr>
+	nnoremap <silent><C-s>       :<C-u>MRW<cr>
+endif
+
+if s:is_installed('fern.vim')
+	let g:fern#default_hidden = 1
+	let g:fern#disable_default_mappings = 1
+	nnoremap <silent><C-f>       :<C-u>Fern .<cr>
+	function! s:init_fern() abort
+		nmap <buffer>h           <Plug>(fern-action-leave)
+		nmap <buffer>l           <Plug>(fern-action-open-or-enter)
+	endfunction
+	autocmd vimrc FileType      fern  :call s:init_fern()
 endif
 
 if s:is_installed('vim-one')
@@ -366,7 +372,7 @@ if s:is_installed('vim-one')
 endif
 
 if s:is_installed('vim-operator-replace')
-	nmap     <silent><nowait>s               <Plug>(operator-replace)
+	nmap     <silent>s           <Plug>(operator-replace)
 endif
 
 if s:is_installed('restart.vim')
@@ -381,36 +387,40 @@ endif
 
 " Emacs key mappings
 if has('win32') && (&shell =~# '\<cmd\.exe$')
-	tnoremap <silent><nowait><C-p>       <up>
-	tnoremap <silent><nowait><C-n>       <down>
-	tnoremap <silent><nowait><C-b>       <left>
-	tnoremap <silent><nowait><C-f>       <right>
-	tnoremap <silent><nowait><C-e>       <end>
-	tnoremap <silent><nowait><C-a>       <home>
-	tnoremap <silent><nowait><C-u>       <esc>
+	tnoremap <silent><C-p>       <up>
+	tnoremap <silent><C-n>       <down>
+	tnoremap <silent><C-b>       <left>
+	tnoremap <silent><C-f>       <right>
+	tnoremap <silent><C-e>       <end>
+	tnoremap <silent><C-a>       <home>
+	tnoremap <silent><C-u>       <esc>
 endif
-cnoremap         <nowait><C-b>           <left>
-cnoremap         <nowait><C-f>           <right>
-cnoremap         <nowait><C-e>           <end>
-cnoremap         <nowait><C-a>           <home>
+cnoremap         <C-b>           <left>
+cnoremap         <C-f>           <right>
+cnoremap         <C-e>           <end>
+cnoremap         <C-a>           <home>
 
 " Escape from Terminal mode.
 if has('nvim')
-	tnoremap <silent><nowait><C-w>N       <C-\><C-n>
+	tnoremap <silent><C-w>N      <C-\><C-n>
 endif
+
+" Can't use <S-space> at :terminal
+" https://github.com/vim/vim/issues/6040
+tnoremap <silent><S-space>       <space>
 
 " Move the next/previous tabpage.
 if s:vimpatch_cmdtag
-	tnoremap <silent><nowait>gt              <Cmd>tabnext<cr>
-	tnoremap <silent><nowait>gT              <Cmd>tabprevious<cr>
+	tnoremap <silent>gt          <Cmd>tabnext<cr>
+	tnoremap <silent>gT          <Cmd>tabprevious<cr>
 endif
 
 " Move the next/previous error in quickfix.
-nnoremap <silent><nowait><C-j>           :<C-u>cnext<cr>
-nnoremap <silent><nowait><C-k>           :<C-u>cprevious<cr>
+nnoremap <silent><C-j>           :<C-u>cnext<cr>
+nnoremap <silent><C-k>           :<C-u>cprevious<cr>
 
 " Smart space on wildmenu
-cnoremap   <expr><nowait><space>         (wildmenumode() && (getcmdline() =~# '[\/]$')) ? '<space><bs>' : '<space>'
+cnoremap   <expr><space>         (wildmenumode() && (getcmdline() =~# '[\/]$')) ? '<space><bs>' : '<space>'
 
 " Save script variables for debugging purposes.
 let g:vimrc_scriptvars = s:
