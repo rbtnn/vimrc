@@ -28,7 +28,7 @@ function! s:gitgrep_exec(q_bang, q_args) abort
 			throw "Please give a search text!"
 		endif
 
-		let cmd = printf('git --no-pager grep -n %s .', a:q_args)
+		let cmd = printf('git --no-pager grep --column --line --no-color %s .', a:q_args)
 		call setqflist([], ' ', { 'title': cmd, })
 		if has('nvim')
 			let s:job_id = jobstart(cmd, {
@@ -54,12 +54,13 @@ endfunction
 function! s:vim_out_cb(channel, msg) abort
 	let line = a:msg
 	if !empty(line)
-		let m = matchlist(line, '^\([^:]\+\):\(\d\+\):\(.*\)$')
+		let m = matchlist(line, '^\([^:]\+\):\(\d\+\):\(\d\+\):\(.*\)$')
 		if !empty(m)
 			call setqflist([{
 				\ 'filename': m[1],
 				\ 'lnum': m[2],
-				\ 'text': m[3],
+				\ 'col': m[3],
+				\ 'text': m[4],
 				\ }], 'a')
 		else
 			call setqflist([{ 'text': line, }], 'a')

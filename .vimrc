@@ -224,9 +224,10 @@ if filereadable(s:plugvim_path) && (get(readfile(s:plugvim_path, '', 1), 0, '') 
 	set packpath=
 	let g:plug_url_format = 'https://github.com/%s.git'
 	call plug#begin($VIMRC_PACKSTART)
+	call plug#('cohama/lexima.vim')
 	call plug#('kana/vim-operator-replace')
 	call plug#('kana/vim-operator-user')
-	call plug#('lambdalisue/fern.vim')
+	call plug#('mattn/vim-molder')
 	call plug#('rakr/vim-one')
 	call plug#('rbtnn/vim-gloaded')
 	call plug#('rbtnn/vim-mrw')
@@ -327,21 +328,21 @@ if s:is_installed('vim-gloaded')
 	source $VIMRC_PACKSTART/vim-gloaded/plugin/gloaded.vim
 endif
 
-nnoremap <silent><C-g>           :<C-u>GitDiff<cr>
+nnoremap <silent><C-d>           :<C-u>GitDiff<cr>
+nnoremap         <C-g>           :<C-u>GitGrep<space>
 
 if s:is_installed('vim-mrw')
 	nnoremap <silent><C-s>       :<C-u>MRW<cr>
 endif
 
-if s:is_installed('fern.vim')
-	let g:fern#default_hidden = 1
-	let g:fern#disable_default_mappings = 1
-	nnoremap <silent><C-f>       :<C-u>Fern .<cr>
-	function! s:init_fern() abort
-		nmap <buffer>h           <Plug>(fern-action-leave)
-		nmap <buffer>l           <Plug>(fern-action-open-or-enter)
+if s:is_installed('vim-molder')
+	let g:molder_show_hidden = 1
+	nnoremap <silent><C-f>       :<C-u>execute 'e ' .. (filereadable(expand('%')) ? '%:h' : '.')<cr>
+	function! s:init_molder() abort
+		nmap <buffer>h           <plug>(molder-up)
+		nmap <buffer>l           <plug>(molder-open)
 	endfunction
-	autocmd vimrc FileType      fern  :call s:init_fern()
+	autocmd vimrc FileType      molder  :call s:init_molder()
 endif
 
 if s:is_installed('vim-one')
@@ -373,6 +374,10 @@ endif
 
 if s:is_installed('vim-operator-replace')
 	nmap     <silent>s           <Plug>(operator-replace)
+endif
+
+if s:is_installed('lexima.vim')
+	set backspace=indent,eol,start
 endif
 
 if s:is_installed('restart.vim')

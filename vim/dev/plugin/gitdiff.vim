@@ -41,7 +41,7 @@ function! s:gitdiffnumstat_makelines(rootdir, args_list) abort
 			if ('0' != m[1]) || ('0' != m[2])
 				let lines += [printf('%5s %5s %s', '+' .. m[1], '-' .. m[2], m[3])]
 			endif
-		else
+		elseif !empty(line)
 			let lines += [line]
 		endif
 	endfor
