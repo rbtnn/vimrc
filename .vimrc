@@ -328,16 +328,17 @@ if s:is_installed('vim-gloaded')
 	source $VIMRC_PACKSTART/vim-gloaded/plugin/gloaded.vim
 endif
 
-nnoremap <silent><C-d>           :<C-u>GitDiff<cr>
-nnoremap         <C-g>           :<C-u>GitGrep<space>
+nnoremap <silent><space>d        :<C-u>GitDiff<cr>
+nnoremap         <space>r        :<C-u>GitGotoRootDir<cr>
+nnoremap         <space>g        :<C-u>GitGrep<space>
 
 if s:is_installed('vim-mrw')
-	nnoremap <silent><C-s>       :<C-u>MRW<cr>
+	nnoremap <silent><space>s       :<C-u>MRW<cr>
 endif
 
 if s:is_installed('vim-molder')
 	let g:molder_show_hidden = 1
-	nnoremap <silent><C-f>       :<C-u>execute 'e ' .. (filereadable(expand('%')) ? '%:h' : '.')<cr>
+	nnoremap <silent><space>f       :<C-u>execute 'e ' .. (filereadable(expand('%')) ? '%:h' : '.')<cr>
 	function! s:init_molder() abort
 		nmap <buffer>h           <plug>(molder-up)
 		nmap <buffer>l           <plug>(molder-open)
