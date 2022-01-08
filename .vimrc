@@ -48,6 +48,7 @@ let g:vim_indent_cont = &g:shiftwidth
 " cmdline
 set cmdwinheight=5
 set cmdheight=3
+set noshowcmd
 let &cedit = "\<C-q>"
 
 " backup/swap
@@ -146,7 +147,7 @@ function! Tabpages(is_tabsidebar) abort
 			else
 				let lines += [(tnr == tabpagenr() ? hl_sel : hl_def) .. '<Tab.' .. tnr .. '> ']
 			endif
-			for x in filter(getwininfo(), { i, x -> tnr == x['tabnr']})
+			for x in filter(getwininfo(), { i, x -> tnr == x['tabnr'] && ('popup' != win_gettype(x['winid'])) })
 				let ft = getbufvar(x['bufnr'], '&filetype')
 				let bt = getbufvar(x['bufnr'], '&buftype')
 				let is_curwin = (tnr == tabpagenr()) && (x['winnr'] == winnr())
@@ -224,13 +225,13 @@ if filereadable(s:plugvim_path) && (get(readfile(s:plugvim_path, '', 1), 0, '') 
 	set packpath=
 	let g:plug_url_format = 'https://github.com/%s.git'
 	call plug#begin($VIMRC_PACKSTART)
-	call plug#('cohama/lexima.vim')
 	call plug#('kana/vim-operator-replace')
 	call plug#('kana/vim-operator-user')
 	call plug#('mattn/vim-molder')
 	call plug#('rakr/vim-one')
 	call plug#('rbtnn/vim-gloaded')
 	call plug#('rbtnn/vim-mrw')
+	call plug#('rbtnn/vim-qfpopup')
 	call plug#('rbtnn/vim-testing-for-tabsidebar')
 	call plug#('rbtnn/vim-vimscript_indentexpr')
 	call plug#('rbtnn/vim-vimscript_lasterror')
@@ -318,6 +319,33 @@ if (bufname() =~# '\<cmd\.exe$') && has('win32')
 	autocmd vimrc VimLeave           * :silent! call delete(s:initcmd_path)
 endif
 
+function! s:toggle_terminal() abort
+	if &buftype == 'terminal'
+		setlocal hidden
+		close
+	else
+		let xs = getbufinfo()
+		call filter(xs, { i,x -> getbufvar(x['bufnr'], '&buftype') == 'terminal' })
+		if !has('nvim')
+			call filter(xs, { i,x -> term_getstatus(x['bufnr']) != 'finished' })
+		endif
+		rightbelow vertical new
+		if empty(xs)
+			if has('nvim')
+				terminal
+			else
+				terminal ++kill=kill ++curwin
+			endif
+		else
+			execute 'buffer ' .. xs[0]['bufnr']
+		endif
+		startinsert
+	endif
+endfunction
+
+tnoremap <C-q> <Cmd>call <SID>toggle_terminal()<cr>
+nnoremap <C-q> <Cmd>call <SID>toggle_terminal()<cr>
+
 if has('vim_starting')
 	if (has('win32') || (256 == &t_Co)) && has('termguicolors') && !has('gui_running')
 		silent! set termguicolors
@@ -375,10 +403,6 @@ endif
 
 if s:is_installed('vim-operator-replace')
 	nmap     <silent>s           <Plug>(operator-replace)
-endif
-
-if s:is_installed('lexima.vim')
-	set backspace=indent,eol,start
 endif
 
 if s:is_installed('restart.vim')
