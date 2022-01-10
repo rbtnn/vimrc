@@ -229,6 +229,7 @@ if filereadable(s:plugvim_path) && (get(readfile(s:plugvim_path, '', 1), 0, '') 
 	call plug#('kana/vim-operator-user')
 	call plug#('mattn/vim-molder')
 	call plug#('rakr/vim-one')
+	call plug#('rbtnn/vim-emphasiscursor')
 	call plug#('rbtnn/vim-gloaded')
 	call plug#('rbtnn/vim-mrw')
 	call plug#('rbtnn/vim-qfpopup')
@@ -322,29 +323,45 @@ endif
 function! s:toggle_terminal() abort
 	if &buftype == 'terminal'
 		setlocal hidden
-		close
-	else
-		let xs = getbufinfo()
-		call filter(xs, { i,x -> getbufvar(x['bufnr'], '&buftype') == 'terminal' })
-		if !has('nvim')
-			call filter(xs, { i,x -> term_getstatus(x['bufnr']) != 'finished' })
-		endif
-		rightbelow vertical new
-		if empty(xs)
-			if has('nvim')
-				terminal
-			else
-				terminal ++kill=kill ++curwin
-			endif
+		if 1 < winnr('$')
+			close
 		else
-			execute 'buffer ' .. xs[0]['bufnr']
+			enew
 		endif
-		startinsert
+	else
+		let exists = v:false
+		for wnr in range(1, winnr('$'))
+			if getwinvar(wnr, '&buftype') == 'terminal'
+				call win_gotoid(win_getid(wnr))
+				let exists = v:true
+				break
+			endif
+		endfor
+		if !exists
+			let xs = getbufinfo()
+			call filter(xs, { i,x -> getbufvar(x['bufnr'], '&buftype') == 'terminal' })
+			if !has('nvim')
+				call filter(xs, { i,x -> term_getstatus(x['bufnr']) != 'finished' })
+			endif
+			rightbelow vertical new
+			if empty(xs)
+				if has('nvim')
+					terminal
+				else
+					terminal ++kill=kill ++curwin
+				endif
+			else
+				execute 'buffer ' .. xs[0]['bufnr']
+			endif
+			startinsert
+		endif
 	endif
 endfunction
 
-tnoremap <C-q> <Cmd>call <SID>toggle_terminal()<cr>
-nnoremap <C-q> <Cmd>call <SID>toggle_terminal()<cr>
+if s:vimpatch_cmdtag
+	tnoremap <C-q> <Cmd>call <SID>toggle_terminal()<cr>
+	nnoremap <C-q> <Cmd>call <SID>toggle_terminal()<cr>
+endif
 
 if has('vim_starting')
 	if (has('win32') || (256 == &t_Co)) && has('termguicolors') && !has('gui_running')
