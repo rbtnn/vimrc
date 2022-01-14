@@ -129,67 +129,18 @@ set showmode
 set tags=./tags;
 set updatetime=100
 
-" tabline/tabsidebar
-function! Tabpages(is_tabsidebar) abort
-	try
-		let hl_lbl = a:is_tabsidebar ? '%#Label#' : ''
-		let hl_sel = a:is_tabsidebar ? '%#TabSideBarSel#' : '%#TabLineSel#'
-		let hl_def = a:is_tabsidebar ? '%#TabSideBar#' : '%#TabLine#'
-		let hl_fil = a:is_tabsidebar ? '%#TabSideBarFill#' : '%#TabLineFill#'
-		let hl_alt = a:is_tabsidebar ? '%#PreProc#' : ''
-		let lines = []
-		for tnr in range(1, tabpagenr('$'))
-			if a:is_tabsidebar && (tnr != get(g:, 'actual_curtabpage', tabpagenr()))
-				continue
-			endif
-			if a:is_tabsidebar
-				let lines += ['', hl_lbl .. '--- ' .. tnr .. ' ---' .. hl_def]
-			else
-				let lines += [(tnr == tabpagenr() ? hl_sel : hl_def) .. '<Tab.' .. tnr .. '> ']
-			endif
-			for x in filter(getwininfo(), { i, x -> tnr == x['tabnr'] && ('popup' != win_gettype(x['winid'])) })
-				let ft = getbufvar(x['bufnr'], '&filetype')
-				let bt = getbufvar(x['bufnr'], '&buftype')
-				let is_curwin = (tnr == tabpagenr()) && (x['winnr'] == winnr())
-				let is_altwin = (tnr == tabpagenr()) && (x['winnr'] == winnr('#'))
-				let text =
-					\ (is_curwin
-					\   ? hl_sel .. '(%%)'
-					\   : (is_altwin
-					\       ? hl_alt .. '(#)'
-					\       : (hl_def .. '(' .. x['winnr'] .. ')')))
-					\ .. ' '
-					\ .. (!empty(bt)
-					\      ? printf('[%s]', bt == 'nofile' ? ft : bt)
-					\      : (empty(bufname(x['bufnr']))
-					\          ? '[No Name]'
-					\          : fnamemodify(bufname(x['bufnr']), ':t')))
-				let lines += [text]
-			endfor
-		endfor
-		if !a:is_tabsidebar
-			let lines += [hl_fil]
-		endif
-		return join(lines, a:is_tabsidebar ? "\n" : ' ')
-	catch
-		let g:tab_throwpoint = v:throwpoint
-		let g:tab_exception = v:exception
-		return 'Error! Please see g:tab_throwpoint and g:tab_exception.'
-	endtry
-endfunction
-
 if has('tabsidebar')
 	let g:tabsidebar_vertsplit = 1
 	set notabsidebaralign
 	set notabsidebarwrap
 	set showtabsidebar=2
-	set tabsidebar=%!Tabpages(v:true)
+	set tabsidebar=%!vimrc#tabpages#expr(v:true)
 	set tabsidebarcolumns=20
 	set showtabline=0
 	set tabline&
 else
 	set showtabline=2
-	set tabline=%!Tabpages(v:false)
+	set tabline=%!vimrc#tabpages#expr(v:false)
 endif
 
 " for Neovim
@@ -271,98 +222,6 @@ autocmd vimrc CmdlineEnter     *
 
 autocmd vimrc FileType     help :setlocal colorcolumn=78
 
-function! s:term_win_open() abort
-	if (bufname() =~# '\<cmd\.exe\>') && has('win32')
-		" https://en.wikipedia.org/wiki/Windows_10_version_history
-		" https://docs.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2012-R2-and-2012/cc725943(v=ws.11)
-		" https://gist.github.com/fnky/458719343aabd01cfb17a3a4f7296797
-		let s:vcvarsall_path = glob('C:\Program Files (x86)\Microsoft Visual Studio\2019\*\VC\Auxiliary\Build\vcvarsall.bat')
-		let s:initcmd_path = get(s:, 'initcmd_path', tempname() .. '.cmd')
-		let s:windows_build_number = get(s:, 'windows_build_number', -1)
-		let s:win10_anniversary_update = get(s:, 'win10_anniversary_update', v:false)
-		if executable('wmic') && (-1 == s:windows_build_number)
-			let s:windows_build_number = str2nr(join(filter(split(system('wmic os get BuildNumber'), '\zs'), { i,x -> (0x30 <= char2nr(x)) && (char2nr(x) <= 0x39) }), ''))
-			let s:win10_anniversary_update = 14393 <= s:windows_build_number
-		endif
-		call writefile(map([
-			\	'@echo off', 'cls',
-			\	(s:win10_anniversary_update ? 'prompt $e[0;32m$$$e[0m' : 'prompt $$'),
-			\	'doskey vc=call "' .. s:vcvarsall_path .. '" $*',
-			\	'doskey ls=dir /b $*',
-			\	'doskey rm=del /q $*',
-			\	'doskey mv=move /y $*',
-			\	'doskey cp=copy /y $*',
-			\	'doskey pwd=cd',
-			\ ], { i,x -> x .. "\r" }), s:initcmd_path)
-		if has('nvim')
-			startinsert
-			call jobsend(b:terminal_job_id, printf("call %s\r", s:initcmd_path))
-		else
-			call term_sendkeys(bufnr(), printf("call %s\r", s:initcmd_path))
-		endif
-	endif
-	if bufname() =~# '\<bash\>'
-		let cmd = join(['export PS1="\[\e[0;32m\]$\[\e[0m\]"', 'clear', ''], "\r")
-		if has('nvim')
-			startinsert
-			call jobsend(b:terminal_job_id, cmd)
-		else
-			call term_sendkeys(bufnr(), cmd)
-		endif
-	endif
-endfunction
-if has('nvim')
-	autocmd vimrc TermOpen           * :silent! call s:term_win_open()
-else
-	autocmd vimrc TerminalWinOpen    * :silent! call s:term_win_open()
-endif
-if (bufname() =~# '\<cmd\.exe$') && has('win32')
-	autocmd vimrc VimLeave           * :silent! call delete(s:initcmd_path)
-endif
-
-function! s:toggle_terminal() abort
-	if &buftype == 'terminal'
-		setlocal hidden
-		if 1 < winnr('$')
-			close
-		else
-			enew
-		endif
-	else
-		let exists = v:false
-		for wnr in range(1, winnr('$'))
-			if getwinvar(wnr, '&buftype') == 'terminal'
-				call win_gotoid(win_getid(wnr))
-				let exists = v:true
-				break
-			endif
-		endfor
-		if !exists
-			let xs = getbufinfo()
-			call filter(xs, { i,x -> getbufvar(x['bufnr'], '&buftype') == 'terminal' })
-			if !has('nvim')
-				call filter(xs, { i,x -> term_getstatus(x['bufnr']) != 'finished' })
-			endif
-			rightbelow vertical new
-			if empty(xs)
-				if has('nvim')
-					terminal
-				else
-					terminal ++kill=kill ++curwin
-				endif
-			else
-				execute 'buffer ' .. xs[0]['bufnr']
-			endif
-			startinsert
-		endif
-	endif
-endfunction
-
-if s:vimpatch_cmdtag
-	tnoremap <C-q> <Cmd>call <SID>toggle_terminal()<cr>
-	nnoremap <C-q> <Cmd>call <SID>toggle_terminal()<cr>
-endif
-
 if has('vim_starting')
 	if (has('win32') || (256 == &t_Co)) && has('termguicolors') && !has('gui_running')
 		silent! set termguicolors
@@ -407,13 +266,7 @@ if s:is_installed('vim-one')
 			\ | highlight!       DiffAdded                     guibg=NONE
 			\ | highlight!       DiffRemoved                   guibg=NONE
 			\ | highlight!       Terminal        guifg=#eeeeee guibg=#000000
-		if &background == 'dark'
-			autocmd vimrc ColorScheme      *
-				\ : highlight!       SpecialKey      guifg=#383c44
-		else
-			autocmd vimrc ColorScheme      *
-				\ : highlight!       SpecialKey      guifg=#eeeeee
-		endif
+			\ | highlight!       SpecialKey      guifg=#383c44
 		colorscheme one
 	endif
 endif
@@ -469,8 +322,10 @@ nnoremap <silent><C-k>           :<C-u>cprevious<cr>
 " Smart space on wildmenu
 cnoremap   <expr><space>         (wildmenumode() && (getcmdline() =~# '[\/]$')) ? '<space><bs>' : '<space>'
 
-" Save script variables for debugging purposes.
-let g:vimrc_scriptvars = s:
+call vimrc#snippet#add('vim', 'fu', "nction! () abort\<cr>endfunction\<up>\<left>")
+call vimrc#snippet#add('vim', 'if', " \<cr>endif\<up>")
+
+inoremap   <expr><C-f>           vimrc#snippet#expand()
 
 if !has('vim_starting')
 	" Check whether echo-messages are not disappeared when .vimrc is read.
