@@ -98,8 +98,10 @@ set noruler
 set rulerformat&
 
 " statusline
-set laststatus=0
-set statusline&
+if has('vim_starting')
+	set laststatus=2
+	set statusline&
+endif
 
 " undo
 if has('persistent_undo')
@@ -176,10 +178,10 @@ if filereadable(s:plugvim_path) && (get(readfile(s:plugvim_path, '', 1), 0, '') 
 	set packpath=
 	let g:plug_url_format = 'https://github.com/%s.git'
 	call plug#begin($VIMRC_PACKSTART)
+	call plug#('itchyny/lightline.vim')
 	call plug#('kana/vim-operator-replace')
 	call plug#('kana/vim-operator-user')
 	call plug#('mattn/vim-molder')
-	call plug#('rakr/vim-one')
 	call plug#('rbtnn/vim-emphasiscursor')
 	call plug#('rbtnn/vim-gloaded')
 	call plug#('rbtnn/vim-mrw')
@@ -188,6 +190,7 @@ if filereadable(s:plugvim_path) && (get(readfile(s:plugvim_path, '', 1), 0, '') 
 	call plug#('rbtnn/vim-vimscript_indentexpr')
 	call plug#('rbtnn/vim-vimscript_lasterror')
 	call plug#('rbtnn/vim-vimscript_tagfunc')
+	call plug#('sonph/onehalf', { 'rtp': 'vim/', })
 	call plug#('thinca/vim-qfreplace')
 	if !has('nvim') && has('win32')
 		call plug#('tyru/restart.vim')
@@ -233,6 +236,7 @@ if s:is_installed('vim-gloaded')
 endif
 
 nnoremap <silent><space>d        :<C-u>GitDiff<cr>
+nnoremap <silent><space>t        :<C-u>terminal<cr>
 nnoremap         <space>r        :<C-u>GitGotoRootDir<cr>
 nnoremap         <space>g        :<C-u>GitGrep<space>
 
@@ -250,24 +254,27 @@ if s:is_installed('vim-molder')
 	autocmd vimrc FileType      molder  :call s:init_molder()
 endif
 
-if s:is_installed('vim-one')
+if s:is_installed('lightline.vim')
+	let g:lightline = {
+		\   'colorscheme': 'onehalfdark',
+		\   'enable': {
+		\     'statusline': 1,
+		\     'tabline': 0,
+		\   },
+		\ }
+endif
+
+if s:is_installed('onehalf')
 	if has('vim_starting')
 		set background=dark
 		autocmd vimrc ColorScheme      *
 			\ : highlight!       TabSideBar      guifg=#76787b guibg=NONE    gui=NONE           cterm=NONE
 			\ | highlight!       TabSideBarFill  guifg=#1a1a1a guibg=NONE    gui=NONE           cterm=NONE
 			\ | highlight!       TabSideBarSel   guifg=#22863a guibg=NONE    gui=NONE           cterm=NONE
-			\ | highlight!       Cursor          guifg=NONE    guibg=#aaaaaa
-			\ | highlight!       CursorIM        guifg=NONE    guibg=#aa0000
 			\ | highlight!       Comment                                     gui=NONE           cterm=NONE
-			\ | highlight!       DiffLine                      guibg=NONE
-			\ | highlight!       DiffFile                      guibg=NONE
-			\ | highlight!       DiffNewFile                   guibg=NONE
-			\ | highlight!       DiffAdded                     guibg=NONE
-			\ | highlight!       DiffRemoved                   guibg=NONE
-			\ | highlight!       Terminal        guifg=#eeeeee guibg=#000000
+			\ | highlight!       CursorIM        guifg=NONE    guibg=#aa0000
 			\ | highlight!       SpecialKey      guifg=#383c44
-		colorscheme one
+		colorscheme onehalfdark
 	endif
 endif
 

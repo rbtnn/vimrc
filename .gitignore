@@ -27,13 +27,11 @@
 .dropbox/
 .electron/
 .fern/
-.find/
 .gem/
 .ghc/
 .ghost/
 .git-for-windows-updater
 .gitconfig.local
-.grizzly_history
 .gstreamer-0.10/
 .gtkrc-2.0
 .keras/
@@ -111,7 +109,6 @@ _viminfo
 examples.desktop
 go/
 init.local.cmd
-layout.json
 node_modules/
 ntuser.*
 python_games/
