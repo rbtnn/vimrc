@@ -119,6 +119,7 @@ endif
 
 " others
 set autoread
+set backspace=indent,eol,start
 set fileformats=unix,dos
 set keywordprg=:help
 set nrformats&
@@ -225,6 +226,56 @@ autocmd vimrc CmdlineEnter     *
 
 autocmd vimrc FileType     help :setlocal colorcolumn=78
 
+function! s:term_win_open() abort
+	if (bufname() =~# '\<cmd\.exe\>') && has('win32')
+		" https://en.wikipedia.org/wiki/Windows_10_version_history
+		" https://docs.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2012-R2-and-2012/cc725943(v=ws.11)
+		" https://gist.github.com/fnky/458719343aabd01cfb17a3a4f7296797
+		let s:vcvarsall_path = glob('C:\Program Files (x86)\Microsoft Visual Studio\2019\*\VC\Auxiliary\Build\vcvarsall.bat')
+		let s:initcmd_path = get(s:, 'initcmd_path', tempname() .. '.cmd')
+		let s:windows_build_number = get(s:, 'windows_build_number', -1)
+		let s:win10_anniversary_update = get(s:, 'win10_anniversary_update', v:false)
+		if executable('wmic') && (-1 == s:windows_build_number)
+			let s:windows_build_number = str2nr(join(filter(split(system('wmic os get BuildNumber'), '\zs'), { i,x -> (0x30 <= char2nr(x)) && (char2nr(x) <= 0x39) }), ''))
+			let s:win10_anniversary_update = 14393 <= s:windows_build_number
+		endif
+		call writefile(map([
+			\	'@echo off', 'cls',
+			\	(s:win10_anniversary_update ? 'prompt $e[0;32m$$$e[0m' : 'prompt $$'),
+			\	'doskey vc=call "' .. s:vcvarsall_path .. '" $*',
+			\	'doskey ls=dir /b $*',
+			\	'doskey rm=del /q $*',
+			\	'doskey mv=move /y $*',
+			\	'doskey cp=copy /y $*',
+			\	'doskey pwd=cd',
+			\ ], { i,x -> x .. "\r" }), s:initcmd_path)
+		if has('nvim')
+			startinsert
+			call jobsend(b:terminal_job_id, printf("call %s\r", s:initcmd_path))
+		else
+			call term_sendkeys(bufnr(), printf("call %s\r", s:initcmd_path))
+		endif
+	endif
+	if bufname() =~# '\<bash\>'
+		let cmd = join(['export PS1="\[\e[0;32m\]$\[\e[0m\]"', 'clear', ''], "\r")
+		if has('nvim')
+			startinsert
+			call jobsend(b:terminal_job_id, cmd)
+		else
+			call term_sendkeys(bufnr(), cmd)
+		endif
+	endif
+endfunction
+
+if has('nvim')
+	autocmd vimrc TermOpen           * :silent! call s:term_win_open()
+else
+	autocmd vimrc TerminalWinOpen    * :silent! call s:term_win_open()
+endif
+if (bufname() =~# '\<cmd\.exe$') && has('win32')
+	autocmd vimrc VimLeave           * :silent! call delete(s:initcmd_path)
+endif
+
 if has('vim_starting')
 	if (has('win32') || (256 == &t_Co)) && has('termguicolors') && !has('gui_running')
 		silent! set termguicolors
@@ -274,6 +325,8 @@ if s:is_installed('onehalf')
 			\ | highlight!       Comment                                     gui=NONE           cterm=NONE
 			\ | highlight!       CursorIM        guifg=NONE    guibg=#aa0000
 			\ | highlight!       SpecialKey      guifg=#383c44
+			\ | highlight!       Pmenu           guifg=#dcdfe4 guibg=#313640
+			\ | highlight!       LineNr                        guibg=#313640
 		colorscheme onehalfdark
 	endif
 endif
@@ -329,8 +382,11 @@ nnoremap <silent><C-k>           :<C-u>cprevious<cr>
 " Smart space on wildmenu
 cnoremap   <expr><space>         (wildmenumode() && (getcmdline() =~# '[\/]$')) ? '<space><bs>' : '<space>'
 
-call vimrc#snippet#add('vim', 'fu', "nction! () abort\<cr>endfunction\<up>\<left>")
-call vimrc#snippet#add('vim', 'if', " \<cr>endif\<up>")
+call vimrc#snippet#clear('vim')
+call vimrc#snippet#add('vim', '\<fu\%[nction\]', "function! () abort\<cr>endfunction\<up>\<left>")
+call vimrc#snippet#add('vim', '\<au\%[group\]', "augroup \<cr>autocmd!\<cr>augroup END\<up>\<up>")
+call vimrc#snippet#add('vim', '\<if', " \<cr>endif\<up>")
+call vimrc#snippet#add('vim', '\<wh\%[ile\]', "while \<cr>endwhile\<up>")
 
 inoremap   <expr><C-f>           vimrc#snippet#expand()
 

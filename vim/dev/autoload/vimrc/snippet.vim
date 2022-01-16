@@ -1,6 +1,10 @@
 
 let s:snippets = get(s:, 'snippets', {})
 
+function! vimrc#snippet#clear(filetype) abort
+	let s:snippets[a:filetype] = {}
+endfunction
+
 function! vimrc#snippet#add(filetype, trigger, input_text) abort
 	if !has_key(s:snippets, a:filetype)
 		let s:snippets[a:filetype] = {}
@@ -11,10 +15,9 @@ endfunction
 function! vimrc#snippet#expand() abort
 	if has_key(s:snippets, &filetype)
 		let word = s:inputting_text()
-		echo string(word)
 		for trigger in keys(s:snippets[&filetype])
-			if word == trigger
-				return s:snippets[&filetype][trigger]
+			if word =~# '^' .. trigger
+				return repeat("\<bs>", len(word)) .. s:snippets[&filetype][trigger]
 			endif
 		endfor
 	endif
@@ -26,12 +29,12 @@ function! s:inputting_text() abort
 	let word = ''
 	if !empty(chs)
 		let i = len(chs) - 1
-		if ' ' == chs[i]
+		while (0 <= i) && (' ' == chs[i])
 			let word = chs[i] .. word
 			let i -= 1
-		endif
+		endwhile
 		while 0 <= i
-			if chs[i] =~# '[0-9a-zA-Z_]'
+			if chs[i] =~# '\k'
 				let word = chs[i] .. word
 			else
 				break
