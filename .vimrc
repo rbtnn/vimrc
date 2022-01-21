@@ -30,9 +30,6 @@ set belloff=all
 set clipboard=unnamed
 
 " display
-if has('vim_starting')
-	set ambiwidth=double
-endif
 set nonumber
 set norelativenumber
 set nowrap
@@ -184,6 +181,7 @@ if filereadable(s:plugvim_path) && (get(readfile(s:plugvim_path, '', 1), 0, '') 
 	call plug#('kana/vim-operator-user')
 	call plug#('kana/vim-textobj-user')
 	call plug#('mattn/vim-molder')
+	call plug#('rbtnn/vim-ambiwidth')
 	call plug#('rbtnn/vim-emphasiscursor')
 	call plug#('rbtnn/vim-gloaded')
 	call plug#('rbtnn/vim-mrw')
@@ -288,6 +286,10 @@ if s:is_installed('vim-gloaded')
 	source $VIMRC_PACKSTART/vim-gloaded/plugin/gloaded.vim
 endif
 
+if s:is_installed('vim-qfpopup')
+	autocmd vimrc VimResized         * :let g:qfpopup_width = &columns * 2 / 5
+endif
+
 nnoremap <silent><space>d        :<C-u>GitDiff<cr>
 nnoremap <silent><space>t        :<C-u>terminal<cr>
 nnoremap         <space>r        :<C-u>GitGotoRootDir<cr>
@@ -308,13 +310,10 @@ if s:is_installed('vim-molder')
 endif
 
 if s:is_installed('lightline.vim')
-	let g:lightline = {
-		\   'colorscheme': 'onehalfdark',
-		\   'enable': {
-		\     'statusline': 1,
-		\     'tabline': 0,
-		\   },
-		\ }
+	let g:lightline = {}
+	let g:lightline['colorscheme'] = 'onehalfdark'
+	let g:lightline['enable'] = { 'statusline': 1, 'tabline': 0, }
+	let g:lightline['separator'] = { 'left': nr2char(0xe0b0), 'right': nr2char(0xe0b2), }
 endif
 
 if s:is_installed('onehalf')
