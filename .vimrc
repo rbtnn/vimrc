@@ -387,7 +387,7 @@ cnoremap   <expr><space>         (wildmenumode() && (getcmdline() =~# '[\/]$')) 
 call vimrc#snippet#clear('vim')
 call vimrc#snippet#add('vim', '\<fu\%[nction\]', "function! () abort\<cr>endfunction\<up>\<left>")
 call vimrc#snippet#add('vim', '\<au\%[group\]', "augroup \<cr>autocmd!\<cr>augroup END\<up>\<up>")
-call vimrc#snippet#add('vim', '\<if', " \<cr>endif\<up>")
+call vimrc#snippet#add('vim', '\<if', "if \<cr>endif\<up>")
 call vimrc#snippet#add('vim', '\<wh\%[ile\]', "while \<cr>endwhile\<up>")
 
 inoremap   <expr><C-f>           vimrc#snippet#expand()
