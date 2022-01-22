@@ -10,6 +10,8 @@ scriptencoding utf-8
 let s:vimpatch_cmdtag = has('patch-8.2.1978') || has('nvim')
 " https://github.com/vim/vim/commit/aaad995f8384a77a64efba6846c9c4ac99de0953
 let s:vimpatch_unsigned = has('patch-8.2.0860') || has('nvim')
+let g:vim_indent_cont = &g:shiftwidth
+let &cedit = "\<C-q>"
 
 let $MYVIMRC = resolve($MYVIMRC)
 let $VIMRC_ROOT = expand('<sfile>:h')
@@ -19,9 +21,19 @@ let $VIMRC_PACKSTART = expand('$VIMRC_VIM/pack/my/start')
 
 augroup vimrc
 	autocmd!
+	" Delete unused commands, because it's an obstacle on cmdline-completion.
+	autocmd CmdlineEnter     *
+		\ : for s:cmdname in [
+		\		'MANPAGER', 'Man', 'Tutor', 'VimFoldh',
+		\		'Plug', 'PlugDiff', 'PlugInstall', 'PlugSnapshot',
+		\		'PlugStatus', 'PlugUpgrade', 'UpdateRemotePlugins',
+		\		]
+		\ | 	execute printf('silent! delcommand %s', s:cmdname)
+		\ | endfor
+		\ | unlet s:cmdname
+	autocmd FileType     help :setlocal colorcolumn=78
 augroup END
 
-" system
 language message C
 set winaltkeys=yes
 set guioptions=mM
@@ -29,78 +41,60 @@ set mouse=a
 set belloff=all
 set clipboard=unnamed
 
-" display
-set nonumber
-set norelativenumber
-set nowrap
-set scrolloff=5
-
-" indent size
-set shiftround
-set softtabstop=-1
-set shiftwidth=4
-set tabstop=4
-let g:vim_indent_cont = &g:shiftwidth
-
-" cmdline
-set cmdwinheight=5
+set autoread
+set backspace=indent,eol,start
 set cmdheight=3
-set noshowcmd
-let &cedit = "\<C-q>"
-
-" backup/swap
-set nobackup
-set nowritebackup
-set noswapfile
-
-" title
-if has('win32')
-	set title
-	set titlestring&
-else
-	set notitle
-endif
-
-" complete
-set pumheight=10
-set wildmenu
-set isfname-==
+set cmdwinheight=5
 set complete-=t
-
-" special
-set list
-set listchars=tab:\ \ \|,trail:-
-
-" fold
-set foldmethod=indent
+set completeslash=slash
+set fileformats=unix,dos
 set foldlevelstart=999
-
-" search
-set incsearch
-set hlsearch
-set nowrapscan
-set ignorecase
-
-" matchpairs
-set showmatch
-set matchtime=1
-set matchpairs+=<:>
-
-" vimgrep
+set foldmethod=indent
 set grepformat&
 set grepprg=internal
-
-" ruler
+set ignorecase
+set incsearch
+set isfname-==
+set keywordprg=:help
+set list
+set listchars=tab:\ \ \|,trail:-
+set matchpairs+=<:>
+set matchtime=1
+set nobackup
+set nonumber
+set norelativenumber
 set noruler
+set noshowcmd
+set noswapfile
+set nowrap
+set nowrapscan
+set nowritebackup
+set nrformats&
+set pumheight=10
 set rulerformat&
+set scrolloff=5
+set sessionoptions=winpos,resize,tabpages,curdir,help
+set shiftround
+set shiftwidth=4
+set showmatch
+set showmode
+set softtabstop=-1
+set tabstop=4
+set tags=./tags;
+set updatetime=100
+set wildmenu
 
-" statusline
+if s:vimpatch_unsigned
+	set nrformats-=octal
+	set nrformats+=unsigned
+endif
+
 if has('vim_starting')
+	set hlsearch
 	set laststatus=2
 	set statusline&
 endif
 
-" undo
 if has('persistent_undo')
 	set undofile
 	" https://github.com/neovim/neovim/commit/6995fad260e3e7c49e4f9dc4b63de03989411c7b
@@ -113,21 +107,6 @@ if has('persistent_undo')
 else
 	set noundofile
 endif
-
-" others
-set autoread
-set backspace=indent,eol,start
-set fileformats=unix,dos
-set keywordprg=:help
-set nrformats&
-if s:vimpatch_unsigned
-	set nrformats-=octal
-	set nrformats+=unsigned
-endif
-set sessionoptions=winpos,resize,tabpages,curdir,help
-set showmode
-set tags=./tags;
-set updatetime=100
 
 if has('tabsidebar')
 	let g:tabsidebar_vertsplit = 1
@@ -143,7 +122,6 @@ else
 	set tabline=%!vimrc#tabpages#expr(v:false)
 endif
 
-" for Neovim
 if has('nvim')
 	if has('win32')
 		" Running nvim-qt.exe on Windows OS, never use GUI popupmenu and tabline.
@@ -176,23 +154,23 @@ if filereadable(s:plugvim_path) && (get(readfile(s:plugvim_path, '', 1), 0, '') 
 	set packpath=
 	let g:plug_url_format = 'https://github.com/%s.git'
 	call plug#begin($VIMRC_PACKSTART)
+
 	call plug#('itchyny/lightline.vim')
 	call plug#('kana/vim-operator-replace')
 	call plug#('kana/vim-operator-user')
 	call plug#('kana/vim-textobj-user')
-	call plug#('mattn/vim-molder')
+	call plug#('cocopon/vaffle.vim')
 	call plug#('rbtnn/vim-ambiwidth')
-	call plug#('rbtnn/vim-emphasiscursor')
 	call plug#('rbtnn/vim-gloaded')
 	call plug#('rbtnn/vim-mrw')
 	call plug#('rbtnn/vim-qfpopup')
-	call plug#('rbtnn/vim-testing-for-tabsidebar')
 	call plug#('rbtnn/vim-textobj-string')
 	call plug#('rbtnn/vim-vimscript_indentexpr')
 	call plug#('rbtnn/vim-vimscript_lasterror')
 	call plug#('rbtnn/vim-vimscript_tagfunc')
 	call plug#('sonph/onehalf', { 'rtp': 'vim/', })
 	call plug#('thinca/vim-qfreplace')
+
 	if !has('nvim') && has('win32')
 		call plug#('tyru/restart.vim')
 	endif
@@ -201,89 +179,19 @@ if filereadable(s:plugvim_path) && (get(readfile(s:plugvim_path, '', 1), 0, '') 
 	function! s:is_installed(name) abort
 		return isdirectory($VIMRC_PACKSTART .. '/' .. a:name) && (-1 != index(keys(g:plugs), a:name))
 	endfunction
-else
-	set runtimepath=$VIMRUNTIME,$VIMRC_DEV
-	set packpath=$VIMRC_VIM
-	silent! source ~/.vimrc.local
-	packloadall!
-	filetype indent plugin on
-	syntax on
-	function! s:is_installed(name) abort
-		return isdirectory($VIMRC_PACKSTART .. '/' .. a:name)
-	endfunction
 endif
 
-" Delete unused commands, because it's an obstacle on cmdline-completion.
-autocmd vimrc CmdlineEnter     *
-	\ : for s:cmdname in [
-	\		'MANPAGER', 'Man', 'Tutor', 'VimFoldh',
-	\		'Plug', 'PlugDiff', 'PlugInstall', 'PlugSnapshot',
-	\		'PlugStatus', 'PlugUpgrade', 'UpdateRemotePlugins',
-	\		]
-	\ | 	execute printf('silent! delcommand %s', s:cmdname)
-	\ | endfor
-	\ | unlet s:cmdname
-
-autocmd vimrc FileType     help :setlocal colorcolumn=78
-
-function! s:term_win_open() abort
-	if (bufname() =~# '\<cmd\.exe\>') && has('win32')
-		" https://en.wikipedia.org/wiki/Windows_10_version_history
-		" https://docs.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2012-R2-and-2012/cc725943(v=ws.11)
-		" https://gist.github.com/fnky/458719343aabd01cfb17a3a4f7296797
-		let s:vcvarsall_path = glob('C:\Program Files (x86)\Microsoft Visual Studio\2019\*\VC\Auxiliary\Build\vcvarsall.bat')
-		let s:initcmd_path = get(s:, 'initcmd_path', tempname() .. '.cmd')
-		let s:windows_build_number = get(s:, 'windows_build_number', -1)
-		let s:win10_anniversary_update = get(s:, 'win10_anniversary_update', v:false)
-		if executable('wmic') && (-1 == s:windows_build_number)
-			let s:windows_build_number = str2nr(join(filter(split(system('wmic os get BuildNumber'), '\zs'), { i,x -> (0x30 <= char2nr(x)) && (char2nr(x) <= 0x39) }), ''))
-			let s:win10_anniversary_update = 14393 <= s:windows_build_number
-		endif
-		call writefile(map([
-			\	'@echo off', 'cls',
-			\	(s:win10_anniversary_update ? 'prompt $e[0;32m$$$e[0m' : 'prompt $$'),
-			\	'doskey vc=call "' .. s:vcvarsall_path .. '" $*',
-			\	'doskey ls=dir /b $*',
-			\	'doskey rm=del /q $*',
-			\	'doskey mv=move /y $*',
-			\	'doskey cp=copy /y $*',
-			\	'doskey pwd=cd',
-			\ ], { i,x -> x .. "\r" }), s:initcmd_path)
-		if has('nvim')
-			startinsert
-			call jobsend(b:terminal_job_id, printf("call %s\r", s:initcmd_path))
-		else
-			call term_sendkeys(bufnr(), printf("call %s\r", s:initcmd_path))
-		endif
-	endif
-	if bufname() =~# '\<bash\>'
-		let cmd = join(['export PS1="\[\e[0;32m\]$\[\e[0m\]"', 'clear', ''], "\r")
-		if has('nvim')
-			startinsert
-			call jobsend(b:terminal_job_id, cmd)
-		else
-			call term_sendkeys(bufnr(), cmd)
-		endif
-	endif
-endfunction
-
-if has('nvim')
-	autocmd vimrc TermOpen           * :silent! call s:term_win_open()
-else
-	autocmd vimrc TerminalWinOpen    * :silent! call s:term_win_open()
-endif
-if (bufname() =~# '\<cmd\.exe$') && has('win32')
-	autocmd vimrc VimLeave           * :silent! call delete(s:initcmd_path)
-endif
-
-if has('vim_starting')
-	if (has('win32') || (256 == &t_Co)) && has('termguicolors') && !has('gui_running')
-		silent! set termguicolors
-	endif
+if has('vim_starting') && has('termguicolors') && !has('gui_running') && (has('win32') || (256 == &t_Co))
+	silent! set termguicolors
 endif
 
 if s:is_installed('vim-gloaded')
 	source $VIMRC_PACKSTART/vim-gloaded/plugin/gloaded.vim
+endif
+
+if s:is_installed('vaffle.vim')
+	let g:vaffle_show_hidden_files = 1
+	nnoremap <silent><space>f       :<C-u>execute 'Vaffle ' .. (filereadable(expand('%')) ? '%:h' : '.')<cr>
 endif
 
 if s:is_installed('vim-qfpopup')
@@ -297,16 +205,6 @@ nnoremap         <space>g        :<C-u>GitGrep<space>
 
 if s:is_installed('vim-mrw')
 	nnoremap <silent><space>s       :<C-u>MRW<cr>
-endif
-
-if s:is_installed('vim-molder')
-	let g:molder_show_hidden = 1
-	nnoremap <silent><space>f       :<C-u>execute 'e ' .. (filereadable(expand('%')) ? '%:h' : '.')<cr>
-	function! s:init_molder() abort
-		nmap <buffer>h           <plug>(molder-up)
-		nmap <buffer>l           <plug>(molder-open)
-	endfunction
-	autocmd vimrc FileType      molder  :call s:init_molder()
 endif
 
 if s:is_installed('lightline.vim')
@@ -338,12 +236,6 @@ endif
 
 if s:is_installed('restart.vim')
 	let g:restart_sessionoptions = &sessionoptions
-endif
-
-if s:is_installed('denops.vim')
-	command! -nargs=0 DenoRestart
-		\ : let g:denops#debug = 1
-		\ | call denops#server#restart()
 endif
 
 " Emacs key mappings
