@@ -288,3 +288,14 @@ if !has('vim_starting')
 	echo '.vimrc has just read!'
 endif
 
+finish
+"
+" termopen.vim
+" https://gist.github.com/rbtnn/bf3d58f99d95da9d9c0d2dcd51d30e47
+" toggle_terminal.vim
+" https://gist.github.com/rbtnn/e71d36b462ac89d4dd029f4f42b42666
+" ddc_and_pum.vim
+" https://gist.github.com/rbtnn/4373572564964a905d1c162ed3931497
+" airline and lightline arrow settings
+" https://gist.github.com/rbtnn/41176651514d48178842f807ec8cac72
+"
