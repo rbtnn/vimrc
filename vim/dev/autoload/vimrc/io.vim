@@ -1,5 +1,4 @@
 
-
 function vimrc#io#system(cmd, cwd) abort
 	let lines = []
 	if has('nvim')

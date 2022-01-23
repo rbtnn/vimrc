@@ -24,7 +24,7 @@ augroup vimrc
 	" Delete unused commands, because it's an obstacle on cmdline-completion.
 	autocmd CmdlineEnter     *
 		\ : for s:cmdname in [
-		\		'MANPAGER', 'Man', 'Tutor', 'VimFoldh',
+		\		'MANPAGER', 'Man', 'Tutor', 'VimFoldh', 'TextobjStringDefaultKeyMappings',
 		\		'Plug', 'PlugDiff', 'PlugInstall', 'PlugSnapshot',
 		\		'PlugStatus', 'PlugUpgrade', 'UpdateRemotePlugins',
 		\		]
