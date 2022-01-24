@@ -142,6 +142,71 @@ else
 	endif
 endif
 
+if has('vim_starting') && has('termguicolors') && !has('gui_running') && (has('win32') || (256 == &t_Co))
+	silent! set termguicolors
+endif
+
+set runtimepath=$VIMRUNTIME,$VIMRC_DEV
+set packpath=
+
+call vimrc#snippet#clear('vim')
+call vimrc#snippet#add('vim', '\<fu\%[nction\]', "function! () abort\<cr>endfunction\<up>\<left>")
+call vimrc#snippet#add('vim', '\<au\%[group\]', "augroup \<cr>autocmd!\<cr>augroup END\<up>\<up>")
+call vimrc#snippet#add('vim', '\<if', "if \<cr>endif\<up>")
+call vimrc#snippet#add('vim', '\<wh\%[ile\]', "while \<cr>endwhile\<up>")
+
+inoremap   <expr><C-f>               vimrc#snippet#expand()
+
+" Can't use <S-space> at :terminal
+" https://github.com/vim/vim/issues/6040
+tnoremap <silent><S-space>           <space>
+
+" Smart space on wildmenu
+cnoremap   <expr><space>             (wildmenumode() && (getcmdline() =~# '[\/]$')) ? '<space><bs>' : '<space>'
+
+" Escape from Terminal mode.
+if has('nvim')
+	tnoremap <silent><C-w>N          <C-\><C-n>
+endif
+
+nnoremap             <space>g        :<C-u>GitGrep<space>
+
+" Emacs key mappings
+if has('win32') && (&shell =~# '\<cmd\.exe$')
+	tnoremap <silent><C-p>           <up>
+	tnoremap <silent><C-n>           <down>
+	tnoremap <silent><C-b>           <left>
+	tnoremap <silent><C-f>           <right>
+	tnoremap <silent><C-e>           <end>
+	tnoremap <silent><C-a>           <home>
+	tnoremap <silent><C-u>           <esc>
+endif
+cnoremap         <C-b>               <left>
+cnoremap         <C-f>               <right>
+cnoremap         <C-e>               <end>
+cnoremap         <C-a>               <home>
+
+if s:vimpatch_cmdtag
+	nnoremap <silent><space>d        <Cmd>GitDiff<cr>
+	nnoremap         <space>r        <Cmd>GitGotoRootDir<cr>
+
+	if has('nvim')
+		nnoremap <silent><space>t    <Cmd>tabnew \| execute 'terminal' \| startinsert<cr>
+	else
+		nnoremap <silent><space>t    <Cmd>tabnew \| terminal ++curwin<cr>
+	endif
+
+	" Move the next/previous tabpage.
+	tnoremap <silent><C-j>           <Cmd>tabnext<cr>
+	tnoremap <silent><C-k>           <Cmd>tabprevious<cr>
+	nnoremap <silent><C-j>           <Cmd>tabnext<cr>
+	nnoremap <silent><C-k>           <Cmd>tabprevious<cr>
+
+	" Move the next/previous error in quickfix.
+	nnoremap <silent><C-n>           <Cmd>cnext<cr>
+	nnoremap <silent><C-p>           <Cmd>cprevious<cr>
+endif
+
 let s:plugvim_path = expand('$VIMRC_DEV/autoload/plug.vim')
 
 if !filereadable(s:plugvim_path) && executable('curl') && has('vim_starting')
@@ -150,8 +215,6 @@ if !filereadable(s:plugvim_path) && executable('curl') && has('vim_starting')
 endif
 
 if filereadable(s:plugvim_path) && (get(readfile(s:plugvim_path, '', 1), 0, '') != '404: Not Found')
-	set runtimepath=$VIMRUNTIME,$VIMRC_DEV
-	set packpath=
 	let g:plug_url_format = 'https://github.com/%s.git'
 	call plug#begin($VIMRC_PACKSTART)
 
@@ -179,109 +242,65 @@ if filereadable(s:plugvim_path) && (get(readfile(s:plugvim_path, '', 1), 0, '') 
 	function! s:is_installed(name) abort
 		return isdirectory($VIMRC_PACKSTART .. '/' .. a:name) && (-1 != index(keys(g:plugs), a:name))
 	endfunction
-endif
 
-if has('vim_starting') && has('termguicolors') && !has('gui_running') && (has('win32') || (256 == &t_Co))
-	silent! set termguicolors
-endif
+	if s:is_installed('vim-gloaded')
+		source $VIMRC_PACKSTART/vim-gloaded/plugin/gloaded.vim
+	endif
 
-if s:is_installed('vim-gloaded')
-	source $VIMRC_PACKSTART/vim-gloaded/plugin/gloaded.vim
-endif
+	if s:is_installed('vaffle.vim')
+		let g:vaffle_show_hidden_files = 1
+		nnoremap <silent><space>f       :<C-u>execute 'Vaffle ' .. (filereadable(expand('%')) ? '%:h' : '.')<cr>
+	endif
 
-if s:is_installed('vaffle.vim')
-	let g:vaffle_show_hidden_files = 1
-	nnoremap <silent><space>f       :<C-u>execute 'Vaffle ' .. (filereadable(expand('%')) ? '%:h' : '.')<cr>
-endif
+	if s:is_installed('vim-qfpopup')
+		autocmd vimrc VimResized         * :let g:qfpopup_width = &columns * 2 / 5
+	endif
 
-if s:is_installed('vim-qfpopup')
-	autocmd vimrc VimResized         * :let g:qfpopup_width = &columns * 2 / 5
-endif
+	if s:is_installed('vim-mrw')
+		nnoremap <silent><space>s       :<C-u>MRW<cr>
+	endif
 
-nnoremap <silent><space>d        :<C-u>GitDiff<cr>
-nnoremap <silent><space>t        :<C-u>terminal<cr>
-nnoremap         <space>r        :<C-u>GitGotoRootDir<cr>
-nnoremap         <space>g        :<C-u>GitGrep<space>
+	if s:is_installed('lightline.vim')
+		let g:lightline = {}
+		let g:lightline['colorscheme'] = 'onehalfdark'
+		let g:lightline['enable'] = { 'statusline': 1, 'tabline': 0, }
+		let g:lightline['separator'] = { 'left': nr2char(0xe0b0), 'right': nr2char(0xe0b2), }
+	endif
 
-if s:is_installed('vim-mrw')
-	nnoremap <silent><space>s       :<C-u>MRW<cr>
-endif
+	if s:is_installed('onehalf')
+		if has('vim_starting')
+			set background=dark
+			autocmd vimrc ColorScheme      *
+				\ : highlight!       TabSideBar      guifg=#76787b guibg=NONE    gui=NONE           cterm=NONE
+				\ | highlight!       TabSideBarFill  guifg=#1a1a1a guibg=NONE    gui=NONE           cterm=NONE
+				\ | highlight!       TabSideBarSel   guifg=#22863a guibg=NONE    gui=NONE           cterm=NONE
+				\ | highlight!       Comment                                     gui=NONE           cterm=NONE
+				\ | highlight!       CursorIM        guifg=NONE    guibg=#aa0000
+				\ | highlight!       SpecialKey      guifg=#383c44
+				\ | highlight!       Pmenu           guifg=#dcdfe4 guibg=#313640
+				\ | highlight!       LineNr                        guibg=#313640
+			colorscheme onehalfdark
+		endif
+	endif
 
-if s:is_installed('lightline.vim')
-	let g:lightline = {}
-	let g:lightline['colorscheme'] = 'onehalfdark'
-	let g:lightline['enable'] = { 'statusline': 1, 'tabline': 0, }
-	let g:lightline['separator'] = { 'left': nr2char(0xe0b0), 'right': nr2char(0xe0b2), }
-endif
+	if s:is_installed('vim-operator-replace')
+		nmap     <silent>s           <Plug>(operator-replace)
+	endif
 
-if s:is_installed('onehalf')
+	if s:is_installed('restart.vim')
+		let g:restart_sessionoptions = &sessionoptions
+	endif
+else
+	filetype plugin indent on
 	if has('vim_starting')
-		set background=dark
-		autocmd vimrc ColorScheme      *
-			\ : highlight!       TabSideBar      guifg=#76787b guibg=NONE    gui=NONE           cterm=NONE
-			\ | highlight!       TabSideBarFill  guifg=#1a1a1a guibg=NONE    gui=NONE           cterm=NONE
-			\ | highlight!       TabSideBarSel   guifg=#22863a guibg=NONE    gui=NONE           cterm=NONE
-			\ | highlight!       Comment                                     gui=NONE           cterm=NONE
-			\ | highlight!       CursorIM        guifg=NONE    guibg=#aa0000
-			\ | highlight!       SpecialKey      guifg=#383c44
-			\ | highlight!       Pmenu           guifg=#dcdfe4 guibg=#313640
-			\ | highlight!       LineNr                        guibg=#313640
-		colorscheme onehalfdark
+		syntax enable
+		if has('tabsidebar')
+			highlight!       TabSideBar                    guibg=NONE    gui=NONE           cterm=NONE
+			highlight!       TabSideBarFill                guibg=NONE    gui=NONE           cterm=NONE
+			highlight!       TabSideBarSel                 guibg=NONE    gui=NONE           cterm=NONE
+		endif
 	endif
 endif
-
-if s:is_installed('vim-operator-replace')
-	nmap     <silent>s           <Plug>(operator-replace)
-endif
-
-if s:is_installed('restart.vim')
-	let g:restart_sessionoptions = &sessionoptions
-endif
-
-" Emacs key mappings
-if has('win32') && (&shell =~# '\<cmd\.exe$')
-	tnoremap <silent><C-p>       <up>
-	tnoremap <silent><C-n>       <down>
-	tnoremap <silent><C-b>       <left>
-	tnoremap <silent><C-f>       <right>
-	tnoremap <silent><C-e>       <end>
-	tnoremap <silent><C-a>       <home>
-	tnoremap <silent><C-u>       <esc>
-endif
-cnoremap         <C-b>           <left>
-cnoremap         <C-f>           <right>
-cnoremap         <C-e>           <end>
-cnoremap         <C-a>           <home>
-
-" Escape from Terminal mode.
-if has('nvim')
-	tnoremap <silent><C-w>N      <C-\><C-n>
-endif
-
-" Can't use <S-space> at :terminal
-" https://github.com/vim/vim/issues/6040
-tnoremap <silent><S-space>       <space>
-
-" Move the next/previous tabpage.
-if s:vimpatch_cmdtag
-	tnoremap <silent>gt          <Cmd>tabnext<cr>
-	tnoremap <silent>gT          <Cmd>tabprevious<cr>
-endif
-
-" Move the next/previous error in quickfix.
-nnoremap <silent><C-j>           :<C-u>cnext<cr>
-nnoremap <silent><C-k>           :<C-u>cprevious<cr>
-
-" Smart space on wildmenu
-cnoremap   <expr><space>         (wildmenumode() && (getcmdline() =~# '[\/]$')) ? '<space><bs>' : '<space>'
-
-call vimrc#snippet#clear('vim')
-call vimrc#snippet#add('vim', '\<fu\%[nction\]', "function! () abort\<cr>endfunction\<up>\<left>")
-call vimrc#snippet#add('vim', '\<au\%[group\]', "augroup \<cr>autocmd!\<cr>augroup END\<up>\<up>")
-call vimrc#snippet#add('vim', '\<if', "if \<cr>endif\<up>")
-call vimrc#snippet#add('vim', '\<wh\%[ile\]', "while \<cr>endwhile\<up>")
-
-inoremap   <expr><C-f>           vimrc#snippet#expand()
 
 if !has('vim_starting')
 	" Check whether echo-messages are not disappeared when .vimrc is read.
