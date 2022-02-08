@@ -10,6 +10,8 @@ scriptencoding utf-8
 let s:vimpatch_cmdtag = has('patch-8.2.1978') || has('nvim')
 " https://github.com/vim/vim/commit/aaad995f8384a77a64efba6846c9c4ac99de0953
 let s:vimpatch_unsigned = has('patch-8.2.0860') || has('nvim')
+" https://github.com/vim/vim/commit/3908ef5017a6b4425727013588f72cc7343199b9
+let s:vimpatch_cmdlinepum = has('patch-8.2.4325') || has('nvim')
 
 let $MYVIMRC = resolve($MYVIMRC)
 let $VIMRC_ROOT = expand('<sfile>:h')
@@ -81,6 +83,10 @@ set tabstop=4
 set tags=./tags;
 set updatetime=100
 set wildmenu
+
+if s:vimpatch_cmdlinepum
+	set wildoptions=pum
+endif
 
 if s:vimpatch_unsigned
 	set nrformats-=octal
