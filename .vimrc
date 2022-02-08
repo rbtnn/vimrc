@@ -10,8 +10,6 @@ scriptencoding utf-8
 let s:vimpatch_cmdtag = has('patch-8.2.1978') || has('nvim')
 " https://github.com/vim/vim/commit/aaad995f8384a77a64efba6846c9c4ac99de0953
 let s:vimpatch_unsigned = has('patch-8.2.0860') || has('nvim')
-let g:vim_indent_cont = &g:shiftwidth
-let &cedit = "\<C-q>"
 
 let $MYVIMRC = resolve($MYVIMRC)
 let $VIMRC_ROOT = expand('<sfile>:h')
@@ -146,6 +144,9 @@ if has('vim_starting') && has('termguicolors') && !has('gui_running') && (has('w
 	silent! set termguicolors
 endif
 
+let &cedit = "\<C-q>"
+let g:vim_indent_cont = &g:shiftwidth
+
 set runtimepath=$VIMRUNTIME,$VIMRC_DEV
 set packpath=
 
@@ -218,20 +219,19 @@ if filereadable(s:plugvim_path) && (get(readfile(s:plugvim_path, '', 1), 0, '') 
 	let g:plug_url_format = 'https://github.com/%s.git'
 	call plug#begin($VIMRC_PACKSTART)
 
+	call plug#('cocopon/vaffle.vim')
+	call plug#('bluz71/vim-moonfly-colors')
 	call plug#('itchyny/lightline.vim')
 	call plug#('kana/vim-operator-replace')
 	call plug#('kana/vim-operator-user')
 	call plug#('kana/vim-textobj-user')
-	call plug#('cocopon/vaffle.vim')
 	call plug#('rbtnn/vim-ambiwidth')
 	call plug#('rbtnn/vim-gloaded')
 	call plug#('rbtnn/vim-mrw')
-	call plug#('rbtnn/vim-qfpopup')
 	call plug#('rbtnn/vim-textobj-string')
 	call plug#('rbtnn/vim-vimscript_indentexpr')
 	call plug#('rbtnn/vim-vimscript_lasterror')
 	call plug#('rbtnn/vim-vimscript_tagfunc')
-	call plug#('sonph/onehalf', { 'rtp': 'vim/', })
 	call plug#('thinca/vim-qfreplace')
 
 	if !has('nvim') && has('win32')
@@ -252,34 +252,28 @@ if filereadable(s:plugvim_path) && (get(readfile(s:plugvim_path, '', 1), 0, '') 
 		nnoremap <silent><space>f       :<C-u>execute 'Vaffle ' .. (filereadable(expand('%')) ? '%:h' : '.')<cr>
 	endif
 
-	if s:is_installed('vim-qfpopup')
-		autocmd vimrc VimResized         * :let g:qfpopup_width = &columns * 2 / 5
-	endif
-
 	if s:is_installed('vim-mrw')
 		nnoremap <silent><space>s       :<C-u>MRW<cr>
 	endif
 
 	if s:is_installed('lightline.vim')
 		let g:lightline = {}
-		let g:lightline['colorscheme'] = 'onehalfdark'
+		let g:lightline['colorscheme'] = 'moonfly'
 		let g:lightline['enable'] = { 'statusline': 1, 'tabline': 0, }
 		let g:lightline['separator'] = { 'left': nr2char(0xe0b0), 'right': nr2char(0xe0b2), }
 	endif
 
-	if s:is_installed('onehalf')
+	if s:is_installed('vim-moonfly-colors')
 		if has('vim_starting')
 			set background=dark
 			autocmd vimrc ColorScheme      *
 				\ : highlight!       TabSideBar      guifg=#76787b guibg=NONE    gui=NONE           cterm=NONE
 				\ | highlight!       TabSideBarFill  guifg=#1a1a1a guibg=NONE    gui=NONE           cterm=NONE
 				\ | highlight!       TabSideBarSel   guifg=#22863a guibg=NONE    gui=NONE           cterm=NONE
-				\ | highlight!       Comment                                     gui=NONE           cterm=NONE
-				\ | highlight!       CursorIM        guifg=NONE    guibg=#aa0000
-				\ | highlight!       SpecialKey      guifg=#383c44
-				\ | highlight!       Pmenu           guifg=#dcdfe4 guibg=#313640
-				\ | highlight!       LineNr                        guibg=#313640
-			colorscheme onehalfdark
+				\ | highlight!       Comment         guifg=#313131               gui=NONE           cterm=NONE
+				\ | highlight!       CursorIM        guifg=NONE    guibg=#ff0000
+				\ | highlight!       SpecialKey      guifg=#080c14
+			colorscheme moonfly
 		endif
 	endif
 
