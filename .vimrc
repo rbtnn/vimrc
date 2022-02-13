@@ -34,7 +34,7 @@ augroup vimrc
 	autocmd FileType     help :setlocal colorcolumn=78
 augroup END
 
-language message C
+language messages C
 set winaltkeys=yes
 set guioptions=mM
 set mouse=a
@@ -176,7 +176,9 @@ if has('nvim')
 	tnoremap <silent><C-w>N          <C-\><C-n>
 endif
 
-nnoremap             <space>g        :<C-u>GitGrep<space>
+nnoremap         <space>g        :<C-u>GitGrep<space>
+nnoremap <silent><space>d        :<C-u>GitDiff<cr>
+nnoremap         <space>r        :<C-u>GitGotoRootDir<cr>
 
 " Emacs key mappings
 if has('win32') && (&shell =~# '\<cmd\.exe$')
@@ -194,9 +196,6 @@ cnoremap         <C-e>               <end>
 cnoremap         <C-a>               <home>
 
 if s:vimpatch_cmdtag
-	nnoremap <silent><space>d        <Cmd>GitDiff<cr>
-	nnoremap         <space>r        <Cmd>GitGotoRootDir<cr>
-
 	if has('nvim')
 		nnoremap <silent><space>t    <Cmd>tabnew \| execute 'terminal' \| startinsert<cr>
 	else
@@ -278,7 +277,7 @@ if filereadable(s:plugvim_path) && (get(readfile(s:plugvim_path, '', 1), 0, '') 
 				\ | highlight!       TabSideBarSel   guifg=#22863a guibg=NONE    gui=NONE           cterm=NONE
 				\ | highlight!       Comment         guifg=#313131               gui=NONE           cterm=NONE
 				\ | highlight!       CursorIM        guifg=NONE    guibg=#ff0000
-				\ | highlight!       SpecialKey      guifg=#080c14
+				\ | highlight!       SpecialKey      guifg=#1a1a1a
 			colorscheme moonfly
 		endif
 	endif
