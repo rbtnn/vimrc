@@ -1,54 +1,59 @@
 
-let s:base_cmd = 'git -c credential.helper= '
-
-function! pack#sync(pack_dir, xs) abort
-	if !isdirectory(expand(a:pack_dir))
-		call mkdir(expand(a:pack_dir), 'p')
-	endif
+function! pack#sync(pack_dir, d, ...) abort
+	let opts = 0 < a:0 ? a:1 : {}
+	let base_cmd = get(opts, 'base_cmd', 'git -c credential.helper= ')
 	let params = []
-	for x in (type([]) == type(a:xs)) ? a:xs : [(a:xs)]
-		let plugin_dir = expand(a:pack_dir .. '/' .. split(x, '/')[1])
-		if isdirectory(plugin_dir)
-			let params += [[
-				\ x,
-				\ printf('%s fetch', s:base_cmd),
-				\ plugin_dir,
-				\ has('nvim') ? { 'lines': [] } : tempname(),
-				\ v:null,
-				\ ]]
-		else
-			let params += [[
-				\ x,
-				\ printf('%s clone --origin origin --depth 1 https://github.com/%s.git', s:base_cmd, x),
-				\ expand(a:pack_dir),
-				\ has('nvim') ? { 'lines': [] } : tempname(),
-				\ v:null,
-				\ ]]
+	for username in keys(a:d)
+		let pack_dir = expand(join([a:pack_dir, 'pack', username, 'start'], '/'))
+		if !isdirectory(pack_dir)
+			call mkdir(pack_dir, 'p')
 		endif
+		for plugin_name in a:d[username]
+			let plugin_dir = pack_dir .. '/' .. plugin_name
+			if isdirectory(plugin_dir)
+				let params += [{
+					\   'name': printf('%s/%s', username, plugin_name),
+					\   'cmd': printf('%s fetch', base_cmd),
+					\   'cwd': plugin_dir,
+					\   'arg': has('nvim') ? { 'lines': [] } : tempname(),
+					\   'job': v:null,
+					\ }]
+			else
+				let params += [{
+					\   'name': printf('%s/%s', username, plugin_name),
+					\   'cmd': printf(
+					\     '%s clone --origin origin --depth 1 https://github.com/%s.git', base_cmd, printf('%s/%s', username, plugin_name)
+					\   ),
+					\   'cwd': pack_dir,
+					\   'arg': has('nvim') ? { 'lines': [] } : tempname(),
+					\   'job': v:null,
+					\ }]
+			endif
+		endfor
 	endfor
 	if has('nvim')
 		for param in params
-			let param[4] = jobstart(param[1], {
-				\ 'cwd': param[2],
-				\ 'on_stdout': function('s:system_onevent', [param[3]]),
-				\ 'on_stderr': function('s:system_onevent', [param[3]]),
+			let param['job'] = jobstart(param['cmd'], {
+				\ 'cwd': param['cwd'],
+				\ 'on_stdout': function('s:system_onevent', [param['arg']]),
+				\ 'on_stderr': function('s:system_onevent', [param['arg']]),
 				\ })
 		endfor
 		let n = 0
 		for param in params
 			let n += 1
 			echohl Title
-			echomsg printf('%3d/%d. %s', n, len(params), param[0])
+			echomsg printf('%3d/%d. %s', n, len(params), param['name'])
 			echohl None
-			call jobwait([param[4]])
-			echomsg trim(join(param[3]['lines'], "\n"))
+			call jobwait([param['job']])
+			echomsg trim(join(param['arg']['lines'], "\n"))
 		endfor
 	else
 		for param in params
-			let param[4] = job_start(param[1], {
-				\ 'cwd': param[2],
+			let param['job'] = job_start(param['cmd'], {
+				\ 'cwd': param['cwd'],
 				\ 'out_io': 'file',
-				\ 'out_name': param[3],
+				\ 'out_name': param['arg'],
 				\ 'err_io': 'out',
 				\ })
 		endfor
@@ -56,13 +61,13 @@ function! pack#sync(pack_dir, xs) abort
 		for param in params
 			let n += 1
 			echohl Title
-			echomsg printf('%3d/%d. %s', n, len(params), param[0])
+			echomsg printf('%3d/%d. %s', n, len(params), param['name'])
 			echohl None
-			while 'run' == job_status(param[4])
+			while 'run' == job_status(param['job'])
 			endwhile
-			if filereadable(param[3])
-				echomsg join(readfile(param[3]), "\n")
-				call delete(param[3])
+			if filereadable(param['arg'])
+				echomsg join(readfile(param['arg']), "\n")
+				call delete(param['arg'])
 			endif
 		endfor
 	endif

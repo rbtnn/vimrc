@@ -149,23 +149,27 @@ endif
 let &cedit = "\<C-q>"
 let g:vim_indent_cont = &g:shiftwidth
 
-command -nargs=0 PackSync :call pack#sync('$VIMRC_VIM/pack/my/start', [
-	\ 'bluz71/vim-moonfly-colors',
-	\ 'cocopon/vaffle.vim',
-	\ 'itchyny/lightline.vim',
-	\ 'kana/vim-operator-replace',
-	\ 'kana/vim-operator-user',
-	\ 'kana/vim-textobj-user',
-	\ 'rbtnn/vim-ambiwidth',
-	\ 'rbtnn/vim-gloaded',
-	\ 'rbtnn/vim-mrw',
-	\ 'rbtnn/vim-textobj-string',
-	\ 'rbtnn/vim-vimscript_indentexpr',
-	\ 'rbtnn/vim-vimscript_lasterror',
-	\ 'rbtnn/vim-vimscript_tagfunc',
-	\ 'thinca/vim-qfreplace',
-	\ 'tyru/restart.vim',
-	\ ])
+command -nargs=0 PackSync :call pack#sync($VIMRC_VIM, {
+	\ 'bluz71': ['vim-moonfly-colors'],
+	\ 'cocopon': ['vaffle.vim'],
+	\ 'itchyny': ['lightline.vim'],
+	\ 'kana': [
+	\   'vim-operator-replace',
+	\   'vim-operator-user',
+	\   'vim-textobj-user',
+	\ ],
+	\ 'rbtnn': [
+	\   'vim-ambiwidth',
+	\   'vim-gloaded',
+	\   'vim-mrw',
+	\   'vim-textobj-string',
+	\   'vim-vimscript_indentexpr',
+	\   'vim-vimscript_lasterror',
+	\   'vim-vimscript_tagfunc',
+	\ ],
+	\ 'thinca': ['vim-qfreplace'],
+	\ 'tyru': ['restart.vim'],
+	\ })
 
 if has('vim_starting')
 	set packpath=$VIMRC_VIM
@@ -224,21 +228,21 @@ if s:vimpatch_cmdtag
 	nnoremap <silent><C-p>           <Cmd>cprevious<cr>
 endif
 
-if isdirectory(expand('$VIMRC_VIM/pack/my/start/vim-gloaded'))
-	source $VIMRC_VIM/pack/my/start/vim-gloaded/plugin/gloaded.vim
+if isdirectory(expand('$VIMRC_VIM/pack/rbtnn/start/vim-gloaded'))
+	source $VIMRC_VIM/pack/rbtnn/start/vim-gloaded/plugin/gloaded.vim
 endif
 
-if isdirectory(expand('$VIMRC_VIM/pack/my/start/vaffle.vim'))
+if isdirectory(expand('$VIMRC_VIM/pack/cocopon/start/vaffle.vim'))
 	let g:vaffle_show_hidden_files = 1
 	nnoremap <silent><space>f       :<C-u>execute 'Vaffle ' .. (filereadable(expand('%')) ? '%:h' : '.')<cr>
 endif
 
-if isdirectory(expand('$VIMRC_VIM/pack/my/start/vim-mrw'))
+if isdirectory(expand('$VIMRC_VIM/pack/rbtnn/start/vim-mrw'))
 	nnoremap <silent><space>s       :<C-u>MRW<cr>
 endif
 
-if isdirectory(expand('$VIMRC_VIM/pack/my/start/vim-moonfly-colors'))
-	if isdirectory(expand('$VIMRC_VIM/pack/my/start/lightline.vim'))
+if isdirectory(expand('$VIMRC_VIM/pack/bluz71/start/vim-moonfly-colors'))
+	if isdirectory(expand('$VIMRC_VIM/pack/itchyny/start/lightline.vim'))
 		let g:lightline = {}
 		let g:lightline['colorscheme'] = 'moonfly'
 		let g:lightline['enable'] = { 'statusline': 1, 'tabline': 0, }
@@ -263,11 +267,11 @@ else
 	endif
 endif
 
-if isdirectory(expand('$VIMRC_VIM/pack/my/start/vim-operator-replace'))
+if isdirectory(expand('$VIMRC_VIM/pack/kana/start/vim-operator-replace'))
 	nmap     <silent>s           <Plug>(operator-replace)
 endif
 
-if isdirectory(expand('$VIMRC_VIM/pack/my/start/restart.vim'))
+if isdirectory(expand('$VIMRC_VIM/pack/tyru/start/restart.vim'))
 	let g:restart_sessionoptions = &sessionoptions
 endif
 

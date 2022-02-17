@@ -36,5 +36,6 @@ endfunction
 
 function s:system_onevent(d, job, data, event) abort
 	let a:d['lines'] += a:data
+	sleep 10m
 endfunction
 
