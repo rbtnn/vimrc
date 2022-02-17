@@ -160,7 +160,9 @@ function! s:plugin_sync(username_and_pluginname) abort
 		let cwd = $VIMRC_PACKSTART
 		let msg = 'Installing'
 	endif
+	echohl Title
 	echo printf('[%s] %s...', a:username_and_pluginname, msg)
+	echohl None
 	echo join(vimrc#io#system(cmd, cwd), "\n")
 endfunction
 
@@ -258,14 +260,13 @@ if s:plugin_installed('vim-mrw')
 	nnoremap <silent><space>s       :<C-u>MRW<cr>
 endif
 
-if s:plugin_installed('lightline.vim')
-	let g:lightline = {}
-	let g:lightline['colorscheme'] = 'moonfly'
-	let g:lightline['enable'] = { 'statusline': 1, 'tabline': 0, }
-	let g:lightline['separator'] = { 'left': nr2char(0xe0b0), 'right': nr2char(0xe0b2), }
-endif
-
 if s:plugin_installed('vim-moonfly-colors')
+	if s:plugin_installed('lightline.vim')
+		let g:lightline = {}
+		let g:lightline['colorscheme'] = 'moonfly'
+		let g:lightline['enable'] = { 'statusline': 1, 'tabline': 0, }
+		let g:lightline['separator'] = { 'left': nr2char(0xe0b0), 'right': nr2char(0xe0b2), }
+	endif
 	if has('vim_starting')
 		set background=dark
 		autocmd vimrc ColorScheme      *
