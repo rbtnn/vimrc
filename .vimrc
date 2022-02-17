@@ -14,8 +14,7 @@ let s:vimpatch_unsigned = has('patch-8.2.0860') || has('nvim')
 let s:vimpatch_cmdlinepum = has('patch-8.2.4325') || has('nvim')
 
 let $MYVIMRC = resolve($MYVIMRC)
-let $VIMRC_ROOT = expand('<sfile>:h')
-let $VIMRC_VIM = expand('$VIMRC_ROOT/vim')
+let $VIMRC_VIM = expand(expand('<sfile>:h') .. '/vim')
 let $VIMRC_DEV = expand('$VIMRC_VIM/dev')
 let $VIMRC_PACKSTART = expand('$VIMRC_VIM/pack/my/start')
 
@@ -24,9 +23,7 @@ augroup vimrc
 	" Delete unused commands, because it's an obstacle on cmdline-completion.
 	autocmd CmdlineEnter     *
 		\ : for s:cmdname in [
-		\		'MANPAGER', 'Man', 'Tutor', 'VimFoldh', 'TextobjStringDefaultKeyMappings',
-		\		'Plug', 'PlugDiff', 'PlugInstall', 'PlugSnapshot',
-		\		'PlugStatus', 'PlugUpgrade', 'UpdateRemotePlugins',
+		\		'MANPAGER', 'Man', 'Tutor', 'VimFoldh', 'TextobjStringDefaultKeyMappings', 'UpdateRemotePlugins',
 		\		]
 		\ | 	execute printf('silent! delcommand %s', s:cmdname)
 		\ | endfor
@@ -153,16 +150,51 @@ endif
 let &cedit = "\<C-q>"
 let g:vim_indent_cont = &g:shiftwidth
 
-set runtimepath=$VIMRUNTIME,$VIMRC_DEV
-set packpath=
+function! s:plugin_sync(username_and_pluginname) abort
+	let base_cmd = 'git -c credential.helper= '
+	let cmd = printf('%s fetch', base_cmd)
+	let cwd = expand($VIMRC_PACKSTART .. '/' .. split(a:username_and_pluginname, '/')[1])
+	let msg = 'Updating'
+	if !isdirectory(cwd)
+		let cmd = printf('%s clone --origin origin --depth 1 https://github.com/%s.git', base_cmd, a:username_and_pluginname)
+		let cwd = $VIMRC_PACKSTART
+		let msg = 'Installing'
+	endif
+	echo printf('[%s] %s...', a:username_and_pluginname, msg)
+	echo join(vimrc#io#system(cmd, cwd), "\n")
+endfunction
 
-call vimrc#snippet#clear('vim')
-call vimrc#snippet#add('vim', '\<fu\%[nction\]', "function! () abort\<cr>endfunction\<up>\<left>")
-call vimrc#snippet#add('vim', '\<au\%[group\]', "augroup \<cr>autocmd!\<cr>augroup END\<up>\<up>")
-call vimrc#snippet#add('vim', '\<if', "if \<cr>endif\<up>")
-call vimrc#snippet#add('vim', '\<wh\%[ile\]', "while \<cr>endwhile\<up>")
+function! s:plugin_installed(name) abort
+	return isdirectory($VIMRC_PACKSTART .. '/' .. a:name)
+endfunction
 
-inoremap   <expr><C-f>               vimrc#snippet#expand()
+function! s:plugin_setup() abort
+	call s:plugin_sync('bluz71/vim-moonfly-colors')
+	call s:plugin_sync('cocopon/vaffle.vim')
+	call s:plugin_sync('itchyny/lightline.vim')
+	call s:plugin_sync('kana/vim-operator-replace')
+	call s:plugin_sync('kana/vim-operator-user')
+	call s:plugin_sync('kana/vim-textobj-user')
+	call s:plugin_sync('rbtnn/vim-ambiwidth')
+	call s:plugin_sync('rbtnn/vim-gloaded')
+	call s:plugin_sync('rbtnn/vim-mrw')
+	call s:plugin_sync('rbtnn/vim-textobj-string')
+	call s:plugin_sync('rbtnn/vim-vimscript_indentexpr')
+	call s:plugin_sync('rbtnn/vim-vimscript_lasterror')
+	call s:plugin_sync('rbtnn/vim-vimscript_tagfunc')
+	call s:plugin_sync('thinca/vim-qfreplace')
+	call s:plugin_sync('tyru/restart.vim')
+endfunction
+
+command -nargs=0 PluginSync :call <SID>plugin_setup()
+
+if has('vim_starting')
+	set packpath=$VIMRC_VIM
+	set runtimepath=$VIMRUNTIME,$VIMRC_DEV
+	silent! source ~/.vimrc.local
+	filetype plugin indent on
+	syntax enable
+endif
 
 " Can't use <S-space> at :terminal
 " https://github.com/vim/vim/issues/6040
@@ -213,92 +245,52 @@ if s:vimpatch_cmdtag
 	nnoremap <silent><C-p>           <Cmd>cprevious<cr>
 endif
 
-let s:plugvim_path = expand('$VIMRC_DEV/autoload/plug.vim')
-
-if !filereadable(s:plugvim_path) && executable('curl') && has('vim_starting')
-	silent! call mkdir($VIMRC_PACKSTART, 'p')
-	call system(printf('curl -o "%s" https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim', s:plugvim_path))
+if s:plugin_installed('vim-gloaded')
+	source $VIMRC_PACKSTART/vim-gloaded/plugin/gloaded.vim
 endif
 
-if filereadable(s:plugvim_path) && (get(readfile(s:plugvim_path, '', 1), 0, '') != '404: Not Found')
-	let g:plug_url_format = 'https://github.com/%s.git'
-	call plug#begin($VIMRC_PACKSTART)
+if s:plugin_installed('vaffle.vim')
+	let g:vaffle_show_hidden_files = 1
+	nnoremap <silent><space>f       :<C-u>execute 'Vaffle ' .. (filereadable(expand('%')) ? '%:h' : '.')<cr>
+endif
 
-	call plug#('cocopon/vaffle.vim')
-	call plug#('bluz71/vim-moonfly-colors')
-	call plug#('itchyny/lightline.vim')
-	call plug#('kana/vim-operator-replace')
-	call plug#('kana/vim-operator-user')
-	call plug#('kana/vim-textobj-user')
-	call plug#('rbtnn/vim-ambiwidth')
-	call plug#('rbtnn/vim-gloaded')
-	call plug#('rbtnn/vim-mrw')
-	call plug#('rbtnn/vim-textobj-string')
-	call plug#('rbtnn/vim-vimscript_indentexpr')
-	call plug#('rbtnn/vim-vimscript_lasterror')
-	call plug#('rbtnn/vim-vimscript_tagfunc')
-	call plug#('thinca/vim-qfreplace')
+if s:plugin_installed('vim-mrw')
+	nnoremap <silent><space>s       :<C-u>MRW<cr>
+endif
 
-	if !has('nvim') && has('win32')
-		call plug#('tyru/restart.vim')
-	endif
-	silent! source ~/.vimrc.local
-	call plug#end()
-	function! s:is_installed(name) abort
-		return isdirectory($VIMRC_PACKSTART .. '/' .. a:name) && (-1 != index(keys(g:plugs), a:name))
-	endfunction
+if s:plugin_installed('lightline.vim')
+	let g:lightline = {}
+	let g:lightline['colorscheme'] = 'moonfly'
+	let g:lightline['enable'] = { 'statusline': 1, 'tabline': 0, }
+	let g:lightline['separator'] = { 'left': nr2char(0xe0b0), 'right': nr2char(0xe0b2), }
+endif
 
-	if s:is_installed('vim-gloaded')
-		source $VIMRC_PACKSTART/vim-gloaded/plugin/gloaded.vim
-	endif
-
-	if s:is_installed('vaffle.vim')
-		let g:vaffle_show_hidden_files = 1
-		nnoremap <silent><space>f       :<C-u>execute 'Vaffle ' .. (filereadable(expand('%')) ? '%:h' : '.')<cr>
-	endif
-
-	if s:is_installed('vim-mrw')
-		nnoremap <silent><space>s       :<C-u>MRW<cr>
-	endif
-
-	if s:is_installed('lightline.vim')
-		let g:lightline = {}
-		let g:lightline['colorscheme'] = 'moonfly'
-		let g:lightline['enable'] = { 'statusline': 1, 'tabline': 0, }
-		let g:lightline['separator'] = { 'left': nr2char(0xe0b0), 'right': nr2char(0xe0b2), }
-	endif
-
-	if s:is_installed('vim-moonfly-colors')
-		if has('vim_starting')
-			set background=dark
-			autocmd vimrc ColorScheme      *
-				\ : highlight!       TabSideBar      guifg=#76787b guibg=NONE    gui=NONE           cterm=NONE
-				\ | highlight!       TabSideBarFill  guifg=#1a1a1a guibg=NONE    gui=NONE           cterm=NONE
-				\ | highlight!       TabSideBarSel   guifg=#22863a guibg=NONE    gui=NONE           cterm=NONE
-				\ | highlight!       Comment         guifg=#313131               gui=NONE           cterm=NONE
-				\ | highlight!       CursorIM        guifg=NONE    guibg=#ff0000
-				\ | highlight!       SpecialKey      guifg=#1a1a1a
-			colorscheme moonfly
-		endif
-	endif
-
-	if s:is_installed('vim-operator-replace')
-		nmap     <silent>s           <Plug>(operator-replace)
-	endif
-
-	if s:is_installed('restart.vim')
-		let g:restart_sessionoptions = &sessionoptions
+if s:plugin_installed('vim-moonfly-colors')
+	if has('vim_starting')
+		set background=dark
+		autocmd vimrc ColorScheme      *
+			\ : highlight!       TabSideBar      guifg=#76787b guibg=NONE    gui=NONE           cterm=NONE
+			\ | highlight!       TabSideBarFill  guifg=#1a1a1a guibg=NONE    gui=NONE           cterm=NONE
+			\ | highlight!       TabSideBarSel   guifg=#22863a guibg=NONE    gui=NONE           cterm=NONE
+			\ | highlight!       Comment         guifg=#313131               gui=NONE           cterm=NONE
+			\ | highlight!       CursorIM        guifg=NONE    guibg=#ff0000
+			\ | highlight!       SpecialKey      guifg=#1a1a1a
+		colorscheme moonfly
 	endif
 else
-	filetype plugin indent on
-	if has('vim_starting')
-		syntax enable
-		if has('tabsidebar')
-			highlight!       TabSideBar                    guibg=NONE    gui=NONE           cterm=NONE
-			highlight!       TabSideBarFill                guibg=NONE    gui=NONE           cterm=NONE
-			highlight!       TabSideBarSel                 guibg=NONE    gui=NONE           cterm=NONE
-		endif
+	if has('tabsidebar')
+		highlight!       TabSideBar                    guibg=NONE    gui=NONE           cterm=NONE
+		highlight!       TabSideBarFill                guibg=NONE    gui=NONE           cterm=NONE
+		highlight!       TabSideBarSel                 guibg=NONE    gui=NONE           cterm=NONE
 	endif
+endif
+
+if s:plugin_installed('vim-operator-replace')
+	nmap     <silent>s           <Plug>(operator-replace)
+endif
+
+if s:plugin_installed('restart.vim')
+	let g:restart_sessionoptions = &sessionoptions
 endif
 
 if !has('vim_starting')
@@ -306,14 +298,3 @@ if !has('vim_starting')
 	echo '.vimrc has just read!'
 endif
 
-finish
-"
-" termopen.vim
-" https://gist.github.com/rbtnn/bf3d58f99d95da9d9c0d2dcd51d30e47
-" toggle_terminal.vim
-" https://gist.github.com/rbtnn/e71d36b462ac89d4dd029f4f42b42666
-" ddc_and_pum.vim
-" https://gist.github.com/rbtnn/4373572564964a905d1c162ed3931497
-" airline and lightline arrow settings
-" https://gist.github.com/rbtnn/41176651514d48178842f807ec8cac72
-"
