@@ -1,20 +1,20 @@
 
 let s:snippets = get(s:, 'snippets', {})
 
-function! vimrc#snippet#clear(filetype) abort
+function! snippet#clear(filetype) abort
 	if !empty(a:filetype)
 		let s:snippets[a:filetype] = {}
 	endif
 endfunction
 
-function! vimrc#snippet#add(filetype, trigger, input_text) abort
+function! snippet#add(filetype, trigger, input_text) abort
 	if !empty(a:filetype) && !empty(a:trigger)
 		let s:snippets[a:filetype] = get(s:snippets, a:filetype, {})
 		let s:snippets[a:filetype][a:trigger] = a:input_text
 	endif
 endfunction
 
-function! vimrc#snippet#expand() abort
+function! snippet#expand() abort
 	if has_key(s:snippets, &filetype)
 		let word = s:inputting_text()
 		for trigger in keys(s:snippets[&filetype])

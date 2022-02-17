@@ -14,7 +14,7 @@ let s:this_script_id = expand('<SID>')
 let s:recently_args = get(s:, 'recently_args', [])
 
 function! s:gitdiffnumstat_open(q_bang, q_args) abort
-	let rootdir = vimrc#git#get_rootdir('.')
+	let rootdir = git#get_rootdir('.')
 	if empty(rootdir)
 		call s:errormsg('current directory is not a git repository.')
 	else
@@ -273,7 +273,7 @@ function! s:errormsg(text) abort
 endfunction
 
 function! s:system_for_gitdiff(cmd, cwd) abort
-	let lines = vimrc#io#system(a:cmd, a:cwd)
+	let lines = io#system(a:cmd, a:cwd)
 	let enc_from = ''
 	for i in range(0, len(lines) - 1)
 		" The encoding of top 4 lines('diff -...', 'index ...', '--- a/...', '+++ b/...') is always utf-8.
@@ -283,8 +283,8 @@ function! s:system_for_gitdiff(cmd, cwd) abort
 			endif
 		else
 			if empty(enc_from)
-				if vimrc#encoding#contains_multichar(lines[i])
-					if vimrc#encoding#is_utf8(lines[i])
+				if encoding#contains_multichar(lines[i])
+					if encoding#is_utf8(lines[i])
 						let enc_from = 'utf-8'
 					else
 						let enc_from = 'shift_jis'
@@ -300,7 +300,7 @@ function! s:system_for_gitdiff(cmd, cwd) abort
 endfunction
 
 function! s:system_for_gitoutput(cmd, cwd) abort
-	let lines = vimrc#io#system(a:cmd, a:cwd)
+	let lines = io#system(a:cmd, a:cwd)
 	if 'utf-8' != &encoding
 		for i in range(0, len(lines) - 1)
 			let lines[i] = iconv(lines[i], 'utf-8', &encoding)

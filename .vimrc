@@ -16,7 +16,6 @@ let s:vimpatch_cmdlinepum = has('patch-8.2.4325') || has('nvim')
 let $MYVIMRC = resolve($MYVIMRC)
 let $VIMRC_VIM = expand(expand('<sfile>:h') .. '/vim')
 let $VIMRC_DEV = expand('$VIMRC_VIM/dev')
-let $VIMRC_PACKSTART = expand('$VIMRC_VIM/pack/my/start')
 
 augroup vimrc
 	autocmd!
@@ -114,13 +113,13 @@ if has('tabsidebar')
 	set notabsidebaralign
 	set notabsidebarwrap
 	set showtabsidebar=2
-	set tabsidebar=%!vimrc#tabpages#expr(v:true)
+	set tabsidebar=%!tabpages#expr(v:true)
 	set tabsidebarcolumns=20
 	set showtabline=0
 	set tabline&
 else
 	set showtabline=2
-	set tabline=%!vimrc#tabpages#expr(v:false)
+	set tabline=%!tabpages#expr(v:false)
 endif
 
 if has('nvim')
@@ -150,45 +149,23 @@ endif
 let &cedit = "\<C-q>"
 let g:vim_indent_cont = &g:shiftwidth
 
-function! s:plugin_sync(username_and_pluginname) abort
-	let base_cmd = 'git -c credential.helper= '
-	let cmd = printf('%s fetch', base_cmd)
-	let cwd = expand($VIMRC_PACKSTART .. '/' .. split(a:username_and_pluginname, '/')[1])
-	let msg = 'Updating'
-	if !isdirectory(cwd)
-		let cmd = printf('%s clone --origin origin --depth 1 https://github.com/%s.git', base_cmd, a:username_and_pluginname)
-		let cwd = $VIMRC_PACKSTART
-		let msg = 'Installing'
-	endif
-	echohl Title
-	echo printf('[%s] %s...', a:username_and_pluginname, msg)
-	echohl None
-	echo join(vimrc#io#system(cmd, cwd), "\n")
-endfunction
-
-function! s:plugin_installed(name) abort
-	return isdirectory($VIMRC_PACKSTART .. '/' .. a:name)
-endfunction
-
-function! s:plugin_setup() abort
-	call s:plugin_sync('bluz71/vim-moonfly-colors')
-	call s:plugin_sync('cocopon/vaffle.vim')
-	call s:plugin_sync('itchyny/lightline.vim')
-	call s:plugin_sync('kana/vim-operator-replace')
-	call s:plugin_sync('kana/vim-operator-user')
-	call s:plugin_sync('kana/vim-textobj-user')
-	call s:plugin_sync('rbtnn/vim-ambiwidth')
-	call s:plugin_sync('rbtnn/vim-gloaded')
-	call s:plugin_sync('rbtnn/vim-mrw')
-	call s:plugin_sync('rbtnn/vim-textobj-string')
-	call s:plugin_sync('rbtnn/vim-vimscript_indentexpr')
-	call s:plugin_sync('rbtnn/vim-vimscript_lasterror')
-	call s:plugin_sync('rbtnn/vim-vimscript_tagfunc')
-	call s:plugin_sync('thinca/vim-qfreplace')
-	call s:plugin_sync('tyru/restart.vim')
-endfunction
-
-command -nargs=0 PluginSync :call <SID>plugin_setup()
+command -nargs=0 PackSync :call pack#sync('$VIMRC_VIM/pack/my/start', [
+	\ 'bluz71/vim-moonfly-colors',
+	\ 'cocopon/vaffle.vim',
+	\ 'itchyny/lightline.vim',
+	\ 'kana/vim-operator-replace',
+	\ 'kana/vim-operator-user',
+	\ 'kana/vim-textobj-user',
+	\ 'rbtnn/vim-ambiwidth',
+	\ 'rbtnn/vim-gloaded',
+	\ 'rbtnn/vim-mrw',
+	\ 'rbtnn/vim-textobj-string',
+	\ 'rbtnn/vim-vimscript_indentexpr',
+	\ 'rbtnn/vim-vimscript_lasterror',
+	\ 'rbtnn/vim-vimscript_tagfunc',
+	\ 'thinca/vim-qfreplace',
+	\ 'tyru/restart.vim',
+	\ ])
 
 if has('vim_starting')
 	set packpath=$VIMRC_VIM
@@ -247,21 +224,21 @@ if s:vimpatch_cmdtag
 	nnoremap <silent><C-p>           <Cmd>cprevious<cr>
 endif
 
-if s:plugin_installed('vim-gloaded')
-	source $VIMRC_PACKSTART/vim-gloaded/plugin/gloaded.vim
+if isdirectory(expand('$VIMRC_VIM/pack/my/start/vim-gloaded'))
+	source $VIMRC_VIM/pack/my/start/vim-gloaded/plugin/gloaded.vim
 endif
 
-if s:plugin_installed('vaffle.vim')
+if isdirectory(expand('$VIMRC_VIM/pack/my/start/vaffle.vim'))
 	let g:vaffle_show_hidden_files = 1
 	nnoremap <silent><space>f       :<C-u>execute 'Vaffle ' .. (filereadable(expand('%')) ? '%:h' : '.')<cr>
 endif
 
-if s:plugin_installed('vim-mrw')
+if isdirectory(expand('$VIMRC_VIM/pack/my/start/vim-mrw'))
 	nnoremap <silent><space>s       :<C-u>MRW<cr>
 endif
 
-if s:plugin_installed('vim-moonfly-colors')
-	if s:plugin_installed('lightline.vim')
+if isdirectory(expand('$VIMRC_VIM/pack/my/start/vim-moonfly-colors'))
+	if isdirectory(expand('$VIMRC_VIM/pack/my/start/lightline.vim'))
 		let g:lightline = {}
 		let g:lightline['colorscheme'] = 'moonfly'
 		let g:lightline['enable'] = { 'statusline': 1, 'tabline': 0, }
@@ -286,11 +263,11 @@ else
 	endif
 endif
 
-if s:plugin_installed('vim-operator-replace')
+if isdirectory(expand('$VIMRC_VIM/pack/my/start/vim-operator-replace'))
 	nmap     <silent>s           <Plug>(operator-replace)
 endif
 
-if s:plugin_installed('restart.vim')
+if isdirectory(expand('$VIMRC_VIM/pack/my/start/restart.vim'))
 	let g:restart_sessionoptions = &sessionoptions
 endif
 

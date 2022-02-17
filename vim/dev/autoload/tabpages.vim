@@ -1,5 +1,5 @@
 
-function! vimrc#tabpages#expr(is_tabsidebar) abort
+function! tabpages#expr(is_tabsidebar) abort
 	try
 		let hl_lbl = a:is_tabsidebar ? '%#Label#' : ''
 		let hl_sel = a:is_tabsidebar ? '%#TabSideBarSel#' : '%#TabLineSel#'

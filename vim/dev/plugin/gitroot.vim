@@ -8,7 +8,7 @@ function! s:gitgoto_rootdir() abort
 	if filereadable(expand('%:p'))
 		let cwd = fnamemodify(expand('%:p'), ':h')
 	endif
-	let path = vimrc#git#get_rootdir(cwd)
+	let path = git#get_rootdir(cwd)
 	if !empty(path)
 		execute 'lcd' path
 		verbose pwd

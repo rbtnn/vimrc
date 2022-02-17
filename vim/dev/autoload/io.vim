@@ -1,5 +1,5 @@
 
-function vimrc#io#system(cmd, cwd) abort
+function io#system(cmd, cwd) abort
 	let lines = []
 	if has('nvim')
 		let job = jobstart(a:cmd, {
