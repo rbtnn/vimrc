@@ -1,66 +1,75 @@
 
-function! pack#sync(pack_dir, d, ...) abort
-	let opts = 0 < a:0 ? a:1 : {}
-	let params = s:make_params(a:pack_dir, a:d, opts)
-	call s:wait_and_echomsg(params)
-	call s:delete_unmanaged_plugins(a:pack_dir, a:d)
+function! pack#sync(pack_dir, start_d, ...) abort
+	let opt_d = 0 < a:0 ? a:1 : {}
+	let params = s:make_params(a:pack_dir, a:start_d, opt_d)
+	call s:start_jobs(params)
+	call s:wait_jobs(params)
+	call s:delete_unmanaged_plugins(a:pack_dir, a:start_d, opt_d)
 endfunction
 
-function! s:make_params(pack_dir, d, opts) abort
-	let base_cmd = get(a:opts, 'base_cmd', 'git -c credential.helper= ')
+function! s:make_params(pack_dir, start_d, opt_d) abort
+	let base_cmd = 'git -c credential.helper= '
 	let params = []
-	for username in keys(a:d)
-		let pack_dir = expand(join([a:pack_dir, 'pack', username, 'start'], '/'))
-		if !isdirectory(pack_dir)
-			call mkdir(pack_dir, 'p')
-		endif
-		for plugin_name in a:d[username]
-			let plugin_dir = pack_dir .. '/' .. plugin_name
-			if isdirectory(plugin_dir)
-				let params += [{
-					\   'name': printf('%s/%s', username, plugin_name),
-					\   'cmd': printf('%s fetch', base_cmd),
-					\   'cwd': plugin_dir,
-					\   'arg': has('nvim') ? { 'lines': [] } : tempname(),
-					\   'job': v:null,
-					\   'msg': 'Updating',
-					\ }]
-			else
-				let params += [{
-					\   'name': printf('%s/%s', username, plugin_name),
-					\   'cmd': printf(
-					\     '%s clone --origin origin --depth 1 https://github.com/%s.git', base_cmd, printf('%s/%s', username, plugin_name)
-					\   ),
-					\   'cwd': pack_dir,
-					\   'arg': has('nvim') ? { 'lines': [] } : tempname(),
-					\   'job': v:null,
-					\   'msg': 'Installing',
-					\ }]
+	for d in [a:start_d, a:opt_d]
+		let start_or_opt = (d == a:start_d ? 'start' : 'opt')
+		for username in keys(d)
+			let pack_dir = expand(join([a:pack_dir, 'pack', username, start_or_opt], '/'))
+			if !isdirectory(pack_dir)
+				call mkdir(pack_dir, 'p')
 			endif
+			for plugin_name in d[username]
+				let plugin_dir = pack_dir .. '/' .. plugin_name
+				if isdirectory(plugin_dir)
+					let params += [{
+						\   'name': printf('%s/%s', username, plugin_name),
+						\   'cmd': printf('%s fetch', base_cmd),
+						\   'cwd': plugin_dir,
+						\   'arg': has('nvim') ? { 'lines': [] } : tempname(),
+						\   'job': v:null,
+						\   'msg': 'Updating',
+						\   'running': v:true,
+						\ }]
+				else
+					let params += [{
+						\   'name': printf('%s/%s', username, plugin_name),
+						\   'cmd': printf(
+						\     '%s clone --origin origin --depth 1 https://github.com/%s.git', base_cmd, printf('%s/%s', username, plugin_name)
+						\   ),
+						\   'cwd': pack_dir,
+						\   'arg': has('nvim') ? { 'lines': [] } : tempname(),
+						\   'job': v:null,
+						\   'msg': 'Installing',
+						\   'running': v:true,
+						\ }]
+				endif
+			endfor
 		endfor
 	endfor
 	return params
 endfunction
 
-function! s:delete_unmanaged_plugins(pack_dir, d) abort
-	for x in split(globpath(join([a:pack_dir, 'pack', '*', 'start'], '/'), '*'), "\n")
-		let exists = v:false
-		for username in keys(a:d)
-			for plugin_name in a:d[username]
-				if x =~# '[\/]' .. username .. '[\/]start[\/]' .. plugin_name .. '$'
-					let exists = v:true
-					break
-				endif
+function! s:delete_unmanaged_plugins(pack_dir, start_d, opt_d) abort
+	for d in [a:start_d, a:opt_d]
+		let start_or_opt = (d == a:start_d ? 'start' : 'opt')
+		for x in split(globpath(join([a:pack_dir, 'pack', '*', start_or_opt], '/'), '*'), "\n")
+			let exists = v:false
+			for username in keys(d)
+				for plugin_name in d[username]
+					if x =~# '[\/]' .. username .. '[\/]' .. start_or_opt .. '[\/]' .. plugin_name .. '$'
+						let exists = v:true
+						break
+					endif
+				endfor
 			endfor
 		endfor
 		if !exists
 			call s:delete_carefull(a:pack_dir, x)
 		endif
-	endfor
-	for x in split(globpath(join([a:pack_dir, 'pack', '*'], '/'), 'start'), "\n")
-		if !len(readdir(x))
-			call s:delete_carefull(a:pack_dir, fnamemodify(x, ':h'))
-		endif
+		for x in split(globpath(join([a:pack_dir, 'pack', '*'], '/'), start_or_opt), "\n")
+			if !len(readdir(x))
+				call s:delete_carefull(a:pack_dir, x)
+			endif
+		endfor
 	endfor
 	for x in split(globpath(join([a:pack_dir, 'pack'], '/'), '*'), "\n")
 		if !len(readdir(x))
@@ -76,7 +85,7 @@ function! s:delete_carefull(pack_dir, path) abort
 	endif
 endfunction
 
-function! s:wait_and_echomsg(params) abort
+function! s:start_jobs(params) abort
 	if has('nvim')
 		for param in a:params
 			let param['job'] = jobstart(param['cmd'], {
@@ -84,17 +93,6 @@ function! s:wait_and_echomsg(params) abort
 				\ 'on_stdout': function('s:system_onevent', [param['arg']]),
 				\ 'on_stderr': function('s:system_onevent', [param['arg']]),
 				\ })
-		endfor
-		let n = 0
-		for param in a:params
-			let n += 1
-			call s:echomsg(param['msg'], param['name'])
-			call jobwait([param['job']])
-			for line in param['arg']['lines']
-				if !empty(trim(line))
-					echomsg '  ' .. line
-				endif
-			endfor
 		endfor
 	else
 		for param in a:params
@@ -105,22 +103,49 @@ function! s:wait_and_echomsg(params) abort
 				\ 'err_io': 'out',
 				\ })
 		endfor
-		let n = 0
+	endif
+endfunction
+
+function! s:wait_jobs(params) abort
+	let n = 0
+	while n < len(a:params)
 		for param in a:params
+			if !param['running']
+				continue
+			endif
+
+			if has('nvim')
+				if -1 == jobwait([param['job']], 0)[0]
+					continue
+				endif
+			else
+				if 'run' == job_status(param['job'])
+					continue
+				endif
+			endif
+
 			let n += 1
+			let param['running'] = v:false
 			call s:echomsg(param['msg'], param['name'])
-			while 'run' == job_status(param['job'])
-			endwhile
-			if filereadable(param['arg'])
-				for line in readfile(param['arg'])
+
+			if has('nvim')
+				for line in param['arg']['lines']
 					if !empty(trim(line))
 						echomsg '  ' .. line
 					endif
 				endfor
-				call delete(param['arg'])
+			else
+				if filereadable(param['arg'])
+					for line in readfile(param['arg'])
+						if !empty(trim(line))
+							echomsg '  ' .. line
+						endif
+					endfor
+					call delete(param['arg'])
+				endif
 			endif
 		endfor
-	endif
+	endwhile
 endfunction
 
 function s:system_onevent(d, job, data, event) abort
