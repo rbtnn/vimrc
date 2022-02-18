@@ -91,7 +91,9 @@ function! s:wait_and_echomsg(params) abort
 			call s:echomsg(param['msg'], param['name'])
 			call jobwait([param['job']])
 			for line in param['arg']['lines']
-				echomsg '  ' .. line
+				if !empty(trim(line))
+					echomsg '  ' .. line
+				endif
 			endfor
 		endfor
 	else
@@ -111,7 +113,9 @@ function! s:wait_and_echomsg(params) abort
 			endwhile
 			if filereadable(param['arg'])
 				for line in readfile(param['arg'])
-					echomsg '  ' .. line
+					if !empty(trim(line))
+						echomsg '  ' .. line
+					endif
 				endfor
 				call delete(param['arg'])
 			endif
