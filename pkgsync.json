@@ -1,0 +1,27 @@
+{
+    "packpath" : "~/vim",
+    "plugins" : {
+        "start" : {
+            "bluz71" : ["vim-moonfly-colors"],
+            "cocopon" : ["vaffle.vim"],
+            "itchyny" : ["lightline.vim"],
+            "kana" : [
+                "vim-operator-replace",
+                "vim-operator-user",
+                "vim-textobj-user"
+            ],
+            "rbtnn" : [
+                "vim-pkgsync",
+                "vim-ambiwidth",
+                "vim-gloaded",
+                "vim-mrw",
+                "vim-textobj-string",
+                "vim-vimscript_indentexpr",
+                "vim-vimscript_lasterror",
+                "vim-vimscript_tagfunc"
+            ],
+            "tyru" : ["restart.vim"],
+            "thinca" : ["vim-qfreplace"]
+        }
+    }
+}

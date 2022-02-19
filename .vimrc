@@ -149,28 +149,6 @@ endif
 let &cedit = "\<C-q>"
 let g:vim_indent_cont = &g:shiftwidth
 
-command -nargs=0 PackSync :call pack#sync($VIMRC_VIM, {
-	\ 'bluz71': ['vim-moonfly-colors'],
-	\ 'cocopon': ['vaffle.vim'],
-	\ 'itchyny': ['lightline.vim'],
-	\ 'kana': [
-	\   'vim-operator-replace',
-	\   'vim-operator-user',
-	\   'vim-textobj-user',
-	\ ],
-	\ 'rbtnn': [
-	\   'vim-ambiwidth',
-	\   'vim-gloaded',
-	\   'vim-mrw',
-	\   'vim-textobj-string',
-	\   'vim-vimscript_indentexpr',
-	\   'vim-vimscript_lasterror',
-	\   'vim-vimscript_tagfunc',
-	\ ],
-	\ 'thinca': ['vim-qfreplace'],
-	\ 'tyru': ['restart.vim'],
-	\ })
-
 if has('vim_starting')
 	set packpath=$VIMRC_VIM
 	set runtimepath=$VIMRUNTIME,$VIMRC_DEV
