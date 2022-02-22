@@ -1,5 +1,5 @@
 {
-    "packpath" : "~/vim",
+    "packpath" : "$VIMRC_VIM",
     "plugins" : {
         "start" : {
             "bluz71" : ["vim-moonfly-colors"],
@@ -9,6 +9,9 @@
                 "vim-operator-replace",
                 "vim-operator-user",
                 "vim-textobj-user"
+            ],
+            "mattn" : [
+                "vim-findroot"
             ],
             "rbtnn" : [
                 "vim-pkgsync",

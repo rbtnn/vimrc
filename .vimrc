@@ -21,9 +21,7 @@ augroup vimrc
 	autocmd!
 	" Delete unused commands, because it's an obstacle on cmdline-completion.
 	autocmd CmdlineEnter     *
-		\ : for s:cmdname in [
-		\		'MANPAGER', 'Man', 'Tutor', 'VimFoldh', 'TextobjStringDefaultKeyMappings', 'UpdateRemotePlugins',
-		\		]
+		\ : for s:cmdname in ['MANPAGER', 'Man', 'Tutor', 'VimFoldh', 'TextobjStringDefaultKeyMappings', 'UpdateRemotePlugins']
 		\ | 	execute printf('silent! delcommand %s', s:cmdname)
 		\ | endfor
 		\ | unlet s:cmdname
@@ -68,7 +66,7 @@ set nowritebackup
 set nrformats&
 set pumheight=10
 set rulerformat&
-set scrolloff=5
+set scrolloff&
 set sessionoptions=winpos,resize,tabpages,curdir,help
 set shiftround
 set shiftwidth=4
@@ -77,7 +75,7 @@ set showmode
 set softtabstop=-1
 set tabstop=4
 set tags=./tags;
-set updatetime=100
+set updatetime&
 set wildmenu
 
 if s:vimpatch_cmdlinepum
@@ -109,17 +107,57 @@ else
 endif
 
 if has('tabsidebar')
+	function! TabSideBar() abort
+		try
+			let hl_lbl = '%#Label#'
+			let hl_sel = '%#TabSideBarSel#'
+			let hl_def = '%#TabSideBar#'
+			let hl_fil = '%#TabSideBarFill#'
+			let hl_alt = hl_def
+			let lines = []
+			for tnr in range(1, tabpagenr('$'))
+				if tnr != get(g:, 'actual_curtabpage', tabpagenr())
+					continue
+				endif
+				let lines += ['', hl_lbl .. '--- Tab ' .. tnr .. ' ---' .. hl_def]
+				for x in filter(getwininfo(), { i, x -> tnr == x['tabnr'] && ('popup' != win_gettype(x['winid'])) })
+					let ft = getbufvar(x['bufnr'], '&filetype')
+					let bt = getbufvar(x['bufnr'], '&buftype')
+					let is_curwin = (tnr == tabpagenr()) && (x['winnr'] == winnr())
+					let is_altwin = (tnr == tabpagenr()) && (x['winnr'] == winnr('#'))
+					let text =
+						\ (is_curwin
+						\   ? hl_sel .. '(%%)'
+						\   : (is_altwin
+						\       ? hl_alt .. '(#)'
+						\       : (hl_def .. '(' .. x['winnr'] .. ')')))
+						\ .. ' '
+						\ .. (!empty(bt)
+						\      ? printf('[%s]', bt == 'nofile' ? ft : bt)
+						\      : (empty(bufname(x['bufnr']))
+						\          ? '[No Name]'
+						\          : fnamemodify(bufname(x['bufnr']), ':t')))
+					let lines += [text]
+				endfor
+			endfor
+			return join(lines, "\n")
+		catch
+			let g:tab_throwpoint = v:throwpoint
+			let g:tab_exception = v:exception
+			return 'Error! Please see g:tab_throwpoint and g:tab_exception.'
+		endtry
+	endfunction
 	let g:tabsidebar_vertsplit = 1
 	set notabsidebaralign
 	set notabsidebarwrap
 	set showtabsidebar=2
-	set tabsidebar=%!tabpages#expr(v:true)
+	set tabsidebar=%!TabSideBar()
 	set tabsidebarcolumns=20
 	set showtabline=0
 	set tabline&
 else
 	set showtabline=2
-	set tabline=%!tabpages#expr(v:false)
+	set tabline&
 endif
 
 if has('nvim')
@@ -130,7 +168,6 @@ if has('nvim')
 			call rpcnotify(0, 'Gui', 'Option', 'Tabline', 0)
 		endif
 	endif
-	set pumblend=20
 else
 	if has('win32')
 		" This is the same as stdpath('config') in nvim on Windows OS.
@@ -171,7 +208,6 @@ endif
 
 nnoremap         <space>g        :<C-u>GitGrep<space>
 nnoremap <silent><space>d        :<C-u>GitDiff<cr>
-nnoremap         <space>r        :<C-u>GitGotoRootDir<cr>
 
 " Emacs key mappings
 if has('win32') && (&shell =~# '\<cmd\.exe$')
@@ -190,9 +226,9 @@ cnoremap         <C-a>               <home>
 
 if s:vimpatch_cmdtag
 	if has('nvim')
-		nnoremap <silent><space>t    <Cmd>tabnew \| execute 'terminal' \| startinsert<cr>
+		nnoremap <silent><space>t    <Cmd>new \| execute 'terminal' \| startinsert<cr>
 	else
-		nnoremap <silent><space>t    <Cmd>tabnew \| terminal ++curwin<cr>
+		nnoremap <silent><space>t    <Cmd>new \| terminal ++curwin<cr>
 	endif
 
 	" Move the next/previous tabpage.
@@ -208,6 +244,11 @@ endif
 
 if isdirectory(expand('$VIMRC_VIM/pack/rbtnn/start/vim-gloaded'))
 	source $VIMRC_VIM/pack/rbtnn/start/vim-gloaded/plugin/gloaded.vim
+endif
+
+if isdirectory(expand('$VIMRC_VIM/pack/mattn/start/vim-findroot'))
+	let g:findroot_not_for_subdir = 0
+	nnoremap         <space>r        :<C-u>FindRoot!<cr>
 endif
 
 if isdirectory(expand('$VIMRC_VIM/pack/cocopon/start/vaffle.vim'))
@@ -231,7 +272,7 @@ if isdirectory(expand('$VIMRC_VIM/pack/bluz71/start/vim-moonfly-colors'))
 		autocmd vimrc ColorScheme      *
 			\ : highlight!       TabSideBar      guifg=#76787b guibg=NONE    gui=NONE           cterm=NONE
 			\ | highlight!       TabSideBarFill  guifg=#1a1a1a guibg=NONE    gui=NONE           cterm=NONE
-			\ | highlight!       TabSideBarSel   guifg=#22863a guibg=NONE    gui=NONE           cterm=NONE
+			\ | highlight!       TabSideBarSel   guifg=#ff80ff guibg=NONE    gui=NONE           cterm=NONE
 			\ | highlight!       Comment         guifg=#313131               gui=NONE           cterm=NONE
 			\ | highlight!       CursorIM        guifg=NONE    guibg=#ff0000
 			\ | highlight!       SpecialKey      guifg=#1a1a1a
