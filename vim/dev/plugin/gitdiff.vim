@@ -14,7 +14,7 @@ let s:this_script_id = expand('<SID>')
 let s:recently_args = get(s:, 'recently_args', [])
 
 function! s:gitdiffnumstat_open(q_bang, q_args) abort
-	let rootdir = git#get_rootdir('.')
+	let rootdir = s:get_gitrootdir('.')
 	if empty(rootdir)
 		call s:errormsg('current directory is not a git repository.')
 	else
@@ -273,7 +273,7 @@ function! s:errormsg(text) abort
 endfunction
 
 function! s:system_for_gitdiff(cmd, cwd) abort
-	let lines = io#system(a:cmd, a:cwd)
+	let lines = s:system(a:cmd, a:cwd)
 	let enc_from = ''
 	for i in range(0, len(lines) - 1)
 		" The encoding of top 4 lines('diff -...', 'index ...', '--- a/...', '+++ b/...') is always utf-8.
@@ -300,7 +300,7 @@ function! s:system_for_gitdiff(cmd, cwd) abort
 endfunction
 
 function! s:system_for_gitoutput(cmd, cwd) abort
-	let lines = io#system(a:cmd, a:cwd)
+	let lines = s:system(a:cmd, a:cwd)
 	if 'utf-8' != &encoding
 		for i in range(0, len(lines) - 1)
 			let lines[i] = iconv(lines[i], 'utf-8', &encoding)
@@ -341,3 +341,57 @@ function! s:open_file(path, lnum) abort
 		call cursor([a:lnum, 1])
 	endif
 endfunction
+
+function! s:get_gitrootdir(path) abort
+	let xs = split(fnamemodify(a:path, ':p'), '[\/]')
+	let prefix = (has('mac') || has('linux')) ? '/' : ''
+	while !empty(xs)
+		let path = prefix .. join(xs + ['.git'], '/')
+		if isdirectory(path) || filereadable(path)
+			return prefix .. join(xs, '/')
+		endif
+		call remove(xs, -1)
+	endwhile
+	return ''
+endfunction
+
+function s:system(cmd, cwd) abort
+	let lines = []
+	if has('nvim')
+		let job = jobstart(a:cmd, {
+			\ 'cwd': a:cwd,
+			\ 'on_stdout': function('s:system_onevent', [{ 'lines': lines, }]),
+			\ 'on_stderr': function('s:system_onevent', [{ 'lines': lines, }]),
+			\ })
+		call jobwait([job])
+	else
+		let path = tempname()
+		try
+			if filereadable(path)
+				let lines = readfile(path)
+			endif
+			let job = job_start(a:cmd, {
+				\ 'cwd': a:cwd,
+				\ 'out_io': 'file',
+				\ 'out_name': path,
+				\ 'err_io': 'out',
+				\ })
+			while 'run' == job_status(job)
+			endwhile
+			if filereadable(path)
+				let lines = readfile(path)
+			endif
+		finally
+			if filereadable(path)
+				call delete(path)
+			endif
+		endtry
+	endif
+	return lines
+endfunction
+
+function s:system_onevent(d, job, data, event) abort
+	let a:d['lines'] += a:data
+	sleep 10m
+endfunction
+

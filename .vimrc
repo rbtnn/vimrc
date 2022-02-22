@@ -119,7 +119,7 @@ if has('tabsidebar')
 				if tnr != get(g:, 'actual_curtabpage', tabpagenr())
 					continue
 				endif
-				let lines += ['', hl_lbl .. '--- Tab ' .. tnr .. ' ---' .. hl_def]
+				let lines += ['', printf('%s--- Tab %d ---%s', hl_lbl, tnr, hl_def)]
 				for x in filter(getwininfo(), { i, x -> tnr == x['tabnr'] && ('popup' != win_gettype(x['winid'])) })
 					let ft = getbufvar(x['bufnr'], '&filetype')
 					let bt = getbufvar(x['bufnr'], '&buftype')
