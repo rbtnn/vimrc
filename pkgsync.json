@@ -10,9 +10,8 @@
 				"vim-operator-user",
 				"vim-textobj-user"
 			],
-			"mattn" : [
-				"vim-findroot"
-			],
+			"kyoh86" : ["vim-ripgrep"],
+			"mattn" : ["vim-findroot"],
 			"rbtnn" : [
 				"vim-pkgsync",
 				"vim-ambiwidth",
@@ -25,6 +24,7 @@
 			"tyru" : ["restart.vim"]
 		},
 		"opt" : {
+			"dstein64" : ["vim-startuptime"],
 			"rbtnn" : [
 				"vim-vimscript_lasterror",
 				"vim-testing-for-tabsidebar"

@@ -36,7 +36,6 @@ set belloff=all
 set clipboard=unnamed
 
 set autoread
-set backspace=indent,eol,start
 set cmdheight=3
 set cmdwinheight=5
 set complete-=t
@@ -242,26 +241,27 @@ if s:vimpatch_cmdtag
 	nnoremap <silent><C-p>           <Cmd>cprevious<cr>
 endif
 
-if isdirectory(expand('$VIMRC_VIM/pack/rbtnn/start/vim-gloaded'))
+if !empty(globpath($VIMRC_VIM, 'pack/rbtnn/*/vim-gloaded'))
 	source $VIMRC_VIM/pack/rbtnn/start/vim-gloaded/plugin/gloaded.vim
 endif
 
-if isdirectory(expand('$VIMRC_VIM/pack/mattn/start/vim-findroot'))
+if !empty(globpath($VIMRC_VIM, 'pack/mattn/*/vim-findroot'))
 	let g:findroot_not_for_subdir = 0
 	nnoremap         <space>r        :<C-u>FindRoot!<cr>
 endif
 
-if isdirectory(expand('$VIMRC_VIM/pack/cocopon/start/vaffle.vim'))
+if !empty(globpath($VIMRC_VIM, 'pack/cocopon/*/vaffle.vim'))
 	let g:vaffle_show_hidden_files = 1
 	nnoremap <silent><space>f       :<C-u>execute 'Vaffle ' .. (filereadable(expand('%')) ? '%:h' : '.')<cr>
 endif
 
-if isdirectory(expand('$VIMRC_VIM/pack/rbtnn/start/vim-mrw'))
+if !empty(globpath($VIMRC_VIM, 'pack/rbtnn/*/vim-mrw'))
+	let g:mrw_limit = 100
 	nnoremap <silent><space>s       :<C-u>MRW<cr>
 endif
 
-if isdirectory(expand('$VIMRC_VIM/pack/bluz71/start/vim-moonfly-colors'))
-	if isdirectory(expand('$VIMRC_VIM/pack/itchyny/start/lightline.vim'))
+if !empty(globpath($VIMRC_VIM, 'pack/bluz71/*/vim-moonfly-colors'))
+	if !empty(globpath($VIMRC_VIM, 'pack/itchyny/*/lightline.vim'))
 		let g:lightline = {}
 		let g:lightline['colorscheme'] = 'moonfly'
 		let g:lightline['enable'] = { 'statusline': 1, 'tabline': 0, }
@@ -286,11 +286,15 @@ else
 	endif
 endif
 
-if isdirectory(expand('$VIMRC_VIM/pack/kana/start/vim-operator-replace'))
+if !empty(globpath($VIMRC_VIM, 'pack/kyoh86/*/vim-ripgrep'))
+	command! -nargs=* -complete=file Ripgrep :call ripgrep#search(<q-args>)
+endif
+
+if !empty(globpath($VIMRC_VIM, 'pack/kana/*/vim-operator-replace'))
 	nmap     <silent>s           <Plug>(operator-replace)
 endif
 
-if isdirectory(expand('$VIMRC_VIM/pack/tyru/start/restart.vim'))
+if !empty(globpath($VIMRC_VIM, 'pack/tyru/*/restart.vim'))
 	let g:restart_sessionoptions = &sessionoptions
 endif
 
