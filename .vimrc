@@ -207,6 +207,7 @@ endif
 
 nnoremap         <space>g        :<C-u>GitGrep<space>
 nnoremap <silent><space>d        :<C-u>GitDiff<cr>
+nnoremap         <space>r        :<C-u>GitGotoRootDir<cr>
 
 " Emacs key mappings
 if has('win32') && (&shell =~# '\<cmd\.exe$')
@@ -243,11 +244,6 @@ endif
 
 if !empty(globpath($VIMRC_VIM, 'pack/rbtnn/*/vim-gloaded'))
 	source $VIMRC_VIM/pack/rbtnn/start/vim-gloaded/plugin/gloaded.vim
-endif
-
-if !empty(globpath($VIMRC_VIM, 'pack/mattn/*/vim-findroot'))
-	let g:findroot_not_for_subdir = 0
-	nnoremap         <space>r        :<C-u>FindRoot!<cr>
 endif
 
 if !empty(globpath($VIMRC_VIM, 'pack/cocopon/*/vaffle.vim'))

@@ -11,7 +11,6 @@
 				"vim-textobj-user"
 			],
 			"kyoh86" : ["vim-ripgrep"],
-			"mattn" : ["vim-findroot"],
 			"rbtnn" : [
 				"vim-pkgsync",
 				"vim-ambiwidth",
