@@ -12,10 +12,11 @@
 			],
 			"kyoh86" : ["vim-ripgrep"],
 			"rbtnn" : [
-				"vim-pkgsync",
 				"vim-ambiwidth",
+				"vim-diffnotify",
 				"vim-gloaded",
 				"vim-mrw",
+				"vim-pkgsync",
 				"vim-textobj-string",
 				"vim-vimscript_indentexpr",
 				"vim-vimscript_tagfunc"

@@ -256,6 +256,23 @@ if !empty(globpath($VIMRC_VIM, 'pack/rbtnn/*/vim-mrw'))
 	nnoremap <silent><space>s       :<C-u>MRW<cr>
 endif
 
+if !empty(globpath($VIMRC_VIM, 'pack/rbtnn/*/vim-diffnotify'))
+	augroup DiffNotify
+		autocmd!
+		autocmd User DiffNotifyThresholdUnder
+			\ :let &showtabline = 0
+		autocmd User DiffNotifyThresholdOver
+			\ :let &showtabline = 2
+			\ |let &tabline =
+			\   printf('%%#TabLine#%d changed files with %d additions and %d deletions.',
+			\   len(g:diffnotify_context['changed_files']),
+			\   g:diffnotify_context['additions'],
+			\   g:diffnotify_context['deletions'])
+	augroup END
+	let g:diffnotify_threshold = 0
+	let g:diffnotify_timespan = 1000
+endif
+
 if !empty(globpath($VIMRC_VIM, 'pack/bluz71/*/vim-moonfly-colors'))
 	if !empty(globpath($VIMRC_VIM, 'pack/itchyny/*/lightline.vim'))
 		let g:lightline = {}
