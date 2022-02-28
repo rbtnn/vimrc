@@ -257,18 +257,7 @@ if !empty(globpath($VIMRC_VIM, 'pack/rbtnn/*/vim-mrw'))
 endif
 
 if !empty(globpath($VIMRC_VIM, 'pack/rbtnn/*/vim-diffnotify'))
-	augroup DiffNotify
-		autocmd!
-		autocmd User DiffNotifyThresholdUnder
-			\ :let &showtabline = 0
-		autocmd User DiffNotifyThresholdOver
-			\ :let &showtabline = 2
-			\ |let &tabline =
-			\   printf('%%#TabLine#%d changed files with %d additions and %d deletions.',
-			\   len(g:diffnotify_context['changed_files']),
-			\   g:diffnotify_context['additions'],
-			\   g:diffnotify_context['deletions'])
-	augroup END
+	call diffnotify#styles#tabline()
 	let g:diffnotify_threshold = 0
 	let g:diffnotify_timespan = 1000
 endif
