@@ -155,7 +155,7 @@ if has('tabsidebar')
 	set showtabline=0
 	set tabline&
 else
-	set showtabline=2
+	set showtabline=0
 	set tabline&
 endif
 
@@ -260,6 +260,7 @@ if !empty(globpath($VIMRC_VIM, 'pack/rbtnn/*/vim-diffnotify'))
 	call diffnotify#styles#tabline()
 	let g:diffnotify_threshold = 0
 	let g:diffnotify_timespan = 1000
+	let g:diffnotify_arguments = ['-w']
 endif
 
 if !empty(globpath($VIMRC_VIM, 'pack/bluz71/*/vim-moonfly-colors'))
