@@ -10,7 +10,6 @@
 				"vim-operator-user",
 				"vim-textobj-user"
 			],
-			"kyoh86" : ["vim-ripgrep"],
 			"rbtnn" : [
 				"vim-ambiwidth",
 				"vim-diffnotify",
@@ -25,6 +24,7 @@
 		},
 		"opt" : {
 			"dstein64" : ["vim-startuptime"],
+			"kyoh86" : ["vim-ripgrep"],
 			"rbtnn" : [
 				"vim-vimscript_lasterror",
 				"vim-testing-for-tabsidebar"

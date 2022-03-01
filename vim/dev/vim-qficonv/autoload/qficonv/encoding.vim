@@ -1,11 +1,11 @@
 
 " check if the line contains a multibyte-character.
-function! encoding#contains_multichar(input) abort
+function! qficonv#encoding#contains_multichar(input) abort
 	return 0 < len(filter(split(a:input, '\zs'), { _, x -> 0x80 < char2nr(x) }))
 endfunction
 
 " http://tools.ietf.org/html/rfc3629
-function! encoding#is_utf8(input) abort
+function! qficonv#encoding#is_utf8(input) abort
 	let cs = a:input
 	let i = 0
 	while i < len(cs)

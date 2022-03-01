@@ -90,6 +90,8 @@ if has('vim_starting')
 	set hlsearch
 	set laststatus=2
 	set statusline&
+	set showtabline=0
+	set tabline&
 endif
 
 if has('persistent_undo')
@@ -152,11 +154,6 @@ if has('tabsidebar')
 	set showtabsidebar=2
 	set tabsidebar=%!TabSideBar()
 	set tabsidebarcolumns=20
-	set showtabline=0
-	set tabline&
-else
-	set showtabline=0
-	set tabline&
 endif
 
 if has('nvim')
@@ -187,7 +184,7 @@ let g:vim_indent_cont = &g:shiftwidth
 
 if has('vim_starting')
 	set packpath=$VIMRC_VIM
-	set runtimepath=$VIMRUNTIME,$VIMRC_DEV
+	set runtimepath=$VIMRUNTIME,$VIMRC_DEV/work,$VIMRC_DEV/vim-diffview,$VIMRC_DEV/vim-qficonv
 	silent! source ~/.vimrc.local
 	filetype plugin indent on
 	syntax enable
@@ -205,9 +202,7 @@ if has('nvim')
 	tnoremap <silent><C-w>N          <C-\><C-n>
 endif
 
-nnoremap         <space>g        :<C-u>GitGrep<space>
-nnoremap <silent><space>d        :<C-u>GitDiff<cr>
-nnoremap         <space>r        :<C-u>GitGotoRootDir<cr>
+nnoremap <silent><space>d        :<C-u>DiffView<cr>
 
 " Emacs key mappings
 if has('win32') && (&shell =~# '\<cmd\.exe$')
