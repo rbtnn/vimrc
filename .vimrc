@@ -43,8 +43,6 @@ set completeslash=slash
 set fileformats=unix,dos
 set foldlevelstart=999
 set foldmethod=indent
-set grepformat&
-set grepprg=internal
 set ignorecase
 set incsearch
 set isfname-==
@@ -92,6 +90,13 @@ if has('vim_starting')
 	set statusline&
 	set showtabline=0
 	set tabline&
+endif
+
+set grepformat&
+set grepprg=internal
+if executable('git')
+	set grepformat=%f:%l:%c:%m
+	set grepprg=git\ --no-pager\ grep\ --column\ --line\ --no-color
 endif
 
 if has('persistent_undo')
@@ -184,7 +189,9 @@ let g:vim_indent_cont = &g:shiftwidth
 
 if has('vim_starting')
 	set packpath=$VIMRC_VIM
-	set runtimepath=$VIMRUNTIME,$VIMRC_DEV/work,$VIMRC_DEV/vim-diffview,$VIMRC_DEV/vim-qficonv
+	set runtimepath=$VIMRUNTIME
+	set runtimepath+=$VIMRC_DEV/vim-diffview
+	set runtimepath+=$VIMRC_DEV/vim-qficonv
 	silent! source ~/.vimrc.local
 	filetype plugin indent on
 	syntax enable
@@ -282,10 +289,6 @@ else
 		highlight!       TabSideBarFill                guibg=NONE    gui=NONE           cterm=NONE
 		highlight!       TabSideBarSel                 guibg=NONE    gui=NONE           cterm=NONE
 	endif
-endif
-
-if !empty(globpath($VIMRC_VIM, 'pack/kyoh86/*/vim-ripgrep'))
-	command! -nargs=* -complete=file Ripgrep :call ripgrep#search(<q-args>)
 endif
 
 if !empty(globpath($VIMRC_VIM, 'pack/kana/*/vim-operator-replace'))

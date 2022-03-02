@@ -24,7 +24,6 @@
 		},
 		"opt" : {
 			"dstein64" : ["vim-startuptime"],
-			"kyoh86" : ["vim-ripgrep"],
 			"rbtnn" : [
 				"vim-vimscript_lasterror",
 				"vim-testing-for-tabsidebar"
