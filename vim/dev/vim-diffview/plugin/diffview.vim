@@ -4,17 +4,14 @@ let g:loaded_diffview = 1
 command! -nargs=* DiffView   :call s:main(<q-args>)
 
 function! s:main(q_args) abort
-	let cmd = trim(a:q_args)
-	let rootdir = ''
-	if empty(rootdir)
-		let cmd = 'git --no-pager diff'
-		let rootdir = s:get_rootdir('.', split(cmd)[0])
+	let cmd = ''
+	if !empty(s:get_rootdir('.', 'git'))
+		let cmd = 'git --no-pager diff -w ' .. a:q_args
+	elseif !empty(s:get_rootdir('.', 'svn'))
+		let cmd = 'svn diff -x -w ' .. a:q_args
 	endif
-	if empty(rootdir)
-		let cmd = 'svn diff'
-		let rootdir = s:get_rootdir('.', split(cmd)[0])
-	endif
-	if !empty(rootdir)
+	let rootdir = s:get_rootdir('.', get(split(cmd), 0, ''))
+	if !empty(cmd) && !empty(rootdir)
 		call s:open_window()
 		call s:setlines(rootdir, cmd)
 	endif
@@ -43,7 +40,7 @@ function! s:open_window() abort
 		endif
 	endfor
 	if !exists
-		new
+		rightbelow vnew
 		setfiletype diff
 	endif
 endfunction
@@ -55,6 +52,7 @@ function! s:setlines(rootdir, cmd) abort
 	silent! call deletebufline(bufnr(), 1, '$')
 	call setbufline(bufnr(), 1, lines)
 	setlocal buftype=nofile nomodifiable readonly
+	let &l:statusline = a:cmd
 	execute printf('nnoremap  <buffer><cr>  <Cmd>:call <SID>jumpdiffline(%s)<cr>', string(a:rootdir))
 	call winrestview(view)
 endfunction

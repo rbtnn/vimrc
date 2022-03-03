@@ -15,7 +15,6 @@ let s:vimpatch_cmdlinepum = has('patch-8.2.4325') || has('nvim')
 
 let $MYVIMRC = resolve($MYVIMRC)
 let $VIMRC_VIM = expand(expand('<sfile>:h') .. '/vim')
-let $VIMRC_DEV = expand('$VIMRC_VIM/dev')
 
 augroup vimrc
 	autocmd!
@@ -82,14 +81,6 @@ endif
 if s:vimpatch_unsigned
 	set nrformats-=octal
 	set nrformats+=unsigned
-endif
-
-if has('vim_starting')
-	set hlsearch
-	set laststatus=2
-	set statusline&
-	set showtabline=0
-	set tabline&
 endif
 
 set grepformat&
@@ -161,40 +152,42 @@ if has('tabsidebar')
 	set tabsidebarcolumns=20
 endif
 
-if has('nvim')
-	if has('win32')
-		" Running nvim-qt.exe on Windows OS, never use GUI popupmenu and tabline.
-		if has('vim_starting')
-			call rpcnotify(0, 'Gui', 'Option', 'Popupmenu', 0)
-			call rpcnotify(0, 'Gui', 'Option', 'Tabline', 0)
-		endif
-	endif
-else
-	if has('win32')
-		" This is the same as stdpath('config') in nvim on Windows OS.
-		let s:nvim_initpath = expand('~/AppData/Local/nvim/init.vim')
-		if !filereadable(s:nvim_initpath)
-			silent! call mkdir(fnamemodify(s:nvim_initpath, ':h'), 'p')
-			call writefile(['silent! source ~/.vimrc'], s:nvim_initpath)
-		endif
-	endif
-endif
-
-if has('vim_starting') && has('termguicolors') && !has('gui_running') && (has('win32') || (256 == &t_Co))
-	silent! set termguicolors
-endif
-
 let &cedit = "\<C-q>"
 let g:vim_indent_cont = &g:shiftwidth
 
 if has('vim_starting')
+	set hlsearch
+	set laststatus=2
+	set statusline&
+	set showtabline=0
+	set tabline&
+
+	if has('win32')
+		if has('nvim')
+			" Running nvim-qt.exe on Windows OS, never use GUI popupmenu and tabline.
+			call rpcnotify(0, 'Gui', 'Option', 'Popupmenu', 0)
+			call rpcnotify(0, 'Gui', 'Option', 'Tabline', 0)
+		else
+			" This is the same as stdpath('config') in nvim on Windows OS.
+			let s:nvim_initpath = expand('~/AppData/Local/nvim/init.vim')
+			if !filereadable(s:nvim_initpath)
+				silent! call mkdir(fnamemodify(s:nvim_initpath, ':h'), 'p')
+				call writefile(['silent! source ~/.vimrc'], s:nvim_initpath)
+			endif
+		endif
+	endif
+
 	set packpath=$VIMRC_VIM
 	set runtimepath=$VIMRUNTIME
-	set runtimepath+=$VIMRC_DEV/vim-diffview
-	set runtimepath+=$VIMRC_DEV/vim-qficonv
+	set runtimepath+=$VIMRC_VIM/dev/vim-diffview
+	set runtimepath+=$VIMRC_VIM/dev/vim-qficonv
 	silent! source ~/.vimrc.local
 	filetype plugin indent on
 	syntax enable
+
+	if has('termguicolors') && !has('gui_running') && (has('win32') || (256 == &t_Co))
+		silent! set termguicolors
+	endif
 endif
 
 " Can't use <S-space> at :terminal
@@ -244,29 +237,33 @@ if s:vimpatch_cmdtag
 	nnoremap <silent><C-p>           <Cmd>cprevious<cr>
 endif
 
-if !empty(globpath($VIMRC_VIM, 'pack/rbtnn/*/vim-gloaded'))
+function! s:is_installed(name) abort
+	return !empty(globpath($VIMRC_VIM, 'pack/*/*/' .. a:name))
+endfunction
+
+if s:is_installed('vim-gloaded')
 	source $VIMRC_VIM/pack/rbtnn/start/vim-gloaded/plugin/gloaded.vim
 endif
 
-if !empty(globpath($VIMRC_VIM, 'pack/cocopon/*/vaffle.vim'))
+if s:is_installed('vaffle.vim')
 	let g:vaffle_show_hidden_files = 1
 	nnoremap <silent><space>f       :<C-u>execute 'Vaffle ' .. (filereadable(expand('%')) ? '%:h' : '.')<cr>
 endif
 
-if !empty(globpath($VIMRC_VIM, 'pack/rbtnn/*/vim-mrw'))
+if s:is_installed('vim-mrw')
 	let g:mrw_limit = 100
 	nnoremap <silent><space>s       :<C-u>MRW<cr>
 endif
 
-if !empty(globpath($VIMRC_VIM, 'pack/rbtnn/*/vim-diffnotify'))
+if s:is_installed('vim-diffnotify')
 	call diffnotify#styles#tabline()
 	let g:diffnotify_threshold = 0
 	let g:diffnotify_timespan = 1000
 	let g:diffnotify_arguments = ['-w']
 endif
 
-if !empty(globpath($VIMRC_VIM, 'pack/bluz71/*/vim-moonfly-colors'))
-	if !empty(globpath($VIMRC_VIM, 'pack/itchyny/*/lightline.vim'))
+if s:is_installed('vim-moonfly-colors')
+	if s:is_installed('lightline.vim')
 		let g:lightline = {}
 		let g:lightline['colorscheme'] = 'moonfly'
 		let g:lightline['enable'] = { 'statusline': 1, 'tabline': 0, }
@@ -291,11 +288,11 @@ else
 	endif
 endif
 
-if !empty(globpath($VIMRC_VIM, 'pack/kana/*/vim-operator-replace'))
+if s:is_installed('vim-operator-replace')
 	nmap     <silent>s           <Plug>(operator-replace)
 endif
 
-if !empty(globpath($VIMRC_VIM, 'pack/tyru/*/restart.vim'))
+if s:is_installed('restart.vim')
 	let g:restart_sessionoptions = &sessionoptions
 endif
 

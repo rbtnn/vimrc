@@ -18,16 +18,14 @@
 				"vim-pkgsync",
 				"vim-textobj-string",
 				"vim-vimscript_indentexpr",
+				"vim-vimscript_lasterror",
 				"vim-vimscript_tagfunc"
 			],
 			"tyru" : ["restart.vim"]
 		},
 		"opt" : {
 			"dstein64" : ["vim-startuptime"],
-			"rbtnn" : [
-				"vim-vimscript_lasterror",
-				"vim-testing-for-tabsidebar"
-			],
+			"rbtnn" : ["vim-testing-for-tabsidebar"],
 			"thinca" : [
 				"vim-qfreplace",
 				"vim-prettyprint"
