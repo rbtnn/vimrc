@@ -53,7 +53,11 @@ function! s:setlines(rootdir, cmd) abort
 	call setbufline(bufnr(), 1, lines)
 	setlocal buftype=nofile nomodifiable readonly
 	let &l:statusline = a:cmd
-	execute printf('nnoremap  <buffer><cr>  <Cmd>:call <SID>jumpdiffline(%s)<cr>', string(a:rootdir))
+	let b:diffview = {
+		\ 'cmd': a:cmd,
+		\ 'rootdir': a:rootdir,
+		\ }
+	nnoremap  <buffer><cr>  <Cmd>:call <SID>jumpdiffline(b:diffview['rootdir'])<cr>
 	call winrestview(view)
 endfunction
 
