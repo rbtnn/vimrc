@@ -2,9 +2,9 @@
 	"packpath" : "$VIMRC_VIM",
 	"plugins" : {
 		"start" : {
-			"bluz71" : ["vim-moonfly-colors"],
 			"cocopon" : ["vaffle.vim"],
 			"itchyny" : ["lightline.vim"],
+			"joshdick" : ["onedark.vim"],
 			"kana" : [
 				"vim-operator-replace",
 				"vim-operator-user",
@@ -13,7 +13,6 @@
 			"rbtnn" : [
 				"vim-ambiwidth",
 				"vim-diffnotify",
-				"vim-gloaded",
 				"vim-mrw",
 				"vim-pkgsync",
 				"vim-textobj-string",
@@ -25,7 +24,10 @@
 		},
 		"opt" : {
 			"dstein64" : ["vim-startuptime"],
-			"rbtnn" : ["vim-testing-for-tabsidebar"],
+			"rbtnn" : [
+				"vim-testing-for-tabsidebar",
+				"vim-gloaded"
+			],
 			"thinca" : [
 				"vim-qfreplace",
 				"vim-prettyprint"

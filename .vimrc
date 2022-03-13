@@ -242,7 +242,7 @@ function! s:is_installed(name) abort
 endfunction
 
 if s:is_installed('vim-gloaded')
-	source $VIMRC_VIM/pack/rbtnn/start/vim-gloaded/plugin/gloaded.vim
+	source $VIMRC_VIM/pack/rbtnn/opt/vim-gloaded/plugin/gloaded.vim
 endif
 
 if s:is_installed('vaffle.vim')
@@ -262,10 +262,10 @@ if s:is_installed('vim-diffnotify')
 	let g:diffnotify_arguments = ['-w']
 endif
 
-if s:is_installed('vim-moonfly-colors')
+if s:is_installed('onedark.vim')
 	if s:is_installed('lightline.vim')
 		let g:lightline = {}
-		let g:lightline['colorscheme'] = 'moonfly'
+		let g:lightline['colorscheme'] = 'onedark'
 		let g:lightline['enable'] = { 'statusline': 1, 'tabline': 0, }
 		let g:lightline['separator'] = { 'left': nr2char(0xe0b0), 'right': nr2char(0xe0b2), }
 	endif
@@ -275,10 +275,8 @@ if s:is_installed('vim-moonfly-colors')
 			\ : highlight!       TabSideBar      guifg=#76787b guibg=NONE    gui=NONE           cterm=NONE
 			\ | highlight!       TabSideBarFill  guifg=#1a1a1a guibg=NONE    gui=NONE           cterm=NONE
 			\ | highlight!       TabSideBarSel   guifg=#ff80ff guibg=NONE    gui=NONE           cterm=NONE
-			\ | highlight!       Comment         guifg=#313131               gui=NONE           cterm=NONE
-			\ | highlight!       CursorIM        guifg=NONE    guibg=#ff0000
-			\ | highlight!       SpecialKey      guifg=#1a1a1a
-		colorscheme moonfly
+			\ | highlight!       CursorIM        guifg=NONE    guibg=#993333
+		colorscheme onedark
 	endif
 else
 	if has('tabsidebar')
