@@ -166,15 +166,13 @@ endfunction
 
 function! s:system_and_iconv(cmd, cwd) abort
 	let lines = s:system(a:cmd, a:cwd)
-	let enc_from = ''
 	for i in range(0, len(lines) - 1)
-		if empty(enc_from)
-			if diffview#encoding#contains_multichar(lines[i])
-				if diffview#encoding#is_utf8(lines[i])
-					let enc_from = 'utf-8'
-				else
-					let enc_from = 'shift_jis'
-				endif
+		let enc_from = ''
+		if diffview#encoding#contains_multichar(lines[i])
+			if diffview#encoding#is_utf8(lines[i])
+				let enc_from = 'utf-8'
+			else
+				let enc_from = 'shift_jis'
 			endif
 		endif
 		if !empty(enc_from) && (enc_from != &encoding)
