@@ -3,8 +3,8 @@
 	"plugins" : {
 		"start" : {
 			"cocopon" : ["vaffle.vim"],
+			"cormacrelf" : ["vim-colors-github"],
 			"itchyny" : ["lightline.vim"],
-			"joshdick" : ["onedark.vim"],
 			"kana" : [
 				"vim-operator-replace",
 				"vim-operator-user",

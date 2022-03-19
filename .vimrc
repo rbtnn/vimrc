@@ -40,17 +40,17 @@ set cmdwinheight=5
 set complete-=t
 set completeslash=slash
 set fileformats=unix,dos
+set fillchars=eob:\ ,vert:\ ,fold:-
 set foldlevelstart=999
 set foldmethod=indent
 set ignorecase
 set incsearch
 set isfname-==
 set keywordprg=:help
-set list
-set listchars=tab:\ \ \|,trail:-
 set matchpairs+=<:>
 set matchtime=1
 set nobackup
+set nolist
 set nonumber
 set norelativenumber
 set noruler
@@ -106,7 +106,7 @@ endif
 if has('tabsidebar')
 	function! TabSideBar() abort
 		try
-			let hl_lbl = '%#Label#'
+			let hl_lbl = '%#TabSideBarLabel#'
 			let hl_sel = '%#TabSideBarSel#'
 			let hl_def = '%#TabSideBar#'
 			let hl_fil = '%#TabSideBarFill#'
@@ -144,7 +144,7 @@ if has('tabsidebar')
 			return 'Error! Please see g:tab_throwpoint and g:tab_exception.'
 		endtry
 	endfunction
-	let g:tabsidebar_vertsplit = 1
+	let g:tabsidebar_vertsplit = 0
 	set notabsidebaralign
 	set notabsidebarwrap
 	set showtabsidebar=2
@@ -262,27 +262,28 @@ if s:is_installed('vim-diffnotify')
 	let g:diffnotify_arguments = ['-w']
 endif
 
-if s:is_installed('onedark.vim')
+if s:is_installed('vim-colors-github')
 	if s:is_installed('lightline.vim')
 		let g:lightline = {}
-		let g:lightline['colorscheme'] = 'onedark'
+		let g:lightline['colorscheme'] = 'github'
 		let g:lightline['enable'] = { 'statusline': 1, 'tabline': 0, }
-		let g:lightline['separator'] = { 'left': nr2char(0xe0b0), 'right': nr2char(0xe0b2), }
 	endif
 	if has('vim_starting')
-		set background=dark
+		let g:github_colors_soft = 1
+		set background=light
 		autocmd vimrc ColorScheme      *
-			\ : highlight!       TabSideBar      guifg=#76787b guibg=NONE    gui=NONE           cterm=NONE
-			\ | highlight!       TabSideBarFill  guifg=#1a1a1a guibg=NONE    gui=NONE           cterm=NONE
-			\ | highlight!       TabSideBarSel   guifg=#ff80ff guibg=NONE    gui=NONE           cterm=NONE
-			\ | highlight!       CursorIM        guifg=NONE    guibg=#993333
-		colorscheme onedark
+			\ : highlight!       TabSideBar      guifg=#cccccc guibg=#24292e    gui=NONE cterm=NONE
+			\ | highlight!       TabSideBarFill  guifg=NONE    guibg=#24292e    gui=NONE cterm=NONE
+			\ | highlight!       TabSideBarSel   guifg=#ffffff guibg=#24292e    gui=NONE cterm=NONE
+			\ | highlight!       TabSideBarLabel guifg=#777777 guibg=#24292e    gui=BOLD cterm=NONE
+			\ | highlight!       CursorIM        guifg=NONE    guibg=#ff3333
+		colorscheme github
 	endif
 else
 	if has('tabsidebar')
-		highlight!       TabSideBar                    guibg=NONE    gui=NONE           cterm=NONE
-		highlight!       TabSideBarFill                guibg=NONE    gui=NONE           cterm=NONE
-		highlight!       TabSideBarSel                 guibg=NONE    gui=NONE           cterm=NONE
+		highlight!       TabSideBar                    guibg=NONE    gui=NONE cterm=NONE
+		highlight!       TabSideBarFill                guibg=NONE    gui=NONE cterm=NONE
+		highlight!       TabSideBarSel                 guibg=NONE    gui=NONE cterm=NONE
 	endif
 endif
 
