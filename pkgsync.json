@@ -3,7 +3,6 @@
 	"plugins" : {
 		"start" : {
 			"cocopon" : ["vaffle.vim"],
-			"cormacrelf" : ["vim-colors-github"],
 			"itchyny" : ["lightline.vim"],
 			"kana" : [
 				"vim-operator-replace",
@@ -12,6 +11,7 @@
 			],
 			"rbtnn" : [
 				"vim-ambiwidth",
+				"vim-colors-github",
 				"vim-diffnotify",
 				"vim-mrw",
 				"vim-pkgsync",

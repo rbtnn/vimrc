@@ -106,36 +106,20 @@ endif
 if has('tabsidebar')
 	function! TabSideBar() abort
 		try
-			let hl_lbl = '%#TabSideBarLabel#'
-			let hl_sel = '%#TabSideBarSel#'
-			let hl_def = '%#TabSideBar#'
-			let hl_fil = '%#TabSideBarFill#'
-			let hl_alt = hl_def
-			let lines = []
-			for tnr in range(1, tabpagenr('$'))
-				if tnr != get(g:, 'actual_curtabpage', tabpagenr())
-					continue
-				endif
-				let lines += ['', printf('%s--- Tab %d ---%s', hl_lbl, tnr, hl_def)]
-				for x in filter(getwininfo(), { i, x -> tnr == x['tabnr'] && ('popup' != win_gettype(x['winid'])) })
-					let ft = getbufvar(x['bufnr'], '&filetype')
-					let bt = getbufvar(x['bufnr'], '&buftype')
-					let is_curwin = (tnr == tabpagenr()) && (x['winnr'] == winnr())
-					let is_altwin = (tnr == tabpagenr()) && (x['winnr'] == winnr('#'))
-					let text =
-						\ (is_curwin
-						\   ? hl_sel .. '(%%)'
-						\   : (is_altwin
-						\       ? hl_alt .. '(#)'
-						\       : (hl_def .. '(' .. x['winnr'] .. ')')))
-						\ .. ' '
-						\ .. (!empty(bt)
-						\      ? printf('[%s]', bt == 'nofile' ? ft : bt)
-						\      : (empty(bufname(x['bufnr']))
-						\          ? '[No Name]'
-						\          : fnamemodify(bufname(x['bufnr']), ':t')))
-					let lines += [text]
-				endfor
+			let tnr = get(g:, 'actual_curtabpage', tabpagenr())
+			let lines = ['', printf('%s- Tab %d -%s', '%#TabSideBarLabel#', tnr, '%#TabSideBar#')]
+			for x in filter(getwininfo(), { i, x -> tnr == x['tabnr'] && ('popup' != win_gettype(x['winid'])) })
+				let ft = getbufvar(x['bufnr'], '&filetype')
+				let bt = getbufvar(x['bufnr'], '&buftype')
+				let lines += [
+					\    ((tnr == tabpagenr()) && (x['winnr'] == winnr()) ? '%#TabSideBarSel#' : '%#TabSideBar#')
+					\ .. ' '
+					\ .. (!empty(bt)
+					\      ? printf('[%s]', bt == 'nofile' ? ft : bt)
+					\      : (empty(bufname(x['bufnr']))
+					\          ? '[No Name]'
+					\          : fnamemodify(bufname(x['bufnr']), ':t')))
+					\ ]
 			endfor
 			return join(lines, "\n")
 		catch
