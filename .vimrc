@@ -47,10 +47,10 @@ set ignorecase
 set incsearch
 set isfname-==
 set keywordprg=:help
+set list listchars=tab:<->
 set matchpairs+=<:>
 set matchtime=1
 set nobackup
-set nolist
 set nonumber
 set norelativenumber
 set noruler
@@ -119,6 +119,7 @@ if has('tabsidebar')
 					\      : (empty(bufname(x['bufnr']))
 					\          ? '[No Name]'
 					\          : fnamemodify(bufname(x['bufnr']), ':t')))
+					\ .. (getbufvar(x['bufnr'], '&modified') ? '[+]' : '')
 					\ ]
 			endfor
 			return join(lines, "\n")
@@ -226,7 +227,7 @@ function! s:is_installed(name) abort
 endfunction
 
 if s:is_installed('vim-gloaded')
-	source $VIMRC_VIM/pack/rbtnn/opt/vim-gloaded/plugin/gloaded.vim
+	runtime OPT plugin/gloaded.vim
 endif
 
 if s:is_installed('vaffle.vim')
@@ -235,33 +236,29 @@ if s:is_installed('vaffle.vim')
 endif
 
 if s:is_installed('vim-mrw')
-	let g:mrw_limit = 100
-	nnoremap <silent><space>s       :<C-u>MRW<cr>
+	nnoremap <silent><space>s       :<C-u>MRW -filename-only<cr>
 endif
 
 if s:is_installed('vim-diffnotify')
-	call diffnotify#styles#tabline()
+	let g:diffnotify_style = 'tabline'
 	let g:diffnotify_threshold = 0
 	let g:diffnotify_timespan = 1000
 	let g:diffnotify_arguments = ['-w']
 endif
 
-if s:is_installed('vim-colors-github')
-	if s:is_installed('lightline.vim')
-		let g:lightline = {}
-		let g:lightline['colorscheme'] = 'github'
-		let g:lightline['enable'] = { 'statusline': 1, 'tabline': 0, }
-	endif
+if s:is_installed('SpaceCamp')
 	if has('vim_starting')
-		let g:github_colors_soft = 1
-		set background=light
 		autocmd vimrc ColorScheme      *
-			\ : highlight!       TabSideBar      guifg=#cccccc guibg=#24292e    gui=NONE cterm=NONE
-			\ | highlight!       TabSideBarFill  guifg=NONE    guibg=#24292e    gui=NONE cterm=NONE
-			\ | highlight!       TabSideBarSel   guifg=#ffffff guibg=#24292e    gui=NONE cterm=NONE
-			\ | highlight!       TabSideBarLabel guifg=#777777 guibg=#24292e    gui=BOLD cterm=NONE
+			\ : highlight!       TabSideBar      guifg=#cccccc guibg=#262626    gui=NONE cterm=NONE
+			\ | highlight!       TabSideBarFill  guifg=NONE    guibg=#262626    gui=NONE cterm=NONE
+			\ | highlight!       TabSideBarSel   guifg=#ffffff guibg=#262626    gui=NONE cterm=NONE
+			\ | highlight!       TabSideBarLabel guifg=#777777 guibg=#262626    gui=BOLD cterm=NONE
 			\ | highlight!       CursorIM        guifg=NONE    guibg=#ff3333
-		colorscheme github
+			\ | highlight!       SpecialKey      guifg=#1f1f1f
+		autocmd vimrc FileType      diff
+			\ : highlight! link  diffRemoved     DiffDelete 
+			\ | highlight! link  diffAdded       DiffAdd
+		colorscheme spacecamp
 	endif
 else
 	if has('tabsidebar')

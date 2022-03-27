@@ -3,7 +3,7 @@
 	"plugins" : {
 		"start" : {
 			"cocopon" : ["vaffle.vim"],
-			"itchyny" : ["lightline.vim"],
+			"jaredgorski" : ["SpaceCamp"],
 			"kana" : [
 				"vim-operator-replace",
 				"vim-operator-user",
@@ -11,7 +11,6 @@
 			],
 			"rbtnn" : [
 				"vim-ambiwidth",
-				"vim-colors-github",
 				"vim-diffnotify",
 				"vim-mrw",
 				"vim-pkgsync",
@@ -20,6 +19,7 @@
 				"vim-vimscript_lasterror",
 				"vim-vimscript_tagfunc"
 			],
+			"thinca" : ["vim-qfreplace"],
 			"tyru" : ["restart.vim"]
 		},
 		"opt" : {
@@ -28,10 +28,7 @@
 				"vim-testing-for-tabsidebar",
 				"vim-gloaded"
 			],
-			"thinca" : [
-				"vim-qfreplace",
-				"vim-prettyprint"
-			]
+			"thinca" : ["vim-prettyprint"]
 		}
 	}
 }
