@@ -45,20 +45,43 @@ function! s:open_window() abort
 	endif
 endfunction
 
-function! s:setlines(rootdir, cmd) abort
-	let view = winsaveview()
-	let lines = s:system_and_iconv(a:cmd, a:rootdir)
+function! s:setbuflines(lines) abort
 	setlocal modifiable noreadonly
 	silent! call deletebufline(bufnr(), 1, '$')
-	call setbufline(bufnr(), 1, lines)
+	call setbufline(bufnr(), 1, a:lines)
 	setlocal buftype=nofile nomodifiable readonly
+endfunction
+
+function! s:setlines(rootdir, cmd) abort
+	let view = winsaveview()
+	let lines = s:system(a:cmd, a:rootdir)
 	let &l:statusline = a:cmd
+	call s:setbuflines(lines)
 	let b:diffview = {
 		\ 'cmd': a:cmd,
 		\ 'rootdir': a:rootdir,
 		\ }
 	nnoremap  <buffer><cr>  <Cmd>:call <SID>jumpdiffline(b:diffview['rootdir'])<cr>
 	call winrestview(view)
+
+	" Redraw windows because the encoding process is very slowly.
+	redraw
+
+	" The lines encodes after redrawing.
+	for i in range(0, len(lines) - 1)
+		let enc_from = ''
+		if diffview#encoding#contains_multichar(lines[i])
+			if diffview#encoding#is_utf8(lines[i])
+				let enc_from = 'utf-8'
+			else
+				let enc_from = 'shift_jis'
+			endif
+		endif
+		if !empty(enc_from) && (enc_from != &encoding)
+			let lines[i] = iconv(lines[i], enc_from, &encoding)
+		endif
+	endfor
+	call s:setbuflines(lines)
 endfunction
 
 function! s:find_window_by_path(path) abort
@@ -162,24 +185,6 @@ function! s:calc_lnum(rootdir) abort
 	endif
 
 	return {}
-endfunction
-
-function! s:system_and_iconv(cmd, cwd) abort
-	let lines = s:system(a:cmd, a:cwd)
-	for i in range(0, len(lines) - 1)
-		let enc_from = ''
-		if diffview#encoding#contains_multichar(lines[i])
-			if diffview#encoding#is_utf8(lines[i])
-				let enc_from = 'utf-8'
-			else
-				let enc_from = 'shift_jis'
-			endif
-		endif
-		if !empty(enc_from) && (enc_from != &encoding)
-			let lines[i] = iconv(lines[i], enc_from, &encoding)
-		endif
-	endfor
-	return lines
 endfunction
 
 function s:system(cmd, cwd) abort

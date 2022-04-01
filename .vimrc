@@ -83,11 +83,20 @@ if s:vimpatch_unsigned
 	set nrformats+=unsigned
 endif
 
-set grepformat&
-set grepprg=internal
+command! -nargs=0 GrepprgInternal
+	\ :set grepformat&
+	\ |set grepprg=internal
+
 if executable('git')
-	set grepformat=%f:%l:%c:%m
-	set grepprg=git\ --no-pager\ grep\ --column\ --line\ --no-color
+	command! -nargs=0 GrepprgGit
+		\ :set grepformat=%f:%l:%c:%m
+		\ |let &grepprg = 'git --no-pager grep --column --line --no-color'
+endif
+
+if executable('rg')
+	command! -nargs=0 GrepprgRg
+		\ :set grepformat=%f:%l:%c:%m
+		\ |let &grepprg = 'rg --vimgrep --glob "!.git" --glob "!.svn" -uu'
 endif
 
 if has('persistent_undo')
@@ -119,7 +128,7 @@ if has('tabsidebar')
 					\      : (empty(bufname(x['bufnr']))
 					\          ? '[No Name]'
 					\          : fnamemodify(bufname(x['bufnr']), ':t')))
-					\ .. (getbufvar(x['bufnr'], '&modified') ? '[+]' : '')
+					\ .. (getbufvar(x['bufnr'], '&modified') && empty(bt) ? '[+]' : '')
 					\ ]
 			endfor
 			return join(lines, "\n")
