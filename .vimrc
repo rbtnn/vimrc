@@ -175,6 +175,7 @@ if has('vim_starting')
 	set runtimepath=$VIMRUNTIME
 	set runtimepath+=$VIMRC_VIM/dev/vim-diffview
 	set runtimepath+=$VIMRC_VIM/dev/vim-qficonv
+	set runtimepath+=$VIMRC_VIM/dev/vim-find
 	silent! source ~/.vimrc.local
 	filetype plugin indent on
 	syntax enable
@@ -196,7 +197,8 @@ if has('nvim')
 	tnoremap <silent><C-w>N          <C-\><C-n>
 endif
 
-nnoremap <silent><space>d        :<C-u>DiffView<cr>
+nnoremap <silent><space>d       :<C-u>DiffView<cr>
+nnoremap         <space>f       :<C-u>Find<space>
 
 " Emacs key mappings
 if has('win32') && (&shell =~# '\<cmd\.exe$')
@@ -237,11 +239,6 @@ endfunction
 
 if s:is_installed('vim-gloaded')
 	runtime OPT plugin/gloaded.vim
-endif
-
-if s:is_installed('vaffle.vim')
-	let g:vaffle_show_hidden_files = 1
-	nnoremap <silent><space>f       :<C-u>execute 'Vaffle ' .. (filereadable(expand('%')) ? '%:h' : '.')<cr>
 endif
 
 if s:is_installed('vim-mrw')

@@ -2,7 +2,6 @@
 	"packpath" : "$VIMRC_VIM",
 	"plugins" : {
 		"start" : {
-			"cocopon" : ["vaffle.vim"],
 			"jaredgorski" : ["SpaceCamp"],
 			"kana" : [
 				"vim-operator-replace",
