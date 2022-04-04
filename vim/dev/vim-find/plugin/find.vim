@@ -5,14 +5,14 @@ command! -nargs=? Find :call <SID>main(<q-args>)
 
 function! s:match(q_args, x) abort
 	if a:x !~# ('\(' .. join([
-		\ '\.\<\i\+\>', '\<AppData\>', '\<node_modules\>', '\<undofiles\>', '\<bin\>'
+		\ '\.\<\i\+\>', '\<AppData\>', '\<node_modules\>', '\<undofiles\>', '\<bin\>', '\<Library\>'
 		\ ], '\|') .. '\)\/')
 		if isdirectory(a:x)
 			return v:true
 		else
 			if (a:x =~# a:q_args) && (-1 == index([
 				\ 'png', 'exe', 'xpm', 'dll', 'gif', 'lib', 'zip',
-				\ 'obj', 'dump', 'jpg'
+				\ 'obj', 'o', 'dump', 'jpg'
 				\ ], tolower(fnamemodify(a:x, ':e'))))
 				return v:true
 			endif
@@ -36,14 +36,22 @@ endfunction
 
 function! s:sub(q_args, path) abort
 	try
-		call s:setstatusline()
+		let dirs = []
+		let file_exists = v:false
 		for x in s:readdir(a:q_args, a:path)
 			let line = './' .. fnamemodify(a:path .. '/' .. x, ':.:gs?[\\/]\+?/?')
 			if isdirectory(line)
-				call s:sub(a:q_args, line)
+				let dirs += [line]
 			else
 				call appendbufline(bufnr(), 0, line)
+				let file_exists = v:true
 			endif
+		endfor
+		if file_exists
+			call s:setstatusline()
+		endif
+		for x in dirs
+			call s:sub(a:q_args, x)
 		endfor
 	catch /^Vim\%((\a\+)\)\=:E484:/
 	endtry
