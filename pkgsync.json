@@ -10,7 +10,6 @@
 			],
 			"rbtnn" : [
 				"vim-ambiwidth",
-				"vim-diffnotify",
 				"vim-mrw",
 				"vim-pkgsync",
 				"vim-textobj-string",

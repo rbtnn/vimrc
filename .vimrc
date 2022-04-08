@@ -97,6 +97,9 @@ if executable('rg')
 	command! -nargs=0 GrepprgRg
 		\ :set grepformat=%f:%l:%c:%m
 		\ |let &grepprg = 'rg --vimgrep --glob "!.git" --glob "!.svn" -uu'
+	GrepprgRg
+else
+	GrepprgInternal
 endif
 
 if has('persistent_undo')
@@ -198,7 +201,7 @@ if has('nvim')
 endif
 
 nnoremap <silent><space>d       :<C-u>DiffView<cr>
-nnoremap         <space>f       :<C-u>Find<space>
+nnoremap         <space>f       :<C-u>Find<cr>
 
 " Emacs key mappings
 if has('win32') && (&shell =~# '\<cmd\.exe$')
@@ -242,14 +245,7 @@ if s:is_installed('vim-gloaded')
 endif
 
 if s:is_installed('vim-mrw')
-	nnoremap <silent><space>s       :<C-u>MRW -filename-only<cr>
-endif
-
-if s:is_installed('vim-diffnotify')
-	let g:diffnotify_style = 'tabline'
-	let g:diffnotify_threshold = 0
-	let g:diffnotify_timespan = 1000
-	let g:diffnotify_arguments = ['-w']
+	nnoremap <silent><space>s       :<C-u>MRW<cr>
 endif
 
 if s:is_installed('SpaceCamp')
