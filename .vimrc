@@ -35,7 +35,7 @@ set belloff=all
 set clipboard=unnamed
 
 set autoread
-set cmdheight=3
+set cmdheight=1
 set cmdwinheight=5
 set complete-=t
 set completeslash=slash
@@ -202,6 +202,8 @@ endif
 
 nnoremap <silent><space>d       :<C-u>DiffView<cr>
 nnoremap         <space>f       :<C-u>Find<cr>
+
+nnoremap <expr>        gf       ((&buftype == 'terminal') ? '<C-w>gf' : 'gf')
 
 " Emacs key mappings
 if has('win32') && (&shell =~# '\<cmd\.exe$')
