@@ -21,12 +21,7 @@
 			"tyru" : ["restart.vim"]
 		},
 		"opt" : {
-			"dstein64" : ["vim-startuptime"],
-			"rbtnn" : [
-				"vim-testing-for-tabsidebar",
-				"vim-gloaded"
-			],
-			"thinca" : ["vim-prettyprint"]
+			"rbtnn" : ["vim-gloaded"]
 		}
 	}
 }

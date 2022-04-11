@@ -97,9 +97,6 @@ if executable('rg')
 	command! -nargs=0 GrepprgRg
 		\ :set grepformat=%f:%l:%c:%m
 		\ |let &grepprg = 'rg --vimgrep --glob "!.git" --glob "!.svn" -uu'
-	GrepprgRg
-else
-	GrepprgInternal
 endif
 
 if has('persistent_undo')
@@ -146,7 +143,7 @@ if has('tabsidebar')
 	set notabsidebarwrap
 	set showtabsidebar=2
 	set tabsidebar=%!TabSideBar()
-	set tabsidebarcolumns=20
+	set tabsidebarcolumns=16
 endif
 
 let &cedit = "\<C-q>"
@@ -178,7 +175,6 @@ if has('vim_starting')
 	set runtimepath=$VIMRUNTIME
 	set runtimepath+=$VIMRC_VIM/dev/vim-diffview
 	set runtimepath+=$VIMRC_VIM/dev/vim-qficonv
-	set runtimepath+=$VIMRC_VIM/dev/vim-find
 	silent! source ~/.vimrc.local
 	filetype plugin indent on
 	syntax enable
@@ -192,6 +188,11 @@ endif
 " https://github.com/vim/vim/issues/6040
 tnoremap <silent><S-space>           <space>
 
+" Force close
+if s:vimpatch_cmdtag
+	tnoremap <silent><C-w>c              <Cmd>:q!<cr>
+endif
+
 " Smart space on wildmenu
 cnoremap   <expr><space>             (wildmenumode() && (getcmdline() =~# '[\/]$')) ? '<space><bs>' : '<space>'
 
@@ -201,7 +202,6 @@ if has('nvim')
 endif
 
 nnoremap <silent><space>d       :<C-u>DiffView<cr>
-nnoremap         <space>f       :<C-u>Find<cr>
 
 nnoremap <expr>        gf       ((&buftype == 'terminal') ? '<C-w>gf' : 'gf')
 
@@ -248,6 +248,7 @@ endif
 
 if s:is_installed('vim-mrw')
 	nnoremap <silent><space>s       :<C-u>MRW<cr>
+	nnoremap         <space>f       :<C-u>MRW -filter=
 endif
 
 if s:is_installed('SpaceCamp')
