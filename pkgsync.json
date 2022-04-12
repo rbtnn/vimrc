@@ -2,7 +2,6 @@
 	"packpath" : "$VIMRC_VIM",
 	"plugins" : {
 		"start" : {
-			"jaredgorski" : ["SpaceCamp"],
 			"kana" : [
 				"vim-operator-replace",
 				"vim-operator-user",
@@ -16,6 +15,10 @@
 				"vim-vimscript_indentexpr",
 				"vim-vimscript_lasterror",
 				"vim-vimscript_tagfunc"
+			],
+			"cocopon" : [
+				"iceberg.vim",
+				"vaffle.vim"
 			],
 			"thinca" : ["vim-qfreplace"],
 			"tyru" : ["restart.vim"]

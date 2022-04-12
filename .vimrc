@@ -188,11 +188,6 @@ endif
 " https://github.com/vim/vim/issues/6040
 tnoremap <silent><S-space>           <space>
 
-" Force close
-if s:vimpatch_cmdtag
-	tnoremap <silent><C-w>c              <Cmd>:q!<cr>
-endif
-
 " Smart space on wildmenu
 cnoremap   <expr><space>             (wildmenumode() && (getcmdline() =~# '[\/]$')) ? '<space><bs>' : '<space>'
 
@@ -202,8 +197,6 @@ if has('nvim')
 endif
 
 nnoremap <silent><space>d       :<C-u>DiffView<cr>
-
-nnoremap <expr>        gf       ((&buftype == 'terminal') ? '<C-w>gf' : 'gf')
 
 " Emacs key mappings
 if has('win32') && (&shell =~# '\<cmd\.exe$')
@@ -247,23 +240,22 @@ if s:is_installed('vim-gloaded')
 endif
 
 if s:is_installed('vim-mrw')
-	nnoremap <silent><space>s       :<C-u>MRW<cr>
-	nnoremap         <space>f       :<C-u>MRW -filter=
+	if has('nvim')
+		nnoremap <silent><space>f       :<C-u>MRW<cr>
+	else
+		nnoremap <silent><space>f       :<C-u>call mrw#open_popupwin()<cr>
+	endif
 endif
 
-if s:is_installed('SpaceCamp')
+if s:is_installed('iceberg.vim')
 	if has('vim_starting')
 		autocmd vimrc ColorScheme      *
-			\ : highlight!       TabSideBar      guifg=#cccccc guibg=#262626    gui=NONE cterm=NONE
-			\ | highlight!       TabSideBarFill  guifg=NONE    guibg=#262626    gui=NONE cterm=NONE
-			\ | highlight!       TabSideBarSel   guifg=#ffffff guibg=#262626    gui=NONE cterm=NONE
-			\ | highlight!       TabSideBarLabel guifg=#777777 guibg=#262626    gui=BOLD cterm=NONE
+			\ : highlight!       TabSideBar      guifg=#cccccc guibg=#0f1117    gui=NONE cterm=NONE
+			\ | highlight!       TabSideBarFill  guifg=NONE    guibg=#0f1117    gui=NONE cterm=NONE
+			\ | highlight!       TabSideBarSel   guifg=#ffffff guibg=#0f1117    gui=NONE cterm=NONE
+			\ | highlight!       TabSideBarLabel guifg=#777777 guibg=#0f1117    gui=BOLD cterm=NONE
 			\ | highlight!       CursorIM        guifg=NONE    guibg=#ff3333
-			\ | highlight!       SpecialKey      guifg=#1f1f1f
-		autocmd vimrc FileType      diff
-			\ : highlight! link  diffRemoved     DiffDelete 
-			\ | highlight! link  diffAdded       DiffAdd
-		colorscheme spacecamp
+		colorscheme iceberg
 	endif
 else
 	if has('tabsidebar')
