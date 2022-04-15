@@ -175,6 +175,7 @@ if has('vim_starting')
 	set runtimepath=$VIMRUNTIME
 	set runtimepath+=$VIMRC_VIM/dev/vim-diffview
 	set runtimepath+=$VIMRC_VIM/dev/vim-qficonv
+	set runtimepath+=$VIMRC_VIM/dev/vim-popf
 	silent! source ~/.vimrc.local
 	filetype plugin indent on
 	syntax enable
@@ -196,7 +197,10 @@ if has('nvim')
 	tnoremap <silent><C-w>N          <C-\><C-n>
 endif
 
-nnoremap <silent><space>d       :<C-u>DiffView<cr>
+nnoremap     <silent><space>d       :<C-u>DiffView<cr>
+if !has('nvim')
+	nnoremap <silent><space>f       :<C-u>Popf<cr>
+endif
 
 " Emacs key mappings
 if has('win32') && (&shell =~# '\<cmd\.exe$')
@@ -237,14 +241,6 @@ endfunction
 
 if s:is_installed('vim-gloaded')
 	runtime OPT plugin/gloaded.vim
-endif
-
-if s:is_installed('vim-mrw')
-	if has('nvim')
-		nnoremap <silent><space>f       :<C-u>MRW<cr>
-	else
-		nnoremap <silent><space>f       :<C-u>call mrw#open_popupwin()<cr>
-	endif
 endif
 
 if s:is_installed('iceberg.vim')
