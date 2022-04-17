@@ -12,8 +12,15 @@ function! s:main(q_args) abort
 	endif
 	let rootdir = s:get_rootdir('.', get(split(cmd), 0, ''))
 	if !empty(cmd) && !empty(rootdir)
-		call s:open_window()
-		call s:setlines(rootdir, cmd)
+		let lines = s:system(cmd, rootdir)
+		if !empty(lines)
+			call s:open_window()
+			call s:setlines(rootdir, cmd, lines)
+		else
+			echohl Error
+			echo '[diffview] The modified file was not found!'
+			echohl None
+		endif
 	endif
 endfunction
 
@@ -52,11 +59,10 @@ function! s:setbuflines(lines) abort
 	setlocal buftype=nofile nomodifiable readonly
 endfunction
 
-function! s:setlines(rootdir, cmd) abort
+function! s:setlines(rootdir, cmd, lines) abort
 	let view = winsaveview()
-	let lines = s:system(a:cmd, a:rootdir)
 	let &l:statusline = a:cmd
-	call s:setbuflines(lines)
+	call s:setbuflines(a:lines)
 	let b:diffview = {
 		\ 'cmd': a:cmd,
 		\ 'rootdir': a:rootdir,
@@ -68,20 +74,20 @@ function! s:setlines(rootdir, cmd) abort
 	redraw
 
 	" The lines encodes after redrawing.
-	for i in range(0, len(lines) - 1)
+	for i in range(0, len(a:lines) - 1)
 		let enc_from = ''
-		if diffview#encoding#contains_multichar(lines[i])
-			if diffview#encoding#is_utf8(lines[i])
+		if diffview#encoding#contains_multichar(a:lines[i])
+			if diffview#encoding#is_utf8(a:lines[i])
 				let enc_from = 'utf-8'
 			else
 				let enc_from = 'shift_jis'
 			endif
 		endif
 		if !empty(enc_from) && (enc_from != &encoding)
-			let lines[i] = iconv(lines[i], enc_from, &encoding)
+			let a:lines[i] = iconv(a:lines[i], enc_from, &encoding)
 		endif
 	endfor
-	call s:setbuflines(lines)
+	call s:setbuflines(a:lines)
 endfunction
 
 function! s:find_window_by_path(path) abort

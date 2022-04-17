@@ -2,6 +2,7 @@
 	"packpath" : "$VIMRC_VIM",
 	"plugins" : {
 		"start" : {
+			"itchyny" : ["lightline.vim"],
 			"kana" : [
 				"vim-operator-replace",
 				"vim-operator-user",

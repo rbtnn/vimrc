@@ -173,9 +173,13 @@ if has('vim_starting')
 
 	set packpath=$VIMRC_VIM
 	set runtimepath=$VIMRUNTIME
-	set runtimepath+=$VIMRC_VIM/dev/vim-diffview
 	set runtimepath+=$VIMRC_VIM/dev/vim-qficonv
-	set runtimepath+=$VIMRC_VIM/dev/vim-popf
+	set runtimepath+=$VIMRC_VIM/dev/vim-diffview
+	nnoremap     <silent><space>d       :<C-u>DiffView<cr>
+	if !has('nvim')
+		set runtimepath+=$VIMRC_VIM/dev/vim-popf
+		nnoremap <silent><space>f       :<C-u>Popf<cr>
+	endif
 	silent! source ~/.vimrc.local
 	filetype plugin indent on
 	syntax enable
@@ -195,11 +199,6 @@ cnoremap   <expr><space>             (wildmenumode() && (getcmdline() =~# '[\/]$
 " Escape from Terminal mode.
 if has('nvim')
 	tnoremap <silent><C-w>N          <C-\><C-n>
-endif
-
-nnoremap     <silent><space>d       :<C-u>DiffView<cr>
-if !has('nvim')
-	nnoremap <silent><space>f       :<C-u>Popf<cr>
 endif
 
 " Emacs key mappings
@@ -244,6 +243,12 @@ if s:is_installed('vim-gloaded')
 endif
 
 if s:is_installed('iceberg.vim')
+	if s:is_installed('lightline.vim')
+		let g:lightline = {}
+		let g:lightline['colorscheme'] = 'iceberg'
+		let g:lightline['enable'] = { 'statusline': 1, 'tabline': 0, }
+		let g:lightline['separator'] = { 'left': nr2char(0xe0b0), 'right': nr2char(0xe0b2), }
+	endif
 	if has('vim_starting')
 		autocmd vimrc ColorScheme      *
 			\ : highlight!       TabSideBar      guifg=#cccccc guibg=#0f1117    gui=NONE cterm=NONE
