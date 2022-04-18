@@ -3,14 +3,16 @@ function! popf#exec(q_bang) abort
 	let s:MIN_LNUM = 2
 	let s:MAX_LNUM = &lines / 4
 
-	if a:q_bang == '!'
-		call popf#pre_source()
-	endif
 	let data = []
 	silent! let data += mrw#read_cachefile()
-	if exists('s:globlist')
-		let data += s:globlist
+	if !exists('s:globlist') || (a:q_bang == '!')
+		let xs = []
+		for x in get(g:, 'popf_globlist', [])
+			let xs += map(split(glob(x), "\n"), { i,x -> { 'path': fnamemodify(resolve(x), ':p:gs?\\?/?') } })
+		endfor
+		let s:globlist = xs
 	endif
+	let data += s:globlist
 
 	" exclude the current buffer.
 	let curr_path = expand('%:p:gs?\\?/?')
@@ -43,14 +45,6 @@ function! popf#exec(q_bang) abort
 	call win_execute(winid, 'setfiletype popf')
 endfunction
 
-function! popf#pre_source() abort
-	let xs = []
-	for x in get(g:, 'popf_globlist', [])
-		let xs += map(split(glob(x), "\n"), { i,x -> { 'path': fnamemodify(resolve(x), ':p:gs?\\?/?') } })
-	endfor
-	let s:globlist = xs
-endfunction
-
 function! s:filter(data, winid, key) abort
 	let xs = split(get(getbufline(winbufnr(a:winid), 1), 0, ''), '\zs')
 	let lnum = line('.', a:winid)
@@ -77,7 +71,7 @@ function! s:filter(data, winid, key) abort
 			call s:set_cursorline(a:winid, lnum - 1)
 		endif
 		return 1
-	elseif (128 == char2nr(a:key)) || (8 == char2nr(a:key))
+	elseif ("\x80kb" == a:key) || (8 == char2nr(a:key))
 		" Ctrl-h or bs
 		if 1 < len(xs)
 			call remove(xs, -1)
@@ -94,19 +88,13 @@ function! s:filter(data, winid, key) abort
 endfunction
 
 function! s:callback(winid, result) abort
-	let line = get(getbufline(winbufnr(a:winid), a:result), 0, '')
-	if !empty(line)
-		let m = matchlist(trim(line), '^\(.\{-\}\)\%((\(\d\+\),\(\d\+\))\)\?$')
-		if !empty(m) && filereadable(m[1])
-			let bnr = s:strict_bufnr(m[1])
-			if -1 == bnr
-				execute printf('edit %s', fnameescape(m[1]))
-			else
-				execute printf('buffer %d', bnr)
-			endif
-			if !empty(m[2]) && !empty(m[3])
-				call cursor(str2nr(m[2]), str2nr(m[3]))
-			endif
+	let line = trim(get(getbufline(winbufnr(a:winid), a:result), 0, ''))
+	if filereadable(line)
+		let bnr = s:strict_bufnr(line)
+		if -1 == bnr
+			execute printf('edit %s', fnameescape(line))
+		else
+			execute printf('buffer %d', bnr)
 		endif
 	endif
 endfunction
@@ -121,8 +109,6 @@ function! s:update_window(data, winid, xs) abort
 		let pathes = []
 		for x in a:data
 			let path = get(x, 'path', '')
-			let lnum = get(x, 'lnum', -1)
-			let col = get(x, 'col', -1)
 			if !filereadable(path)
 				continue
 			endif
@@ -132,11 +118,7 @@ function! s:update_window(data, winid, xs) abort
 			if -1 != index(pathes, path)
 				continue
 			endif
-			call setbufline(bnr, n + s:MIN_LNUM, 
-				\ ((-1 != lnum) && (-1 != col))
-				\ ? printf('%s(%d,%d)', path, lnum, col)
-				\ : path
-				\ )
+			call setbufline(bnr, n + s:MIN_LNUM, path)
 			let pathes += [path]
 			let n += 1
 			if s:MAX_LNUM - s:MIN_LNUM < n
