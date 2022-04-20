@@ -108,7 +108,7 @@ function! s:readdir(maxdepth, winid, bnr, pattern, file_count, path) abort
 					let dirs += [path]
 				endif
 			else
-				let s:file_count += 1
+				let file_count += 1
 				if -1 != stridx(path, a:pattern)
 					call setbufline(a:bnr, line('$', a:winid) + 1, path)
 					let file_count += 1
@@ -121,7 +121,7 @@ function! s:readdir(maxdepth, winid, bnr, pattern, file_count, path) abort
 			endfor
 		endif
 	endif
-	call popup_setoptions(a:winid, { 'title': printf(' %d/%d ', line('$', a:winid) - 1, s:file_count) })
+	call popup_setoptions(a:winid, { 'title': printf(' %d/%d ', line('$', a:winid) - 1, file_count) })
 	return file_count
 endfunction
 
