@@ -109,9 +109,8 @@ function! s:readdir(maxdepth, winid, bnr, pattern, file_count, path) abort
 				endif
 			else
 				let file_count += 1
-				if -1 != stridx(path, a:pattern)
+				if path =~ a:pattern
 					call setbufline(a:bnr, line('$', a:winid) + 1, path)
-					let file_count += 1
 				endif
 			endif
 		endfor
