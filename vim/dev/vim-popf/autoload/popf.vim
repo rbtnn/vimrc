@@ -1,9 +1,25 @@
 
-function! popf#exec(q_bang) abort
-	let s:MIN_LNUM = 2
+function! s:init() abort
+	let s:PROMPT_STR = split(getcwd() .. '>', '\zs')
+	let s:PROMPT_LEN = len(s:PROMPT_STR)
+	let s:PROMPT_LNUM = 1
+	let s:START_LNUM = 2
 	let s:MAX_LNUM = &lines / 4
+	let s:MAX_DEPTH = get(g:, 'popf_max_depth', 10)
+	let s:IGNORE_DIRNAMES = get(g:, 'popf_ignore_dirnames', [
+		\ 'undofiles', 'AppData', 'node_modules', 'bin',
+		\ ])
+	let s:IGNORE_EXTS = map(get(g:, 'popf_ignore_exts', [
+		\ 'dll', 'exe', 'obj', 'o', 'obj', 'dat', 'zip', 'png', 'jpg', 'ico',
+		\ 'mp3', 'mp4', 'pdf', 'doc', 'docx', 'xls', 'xlsx', 'gif', 'wav',
+		\ 'jpeg', 'msi', 'bin',
+		\ ]), { _,x -> tolower(x) })
+endfunction
 
-	let width = &columns - 4
+function! popf#exec(q_bang) abort
+	call s:init()
+
+	let width = &columns
 	if has('tabsidebar')
 		if (2 == &showtabsidebar) || ((1 == &showtabsidebar) && (1 < tabpagenr('$')))
 			let width -= &tabsidebarcolumns
@@ -16,15 +32,15 @@ function! popf#exec(q_bang) abort
 		\ 'pos': 'topleft',
 		\ 'line': 1,
 		\ 'col': 1,
-		\ 'minheight': s:MIN_LNUM,
+		\ 'minheight': s:PROMPT_LNUM,
 		\ 'maxheight': s:MAX_LNUM,
 		\ 'minwidth': width,
 		\ 'maxwidth': width,
-		\ 'highlight': 'Normal',
-		\ 'border': [1, 1, 1, 1],
+		\ 'border': [0, 0, 0, 0],
+		\ 'padding': [0, 0, 0, 0],
 		\ })
 
-	call s:update_window_async(winid, ['>'])
+	call s:update_window_async(winid, s:PROMPT_STR)
 	call win_execute(winid, 'setfiletype popf')
 endfunction
 
@@ -33,22 +49,22 @@ function! s:filter(winid, key) abort
 	let lnum = line('.', a:winid)
 	if 21 == char2nr(a:key)
 		" Ctrl-u
-		if 1 < len(xs)
-			call remove(xs, 1, -1)
+		if s:PROMPT_LEN < len(xs)
+			call remove(xs, s:PROMPT_LEN, -1)
 			call s:update_window_async(a:winid, xs)
 		endif
 		return 1
 	elseif 14 == char2nr(a:key)
 		" Ctrl-n
 		if lnum == line('$', a:winid)
-			call s:set_cursorline(a:winid, s:MIN_LNUM)
+			call s:set_cursorline(a:winid, s:START_LNUM)
 		else
 			call s:set_cursorline(a:winid, lnum + 1)
 		endif
 		return 1
 	elseif 16 == char2nr(a:key)
 		" Ctrl-p
-		if lnum == s:MIN_LNUM
+		if lnum == s:START_LNUM
 			call s:set_cursorline(a:winid, line('$', a:winid))
 		else
 			call s:set_cursorline(a:winid, lnum - 1)
@@ -56,7 +72,7 @@ function! s:filter(winid, key) abort
 		return 1
 	elseif ("\x80kb" == a:key) || (8 == char2nr(a:key))
 		" Ctrl-h or bs
-		if 1 < len(xs)
+		if s:PROMPT_LEN < len(xs)
 			call remove(xs, -1)
 			call s:update_window_async(a:winid, xs)
 		endif
@@ -88,14 +104,13 @@ function! s:update_window_async(winid, xs) abort
 		unlet s:timer
 	endif
 	let bnr = winbufnr(a:winid)
-	call setbufline(bnr, 1, join(a:xs, ''))
-	call deletebufline(bnr, s:MIN_LNUM, s:MAX_LNUM)
+	call setbufline(bnr, s:PROMPT_LNUM, join(a:xs, ''))
+	call deletebufline(bnr, s:START_LNUM, s:MAX_LNUM)
 	let s:timer = timer_start(0, function('s:update_window', [a:winid, a:xs]))
 endfunction
 
-function! s:readdir(maxdepth, winid, bnr, pattern, file_count, path) abort
-	let file_count = a:file_count
-	if 0 < a:maxdepth
+function! s:readdir(depth, winid, bnr, pattern, path) abort
+	if a:depth < s:MAX_DEPTH
 		let dirs = []
 		silent! let xs = readdir(a:path, 1, { 'sort': 'none' })
 		for x in xs
@@ -104,42 +119,44 @@ function! s:readdir(maxdepth, winid, bnr, pattern, file_count, path) abort
 			endif
 			let path = expand(a:path .. '/' .. x)
 			if isdirectory(path)
-				if (-1 == index(['undofiles', 'AppData', 'node_modules'], x)) && (x[0] != '.')
+				if (-1 == index(s:IGNORE_DIRNAMES, x)) && (x[0] != '.')
 					let dirs += [path]
 				endif
 			else
-				let file_count += 1
-				if path =~ a:pattern
+				let fname = fnamemodify(path, ':t')
+				let ext = tolower(fnamemodify(path, ':e'))
+				if (path =~ a:pattern)
+					\ && (-1 == index(s:IGNORE_EXTS, ext))
+					\ && (fname != 'desktop.ini')
+					\ && (fname !~ '^ntuser\.')
 					call setbufline(a:bnr, line('$', a:winid) + 1, path)
+					call win_execute(a:winid, 'redraw')
 				endif
 			endif
 		endfor
 		if line('$', a:winid) < s:MAX_LNUM
 			for path in dirs
-				let file_count = s:readdir(a:maxdepth - 1, a:winid, a:bnr, a:pattern, file_count, path)
+				call s:readdir(a:depth + 1, a:winid, a:bnr, a:pattern, path)
 			endfor
 		endif
 	endif
-	call popup_setoptions(a:winid, { 'title': printf(' %d/%d ', line('$', a:winid) - 1, file_count) })
-	return file_count
 endfunction
 
 function! s:update_window(winid, xs, t) abort
 	let bnr = winbufnr(a:winid)
-	let n = 0
-	let pattern = trim(join(a:xs[1:], ''))
-	try
-		let n = s:readdir(10, a:winid, bnr, pattern, s:MIN_LNUM, '.')
-		call deletebufline(bnr, n, s:MAX_LNUM)
-	catch
-		call setbufline(bnr, s:MIN_LNUM, v:exception)
-	endtry
-	if n == 0
-		call popup_setoptions(a:winid, { 'cursorline': v:false })
-	else
-		call popup_setoptions(a:winid, { 'cursorline': v:true })
-		if 1 == line('.', a:winid)
-			call s:set_cursorline(a:winid, s:MIN_LNUM)
+	let pattern = join(a:xs[(s:PROMPT_LEN):], '')
+	call popup_setoptions(a:winid, { 'cursorline': v:false })
+	if !empty(pattern)
+		try
+			call s:readdir(0, a:winid, bnr, pattern, '.')
+		catch
+			call setbufline(bnr, s:START_LNUM, v:exception)
+		endtry
+		if s:PROMPT_LNUM != line('$', a:winid)
+			call popup_setoptions(a:winid, { 'cursorline': v:true })
+			if s:PROMPT_LNUM == line('.', a:winid)
+				call s:set_cursorline(a:winid, s:START_LNUM)
+			endif
 		endif
 	endif
 endfunction

@@ -54,7 +54,6 @@ set nobackup
 set nonumber
 set norelativenumber
 set noruler
-set noshowcmd
 set noswapfile
 set nowrap
 set nowrapscan
@@ -66,6 +65,7 @@ set scrolloff&
 set sessionoptions=winpos,resize,tabpages,curdir,help
 set shiftround
 set shiftwidth=4
+set showcmd
 set showmatch
 set showmode
 set softtabstop=-1
