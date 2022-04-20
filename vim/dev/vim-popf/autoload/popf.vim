@@ -5,7 +5,9 @@ function! s:init() abort
 	let s:PROMPT_LNUM = 1
 	let s:START_LNUM = 2
 	let s:MAX_LNUM = &lines / 4
-	let s:MAX_DEPTH = get(g:, 'popf_max_depth', 10)
+	let s:SEARCHING_DIRECTORIES = get(g:, 'popf_searching_directories', [
+		\ { 'path': '.', 'maxdepth': 10, },
+		\ ])
 	let s:IGNORE_DIRNAMES = get(g:, 'popf_ignore_dirnames', [
 		\ 'undofiles', 'AppData', 'node_modules', 'bin',
 		\ ])
@@ -109,10 +111,10 @@ function! s:update_window_async(winid, xs) abort
 	let s:timer = timer_start(0, function('s:update_window', [a:winid, a:xs]))
 endfunction
 
-function! s:readdir(depth, winid, bnr, pattern, path) abort
-	if a:depth < s:MAX_DEPTH
+function! s:readdir(maxdepth, depth, winid, bnr, pattern, path) abort
+	if !empty(a:path) && isdirectory(expand(a:path)) && ((a:depth < a:maxdepth) || (-1 == a:maxdepth))
 		let dirs = []
-		silent! let xs = readdir(a:path, 1, { 'sort': 'none' })
+		silent! let xs = readdir(expand(a:path), 1, { 'sort': 'none' })
 		for x in xs
 			if !(line('$', a:winid) < s:MAX_LNUM)
 				break
@@ -136,7 +138,7 @@ function! s:readdir(depth, winid, bnr, pattern, path) abort
 		endfor
 		if line('$', a:winid) < s:MAX_LNUM
 			for path in dirs
-				call s:readdir(a:depth + 1, a:winid, a:bnr, a:pattern, path)
+				call s:readdir(a:maxdepth, a:depth + 1, a:winid, a:bnr, a:pattern, path)
 			endfor
 		endif
 	endif
@@ -148,7 +150,9 @@ function! s:update_window(winid, xs, t) abort
 	call popup_setoptions(a:winid, { 'cursorline': v:false })
 	if !empty(pattern)
 		try
-			call s:readdir(0, a:winid, bnr, pattern, '.')
+			for x in s:SEARCHING_DIRECTORIES
+				call s:readdir(get(x, 'maxdepth', -1), 0, a:winid, bnr, pattern, get(x, 'path', ''))
+			endfor
 		catch
 			call setbufline(bnr, s:START_LNUM, v:exception)
 		endtry
