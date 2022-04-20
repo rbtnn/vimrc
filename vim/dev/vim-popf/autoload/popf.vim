@@ -3,23 +3,6 @@ function! popf#exec(q_bang) abort
 	let s:MIN_LNUM = 2
 	let s:MAX_LNUM = &lines / 4
 
-	let data = []
-	silent! let data += mrw#read_cachefile()
-	if !exists('s:globlist') || (a:q_bang == '!')
-		let xs = []
-		for x in get(g:, 'popf_globlist', [])
-			let xs += map(split(glob(x), "\n"), { i,x -> { 'path': fnamemodify(resolve(x), ':p:gs?\\?/?') } })
-		endfor
-		let s:globlist = xs
-	endif
-	let data += s:globlist
-
-	" exclude the current buffer.
-	let curr_path = expand('%:p:gs?\\?/?')
-	if filereadable(curr_path)
-		call filter(data, { i,x -> x['path'] != curr_path })
-	endif
-
 	let width = &columns - 4
 	if has('tabsidebar')
 		if (2 == &showtabsidebar) || ((1 == &showtabsidebar) && (1 < tabpagenr('$')))
@@ -28,7 +11,7 @@ function! popf#exec(q_bang) abort
 	endif
 
 	let winid = popup_menu([], {
-		\ 'filter': function('s:filter', [data]),
+		\ 'filter': function('s:filter'),
 		\ 'callback': function('s:callback'),
 		\ 'pos': 'topleft',
 		\ 'line': 1,
@@ -41,18 +24,18 @@ function! popf#exec(q_bang) abort
 		\ 'border': [1, 1, 1, 1],
 		\ })
 
-	call s:update_window(data, winid, ['>'])
+	call s:update_window_async(winid, ['>'])
 	call win_execute(winid, 'setfiletype popf')
 endfunction
 
-function! s:filter(data, winid, key) abort
+function! s:filter(winid, key) abort
 	let xs = split(get(getbufline(winbufnr(a:winid), 1), 0, ''), '\zs')
 	let lnum = line('.', a:winid)
 	if 21 == char2nr(a:key)
 		" Ctrl-u
 		if 1 < len(xs)
 			call remove(xs, 1, -1)
-			call s:update_window(a:data, a:winid, xs)
+			call s:update_window_async(a:winid, xs)
 		endif
 		return 1
 	elseif 14 == char2nr(a:key)
@@ -75,12 +58,12 @@ function! s:filter(data, winid, key) abort
 		" Ctrl-h or bs
 		if 1 < len(xs)
 			call remove(xs, -1)
-			call s:update_window(a:data, a:winid, xs)
+			call s:update_window_async(a:winid, xs)
 		endif
 		return 1
 	elseif (0x20 <= char2nr(a:key)) && (char2nr(a:key) <= 0x7f)
 		let xs += [a:key]
-		call s:update_window(a:data, a:winid, xs)
+		call s:update_window_async(a:winid, xs)
 		return 1
 	else
 		return popup_filter_menu(a:winid, a:key)
@@ -99,39 +82,59 @@ function! s:callback(winid, result) abort
 	endif
 endfunction
 
-function! s:update_window(data, winid, xs) abort
+function! s:update_window_async(winid, xs) abort
+	if exists('s:timer')
+		call timer_stop(s:timer)
+		unlet s:timer
+	endif
 	let bnr = winbufnr(a:winid)
 	call setbufline(bnr, 1, join(a:xs, ''))
+	call deletebufline(bnr, s:MIN_LNUM, s:MAX_LNUM)
+	let s:timer = timer_start(0, function('s:update_window', [a:winid, a:xs]))
+endfunction
+
+function! s:readdir(maxdepth, winid, bnr, pattern, file_count, path) abort
+	let file_count = a:file_count
+	if 0 < a:maxdepth
+		let dirs = []
+		silent! let xs = readdir(a:path, 1, { 'sort': 'none' })
+		for x in xs
+			if !(line('$', a:winid) < s:MAX_LNUM)
+				break
+			endif
+			let path = expand(a:path .. '/' .. x)
+			if isdirectory(path)
+				if (-1 == index(['undofiles', 'AppData', 'node_modules'], x)) && (x[0] != '.')
+					let dirs += [path]
+				endif
+			else
+				let s:file_count += 1
+				if -1 != stridx(path, a:pattern)
+					call setbufline(a:bnr, line('$', a:winid) + 1, path)
+					let file_count += 1
+				endif
+			endif
+		endfor
+		if line('$', a:winid) < s:MAX_LNUM
+			for path in dirs
+				let file_count = s:readdir(a:maxdepth - 1, a:winid, a:bnr, a:pattern, file_count, path)
+			endfor
+		endif
+	endif
+	call popup_setoptions(a:winid, { 'title': printf(' %d/%d ', line('$', a:winid) - 1, s:file_count) })
+	return file_count
+endfunction
+
+function! s:update_window(winid, xs, t) abort
+	let bnr = winbufnr(a:winid)
 	let n = 0
 	let pattern = trim(join(a:xs[1:], ''))
 	try
-		call win_execute(a:winid, 'call clearmatches()')
-		let pathes = []
-		for x in a:data
-			let path = get(x, 'path', '')
-			if !filereadable(path)
-				continue
-			endif
-			if !empty(pattern) && (path !~ pattern)
-				continue
-			endif
-			if -1 != index(pathes, path)
-				continue
-			endif
-			call setbufline(bnr, n + s:MIN_LNUM, path)
-			let pathes += [path]
-			let n += 1
-			if s:MAX_LNUM - s:MIN_LNUM < n
-				break
-			endif
-		endfor
-		if !empty(pattern)
-			call win_execute(a:winid, printf('call matchadd("Search", %s)', string((&ignorecase ? '\c' : '') .. '\%>1l' .. pattern)))
-		endif
+		let n = s:readdir(10, a:winid, bnr, pattern, s:MIN_LNUM, '.')
+		call deletebufline(bnr, n, s:MAX_LNUM)
 	catch
 		call setbufline(bnr, s:MIN_LNUM, v:exception)
 	endtry
-	call deletebufline(bnr, s:MIN_LNUM + n, s:MAX_LNUM)
 	if n == 0
 		call popup_setoptions(a:winid, { 'cursorline': v:false })
 	else
