@@ -128,6 +128,7 @@ function! s:readdir(maxdepth, depth, winid, bnr, pattern, path) abort
 				if (path =~ a:pattern)
 					\ && (-1 == index(s:IGNORE_EXTS, ext))
 					\ && (fname != 'desktop.ini')
+					\ && (fname != '.DS_Store')
 					\ && (fname !~ '^ntuser\.')
 					call setbufline(a:bnr, line('$', a:winid) + 1, path)
 					"call win_execute(a:winid, 'redraw')
