@@ -83,22 +83,6 @@ if s:vimpatch_unsigned
 	set nrformats+=unsigned
 endif
 
-command! -nargs=0 GrepprgInternal
-	\ :set grepformat&
-	\ |set grepprg=internal
-
-if executable('git')
-	command! -nargs=0 GrepprgGit
-		\ :set grepformat=%f:%l:%c:%m
-		\ |let &grepprg = 'git --no-pager grep --column --line --no-color'
-endif
-
-if executable('rg')
-	command! -nargs=0 GrepprgRg
-		\ :set grepformat=%f:%l:%c:%m
-		\ |let &grepprg = 'rg --vimgrep --glob "!.git" --glob "!.svn" -uu'
-endif
-
 if has('persistent_undo')
 	set undofile
 	" https://github.com/neovim/neovim/commit/6995fad260e3e7c49e4f9dc4b63de03989411c7b
@@ -110,40 +94,6 @@ if has('persistent_undo')
 	silent! call mkdir(&undodir, 'p')
 else
 	set noundofile
-endif
-
-if has('tabsidebar')
-	function! TabSideBar() abort
-		try
-			let tnr = get(g:, 'actual_curtabpage', tabpagenr())
-			let lines = ['', printf('%s- Tab %d -%s', '%#TabSideBarLabel#', tnr, '%#TabSideBar#')]
-			for x in filter(getwininfo(), { i, x -> tnr == x['tabnr'] && ('popup' != win_gettype(x['winid'])) })
-				let ft = getbufvar(x['bufnr'], '&filetype')
-				let bt = getbufvar(x['bufnr'], '&buftype')
-				let lines += [
-					\    ((tnr == tabpagenr()) && (x['winnr'] == winnr()) ? '%#TabSideBarSel#' : '%#TabSideBar#')
-					\ .. ' '
-					\ .. (!empty(bt)
-					\      ? printf('[%s]', bt == 'nofile' ? ft : bt)
-					\      : (empty(bufname(x['bufnr']))
-					\          ? '[No Name]'
-					\          : fnamemodify(bufname(x['bufnr']), ':t')))
-					\ .. (getbufvar(x['bufnr'], '&modified') && empty(bt) ? '[+]' : '')
-					\ ]
-			endfor
-			return join(lines, "\n")
-		catch
-			let g:tab_throwpoint = v:throwpoint
-			let g:tab_exception = v:exception
-			return 'Error! Please see g:tab_throwpoint and g:tab_exception.'
-		endtry
-	endfunction
-	let g:tabsidebar_vertsplit = 0
-	set notabsidebaralign
-	set notabsidebarwrap
-	set showtabsidebar=2
-	set tabsidebar=%!TabSideBar()
-	set tabsidebarcolumns=16
 endif
 
 let &cedit = "\<C-q>"
@@ -175,11 +125,13 @@ if has('vim_starting')
 	set runtimepath=$VIMRUNTIME
 	set runtimepath+=$VIMRC_VIM/dev/vim-qficonv
 	set runtimepath+=$VIMRC_VIM/dev/vim-diffview
-	nnoremap     <silent><space>d       :<C-u>DiffView<cr>
-	if !has('nvim')
-		set runtimepath+=$VIMRC_VIM/dev/vim-popf
-		nnoremap <silent><space>f       :<C-u>Popf<cr>
-	endif
+	set runtimepath+=$VIMRC_VIM/dev/vim-grepsettings
+	set runtimepath+=$VIMRC_VIM/dev/vim-tabsidebar
+	set runtimepath+=$VIMRC_VIM/dev/vim-popf
+
+	nnoremap <silent><space>d       :<C-u>DiffView<cr>
+	nnoremap <silent><space>f       :<C-u>Popf<cr>
+
 	silent! source ~/.vimrc.local
 	filetype plugin indent on
 	syntax enable
@@ -230,8 +182,8 @@ if s:vimpatch_cmdtag
 	nnoremap <silent><C-k>           <Cmd>tabprevious<cr>
 
 	" Move the next/previous error in quickfix.
-	nnoremap <silent><C-n>           <Cmd>cnext<cr>
-	nnoremap <silent><C-p>           <Cmd>cprevious<cr>
+	nnoremap <silent><C-n>           <Cmd>cnext \| normal zz<cr>
+	nnoremap <silent><C-p>           <Cmd>cprevious \| normal zz<cr>
 endif
 
 function! s:is_installed(name) abort

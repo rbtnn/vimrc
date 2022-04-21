@@ -1,7 +1,9 @@
 
-function! s:init() abort
-	let s:PROMPT_STR = split(getcwd() .. '>', '\zs')
-	let s:PROMPT_LEN = len(s:PROMPT_STR)
+function! popf#exec(q_bang) abort
+	let s = split(pathshorten(getcwd()) .. '>', '\zs')
+	let s:PROMPT_INPUT = get(s:, 'PROMPT_INPUT', '')
+	let s:PROMPT_STR = s + split(s:PROMPT_INPUT, '\zs')
+	let s:PROMPT_LEN = len(s)
 	let s:PROMPT_LNUM = 1
 	let s:START_LNUM = 2
 	let s:MAX_LNUM = &lines / 4
@@ -16,10 +18,6 @@ function! s:init() abort
 		\ 'mp3', 'mp4', 'pdf', 'doc', 'docx', 'xls', 'xlsx', 'gif', 'wav',
 		\ 'jpeg', 'msi', 'bin',
 		\ ]), { _,x -> tolower(x) })
-endfunction
-
-function! popf#exec(q_bang) abort
-	call s:init()
 
 	let width = &columns
 	if has('tabsidebar')
@@ -132,7 +130,7 @@ function! s:readdir(maxdepth, depth, winid, bnr, pattern, path) abort
 					\ && (fname != 'desktop.ini')
 					\ && (fname !~ '^ntuser\.')
 					call setbufline(a:bnr, line('$', a:winid) + 1, path)
-					call win_execute(a:winid, 'redraw')
+					"call win_execute(a:winid, 'redraw')
 				endif
 			endif
 		endfor
@@ -146,12 +144,12 @@ endfunction
 
 function! s:update_window(winid, xs, t) abort
 	let bnr = winbufnr(a:winid)
-	let pattern = join(a:xs[(s:PROMPT_LEN):], '')
+	let s:PROMPT_INPUT = join(a:xs[(s:PROMPT_LEN):], '')
 	call popup_setoptions(a:winid, { 'cursorline': v:false })
-	if !empty(pattern)
+	if !empty(s:PROMPT_INPUT)
 		try
 			for x in s:SEARCHING_DIRECTORIES
-				call s:readdir(get(x, 'maxdepth', -1), 0, a:winid, bnr, pattern, get(x, 'path', ''))
+				call s:readdir(get(x, 'maxdepth', -1), 0, a:winid, bnr, s:PROMPT_INPUT, get(x, 'path', ''))
 			endfor
 		catch
 			call setbufline(bnr, s:START_LNUM, v:exception)
