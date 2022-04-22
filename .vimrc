@@ -123,14 +123,16 @@ if has('vim_starting')
 
 	set packpath=$VIMRC_VIM
 	set runtimepath=$VIMRUNTIME
-	set runtimepath+=$VIMRC_VIM/dev/vim-qficonv
+	set runtimepath+=$VIMRC_VIM/dev/vim-csvfilter
 	set runtimepath+=$VIMRC_VIM/dev/vim-diffview
+	set runtimepath+=$VIMRC_VIM/dev/vim-find
+	set runtimepath+=$VIMRC_VIM/dev/vim-funcgrep
 	set runtimepath+=$VIMRC_VIM/dev/vim-grepsettings
+	set runtimepath+=$VIMRC_VIM/dev/vim-qficonv
 	set runtimepath+=$VIMRC_VIM/dev/vim-tabsidebar
-	set runtimepath+=$VIMRC_VIM/dev/vim-popf
 
 	nnoremap <silent><space>d       :<C-u>DiffView<cr>
-	nnoremap <silent><space>f       :<C-u>Popf<cr>
+	nnoremap <silent><space>f       :<C-u>Find<cr>
 
 	silent! source ~/.vimrc.local
 	filetype plugin indent on
@@ -209,12 +211,6 @@ if s:is_installed('iceberg.vim')
 			\ | highlight!       TabSideBarLabel guifg=#777777 guibg=#0f1117    gui=BOLD cterm=NONE
 			\ | highlight!       CursorIM        guifg=NONE    guibg=#ff3333
 		colorscheme iceberg
-	endif
-else
-	if has('tabsidebar')
-		highlight!       TabSideBar                    guibg=NONE    gui=NONE cterm=NONE
-		highlight!       TabSideBarFill                guibg=NONE    gui=NONE cterm=NONE
-		highlight!       TabSideBarSel                 guibg=NONE    gui=NONE cterm=NONE
 	endif
 endif
 

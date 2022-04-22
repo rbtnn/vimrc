@@ -33,5 +33,10 @@ if has('tabsidebar')
 	set showtabsidebar=2
 	set tabsidebar=%!TabSideBar()
 	set tabsidebarcolumns=16
+	for s:name in ['TabSideBar', 'TabSideBarFill', 'TabSideBarSel']
+		if !hlexists(s:name)
+			execute printf('highlight! %s guibg=NONE gui=NONE cterm=NONE', s:name)
+		endif
+	endfor
 endif
 

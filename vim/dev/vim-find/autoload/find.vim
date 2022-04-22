@@ -1,5 +1,5 @@
 
-function! popf#exec(q_bang) abort
+function! find#exec(q_bang) abort
 	let s = split(pathshorten(getcwd()) .. '>', '\zs')
 	let s:PROMPT_INPUT = get(s:, 'PROMPT_INPUT', '')
 	let s:PROMPT_STR = s + split(s:PROMPT_INPUT, '\zs')
@@ -16,7 +16,8 @@ function! popf#exec(q_bang) abort
 	let s:IGNORE_EXTS = map(get(g:, 'popf_ignore_exts', [
 		\ 'dll', 'exe', 'obj', 'o', 'obj', 'dat', 'zip', 'png', 'jpg', 'ico',
 		\ 'mp3', 'mp4', 'pdf', 'doc', 'docx', 'xls', 'xlsx', 'gif', 'wav',
-		\ 'jpeg', 'msi', 'bin',
+		\ 'jpeg', 'msi', 'bin', 'sbr', 'ncb', 'opt', 'plg', 'pch', 'suo',
+		\ 'bsc', 'exp', 'lib', 'pdb', 'res', 'resx', 'rc', 'dsw',
 		\ ]), { _,x -> tolower(x) })
 
 	let width = &columns
@@ -41,7 +42,7 @@ function! popf#exec(q_bang) abort
 		\ })
 
 	call s:update_window_async(winid, s:PROMPT_STR)
-	call win_execute(winid, 'setfiletype popf')
+	call win_execute(winid, 'setfiletype find')
 endfunction
 
 function! s:filter(winid, key) abort
