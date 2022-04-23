@@ -2,6 +2,7 @@
 	"packpath" : "$VIMRC_VIM",
 	"plugins" : {
 		"start" : {
+			"NLKNguyen" : ["papercolor-theme"],
 			"itchyny" : ["lightline.vim"],
 			"kana" : [
 				"vim-operator-replace",
@@ -16,10 +17,6 @@
 				"vim-vimscript_indentexpr",
 				"vim-vimscript_lasterror",
 				"vim-vimscript_tagfunc"
-			],
-			"cocopon" : [
-				"iceberg.vim",
-				"vaffle.vim"
 			],
 			"thinca" : ["vim-qfreplace"],
 			"tyru" : ["restart.vim"]

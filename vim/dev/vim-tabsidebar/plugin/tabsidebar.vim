@@ -27,7 +27,7 @@ if has('tabsidebar')
 			return 'Error! Please see g:tab_throwpoint and g:tab_exception.'
 		endtry
 	endfunction
-	let g:tabsidebar_vertsplit = 0
+	let g:tabsidebar_vertsplit = 1
 	set notabsidebaralign
 	set notabsidebarwrap
 	set showtabsidebar=2

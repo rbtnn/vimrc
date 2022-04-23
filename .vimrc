@@ -20,7 +20,9 @@ augroup vimrc
 	autocmd!
 	" Delete unused commands, because it's an obstacle on cmdline-completion.
 	autocmd CmdlineEnter     *
-		\ : for s:cmdname in ['MANPAGER', 'Man', 'Tutor', 'VimFoldh', 'TextobjStringDefaultKeyMappings', 'UpdateRemotePlugins']
+		\ : for s:cmdname in [
+		\   'MANPAGER', 'Man', 'Tutor', 'VimFoldh', 'TextobjStringDefaultKeyMappings',
+		\   'UpdateRemotePlugins', 'PaperColor']
 		\ | 	execute printf('silent! delcommand %s', s:cmdname)
 		\ | endfor
 		\ | unlet s:cmdname
@@ -40,7 +42,6 @@ set cmdwinheight=5
 set complete-=t
 set completeslash=slash
 set fileformats=unix,dos
-set fillchars=eob:\ ,vert:\ ,fold:-
 set foldlevelstart=999
 set foldmethod=indent
 set ignorecase
@@ -196,21 +197,23 @@ if s:is_installed('vim-gloaded')
 	runtime OPT plugin/gloaded.vim
 endif
 
-if s:is_installed('iceberg.vim')
+if s:is_installed('papercolor-theme')
 	if s:is_installed('lightline.vim')
 		let g:lightline = {}
-		let g:lightline['colorscheme'] = 'iceberg'
+		let g:lightline['colorscheme'] = 'PaperColor'
 		let g:lightline['enable'] = { 'statusline': 1, 'tabline': 0, }
 		let g:lightline['separator'] = { 'left': nr2char(0xe0b0), 'right': nr2char(0xe0b2), }
 	endif
 	if has('vim_starting')
 		autocmd vimrc ColorScheme      *
-			\ : highlight!       TabSideBar      guifg=#cccccc guibg=#0f1117    gui=NONE cterm=NONE
-			\ | highlight!       TabSideBarFill  guifg=NONE    guibg=#0f1117    gui=NONE cterm=NONE
-			\ | highlight!       TabSideBarSel   guifg=#ffffff guibg=#0f1117    gui=NONE cterm=NONE
-			\ | highlight!       TabSideBarLabel guifg=#777777 guibg=#0f1117    gui=BOLD cterm=NONE
-			\ | highlight!       CursorIM        guifg=NONE    guibg=#ff3333
-		colorscheme iceberg
+			\ : highlight!       TabSideBar      guifg=#bcbcbc guibg=NONE    gui=NONE cterm=NONE
+			\ | highlight!       TabSideBarFill  guifg=NONE    guibg=NONE    gui=NONE cterm=NONE
+			\ | highlight!       TabSideBarSel   guifg=#1c1c1c guibg=NONE    gui=NONE cterm=NONE
+			\ | highlight!       TabSideBarLabel guifg=#008700 guibg=NONE    gui=BOLD cterm=NONE
+			\ | highlight!       SpecialKey      guifg=#dddddd guibg=NONE
+			\ | highlight!       CursorIM        guifg=NONE    guibg=#d70000
+		set background=light
+		colorscheme PaperColor
 	endif
 endif
 
