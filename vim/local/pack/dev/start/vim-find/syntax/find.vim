@@ -5,5 +5,5 @@ endif
 
 syntax match   findSearch      '^\%1l[^>]*>'
 
-highlight default link findSearch      Title
+highlight default link findSearch     Directory 
 

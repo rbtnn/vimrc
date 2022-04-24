@@ -48,10 +48,10 @@ set ignorecase
 set incsearch
 set isfname-==
 set keywordprg=:help
-set list listchars=tab:<->
 set matchpairs+=<:>
 set matchtime=1
 set nobackup
+set nolist listchars=tab:<->
 set nonumber
 set norelativenumber
 set noruler
@@ -122,15 +122,8 @@ if has('vim_starting')
 		endif
 	endif
 
-	set packpath=$VIMRC_VIM
+	set packpath=$VIMRC_VIM/local,$VIMRC_VIM/github
 	set runtimepath=$VIMRUNTIME
-	set runtimepath+=$VIMRC_VIM/dev/vim-csvfilter
-	set runtimepath+=$VIMRC_VIM/dev/vim-diffview
-	set runtimepath+=$VIMRC_VIM/dev/vim-find
-	set runtimepath+=$VIMRC_VIM/dev/vim-funcgrep
-	set runtimepath+=$VIMRC_VIM/dev/vim-grepsettings
-	set runtimepath+=$VIMRC_VIM/dev/vim-qficonv
-	set runtimepath+=$VIMRC_VIM/dev/vim-tabsidebar
 
 	nnoremap <silent><space>d       :<C-u>DiffView<cr>
 	nnoremap <silent><space>f       :<C-u>Find<cr>
@@ -190,7 +183,7 @@ if s:vimpatch_cmdtag
 endif
 
 function! s:is_installed(name) abort
-	return !empty(globpath($VIMRC_VIM, 'pack/*/*/' .. a:name))
+	return !empty(globpath($VIMRC_VIM, 'github/pack/*/*/' .. a:name))
 endfunction
 
 if s:is_installed('vim-gloaded')

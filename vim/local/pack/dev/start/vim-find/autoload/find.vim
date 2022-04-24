@@ -120,7 +120,7 @@ function! s:readdir(maxdepth, depth, winid, bnr, pattern, path) abort
 			endif
 			let path = expand(a:path .. '/' .. x)
 			if isdirectory(path)
-				if (-1 == index(s:IGNORE_DIRNAMES, x)) && (x[0] != '.')
+				if (-1 == index(s:IGNORE_DIRNAMES, x)) && ((x[0] != '.') || (-1 != index(['.github'], x)))
 					let dirs += [path]
 				endif
 			else
