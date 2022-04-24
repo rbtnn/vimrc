@@ -35,6 +35,7 @@
 .gstreamer-0.10/
 .gtkrc-2.0
 .keras/
+.lesshst
 .lldb/
 .local/
 .matplotlib/
