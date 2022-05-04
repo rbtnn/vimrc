@@ -22,7 +22,7 @@ augroup vimrc
 	autocmd CmdlineEnter     *
 		\ : for s:cmdname in [
 		\   'MANPAGER', 'Man', 'Tutor', 'VimFoldh', 'TextobjStringDefaultKeyMappings',
-		\   'UpdateRemotePlugins', 'PaperColor']
+		\   'UpdateRemotePlugins', 'TextobjVimfunctionnameDefaultKeyMappings']
 		\ | 	execute printf('silent! delcommand %s', s:cmdname)
 		\ | endfor
 		\ | unlet s:cmdname
@@ -51,7 +51,7 @@ set keywordprg=:help
 set matchpairs+=<:>
 set matchtime=1
 set nobackup
-set nolist listchars=tab:<->
+set list listchars=tab:<->
 set nonumber
 set norelativenumber
 set noruler
@@ -165,10 +165,20 @@ cnoremap         <C-e>               <end>
 cnoremap         <C-a>               <home>
 
 if s:vimpatch_cmdtag
-	if has('nvim')
-		nnoremap <silent><space>t    <Cmd>new \| execute 'terminal' \| startinsert<cr>
-	else
-		nnoremap <silent><space>t    <Cmd>new \| terminal ++curwin<cr>
+	if has('vim_starting')
+		if has('nvim')
+			nnoremap <silent><space>t    <Cmd>new \| execute 'terminal' \| startinsert<cr>
+		else
+			nnoremap <silent><space>t    <Cmd>new \| terminal ++curwin<cr>
+			if has('win32')
+				if executable('wmic') && (-1 == get(s:, 'windows_build_number', -1))
+					let s:windows_build_number = str2nr(join(filter(split(system('wmic os get BuildNumber'), '\zs'), { i,x -> (0x30 <= char2nr(x)) && (char2nr(x) <= 0x39) }), ''))
+					if 14393 <= s:windows_build_number
+						nnoremap <silent><space>t    <Cmd>new \| terminal ++curwin ++close cmd /K "prompt $e[31m$$$e[0m"<cr>
+					endif
+				endif
+			endif
+		endif
 	endif
 
 	" Move the next/previous tabpage.
@@ -190,23 +200,21 @@ if s:is_installed('vim-gloaded')
 	runtime OPT plugin/gloaded.vim
 endif
 
-if s:is_installed('papercolor-theme')
+if s:is_installed('palenight.vim')
 	if s:is_installed('lightline.vim')
 		let g:lightline = {}
-		let g:lightline['colorscheme'] = 'PaperColor'
+		let g:lightline['colorscheme'] = 'palenight'
 		let g:lightline['enable'] = { 'statusline': 1, 'tabline': 0, }
 		let g:lightline['separator'] = { 'left': nr2char(0xe0b0), 'right': nr2char(0xe0b2), }
 	endif
 	if has('vim_starting')
 		autocmd vimrc ColorScheme      *
-			\ : highlight!       TabSideBar      guifg=#bcbcbc guibg=NONE    gui=NONE cterm=NONE
+			\ : highlight!       TabSideBar      guifg=#777777 guibg=NONE    gui=NONE cterm=NONE
 			\ | highlight!       TabSideBarFill  guifg=NONE    guibg=NONE    gui=NONE cterm=NONE
-			\ | highlight!       TabSideBarSel   guifg=#1c1c1c guibg=NONE    gui=NONE cterm=NONE
-			\ | highlight!       TabSideBarLabel guifg=#008700 guibg=NONE    gui=BOLD cterm=NONE
-			\ | highlight!       SpecialKey      guifg=#dddddd guibg=NONE
+			\ | highlight!       TabSideBarSel   guifg=#ffffff guibg=NONE    gui=NONE cterm=NONE
+			\ | highlight!       TabSideBarLabel guifg=#00a700 guibg=NONE    gui=BOLD cterm=NONE
 			\ | highlight!       CursorIM        guifg=NONE    guibg=#d70000
-		set background=light
-		colorscheme PaperColor
+		colorscheme palenight
 	endif
 endif
 

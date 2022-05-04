@@ -1,7 +1,7 @@
 
 function! find#exec(q_bang) abort
 	let s = split(pathshorten(getcwd()) .. '>', '\zs')
-	let s:PROMPT_INPUT = get(s:, 'PROMPT_INPUT', '')
+	let s:PROMPT_INPUT = substitute(get(s:, 'PROMPT_INPUT', ''), '^\s\+', '', '')
 	let s:PROMPT_STR = s + split(s:PROMPT_INPUT, '\zs')
 	let s:PROMPT_LEN = len(s)
 	let s:PROMPT_LNUM = 1
@@ -46,7 +46,8 @@ function! find#exec(q_bang) abort
 endfunction
 
 function! s:filter(winid, key) abort
-	let xs = split(get(getbufline(winbufnr(a:winid), 1), 0, ''), '\zs')
+	let text = get(getbufline(winbufnr(a:winid), 1), 0, '')
+	let xs = split(text, '\zs')
 	let lnum = line('.', a:winid)
 	if 21 == char2nr(a:key)
 		" Ctrl-u
@@ -77,6 +78,8 @@ function! s:filter(winid, key) abort
 			call remove(xs, -1)
 			call s:update_window_async(a:winid, xs)
 		endif
+		return 1
+	elseif (0x20 == char2nr(a:key)) && (s:PROMPT_LEN == len(text))
 		return 1
 	elseif (0x20 <= char2nr(a:key)) && (char2nr(a:key) <= 0x7f)
 		let xs += [a:key]
