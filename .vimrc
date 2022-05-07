@@ -22,8 +22,11 @@ augroup vimrc
 	autocmd CmdlineEnter     *
 		\ : for s:cmdname in [
 		\   'MANPAGER', 'Man', 'Tutor', 'VimFoldh', 'TextobjStringDefaultKeyMappings',
-		\   'UpdateRemotePlugins', 'TextobjVimfunctionnameDefaultKeyMappings']
-		\ | 	execute printf('silent! delcommand %s', s:cmdname)
+		\   'UpdateRemotePlugins', 'TextobjVimfunctionnameDefaultKeyMappings',
+		\   'VimTweakDisableCaption', 'VimTweakDisableMaximize', 'VimTweakDisableTopMost',
+		\   'VimTweakEnableCaption', 'VimTweakEnableMaximize', 'VimTweakEnableTopMost',
+		\ ]
+		\ |     execute printf('silent! delcommand %s', s:cmdname)
 		\ | endfor
 		\ | unlet s:cmdname
 	autocmd FileType     help :setlocal colorcolumn=78
@@ -44,14 +47,16 @@ set completeslash=slash
 set fileformats=unix,dos
 set foldlevelstart=999
 set foldmethod=indent
+set grepformat&
+set grepprg=internal
 set ignorecase
 set incsearch
 set isfname-==
 set keywordprg=:help
+set list listchars=tab:<->
 set matchpairs+=<:>
 set matchtime=1
 set nobackup
-set list listchars=tab:<->
 set nonumber
 set norelativenumber
 set noruler
@@ -170,10 +175,14 @@ if s:vimpatch_cmdtag
 			nnoremap <silent><space>t    <Cmd>new \| execute 'terminal' \| startinsert<cr>
 		else
 			nnoremap <silent><space>t    <Cmd>new \| terminal ++curwin<cr>
-			if has('win32')
-				if executable('wmic') && (-1 == get(s:, 'windows_build_number', -1))
-					let s:windows_build_number = str2nr(join(filter(split(system('wmic os get BuildNumber'), '\zs'), { i,x -> (0x30 <= char2nr(x)) && (char2nr(x) <= 0x39) }), ''))
-					if 14393 <= s:windows_build_number
+		endif
+		if has('win32')
+			if executable('wmic') && (-1 == get(s:, 'windows_build_number', -1))
+				let s:windows_build_number = str2nr(join(filter(split(system('wmic os get BuildNumber'), '\zs'), { i,x -> (0x30 <= char2nr(x)) && (char2nr(x) <= 0x39) }), ''))
+				if 14393 <= s:windows_build_number
+					if has('nvim')
+						nnoremap <silent><space>t    <Cmd>new \| execute 'terminal cmd /K "prompt $e[31m$$$e[0m"' \| startinsert<cr>
+					else
 						nnoremap <silent><space>t    <Cmd>new \| terminal ++curwin ++close cmd /K "prompt $e[31m$$$e[0m"<cr>
 					endif
 				endif
@@ -216,6 +225,14 @@ if s:is_installed('palenight.vim')
 			\ | highlight!       CursorIM        guifg=NONE    guibg=#d70000
 		colorscheme palenight
 	endif
+endif
+
+if s:is_installed('vim-ripgrep')
+	command! -nargs=+ -complete=file Ripgrep :call ripgrep#search(<q-args>)
+	function! RipgrepFinish(...) abort
+		echo '[ripgrep] finished:' .. a:0['status']
+	endfunction
+	call ripgrep#observe#add_observer(g:ripgrep#event#finish, 'RipgrepFinish')
 endif
 
 if s:is_installed('vim-operator-replace')
