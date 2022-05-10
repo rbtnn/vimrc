@@ -170,23 +170,28 @@ cnoremap         <C-e>               <end>
 cnoremap         <C-a>               <home>
 
 if s:vimpatch_cmdtag
-	if has('vim_starting')
+	if has('nvim')
+		nnoremap <silent><space>t    <Cmd>new \| execute 'terminal' \| startinsert<cr>
+	else
+		nnoremap <silent><space>t    <Cmd>new \| terminal ++curwin<cr>
+	endif
+	if has('win32') && executable('wmic')
 		if has('nvim')
-			nnoremap <silent><space>t    <Cmd>new \| execute 'terminal' \| startinsert<cr>
-		else
-			nnoremap <silent><space>t    <Cmd>new \| terminal ++curwin<cr>
-		endif
-		if has('win32')
-			if executable('wmic') && (-1 == get(s:, 'windows_build_number', -1))
-				let s:windows_build_number = str2nr(join(filter(split(system('wmic os get BuildNumber'), '\zs'), { i,x -> (0x30 <= char2nr(x)) && (char2nr(x) <= 0x39) }), ''))
-				if 14393 <= s:windows_build_number
-					if has('nvim')
+			function! s:on_stdout(ch, data, name) abort
+				for line in a:data
+					if 14393 < str2nr(trim(line))
 						nnoremap <silent><space>t    <Cmd>new \| execute 'terminal cmd /K "prompt $e[31m$$$e[0m"' \| startinsert<cr>
-					else
-						nnoremap <silent><space>t    <Cmd>new \| terminal ++curwin ++close cmd /K "prompt $e[31m$$$e[0m"<cr>
 					endif
+				endfor
+			endfunction
+			call jobstart('wmic os get BuildNumber', { 'on_stdout': function('s:on_stdout'), })
+		else
+			function! s:out_cb(ch, mes) abort
+				if 14393 < str2nr(trim(a:mes))
+					nnoremap <silent><space>t    <Cmd>new \| terminal ++curwin ++close cmd /K "prompt $e[31m$$$e[0m"<cr>
 				endif
-			endif
+			endfunction
+			call job_start('wmic os get BuildNumber', { 'out_cb': function('s:out_cb'), })
 		endif
 	endif
 
