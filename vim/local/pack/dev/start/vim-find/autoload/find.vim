@@ -7,13 +7,13 @@ function! find#exec(q_bang) abort
 	let s:PROMPT_LNUM = 1
 	let s:START_LNUM = 2
 	let s:MAX_LNUM = &lines / 4
-	let s:SEARCHING_DIRECTORIES = get(g:, 'popf_searching_directories', [
+	let s:SEARCHING_DIRECTORIES = get(g:, 'find_searching_directories', [
 		\ { 'path': '.', 'maxdepth': 10, },
 		\ ])
-	let s:IGNORE_DIRNAMES = get(g:, 'popf_ignore_dirnames', [
+	let s:IGNORE_DIRNAMES = get(g:, 'find_ignore_dirnames', [
 		\ 'undofiles', 'AppData', 'node_modules', 'bin',
 		\ ])
-	let s:IGNORE_EXTS = map(get(g:, 'popf_ignore_exts', [
+	let s:IGNORE_EXTS = map(get(g:, 'find_ignore_exts', [
 		\ 'dll', 'exe', 'obj', 'o', 'obj', 'dat', 'zip', 'png', 'jpg', 'ico',
 		\ 'mp3', 'mp4', 'pdf', 'doc', 'docx', 'xls', 'xlsx', 'gif', 'wav',
 		\ 'jpeg', 'msi', 'bin', 'sbr', 'ncb', 'opt', 'plg', 'pch', 'suo',

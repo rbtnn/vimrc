@@ -89,6 +89,12 @@ if s:vimpatch_unsigned
 	set nrformats+=unsigned
 endif
 
+if executable('rg')
+	command! -nargs=0 GrepSettingsRg
+		\ :set grepformat=%f:%l:%c:%m
+		\ |let &grepprg = 'rg --vimgrep --glob "!.git" --glob "!.svn" -uu'
+endif
+
 if has('persistent_undo')
 	set undofile
 	" https://github.com/neovim/neovim/commit/6995fad260e3e7c49e4f9dc4b63de03989411c7b
@@ -230,14 +236,6 @@ if s:is_installed('palenight.vim')
 			\ | highlight!       CursorIM        guifg=NONE    guibg=#d70000
 		colorscheme palenight
 	endif
-endif
-
-if s:is_installed('vim-ripgrep')
-	command! -nargs=+ -complete=file Ripgrep :call ripgrep#search(<q-args>)
-	function! RipgrepFinish(...) abort
-		echo '[ripgrep] finished:' .. a:0['status']
-	endfunction
-	call ripgrep#observe#add_observer(g:ripgrep#event#finish, 'RipgrepFinish')
 endif
 
 if s:is_installed('vim-operator-replace')
