@@ -220,21 +220,31 @@ if s:is_installed('vim-gloaded')
 	runtime OPT plugin/gloaded.vim
 endif
 
-if s:is_installed('palenight.vim')
-	if s:is_installed('lightline.vim')
-		let g:lightline = {}
-		let g:lightline['colorscheme'] = 'palenight'
-		let g:lightline['enable'] = { 'statusline': 1, 'tabline': 0, }
-		let g:lightline['separator'] = { 'left': nr2char(0xe0b0), 'right': nr2char(0xe0b2), }
-	endif
+if s:is_installed('lightline.vim')
+	let g:lightline = {}
+	let g:lightline['colorscheme'] = '...'
+	let g:lightline['enable'] = { 'statusline': 1, 'tabline': 0, }
+	let g:lightline['separator'] = { 'left': nr2char(0xe0b0), 'right': nr2char(0xe0b2), }
+endif
+
+if s:is_installed('vim-colors-off')
 	if has('vim_starting')
 		autocmd vimrc ColorScheme      *
 			\ : highlight!       TabSideBar      guifg=#777777 guibg=NONE    gui=NONE cterm=NONE
 			\ | highlight!       TabSideBarFill  guifg=NONE    guibg=NONE    gui=NONE cterm=NONE
 			\ | highlight!       TabSideBarSel   guifg=#ffffff guibg=NONE    gui=NONE cterm=NONE
 			\ | highlight!       TabSideBarLabel guifg=#00a700 guibg=NONE    gui=BOLD cterm=NONE
+			\ | highlight!       Comment                                     gui=NONE cterm=NONE
 			\ | highlight!       CursorIM        guifg=NONE    guibg=#d70000
-		colorscheme palenight
+			\ | highlight!       SpecialKey      guifg=#0f3727
+		set background=dark
+		colorscheme off
+	endif
+endif
+
+if s:is_installed('vimtweak')
+	if has('vim_starting')
+		call timer_start(500, {-> execute('silent! VimTweakSetAlpha 230') })
 	endif
 endif
 
