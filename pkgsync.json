@@ -1,1 +1,37 @@
-{"plugins":{"opt":{"rbtnn":["vim-gloaded"]},"start":{"rbtnn":["vim-ambiwidth","vim-mrw","vim-pkgsync","vim-textobj-string","vim-vimscript_indentexpr","vim-vimscript_lasterror","vim-vimscript_tagfunc","vim-textobj-vimfunctionname","vimtweak"],"pbrisbin":["vim-colors-off"],"drewtempelmeyer":[],"kana":["vim-operator-replace","vim-operator-user","vim-textobj-user"],"thinca":["vim-qfreplace"],"tyru":["restart.vim"]}},"packpath":"~/vim/github"}
+{
+	"packpath": "~/vim/github",
+	"plugins": {
+		"start": {
+			"drewtempelmeyer": [
+				"palenight.vim"
+			],
+			"kana": [
+				"vim-operator-replace",
+				"vim-operator-user",
+				"vim-textobj-user"
+			],
+			"rbtnn": [
+				"vim-ambiwidth",
+				"vim-mrw",
+				"vim-pkgsync",
+				"vim-textobj-string",
+				"vim-textobj-vimfunctionname",
+				"vim-vimscript_indentexpr",
+				"vim-vimscript_lasterror",
+				"vim-vimscript_tagfunc",
+				"vimtweak"
+			],
+			"thinca": [
+				"vim-qfreplace"
+			],
+			"tyru": [
+				"restart.vim"
+			]
+		},
+		"opt": {
+			"rbtnn": [
+				"vim-gloaded"
+			]
+		}
+	}
+}

@@ -59,13 +59,13 @@ set matchtime=1
 set nobackup
 set nonumber
 set norelativenumber
-set noruler
 set noswapfile
 set nowrap
 set nowrapscan
 set nowritebackup
 set nrformats&
 set pumheight=10
+set ruler
 set rulerformat&
 set scrolloff&
 set sessionoptions=winpos,resize,tabpages,curdir,help
@@ -212,47 +212,44 @@ if s:vimpatch_cmdtag
 	nnoremap <silent><C-p>           <Cmd>cprevious \| normal zz<cr>
 endif
 
-function! s:is_installed(name) abort
-	return !empty(globpath($VIMRC_VIM, 'github/pack/*/*/' .. a:name))
+function! s:is_installed(user_and_name) abort
+	let xs = split(a:user_and_name, '/')
+	return !empty(globpath($VIMRC_VIM, 'github/pack/' .. xs[0] .. '/*/' .. xs[1]))
 endfunction
 
-if s:is_installed('vim-gloaded')
+if s:is_installed('rbtnn/vim-gloaded')
 	runtime OPT plugin/gloaded.vim
 endif
 
-if s:is_installed('lightline.vim')
-	let g:lightline = {}
-	let g:lightline['colorscheme'] = '...'
-	let g:lightline['enable'] = { 'statusline': 1, 'tabline': 0, }
-	let g:lightline['separator'] = { 'left': nr2char(0xe0b0), 'right': nr2char(0xe0b2), }
-endif
-
-if s:is_installed('vim-colors-off')
+if s:is_installed('drewtempelmeyer/palenight.vim')
+	if s:is_installed('itchyny/lightline.vim')
+		let g:lightline = {}
+		let g:lightline['colorscheme'] = 'palenight'
+		let g:lightline['enable'] = { 'statusline': 1, 'tabline': 0, }
+		let g:lightline['separator'] = { 'left': nr2char(0xe0b0), 'right': nr2char(0xe0b2), }
+	endif
 	if has('vim_starting')
 		autocmd vimrc ColorScheme      *
 			\ : highlight!       TabSideBar      guifg=#777777 guibg=NONE    gui=NONE cterm=NONE
 			\ | highlight!       TabSideBarFill  guifg=NONE    guibg=NONE    gui=NONE cterm=NONE
 			\ | highlight!       TabSideBarSel   guifg=#ffffff guibg=NONE    gui=NONE cterm=NONE
 			\ | highlight!       TabSideBarLabel guifg=#00a700 guibg=NONE    gui=BOLD cterm=NONE
-			\ | highlight!       Comment                                     gui=NONE cterm=NONE
 			\ | highlight!       CursorIM        guifg=NONE    guibg=#d70000
-			\ | highlight!       SpecialKey      guifg=#0f3727
-		set background=dark
-		colorscheme off
+		colorscheme palenight
 	endif
 endif
 
-if s:is_installed('vimtweak')
+if s:is_installed('rbtnn/vimtweak')
 	if has('vim_starting')
 		call timer_start(500, {-> execute('silent! VimTweakSetAlpha 230') })
 	endif
 endif
 
-if s:is_installed('vim-operator-replace')
+if s:is_installed('kana/vim-operator-replace')
 	nmap     <silent>s           <Plug>(operator-replace)
 endif
 
-if s:is_installed('restart.vim')
+if s:is_installed('tyru/restart.vim')
 	let g:restart_sessionoptions = &sessionoptions
 endif
 
