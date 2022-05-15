@@ -116,33 +116,39 @@ endfunction
 function! s:readdir(maxdepth, depth, winid, bnr, pattern, path) abort
 	if !empty(a:path) && isdirectory(expand(a:path)) && ((a:depth < a:maxdepth) || (-1 == a:maxdepth))
 		let dirs = []
-		silent! let xs = readdir(expand(a:path), 1, { 'sort': 'none' })
-		for x in xs
-			if !(line('$', a:winid) < s:MAX_LNUM)
-				break
+		let key = expand(a:path)
+		if !empty(key) 
+			let s:caches = get(s:, 'caches', {})
+			if !has_key(s:caches, key)
+				silent! let s:caches[key] = readdir(key, 1, { 'sort': 'none' })
 			endif
-			let path = expand(a:path .. '/' .. x)
-			if isdirectory(path)
-				if (-1 == index(s:IGNORE_DIRNAMES, x)) && ((x[0] != '.') || (-1 != index(['.github'], x)))
-					let dirs += [path]
+			for x in get(s:caches, key, [])
+				if !(line('$', a:winid) < s:MAX_LNUM)
+					break
 				endif
-			else
-				let fname = fnamemodify(path, ':t')
-				let ext = tolower(fnamemodify(path, ':e'))
-				if (path =~ a:pattern)
-					\ && (-1 == index(s:IGNORE_EXTS, ext))
-					\ && (fname != 'desktop.ini')
-					\ && (fname != '.DS_Store')
-					\ && (fname !~ '^ntuser\.')
-					call setbufline(a:bnr, line('$', a:winid) + 1, path)
-					"call win_execute(a:winid, 'redraw')
+				let path = expand(a:path .. '/' .. x)
+				if isdirectory(path)
+					if (-1 == index(s:IGNORE_DIRNAMES, x)) && ((x[0] != '.') || (-1 != index(['.github'], x)))
+						let dirs += [path]
+					endif
+				else
+					let fname = fnamemodify(path, ':t')
+					let ext = tolower(fnamemodify(path, ':e'))
+					if (path =~ a:pattern)
+						\ && (-1 == index(s:IGNORE_EXTS, ext))
+						\ && (fname != 'desktop.ini')
+						\ && (fname != '.DS_Store')
+						\ && (fname !~ '^ntuser\.')
+						call setbufline(a:bnr, line('$', a:winid) + 1, path)
+						"call win_execute(a:winid, 'redraw')
+					endif
 				endif
-			endif
-		endfor
-		if line('$', a:winid) < s:MAX_LNUM
-			for path in dirs
-				call s:readdir(a:maxdepth, a:depth + 1, a:winid, a:bnr, a:pattern, path)
 			endfor
+			if line('$', a:winid) < s:MAX_LNUM
+				for path in dirs
+					call s:readdir(a:maxdepth, a:depth + 1, a:winid, a:bnr, a:pattern, path)
+				endfor
+			endif
 		endif
 	endif
 endfunction

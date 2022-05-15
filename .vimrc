@@ -92,7 +92,7 @@ endif
 if executable('rg')
 	command! -nargs=0 GrepSettingsRg
 		\ :set grepformat=%f:%l:%c:%m
-		\ |let &grepprg = 'rg --vimgrep --glob "!.git" --glob "!.svn" -uu'
+		\ |let &grepprg = 'rg --vimgrep --glob "!.git" --glob "!.svn" --glob "!node_modules" -uu'
 endif
 
 if has('persistent_undo')
@@ -135,9 +135,6 @@ if has('vim_starting')
 
 	set packpath=$VIMRC_VIM/local,$VIMRC_VIM/github
 	set runtimepath=$VIMRUNTIME
-
-	nnoremap <silent><space>d       :<C-u>DiffView<cr>
-	nnoremap <silent><space>f       :<C-u>Find<cr>
 
 	silent! source ~/.vimrc.local
 	filetype plugin indent on
@@ -200,6 +197,9 @@ if s:vimpatch_cmdtag
 			call job_start('wmic os get BuildNumber', { 'out_cb': function('s:out_cb'), })
 		endif
 	endif
+
+	nnoremap <silent><space>d        <Cmd>DiffView<cr>
+	nnoremap <silent><space>f        <Cmd>Find<cr>
 
 	" Move the next/previous tabpage.
 	tnoremap <silent><C-j>           <Cmd>tabnext<cr>
