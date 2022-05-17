@@ -1,14 +1,16 @@
 
 let g:loaded_diffview = 1
 
-command! -nargs=* DiffView   :call s:main(<q-args>)
+command! -nargs=* DiffViewGit   :call s:main('git --no-pager diff -w ', <q-args>)
+command! -nargs=* DiffViewSvn   :call s:main('svn diff -x -w ', <q-args>)
+command! -nargs=1 DiffViewOneCommitGit   :call s:main_one_commit('git --no-pager diff -w ', <q-args>)
 
-function! s:main(q_args) abort
+function! s:main(cmd, q_args) abort
 	let cmd = ''
-	if !empty(s:get_rootdir('.', 'git'))
-		let cmd = 'git --no-pager diff -w ' .. a:q_args
-	elseif !empty(s:get_rootdir('.', 'svn'))
-		let cmd = 'svn diff -x -w ' .. a:q_args
+	if (a:cmd =~# 'git') && !empty(s:get_rootdir('.', 'git'))
+		let cmd = a:cmd .. a:q_args
+	elseif (a:cmd =~# 'svn') && !empty(s:get_rootdir('.', 'svn'))
+		let cmd = a:cmd .. a:q_args
 	endif
 	let rootdir = s:get_rootdir('.', get(split(cmd), 0, ''))
 	if !empty(cmd) && !empty(rootdir)
@@ -22,6 +24,10 @@ function! s:main(q_args) abort
 			echohl None
 		endif
 	endif
+endfunction
+
+function! s:main_one_commit(cmd, hash) abort
+	call s:main(a:cmd, printf('%s~1..%s', a:hash, a:hash))
 endfunction
 
 function! s:get_rootdir(path, cmdname) abort

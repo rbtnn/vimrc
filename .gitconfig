@@ -22,6 +22,7 @@
     lg=log --pretty=oneline --graph --abbrev-commit
     po=push -u origin
     st=status
+	fu=fetch upstream
 
 [color]
     diff = true

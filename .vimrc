@@ -198,7 +198,7 @@ if s:vimpatch_cmdtag
 		endif
 	endif
 
-	nnoremap <silent><space>d        <Cmd>DiffView<cr>
+	nnoremap <silent><space>d        <Cmd>DiffViewGit<cr>
 	nnoremap <silent><space>f        <Cmd>Find<cr>
 
 	" Move the next/previous tabpage.
