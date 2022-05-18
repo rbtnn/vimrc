@@ -9,14 +9,20 @@ if has('tabsidebar')
 			for x in filter(getwininfo(), { i, x -> tnr == x['tabnr'] && ('popup' != win_gettype(x['winid'])) })
 				let ft = getbufvar(x['bufnr'], '&filetype')
 				let bt = getbufvar(x['bufnr'], '&buftype')
+				let current = (tnr == tabpagenr()) && (x['winnr'] == winnr())
+				let high = (current ? '%#TabSideBarSel#' : '%#TabSideBar#')
+				let fname = fnamemodify(bufname(x['bufnr']), ':t')
+				if exists('*WebDevIconsGetFileTypeSymbol') && (&guifont =~# '^Cica')
+					let fname = (current ? '%#TabSideBarIcon#' : '') .. WebDevIconsGetFileTypeSymbol(fname) .. high .. fname
+				endif
 				let lines += [
-					\    ((tnr == tabpagenr()) && (x['winnr'] == winnr()) ? '%#TabSideBarSel#' : '%#TabSideBar#')
+					\    high
 					\ .. ' '
 					\ .. (!empty(bt)
 					\      ? printf('[%s]', bt == 'nofile' ? ft : bt)
 					\      : (empty(bufname(x['bufnr']))
 					\          ? '[No Name]'
-					\          : fnamemodify(bufname(x['bufnr']), ':t')))
+					\          : fname))
 					\ .. (getbufvar(x['bufnr'], '&modified') && empty(bt) ? '[+]' : '')
 					\ ]
 			endfor
@@ -32,7 +38,7 @@ if has('tabsidebar')
 	set notabsidebarwrap
 	set showtabsidebar=2
 	set tabsidebar=%!TabSideBar()
-	set tabsidebarcolumns=16
+	set tabsidebarcolumns=20
 	for s:name in ['TabSideBar', 'TabSideBarFill', 'TabSideBarSel']
 		if !hlexists(s:name)
 			execute printf('highlight! %s guibg=NONE gui=NONE cterm=NONE', s:name)

@@ -2,8 +2,8 @@
 	"packpath": "~/vim/github",
 	"plugins": {
 		"start": {
-			"drewtempelmeyer": [
-				"palenight.vim"
+			"kaicataldo": [
+				"material.vim"
 			],
 			"kana": [
 				"vim-operator-replace",
@@ -20,6 +20,9 @@
 				"vim-vimscript_lasterror",
 				"vim-vimscript_tagfunc",
 				"vimtweak"
+			],
+			"ryanoasis": [
+				"vim-devicons"
 			],
 			"thinca": [
 				"vim-qfreplace"
