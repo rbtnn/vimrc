@@ -199,7 +199,6 @@ if s:vimpatch_cmdtag
 	endif
 
 	nnoremap <silent><space>d        <Cmd>DiffViewGit<cr>
-	nnoremap <silent><space>f        <Cmd>Find<cr>
 
 	" Move the next/previous tabpage.
 	tnoremap <silent><C-j>           <Cmd>tabnext<cr>
@@ -208,6 +207,7 @@ if s:vimpatch_cmdtag
 	nnoremap <silent><C-k>           <Cmd>tabprevious<cr>
 
 	" Move the next/previous error in quickfix.
+	nnoremap <silent><space><space>  <Cmd>execute !empty(filter(getwininfo(), { _,x -> x['tabnr'] == tabpagenr() && x['quickfix'] })) ? 'cclose' : 'copen'<cr>
 	nnoremap <silent><C-n>           <Cmd>cnext \| normal zz<cr>
 	nnoremap <silent><C-p>           <Cmd>cprevious \| normal zz<cr>
 endif
@@ -219,6 +219,10 @@ endfunction
 
 if s:is_installed('rbtnn/vim-gloaded')
 	runtime OPT plugin/gloaded.vim
+endif
+
+if s:is_installed('rbtnn/vim-mrw')
+	nnoremap <silent><space>f        <Cmd>MRW -filename-only<cr>
 endif
 
 if s:is_installed('kaicataldo/material.vim')

@@ -1,43 +1,43 @@
 
 [user]
-    name = rbtnn
-    email = naru123456789@gmail.com
+	name = rbtnn
+	email = naru123456789@gmail.com
 
 [http]
-    sslverify = false
+	sslverify = false
 
 [core]
-    autocrlf = false
-    quotepath = false
-    editor = vim -u NONE --noplugin
-    excludesfile = ~/.gitignore.global
+	autocrlf = false
+	quotepath = false
+	editor = vim -u NONE --noplugin
+	excludesfile = ~/.gitignore.global
 
 [alias]
-    save=stash save
-    pop=stash pop
-    br=branch
-    ci=commit
-    co=checkout
-    ls=ls-files
-    lg=log --pretty=oneline --graph --abbrev-commit
-    po=push -u origin
-    st=status
+	save=stash save
+	pop=stash pop
+	br=branch
+	ci=commit
+	co=checkout
+	ls=ls-files
+	lg=log --pretty=oneline --graph --abbrev-commit
+	po=push -u origin
+	st=status
 	fu=fetch upstream
 
 [color]
-    diff = true
-    status = true
-    branch = true
-    interactive = false
+	diff = true
+	status = true
+	branch = true
+	interactive = false
 
 [help]
-    format = man
+	format = man
 
 [fetch]
-    prune = true
+	prune = true
 
 [include]
-    path = ~/.gitconfig.local
+	path = ~/.gitconfig.local
 
 #[url "git@github.com:"]
 #    pushInsteadOf = git://github.com/
