@@ -1,12 +1,12 @@
 
 function! find#exec(q_bang) abort
-	let s = split(pathshorten(getcwd()) .. '>', '\zs')
+	let s = split('>', '\zs')
 	let s:PROMPT_INPUT = substitute(get(s:, 'PROMPT_INPUT', ''), '^\s\+', '', '')
 	let s:PROMPT_STR = s + split(s:PROMPT_INPUT, '\zs')
 	let s:PROMPT_LEN = len(s)
 	let s:PROMPT_LNUM = 1
 	let s:START_LNUM = 2
-	let s:MAX_LNUM = &lines / 4
+	let s:MAX_LNUM = &lines / 3
 	let s:SEARCHING_DIRECTORIES = get(g:, 'find_searching_directories', [
 		\ { 'path': '.', 'maxdepth': 10, },
 		\ ])
@@ -20,24 +20,14 @@ function! find#exec(q_bang) abort
 		\ 'bsc', 'exp', 'lib', 'pdb', 'res', 'resx', 'rc', 'dsw',
 		\ ]), { _,x -> tolower(x) })
 
-	let width = &columns
-	if has('tabsidebar')
-		if (2 == &showtabsidebar) || ((1 == &showtabsidebar) && (1 < tabpagenr('$')))
-			let width -= &tabsidebarcolumns
-		endif
-	endif
-
 	let winid = popup_menu([], {
 		\ 'filter': function('s:filter'),
 		\ 'callback': function('s:callback'),
-		\ 'pos': 'topleft',
-		\ 'line': 1,
-		\ 'col': 1,
-		\ 'minheight': s:PROMPT_LNUM,
+		\ 'pos': 'center',
+		\ 'minheight': s:MAX_LNUM,
 		\ 'maxheight': s:MAX_LNUM,
-		\ 'minwidth': width,
-		\ 'maxwidth': width,
-		\ 'border': [0, 0, 0, 0],
+		\ 'minwidth': &columns / 2,
+		\ 'border': [1, 1, 1, 1],
 		\ 'padding': [0, 0, 0, 0],
 		\ })
 

@@ -199,6 +199,7 @@ if s:vimpatch_cmdtag
 	endif
 
 	nnoremap <silent><space>d        <Cmd>DiffViewGit<cr>
+	nnoremap <silent><space>f        <Cmd>Find<cr>
 
 	" Move the next/previous tabpage.
 	tnoremap <silent><C-j>           <Cmd>tabnext<cr>
@@ -219,10 +220,6 @@ endfunction
 
 if s:is_installed('rbtnn/vim-gloaded')
 	runtime OPT plugin/gloaded.vim
-endif
-
-if s:is_installed('rbtnn/vim-mrw')
-	nnoremap <silent><space>f        <Cmd>MRW -filename-only<cr>
 endif
 
 if s:is_installed('kaicataldo/material.vim')
