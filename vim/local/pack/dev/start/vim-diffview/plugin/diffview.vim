@@ -12,15 +12,21 @@ function! s:main(cmd, q_args) abort
 	elseif (a:cmd =~# 'svn') && !empty(s:get_rootdir('.', 'svn'))
 		let cmd = a:cmd .. a:q_args
 	endif
-	let rootdir = s:get_rootdir('.', get(split(cmd), 0, ''))
-	if !empty(cmd) && !empty(rootdir)
-		let lines = s:system(cmd, rootdir)
-		if !empty(lines)
-			call s:open_window()
-			call s:setlines(rootdir, cmd, lines)
+	if !empty(cmd)
+		let rootdir = s:get_rootdir('.', get(split(cmd), 0, ''))
+	   	if !empty(rootdir)
+			let lines = s:system(cmd, rootdir)
+			if !empty(lines)
+				call s:open_window()
+				call s:setlines(rootdir, cmd, lines)
+			else
+				echohl Error
+				echo '[diffview] The modified file was not found!'
+				echohl None
+			endif
 		else
 			echohl Error
-			echo '[diffview] The modified file was not found!'
+			echo '[diffview] The directory is not under git/svn control!'
 			echohl None
 		endif
 	endif

@@ -59,6 +59,7 @@ set matchtime=1
 set nobackup
 set nonumber
 set norelativenumber
+set noshowmode
 set noswapfile
 set nowrap
 set nowrapscan
@@ -73,7 +74,6 @@ set shiftround
 set shiftwidth=4
 set showcmd
 set showmatch
-set showmode
 set softtabstop=-1
 set tabstop=4
 set tags=./tags;
@@ -199,7 +199,7 @@ if s:vimpatch_cmdtag
 	endif
 
 	nnoremap <silent><space>d        <Cmd>DiffViewGit<cr>
-	nnoremap <silent><space>f        <Cmd>Find<cr>
+	nnoremap <silent><space>f        <Cmd>GitLsFiles<cr>
 
 	" Move the next/previous tabpage.
 	tnoremap <silent><C-j>           <Cmd>tabnext<cr>
@@ -222,10 +222,10 @@ if s:is_installed('rbtnn/vim-gloaded')
 	runtime OPT plugin/gloaded.vim
 endif
 
-if s:is_installed('kaicataldo/material.vim')
+if s:is_installed('jacoborus/tender.vim')
 	if s:is_installed('itchyny/lightline.vim')
 		let g:lightline = {}
-		let g:lightline['colorscheme'] = 'material_vim'
+		let g:lightline['colorscheme'] = 'tender'
 		let g:lightline['enable'] = { 'statusline': 1, 'tabline': 0, }
 		let g:lightline['separator'] = { 'left': nr2char(0xe0b0), 'right': nr2char(0xe0b2), }
 	endif
@@ -238,11 +238,7 @@ if s:is_installed('kaicataldo/material.vim')
 			\ | highlight!       TabSideBarIcon    guifg=#ffa700 guibg=NONE    gui=BOLD cterm=NONE
 			\ | highlight!       CursorIM          guifg=NONE    guibg=#d70000
 			\ | highlight!       VertSplit         guifg=#ffffff guibg=#ffffff
-			\ | highlight!       StatusLine        guifg=#000000 guibg=#ffffff
-			\ | highlight!       StatusLineNC      guifg=#aaaaaa guibg=#ffffff
-			\ | highlight!       StatusLineTerm    guifg=#000000 guibg=#ffffff
-			\ | highlight!       StatusLineTermNC  guifg=#aaaaaa guibg=#ffffff
-		colorscheme material
+		colorscheme tender
 	endif
 endif
 

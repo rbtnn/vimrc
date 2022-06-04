@@ -2,8 +2,11 @@
 	"packpath": "~/vim/github",
 	"plugins": {
 		"start": {
-			"kaicataldo": [
-				"material.vim"
+			"itchyny": [
+				"lightline.vim"
+			],
+			"jacoborus": [
+				"tender.vim"
 			],
 			"kana": [
 				"vim-operator-replace",
