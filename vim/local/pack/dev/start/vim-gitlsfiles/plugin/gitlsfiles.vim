@@ -5,8 +5,17 @@ if !has('nvim') && executable('git')
 	command! -bang -nargs=0 GitLsFiles :call s:main(<q-bang>) 
 
 	function! s:main(q_bang) abort
+		let tstatus = term_getstatus(bufnr())
 		let rootdir = s:get_rootdir('.', 'git')
-		if isdirectory(rootdir)
+		if !isdirectory(rootdir)
+			call s:error('The directory is not under git control')
+		elseif (tstatus != 'finished') && !empty(tstatus)
+			call s:error('Could not open on running terminal buffer')
+		elseif !empty(getcmdwintype())
+			call s:error('Could not open on command-line window')
+		elseif &modified
+			call s:error('Could not open on modified buffer')
+		else
 			let width = &columns - 2
 			let height = &lines - &cmdheight - 4
 			if has('tabsidebar')
@@ -29,11 +38,8 @@ if !has('nvim') && executable('git')
 				\ 'border': [0, 0, 0, 0],
 				\ 'padding': [2, 1, 1, 1],
 				\ })
-			call s:update_window_async(rootdir, winid, [])
-		else
-			echohl Error
-			echo '[gitlsfiles] The directory is not under git control!'
-			echohl None
+			call s:set_title(winid, '')
+			call s:update_window_async(rootdir, winid)
 		endif
 	endfunction
 
@@ -51,13 +57,14 @@ if !has('nvim') && executable('git')
 	endfunction
 
 	function! s:popup_filter(rootdir, winid, key) abort
-		let xs = split(trim(get(popup_getoptions(a:winid), 'title', '')), '\zs')
+		let xs = split(s:get_title(a:winid), '\zs')
 		let lnum = line('.', a:winid)
 		if 21 == char2nr(a:key)
 			" Ctrl-u
 			if 0 < len(xs)
 				call remove(xs, 0, -1)
-				call s:update_window_async(a:rootdir, a:winid, xs)
+				call s:set_title(a:winid, join(xs, ''))
+				call s:update_window_async(a:rootdir, a:winid)
 			endif
 			return 1
 		elseif 14 == char2nr(a:key)
@@ -80,14 +87,16 @@ if !has('nvim') && executable('git')
 			" Ctrl-h or bs
 			if 0 < len(xs)
 				call remove(xs, -1)
-				call s:update_window_async(a:rootdir, a:winid, xs)
+				call s:set_title(a:winid, join(xs, ''))
+				call s:update_window_async(a:rootdir, a:winid)
 			endif
 			return 1
 		elseif (0x20 == char2nr(a:key)) && (0 == len(xs))
 			return 1
 		elseif (0x20 <= char2nr(a:key)) && (char2nr(a:key) <= 0x7f)
 			let xs += [a:key]
-			call s:update_window_async(a:rootdir, a:winid, xs)
+			call s:set_title(a:winid, join(xs, ''))
+			call s:update_window_async(a:rootdir, a:winid)
 			return 1
 		else
 			return popup_filter_menu(a:winid, a:key)
@@ -106,33 +115,49 @@ if !has('nvim') && executable('git')
 		endif
 	endfunction
 
-	function! s:update_window_async(rootdir, winid, xs) abort
+	function! s:update_window_async(rootdir, winid) abort
 		if exists('s:job')
 			call job_stop(s:job)
 			unlet s:job
 		endif
 		let bnr = winbufnr(a:winid)
-		let text = join(a:xs, '')
-		call popup_setoptions(a:winid, {
-			\ 'title': ' ' .. text .. ' ',
-			\ })
 		silent! call deletebufline(bnr, 1, '$')
-		if !empty(text)
-			let cmd = ['git', 'ls-files', '*' .. text .. '*']
-			let s:job = job_start(cmd, {
-				\ 'callback': function('s:job_callback', [bnr, a:winid]),
-				\ 'cwd': a:rootdir,
-				\ })
-		endif
+		let s:job = job_start(['git', '--no-pager', 'ls-files'], {
+			\ 'callback': function('s:job_callback', [bnr, a:winid]),
+			\ 'cwd': a:rootdir,
+			\ })
 	endfunction
 
 	function! s:job_callback(bnr, winid, ch, msg) abort
-		let lnum = line('$', a:winid)
-		if empty(getbufline(a:bnr, lnum)[0])
-			call setbufline(a:bnr, lnum, a:msg)
-		else
-			call appendbufline(a:bnr, lnum, a:msg)
-		endif
+		try
+			let title = s:get_title(a:winid)
+			if empty(title) || (a:msg =~ title)
+				let lnum = line('$', a:winid)
+				let line = getbufline(a:bnr, lnum)[0]
+				if empty(line)
+					call setbufline(a:bnr, lnum, a:msg)
+				else
+					call appendbufline(a:bnr, lnum, a:msg)
+				endif
+			endif
+		catch
+		endtry
+	endfunction
+
+	function! s:set_title(winid, text) abort
+		call popup_setoptions(a:winid, {
+			\ 'title': ' ' .. a:text .. ' ',
+			\ })
+	endfunction
+
+	function! s:error(msg) abort
+		echohl Error
+		echo printf('[gitlsfiles] %s!', a:msg)
+		echohl None
+	endfunction
+
+	function! s:get_title(winid) abort
+		return trim(get(popup_getoptions(a:winid), 'title', ''))
 	endfunction
 
 	function! s:set_cursorline(winid, lnum) abort
@@ -150,3 +175,4 @@ if !has('nvim') && executable('git')
 		endif
 	endfunction
 endif
+
