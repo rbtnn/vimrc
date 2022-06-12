@@ -19,7 +19,7 @@
 	ci=commit
 	co=checkout
 	ls=ls-files
-	lg=log --pretty=oneline --graph --abbrev-commit
+	lg=log --pretty=\"format:%C(yellow)%h %C(green)%cd %C(reset)%s\" --date=iso
 	po=push -u origin
 	st=status
 	fu=fetch upstream
