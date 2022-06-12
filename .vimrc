@@ -183,7 +183,7 @@ if s:vimpatch_cmdtag
 			function! s:on_stdout(ch, data, name) abort
 				for line in a:data
 					if 14393 < str2nr(trim(line))
-						nnoremap <silent><space>t    <Cmd>new \| execute 'terminal cmd /K "prompt $e[31m$$$e[0m"' \| startinsert<cr>
+						nnoremap <silent><space>t    <Cmd>new \| execute 'terminal cmd /K "prompt $e[32m$$$e[0m"' \| startinsert<cr>
 					endif
 				endfor
 			endfunction
@@ -191,12 +191,14 @@ if s:vimpatch_cmdtag
 		else
 			function! s:out_cb(ch, mes) abort
 				if 14393 < str2nr(trim(a:mes))
-					nnoremap <silent><space>t    <Cmd>new \| terminal ++curwin ++close cmd /K "prompt $e[31m$$$e[0m"<cr>
+					nnoremap <silent><space>t    <Cmd>new \| terminal ++curwin ++close cmd /K "prompt $e[32m$$$e[0m"<cr>
 				endif
 			endfunction
 			call job_start('wmic os get BuildNumber', { 'out_cb': function('s:out_cb'), })
 		endif
 	endif
+
+	nnoremap <silent><space><space>  <nop>
 
 	nnoremap <silent><space>d        <Cmd>GitDiff<cr>
 	nnoremap <silent><space>f        <Cmd>GitLsFiles<cr>
@@ -209,7 +211,6 @@ if s:vimpatch_cmdtag
 	nnoremap <silent><C-k>           <Cmd>tabprevious<cr>
 
 	" Move the next/previous error in quickfix.
-	nnoremap <silent><space><space>  <Cmd>execute !empty(filter(getwininfo(), { _,x -> x['tabnr'] == tabpagenr() && x['quickfix'] })) ? 'cclose' : 'copen'<cr>
 	nnoremap <silent><C-n>           <Cmd>cnext \| normal zz<cr>
 	nnoremap <silent><C-p>           <Cmd>cprevious \| normal zz<cr>
 endif

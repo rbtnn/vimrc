@@ -1,6 +1,6 @@
 
 function! git#log#main(q_args) abort
-	let cmd = 'git --no-pager log --pretty="format:%C(yellow)%h %C(green)%cd %C(reset)%s" --date=iso'
+	let cmd = 'git --no-pager log --pretty="format:%C(yellow)%h %C(green)%cd %C(reset)%s" --date=iso -100'
 	let rootdir = git#utils#get_rootdir('.', 'git')
 	let winid = git#utils#create_popupwin(rootdir, [])
 	if -1 != winid
