@@ -54,6 +54,10 @@ function! git#lsfiles#popup_filter(rootdir, winid, key) abort
 		call s:set_title(a:winid, join(xs, ''))
 		call s:update_window_async(a:rootdir, a:winid)
 		return 1
+	elseif 0x0d == char2nr(a:key)
+		return popup_filter_menu(a:winid, "\<cr>")
+	elseif char2nr(a:key) < 0x20
+		return popup_filter_menu(a:winid, "\<esc>")
 	else
 		return popup_filter_menu(a:winid, a:key)
 	endif

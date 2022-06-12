@@ -173,46 +173,20 @@ cnoremap         <C-e>               <end>
 cnoremap         <C-a>               <home>
 
 if s:vimpatch_cmdtag
-	if has('nvim')
-		nnoremap <silent><space>t    <Cmd>new \| execute 'terminal' \| startinsert<cr>
-	else
-		nnoremap <silent><space>t    <Cmd>new \| terminal ++curwin<cr>
-	endif
-	if has('win32') && executable('wmic')
-		if has('nvim')
-			function! s:on_stdout(ch, data, name) abort
-				for line in a:data
-					if 14393 < str2nr(trim(line))
-						nnoremap <silent><space>t    <Cmd>new \| execute 'terminal cmd /K "prompt $e[32m$$$e[0m"' \| startinsert<cr>
-					endif
-				endfor
-			endfunction
-			call jobstart('wmic os get BuildNumber', { 'on_stdout': function('s:on_stdout'), })
-		else
-			function! s:out_cb(ch, mes) abort
-				if 14393 < str2nr(trim(a:mes))
-					nnoremap <silent><space>t    <Cmd>new \| terminal ++curwin ++close cmd /K "prompt $e[32m$$$e[0m"<cr>
-				endif
-			endfunction
-			call job_start('wmic os get BuildNumber', { 'out_cb': function('s:out_cb'), })
-		endif
-	endif
-
-	nnoremap <silent><space><space>  <nop>
-
-	nnoremap <silent><space>d        <Cmd>GitDiff<cr>
-	nnoremap <silent><space>f        <Cmd>GitLsFiles<cr>
-	nnoremap <silent><space>l        <Cmd>GitLog<cr>
+	nnoremap <silent><C-z>    <Cmd>FloatingTerminalToggle<cr>
+	tnoremap <silent><C-z>    <Cmd>FloatingTerminalToggle<cr>
+	nnoremap <silent><C-d>    <Cmd>GitDiff<cr>
+	nnoremap <silent><C-s>    <Cmd>GitLsFiles<cr>
 
 	" Move the next/previous tabpage.
-	tnoremap <silent><C-j>           <Cmd>tabnext<cr>
-	tnoremap <silent><C-k>           <Cmd>tabprevious<cr>
-	nnoremap <silent><C-j>           <Cmd>tabnext<cr>
-	nnoremap <silent><C-k>           <Cmd>tabprevious<cr>
+	tnoremap <silent><C-j>    <Cmd>tabnext<cr>
+	tnoremap <silent><C-k>    <Cmd>tabprevious<cr>
+	nnoremap <silent><C-j>    <Cmd>tabnext<cr>
+	nnoremap <silent><C-k>    <Cmd>tabprevious<cr>
 
 	" Move the next/previous error in quickfix.
-	nnoremap <silent><C-n>           <Cmd>cnext \| normal zz<cr>
-	nnoremap <silent><C-p>           <Cmd>cprevious \| normal zz<cr>
+	nnoremap <silent><C-n>    <Cmd>cnext \| normal zz<cr>
+	nnoremap <silent><C-p>    <Cmd>cprevious \| normal zz<cr>
 endif
 
 function! s:is_installed(user_and_name) abort

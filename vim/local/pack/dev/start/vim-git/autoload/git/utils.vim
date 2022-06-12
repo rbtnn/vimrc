@@ -26,17 +26,16 @@ function! git#utils#create_popupwin(rootdir, lines) abort
 			endif
 		endif
 		return popup_menu(a:lines, {
-			\ 'scrollbar': 0,
-			\ 'pos': 'topleft',
-			\ 'line': 1,
-			\ 'col': 1,
-			\ 'minheight': height,
-			\ 'maxheight': height,
-			\ 'minwidth': width,
-			\ 'maxwidth': width,
 			\ 'wrap': 1,
-			\ 'border': [0, 0, 0, 0],
-			\ 'padding': [2, 1, 1, 1],
+			\ 'scrollbar': 0,
+			\ 'minwidth': &columns * 3 / 4, 'maxwidth': &columns * 3 / 4,
+			\ 'minheight': &lines * 3 / 4, 'maxheight': &lines * 3 / 4,
+			\ 'border': [],
+			\ 'highlight': 'Normal',
+			\ 'borderhighlight': ['Normal', 'Normal', 'Normal', 'Normal'],
+			\ 'borderchars': [
+			\   nr2char(0x2500), nr2char(0x2502), nr2char(0x2500), nr2char(0x2502),
+			\   nr2char(0x250c), nr2char(0x2510), nr2char(0x2518), nr2char(0x2514)]
 			\ })
 	endif
 	return -1

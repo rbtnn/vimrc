@@ -31,6 +31,10 @@ function! git#diff#popup_filter(rootdir, winid, key) abort
 			call git#utils#set_cursorline(a:winid, lnum - 1)
 		endif
 		return 1
+	elseif 0x0d == char2nr(a:key)
+		return popup_filter_menu(a:winid, "\<cr>")
+	elseif char2nr(a:key) < 0x20
+		return popup_filter_menu(a:winid, "\<esc>")
 	else
 		return popup_filter_menu(a:winid, a:key)
 	endif
