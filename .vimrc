@@ -173,10 +173,10 @@ cnoremap         <C-e>               <end>
 cnoremap         <C-a>               <home>
 
 if s:vimpatch_cmdtag
-	nnoremap <silent><C-z>    <Cmd>FloatingTerminalToggle<cr>
-	tnoremap <silent><C-z>    <Cmd>FloatingTerminalToggle<cr>
-	nnoremap <silent><C-x>    <Cmd>GitDiff<cr>
-	nnoremap <silent><C-s>    <Cmd>GitLsFiles<cr>
+	nnoremap <silent><C-s>    <Cmd>FloatingTerminalToggle<cr>
+	tnoremap <silent><C-s>    <Cmd>FloatingTerminalToggle<cr>
+	nnoremap <silent><C-z>    <Cmd>GitDiff<cr>
+	nnoremap <silent><space>  <Cmd>GitLsFiles<cr>
 
 	" Move the next/previous tabpage.
 	tnoremap <silent><C-j>    <Cmd>tabnext<cr>
