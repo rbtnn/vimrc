@@ -47,9 +47,9 @@ function! git#lsfiles#popup_filter(rootdir, winid, key) abort
 			call s:update_window_async(a:rootdir, a:winid)
 		endif
 		return 1
-	elseif (0x20 == char2nr(a:key)) && (0 == len(xs))
-		return 1
-	elseif (0x20 <= char2nr(a:key)) && (char2nr(a:key) <= 0x7f)
+	elseif 0x20 == char2nr(a:key)
+		return popup_filter_menu(a:winid, "\<cr>")
+	elseif (0x21 <= char2nr(a:key)) && (char2nr(a:key) <= 0x7f)
 		let xs += [a:key]
 		call s:set_title(a:winid, join(xs, ''))
 		call s:update_window_async(a:rootdir, a:winid)

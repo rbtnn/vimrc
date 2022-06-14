@@ -6,7 +6,7 @@ function! git#diff#main(q_args) abort
 	if -1 != winid
 		call popup_setoptions(winid, {
 			\ 'filter': function('git#diff#popup_filter', [rootdir]),
-			\ 'callback': function('git#diff#popup_callback', [rootdir]),
+			\ 'callback': function('git#diff#popup_callback', [rootdir, a:q_args]),
 			\ })
 		let lines = git#utils#system(cmd, rootdir)
 		call popup_settext(winid, lines)
@@ -40,12 +40,12 @@ function! git#diff#popup_filter(rootdir, winid, key) abort
 	endif
 endfunction
 
-function! git#diff#popup_callback(rootdir, winid, result) abort
+function! git#diff#popup_callback(rootdir, q_args, winid, result) abort
 	if -1 != a:result
 		let line = get(getbufline(winbufnr(a:winid), a:result), 0, '')
 		if !empty(line)
 			let path = a:rootdir .. '/' .. trim(split(line, "\t")[2])
-			let cmd = 'git --no-pager diff -w -- ' .. path
+			let cmd = 'git --no-pager diff -w ' .. a:q_args .. ' -- ' .. path
 			call git#utils#open_diffwindow()
 			let lines = git#utils#system(cmd, a:rootdir)
 			call git#utils#setlines(a:rootdir, cmd, lines)
