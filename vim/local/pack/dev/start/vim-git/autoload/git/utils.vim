@@ -1,4 +1,6 @@
 
+scriptencoding utf-8
+
 function! git#utils#create_popupwin(rootdir, lines) abort
 	let tstatus = term_getstatus(bufnr())
 	if !isdirectory(a:rootdir)
@@ -31,6 +33,18 @@ function! git#utils#create_popupwin(rootdir, lines) abort
 endfunction
 
 function! git#utils#get_popupwin_options() abort
+	" ┌──┐
+	" │  │
+	" └──┘
+	let borderchars_typeA = [
+		\ nr2char(0x2500), nr2char(0x2502), nr2char(0x2500), nr2char(0x2502),
+		\ nr2char(0x250c), nr2char(0x2510), nr2char(0x2518), nr2char(0x2514)]
+	" ╭──╮
+	" │  │
+	" ╰──╯
+	let borderchars_typeB = [
+		\ nr2char(0x2500), nr2char(0x2502), nr2char(0x2500), nr2char(0x2502),
+		\ nr2char(0x256d), nr2char(0x256e), nr2char(0x256f), nr2char(0x2570)]
 	return {
 		\ 'wrap': 1,
 		\ 'scrollbar': 0,
@@ -39,9 +53,7 @@ function! git#utils#get_popupwin_options() abort
 		\ 'border': [],
 		\ 'highlight': 'Normal',
 		\ 'borderhighlight': ['Normal', 'Normal', 'Normal', 'Normal'],
-		\ 'borderchars': [
-		\   nr2char(0x2500), nr2char(0x2502), nr2char(0x2500), nr2char(0x2502),
-		\   nr2char(0x250c), nr2char(0x2510), nr2char(0x2518), nr2char(0x2514)]
+		\ 'borderchars': borderchars_typeB,
 		\ }
 endfunction
 

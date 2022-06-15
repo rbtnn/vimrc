@@ -24,9 +24,6 @@
 				"vim-vimscript_tagfunc",
 				"vimtweak"
 			],
-			"ryanoasis": [
-				"vim-devicons"
-			],
 			"thinca": [
 				"vim-qfreplace"
 			],

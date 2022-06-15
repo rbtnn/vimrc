@@ -198,6 +198,10 @@ if s:is_installed('rbtnn/vim-gloaded')
 	runtime OPT plugin/gloaded.vim
 endif
 
+if s:is_installed('rbtnn/vim-ambiwidth')
+	let g:ambiwidth_cica_enabled = (&guifont =~# '^Cica')
+endif
+
 if s:is_installed('jacoborus/tender.vim')
 	if s:is_installed('itchyny/lightline.vim')
 		let g:lightline = {}
@@ -211,9 +215,12 @@ if s:is_installed('jacoborus/tender.vim')
 			\ | highlight!       TabSideBarFill    guifg=NONE    guibg=NONE    gui=NONE cterm=NONE
 			\ | highlight!       TabSideBarSel     guifg=#ffffff guibg=NONE    gui=NONE cterm=NONE
 			\ | highlight!       TabSideBarLabel   guifg=#00a700 guibg=NONE    gui=BOLD cterm=NONE
-			\ | highlight!       TabSideBarIcon    guifg=#ffa700 guibg=NONE    gui=BOLD cterm=NONE
 			\ | highlight!       CursorIM          guifg=NONE    guibg=#d70000
 			\ | highlight!       VertSplit         guifg=#ffffff guibg=#ffffff
+		if &guifont =~# '^Cica'
+			autocmd vimrc ColorScheme      *
+				\ | highlight!       TabSideBarIcon    guifg=#ffa700 guibg=NONE    gui=BOLD cterm=NONE
+		endif
 		colorscheme tender
 	endif
 endif
