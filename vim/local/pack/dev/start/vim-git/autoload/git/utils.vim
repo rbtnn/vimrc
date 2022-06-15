@@ -25,20 +25,24 @@ function! git#utils#create_popupwin(rootdir, lines) abort
 				let width -= &tabsidebarcolumns
 			endif
 		endif
-		return popup_menu(a:lines, {
-			\ 'wrap': 1,
-			\ 'scrollbar': 0,
-			\ 'minwidth': &columns * 3 / 4, 'maxwidth': &columns * 3 / 4,
-			\ 'minheight': &lines * 3 / 4, 'maxheight': &lines * 3 / 4,
-			\ 'border': [],
-			\ 'highlight': 'Normal',
-			\ 'borderhighlight': ['Normal', 'Normal', 'Normal', 'Normal'],
-			\ 'borderchars': [
-			\   nr2char(0x2500), nr2char(0x2502), nr2char(0x2500), nr2char(0x2502),
-			\   nr2char(0x250c), nr2char(0x2510), nr2char(0x2518), nr2char(0x2514)]
-			\ })
+		return popup_menu(a:lines, git#utils#get_popupwin_options())
 	endif
 	return -1
+endfunction
+
+function! git#utils#get_popupwin_options() abort
+	return {
+		\ 'wrap': 1,
+		\ 'scrollbar': 0,
+		\ 'minwidth': &columns * 3 / 4, 'maxwidth': &columns * 3 / 4,
+		\ 'minheight': &lines * 3 / 4, 'maxheight': &lines * 3 / 4,
+		\ 'border': [],
+		\ 'highlight': 'Normal',
+		\ 'borderhighlight': ['Normal', 'Normal', 'Normal', 'Normal'],
+		\ 'borderchars': [
+		\   nr2char(0x2500), nr2char(0x2502), nr2char(0x2500), nr2char(0x2502),
+		\   nr2char(0x250c), nr2char(0x2510), nr2char(0x2518), nr2char(0x2514)]
+		\ }
 endfunction
 
 function! git#utils#get_rootdir(path, cmdname) abort
