@@ -219,7 +219,7 @@ if s:is_installed('jacoborus/tender.vim')
 			\ | highlight!       VertSplit         guifg=#ffffff guibg=#ffffff
 		if &guifont =~# '^Cica'
 			autocmd vimrc ColorScheme      *
-				\ | highlight!       TabSideBarIcon    guifg=#ffa700 guibg=NONE    gui=BOLD cterm=NONE
+				\ : highlight!       TabSideBarIcon    guifg=#ffa700 guibg=NONE    gui=BOLD cterm=NONE
 		endif
 		colorscheme tender
 	endif
