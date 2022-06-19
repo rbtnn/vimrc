@@ -217,6 +217,7 @@ if s:is_installed('jacoborus/tender.vim')
 			\ | highlight!       TabSideBarLabel   guifg=#00a700 guibg=NONE    gui=BOLD cterm=NONE
 			\ | highlight!       CursorIM          guifg=NONE    guibg=#d70000
 			\ | highlight!       VertSplit         guifg=#ffffff guibg=#ffffff
+			\ | highlight!       SpecialKey        guifg=#333333 guibg=NONE    gui=NONE
 		if &guifont =~# '^Cica'
 			autocmd vimrc ColorScheme      *
 				\ : highlight!       TabSideBarIcon    guifg=#ffa700 guibg=NONE    gui=BOLD cterm=NONE

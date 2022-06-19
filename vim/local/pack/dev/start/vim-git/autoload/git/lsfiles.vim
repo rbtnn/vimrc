@@ -106,7 +106,7 @@ endfunction
 
 function! s:set_title(winid, text) abort
 	call popup_setoptions(a:winid, {
-		\ 'title': ' ' .. a:text .. ' ',
+		\ 'title': (empty(a:text) ? '' : ' ' .. a:text .. ' '),
 		\ })
 endfunction
 

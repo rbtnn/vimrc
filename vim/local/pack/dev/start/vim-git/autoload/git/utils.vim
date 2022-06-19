@@ -52,7 +52,7 @@ function! git#utils#get_popupwin_options() abort
 		\ 'minheight': &lines * 3 / 4, 'maxheight': &lines * 3 / 4,
 		\ 'border': [],
 		\ 'highlight': 'Normal',
-		\ 'borderhighlight': ['Normal', 'Normal', 'Normal', 'Normal'],
+		\ 'borderhighlight': repeat(['Normal'], 4),
 		\ 'borderchars': borderchars_typeB,
 		\ }
 endfunction
