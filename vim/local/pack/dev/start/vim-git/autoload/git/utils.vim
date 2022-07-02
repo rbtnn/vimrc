@@ -20,13 +20,6 @@ function! git#utils#create_popupwin(rootdir, lines) abort
 		echo printf('[git] %s!', 'Could not open on modified buffer')
 		echohl None
 	else
-		let width = &columns - 2
-		let height = &lines - &cmdheight - 4
-		if has('tabsidebar')
-			if ((&showtabsidebar == 1) && (1 < tabpagenr('$'))) || (&showtabsidebar == 2)
-				let width -= &tabsidebarcolumns
-			endif
-		endif
 		return popup_menu(a:lines, git#utils#get_popupwin_options())
 	endif
 	return -1
@@ -45,12 +38,20 @@ function! git#utils#get_popupwin_options() abort
 	let borderchars_typeB = [
 		\ nr2char(0x2500), nr2char(0x2502), nr2char(0x2500), nr2char(0x2502),
 		\ nr2char(0x256d), nr2char(0x256e), nr2char(0x256f), nr2char(0x2570)]
+	let width = &columns - 4
+	let height = &lines - &cmdheight - 4
+	if has('tabsidebar')
+		if ((&showtabsidebar == 1) && (1 < tabpagenr('$'))) || (&showtabsidebar == 2)
+			let width -= &tabsidebarcolumns
+		endif
+	endif
 	return {
 		\ 'wrap': 1,
 		\ 'scrollbar': 0,
-		\ 'minwidth': &columns * 3 / 4, 'maxwidth': &columns * 3 / 4,
-		\ 'minheight': &lines * 3 / 4, 'maxheight': &lines * 3 / 4,
+		\ 'minwidth': width, 'maxwidth': width,
+		\ 'minheight': height, 'maxheight': height,
 		\ 'border': [],
+		\ 'padding': repeat([0], 4),
 		\ 'highlight': 'Normal',
 		\ 'borderhighlight': repeat(['Normal'], 4),
 		\ 'borderchars': borderchars_typeB,
@@ -140,9 +141,6 @@ function git#utils#system(cmd, cwd) abort
 	else
 		let path = tempname()
 		try
-			if filereadable(path)
-				let lines = readfile(path)
-			endif
 			let job = job_start(a:cmd, {
 				\ 'cwd': a:cwd,
 				\ 'out_io': 'file',

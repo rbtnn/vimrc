@@ -53,7 +53,7 @@ set ignorecase
 set incsearch
 set isfname-==
 set keywordprg=:help
-set list listchars=tab:<->
+set list listchars=tab:<->,trail:-
 set matchpairs+=<:>
 set matchtime=1
 set nobackup
@@ -178,12 +178,6 @@ if s:vimpatch_cmdtag
 	nnoremap <silent><C-z>    <Cmd>GitDiff<cr>
 	nnoremap <silent><space>  <Cmd>GitLsFiles<cr>
 
-	" Move the next/previous tabpage.
-	tnoremap <silent><C-j>    <Cmd>tabnext<cr>
-	tnoremap <silent><C-k>    <Cmd>tabprevious<cr>
-	nnoremap <silent><C-j>    <Cmd>tabnext<cr>
-	nnoremap <silent><C-k>    <Cmd>tabprevious<cr>
-
 	" Move the next/previous error in quickfix.
 	nnoremap <silent><C-n>    <Cmd>cnext \| normal zz<cr>
 	nnoremap <silent><C-p>    <Cmd>cprevious \| normal zz<cr>
@@ -202,10 +196,10 @@ if s:is_installed('rbtnn/vim-ambiwidth')
 	let g:ambiwidth_cica_enabled = (&guifont =~# '^Cica')
 endif
 
-if s:is_installed('jacoborus/tender.vim')
+if s:is_installed('kaicataldo/material.vim')
 	if s:is_installed('itchyny/lightline.vim')
 		let g:lightline = {}
-		let g:lightline['colorscheme'] = 'tender'
+		let g:lightline['colorscheme'] = 'material_vim'
 		let g:lightline['enable'] = { 'statusline': 1, 'tabline': 0, }
 		let g:lightline['separator'] = { 'left': nr2char(0xe0b0), 'right': nr2char(0xe0b2), }
 	endif
@@ -216,13 +210,14 @@ if s:is_installed('jacoborus/tender.vim')
 			\ | highlight!       TabSideBarSel     guifg=#ffffff guibg=NONE    gui=NONE cterm=NONE
 			\ | highlight!       TabSideBarLabel   guifg=#00a700 guibg=NONE    gui=BOLD cterm=NONE
 			\ | highlight!       CursorIM          guifg=NONE    guibg=#d70000
-			\ | highlight!       VertSplit         guifg=#ffffff guibg=#ffffff
-			\ | highlight!       SpecialKey        guifg=#333333 guibg=NONE    gui=NONE
+			\ | highlight!       SpecialKey        guifg=#2a2a2a guibg=NONE    gui=NONE
+			\ | highlight!       NonText           guifg=#2a2a2a guibg=NONE    gui=NONE
 		if &guifont =~# '^Cica'
 			autocmd vimrc ColorScheme      *
 				\ : highlight!       TabSideBarIcon    guifg=#ffa700 guibg=NONE    gui=BOLD cterm=NONE
 		endif
-		colorscheme tender
+		let g:material_theme_style = 'darker'
+		colorscheme material
 	endif
 endif
 
