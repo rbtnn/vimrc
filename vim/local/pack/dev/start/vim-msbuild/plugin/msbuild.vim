@@ -5,7 +5,7 @@ endif
 
 let g:loaded_msbuild = 1
 
-function! s:main(q_args) abort
+function! MSBuild(q_args, cwd) abort
 	let args = a:q_args
 	if empty(args)
 		let path = findfile('msbuild.xml', ';')
@@ -14,17 +14,21 @@ function! s:main(q_args) abort
 		endif
 	endif
 
-	let lines = s:system('msbuild ' .. args)
+	let lines = s:system('msbuild ' .. args, a:cwd)
 
 	let xs = []
 	for line in lines
 		let m = matchlist(line, '^\s*\([^(]\+\)(\(\d\+\),\(\d\+\)): \(.*\)\[\(.*\)\]$')
 		if !empty(m)
+			let path = m[1]
+			if !filereadable(path) && (path !~# '^[A-Z]:')
+				let path = expand(fnamemodify(m[5], ':h') .. '/' .. m[1])
+			endif
 			let xs += [{
-				\ 'filename': expand(fnamemodify(m[5], ':h') .. '/' .. m[1]),
+				\ 'filename': path,
 				\ 'lnum': m[2],
 				\ 'col': m[3],
-				\ 'text': m[4],
+				\ 'text': printf('%s[%s]', m[4], m[5]),
 				\ }]
 		else
 			let xs += [{ 'text': line, }]
@@ -34,12 +38,12 @@ function! s:main(q_args) abort
 	copen
 endfunction
 
-function s:system(cmd) abort
+function s:system(cmd, cwd) abort
 	let lines = []
 	let path = tempname()
 	try
 		let job = job_start(a:cmd, {
-			\ 'cwd': getcwd(),
+			\ 'cwd': a:cwd,
 			\ 'out_io': 'file',
 			\ 'out_name': path,
 			\ 'err_io': 'out',
@@ -70,5 +74,5 @@ function s:system(cmd) abort
 	return lines
 endfunction
 
-command! -complete=file -nargs=* MSBuild :call s:main(<q-args>) 
+command! -complete=file -nargs=* MSBuild :call MSBuild(<q-args>, getcwd())
 
