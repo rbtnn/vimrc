@@ -47,9 +47,16 @@ function! git#diff#popup_callback(rootdir, q_args, winid, result) abort
 			let path = a:rootdir .. '/' .. trim(split(line, "\t")[2])
 			let cmd = 'git --no-pager diff -w ' .. a:q_args .. ' -- ' .. path
 			call git#utils#open_diffwindow()
-			let lines = git#utils#system(cmd, a:rootdir)
-			call git#utils#setlines(a:rootdir, cmd, lines)
+			call git#diff#setlines(a:rootdir, cmd)
+			execute printf('nnoremap <silent><buffer>R    :<C-u>call git#diff#setlines(%s, %s)<cr>', string(a:rootdir), string(cmd))
 		endif
 	endif
+endfunction
+
+function! git#diff#setlines(rootdir, cmd) abort
+	let x = winsaveview()
+	let lines = git#utils#system(a:cmd, a:rootdir)
+	call git#utils#setlines(a:rootdir, a:cmd, lines)
+	call winrestview(x)
 endfunction
 
