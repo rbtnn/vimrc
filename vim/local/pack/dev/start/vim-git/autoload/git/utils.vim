@@ -102,17 +102,7 @@ function! git#utils#setlines(rootdir, cmd, lines) abort
 
 	" The lines encodes after redrawing.
 	for i in range(0, len(a:lines) - 1)
-		let enc_from = ''
-		if encoding#contains_multichar(a:lines[i])
-			if encoding#is_utf8(a:lines[i])
-				let enc_from = 'utf-8'
-			else
-				let enc_from = 'shift_jis'
-			endif
-		endif
-		if !empty(enc_from) && (enc_from != &encoding)
-			let a:lines[i] = iconv(a:lines[i], enc_from, &encoding)
-		endif
+		let a:lines[i] = qficonv#encoding#iconv_utf8(a:lines[i], 'shift_jis')
 	endfor
 	call s:setbuflines(a:lines)
 endfunction

@@ -5,13 +5,14 @@ endif
 
 let g:loaded_msbuild = 1
 
+let g:msbuild_projectfile = get(g:, 'msbuild_projectfile', "findfile('msbuild.xml', ';')")
+
 function! MSBuild(q_args, cwd) abort
-	let args = a:q_args
-	if empty(args)
-		let path = findfile('msbuild.xml', ';')
-		if filereadable(path)
-			let args = printf('/nologo "%s"', path)
-		endif
+	let path = eval(g:msbuild_projectfile)
+	if filereadable(path)
+		let args = printf('/nologo "%s" %s', path, a:q_args)
+	else
+		let args = printf('/nologo %s', a:q_args)
 	endif
 
 	let lines = s:system('msbuild ' .. args, a:cwd)
@@ -38,6 +39,20 @@ function! MSBuild(q_args, cwd) abort
 	copen
 endfunction
 
+function! MSBuildComp(A, L, P) abort
+	let xs = []
+	let path = eval(g:msbuild_projectfile)
+	if filereadable(path)
+		for line in readfile(path)
+			let m = matchlist(line, '<Target\s\+Name="\([^"]\+\)"')
+			if !empty(m)
+				let xs += ['/t:' .. m[1]]
+			endif
+		endfor
+	endif
+	return xs
+endfunction
+
 function s:system(cmd, cwd) abort
 	let lines = []
 	let path = tempname()
@@ -54,17 +69,7 @@ function s:system(cmd, cwd) abort
 			let lines = readfile(path)
 		endif
 		for i in range(0, len(lines) - 1)
-			let enc_from = ''
-			if encoding#contains_multichar(lines[i])
-				if encoding#is_utf8(lines[i])
-					let enc_from = 'utf-8'
-				else
-					let enc_from = 'shift_jis'
-				endif
-			endif
-			if !empty(enc_from) && (enc_from != &encoding)
-				let lines[i] = iconv(lines[i], enc_from, &encoding)
-			endif
+			let lines[i] = qficonv#encoding#iconv_utf8(lines[i], 'shift_jis')
 		endfor
 	finally
 		if filereadable(path)
@@ -74,5 +79,5 @@ function s:system(cmd, cwd) abort
 	return lines
 endfunction
 
-command! -complete=file -nargs=* MSBuild :call MSBuild(<q-args>, getcwd())
+command! -complete=customlist,MSBuildComp -nargs=* MSBuild :call MSBuild(<q-args>, getcwd())
 

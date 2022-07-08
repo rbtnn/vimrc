@@ -157,6 +157,24 @@ if has('nvim')
 	tnoremap <silent><C-w>N          <C-\><C-n>
 endif
 
+if has('win32') && executable('wmic') && !has('nvim')
+	let s:term_cmd = [&shell]
+	function! s:out_cb(ch, mes) abort
+		if 14393 < str2nr(trim(a:mes))
+			let s:term_cmd = [&shell, '/K', 'doskey pwd=cd & doskey ls=dir /b & prompt $e[96m$P$G$e[0m']
+		endif
+	endfunction
+	call job_start('wmic os get BuildNumber', { 'out_cb': function('s:out_cb'), })
+	command! -nargs=0 Term :call term_start(s:term_cmd, {
+		\ 'term_kill': 'kill',
+		\ 'term_finish': 'close',
+		\ })
+endif
+
+if has('win32') && has('gui_running')
+	nnoremap <silent><C-z>    <nop>
+endif
+
 " Emacs key mappings
 if has('win32') && (&shell =~# '\<cmd\.exe$')
 	tnoremap <silent><C-p>           <up>
@@ -173,9 +191,7 @@ cnoremap         <C-e>               <end>
 cnoremap         <C-a>               <home>
 
 if s:vimpatch_cmdtag
-	nnoremap <silent><C-s>    <Cmd>FloatingTerminalToggle<cr>
-	tnoremap <silent><C-s>    <Cmd>FloatingTerminalToggle<cr>
-	nnoremap <silent><C-z>    <Cmd>GitDiff<cr>
+	nnoremap <silent><C-s>    <Cmd>GitDiff<cr>
 	nnoremap <silent><space>  <Cmd>GitLsFiles<cr>
 
 	" Move the next/previous error in quickfix.
@@ -196,13 +212,29 @@ if s:is_installed('rbtnn/vim-ambiwidth')
 	let g:ambiwidth_cica_enabled = (&guifont =~# '^Cica')
 endif
 
-if s:is_installed('kaicataldo/material.vim')
-	if s:is_installed('itchyny/lightline.vim')
-		let g:lightline = {}
-		let g:lightline['colorscheme'] = 'material_vim'
-		let g:lightline['enable'] = { 'statusline': 1, 'tabline': 0, }
-		let g:lightline['separator'] = { 'left': nr2char(0xe0b0), 'right': nr2char(0xe0b2), }
+if s:is_installed('itchyny/lightline.vim')
+	let g:lightline = {}
+	let g:lightline['colorscheme'] = 'github'
+	let g:lightline['enable'] = { 'statusline': 1, 'tabline': 0, }
+	let g:lightline['separator'] = { 'left': nr2char(0xe0b0), 'right': nr2char(0xe0b2), }
+endif
+
+if s:is_installed('rbtnn/vim-colors-github')
+	if has('vim_starting')
+		autocmd vimrc ColorScheme      *
+			\ : highlight!       TabSideBar        guifg=#777777 guibg=NONE    gui=NONE cterm=NONE
+			\ | highlight!       TabSideBarFill    guifg=NONE    guibg=NONE    gui=NONE cterm=NONE
+			\ | highlight!       TabSideBarSel     guifg=#000000 guibg=NONE    gui=NONE cterm=NONE
+			\ | highlight!       TabSideBarLabel   guifg=#00a700 guibg=NONE    gui=BOLD cterm=NONE
+			\ | highlight!       CursorIM          guifg=NONE    guibg=#d70000
+			\ | highlight!       SpecialKey        guifg=#eaebec guibg=NONE    gui=NONE
+		let g:github_colors_soft = 1
+		set background=light
+		colorscheme github
 	endif
+endif
+
+if s:is_installed('kaicataldo/material.vim')
 	if has('vim_starting')
 		autocmd vimrc ColorScheme      *
 			\ : highlight!       TabSideBar        guifg=#777777 guibg=NONE    gui=NONE cterm=NONE

@@ -3,10 +3,8 @@
 	"plugins": {
 		"start": {
 			"itchyny": [
-				"lightline.vim"
-			],
-			"kaicataldo": [
-				"material.vim"
+				"lightline.vim",
+				"vim-cursorword"
 			],
 			"kana": [
 				"vim-operator-replace",
@@ -15,8 +13,10 @@
 			],
 			"rbtnn": [
 				"vim-ambiwidth",
+				"vim-colors-github",
 				"vim-mrw",
 				"vim-pkgsync",
+				"vim-qficonv",
 				"vim-textobj-string",
 				"vim-textobj-vimfunctionname",
 				"vim-vimscript_indentexpr",
