@@ -89,12 +89,6 @@ if s:vimpatch_unsigned
 	set nrformats+=unsigned
 endif
 
-if executable('rg')
-	command! -nargs=0 GrepSettingsRg
-		\ :set grepformat=%f:%l:%c:%m
-		\ |let &grepprg = 'rg --vimgrep --glob "!.git" --glob "!.svn" --glob "!node_modules" -uu'
-endif
-
 if has('persistent_undo')
 	set undofile
 	" https://github.com/neovim/neovim/commit/6995fad260e3e7c49e4f9dc4b63de03989411c7b
@@ -157,22 +151,29 @@ if has('nvim')
 	tnoremap <silent><C-w>N          <C-\><C-n>
 endif
 
-if has('win32') && executable('wmic') && !has('nvim')
+if !has('nvim')
 	let s:term_cmd = [&shell]
-	function! s:out_cb(ch, mes) abort
-		if 14393 < str2nr(trim(a:mes))
-			let s:term_cmd = [&shell, '/K', 'doskey pwd=cd & doskey ls=dir /b & prompt $e[96m$P$G$e[0m']
+	if has('win32') && executable('wmic')
+		function! s:out_cb(ch, mes) abort
+			if 14393 < str2nr(trim(a:mes))
+				let xs = ['$e[47m', '$e[32m', '$S', '$P', '$S', '$e[0m', nr2char(0xe0b0)]
+				let s:term_cmd = [&shell, '/K', 'doskey pwd=cd & doskey ls=dir /b & prompt ' .. join(xs, '')]
+			endif
+		endfunction
+		call job_start('wmic os get BuildNumber', { 'out_cb': function('s:out_cb'), })
+	endif
+	function! s:terminal() abort
+		let xs = filter(getwininfo(), { _,x -> x['terminal'] && (x['tabnr'] == tabpagenr()) })
+		if empty(xs)
+			call term_start(s:term_cmd, {
+				\ 'term_kill': 'kill',
+				\ 'term_finish': 'close',
+				\ })
+		else
+			call win_gotoid(xs[0]['winid'])
 		endif
 	endfunction
-	call job_start('wmic os get BuildNumber', { 'out_cb': function('s:out_cb'), })
-	command! -nargs=0 Term :call term_start(s:term_cmd, {
-		\ 'term_kill': 'kill',
-		\ 'term_finish': 'close',
-		\ })
-endif
-
-if has('win32') && has('gui_running')
-	nnoremap <silent><C-z>    <nop>
+	command! -nargs=0 Terminal :call <SID>terminal()
 endif
 
 " Emacs key mappings
@@ -191,6 +192,7 @@ cnoremap         <C-e>               <end>
 cnoremap         <C-a>               <home>
 
 if s:vimpatch_cmdtag
+	nnoremap <silent><C-z>    <Cmd>Terminal<cr>
 	nnoremap <silent><C-s>    <Cmd>GitDiff<cr>
 	nnoremap <silent><space>  <Cmd>GitLsFiles<cr>
 
@@ -208,19 +210,23 @@ if s:is_installed('rbtnn/vim-gloaded')
 	runtime OPT plugin/gloaded.vim
 endif
 
-if s:is_installed('rbtnn/vim-ambiwidth')
-	let g:ambiwidth_cica_enabled = (&guifont =~# '^Cica')
+if s:is_installed('kana/vim-operator-replace')
+	nmap     <silent>s           <Plug>(operator-replace)
 endif
 
-if s:is_installed('itchyny/lightline.vim')
-	let g:lightline = {}
-	let g:lightline['colorscheme'] = 'github'
-	let g:lightline['enable'] = { 'statusline': 1, 'tabline': 0, }
-	let g:lightline['separator'] = { 'left': nr2char(0xe0b0), 'right': nr2char(0xe0b2), }
+if s:is_installed('tyru/restart.vim')
+	let g:restart_sessionoptions = &sessionoptions
 endif
 
-if s:is_installed('rbtnn/vim-colors-github')
-	if has('vim_starting')
+if has('vim_starting')
+	if s:is_installed('itchyny/lightline.vim')
+		let g:lightline = {}
+		let g:lightline['colorscheme'] = 'github'
+		let g:lightline['enable'] = { 'statusline': 1, 'tabline': 0, }
+		let g:lightline['separator'] = { 'left': nr2char(0xe0b0), 'right': nr2char(0xe0b2), }
+	endif
+
+	if s:is_installed('rbtnn/vim-colors-github')
 		autocmd vimrc ColorScheme      *
 			\ : highlight!       TabSideBar        guifg=#777777 guibg=NONE    gui=NONE cterm=NONE
 			\ | highlight!       TabSideBarFill    guifg=NONE    guibg=NONE    gui=NONE cterm=NONE
@@ -231,11 +237,12 @@ if s:is_installed('rbtnn/vim-colors-github')
 		let g:github_colors_soft = 1
 		set background=light
 		colorscheme github
+		if has('gui_running') || &termguicolors
+			let g:terminal_ansi_colors[7] = '#000000'
+		endif
 	endif
-endif
 
-if s:is_installed('kaicataldo/material.vim')
-	if has('vim_starting')
+	if s:is_installed('kaicataldo/material.vim')
 		autocmd vimrc ColorScheme      *
 			\ : highlight!       TabSideBar        guifg=#777777 guibg=NONE    gui=NONE cterm=NONE
 			\ | highlight!       TabSideBarFill    guifg=NONE    guibg=NONE    gui=NONE cterm=NONE
@@ -251,14 +258,6 @@ if s:is_installed('kaicataldo/material.vim')
 		let g:material_theme_style = 'darker'
 		colorscheme material
 	endif
-endif
-
-if s:is_installed('kana/vim-operator-replace')
-	nmap     <silent>s           <Plug>(operator-replace)
-endif
-
-if s:is_installed('tyru/restart.vim')
-	let g:restart_sessionoptions = &sessionoptions
 endif
 
 if !has('vim_starting')

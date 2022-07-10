@@ -48,6 +48,7 @@ function! git#diff#popup_callback(rootdir, q_args, winid, result) abort
 			let cmd = 'git --no-pager diff -w ' .. a:q_args .. ' -- ' .. path
 			call git#utils#open_diffwindow()
 			call git#diff#setlines(a:rootdir, cmd)
+			setlocal nolist
 			execute printf('nnoremap <silent><buffer>R    :<C-u>call git#diff#setlines(%s, %s)<cr>', string(a:rootdir), string(cmd))
 		endif
 	endif

@@ -1,5 +1,5 @@
 
-if !has('win32')
+if !has('win32') || !executable('msbuild')
 	finish
 endif
 
@@ -9,34 +9,53 @@ let g:msbuild_projectfile = get(g:, 'msbuild_projectfile', "findfile('msbuild.xm
 
 function! MSBuild(q_args, cwd) abort
 	let path = eval(g:msbuild_projectfile)
+	let cmd = ['msbuild']
 	if filereadable(path)
-		let args = printf('/nologo "%s" %s', path, a:q_args)
+		let cmd += ['/nologo', path, a:q_args]
 	else
-		let args = printf('/nologo %s', a:q_args)
+		let cmd += ['/nologo', a:q_args]
 	endif
-
-	let lines = s:system('msbuild ' .. args, a:cwd)
-
-	let xs = []
-	for line in lines
-		let m = matchlist(line, '^\s*\([^(]\+\)(\(\d\+\),\(\d\+\)): \(.*\)\[\(.*\)\]$')
-		if !empty(m)
-			let path = m[1]
-			if !filereadable(path) && (path !~# '^[A-Z]:')
-				let path = expand(fnamemodify(m[5], ':h') .. '/' .. m[1])
-			endif
-			let xs += [{
-				\ 'filename': path,
-				\ 'lnum': m[2],
-				\ 'col': m[3],
-				\ 'text': printf('%s[%s]', m[4], m[5]),
-				\ }]
-		else
-			let xs += [{ 'text': line, }]
-		endif
-	endfor
-	call setqflist(xs)
+	call setqflist([], 'r')
+	let job = job_start(cmd, {
+		\ 'out_cb': function('s:out_cb'),
+		\ 'err_io': 'out',
+		\ 'cwd': a:cwd,
+		\ })
+	try
+		while 'run' == job_status(job)
+			sleep 10m
+		endwhile
+	catch /^Vim:Interrupt$/
+		call job_stop(job, 'kill')
+		echohl ErrorMsg
+		echo 'Interrupt!'
+		echohl None
+	endtry
 	copen
+endfunction
+
+function s:out_cb(ch, msg) abort
+	if g:loaded_qficonv
+		let line = qficonv#encoding#iconv_utf8(a:msg, 'shift_jis')
+	else
+		let line = a:msg
+	endif
+	let m = matchlist(line, '^\s*\([^(]\+\)(\(\d\+\),\(\d\+\)): \(.*\)\[\(.*\)\]$')
+	if !empty(m)
+		let path = m[1]
+		if !filereadable(path) && (path !~# '^[A-Z]:')
+			let path = expand(fnamemodify(m[5], ':h') .. '/' .. m[1])
+		endif
+		let x = [{
+			\ 'filename': path,
+			\ 'lnum': m[2],
+			\ 'col': m[3],
+			\ 'text': printf('%s[%s]', m[4], m[5]),
+			\ }]
+	else
+		let x = [{ 'text': line, }]
+	endif
+	call setqflist(x, 'a')
 endfunction
 
 function! MSBuildComp(A, L, P) abort
@@ -51,32 +70,6 @@ function! MSBuildComp(A, L, P) abort
 		endfor
 	endif
 	return xs
-endfunction
-
-function s:system(cmd, cwd) abort
-	let lines = []
-	let path = tempname()
-	try
-		let job = job_start(a:cmd, {
-			\ 'cwd': a:cwd,
-			\ 'out_io': 'file',
-			\ 'out_name': path,
-			\ 'err_io': 'out',
-			\ })
-		while 'run' == job_status(job)
-		endwhile
-		if filereadable(path)
-			let lines = readfile(path)
-		endif
-		for i in range(0, len(lines) - 1)
-			let lines[i] = qficonv#encoding#iconv_utf8(lines[i], 'shift_jis')
-		endfor
-	finally
-		if filereadable(path)
-			call delete(path)
-		endif
-	endtry
-	return lines
 endfunction
 
 command! -complete=customlist,MSBuildComp -nargs=* MSBuild :call MSBuild(<q-args>, getcwd())
