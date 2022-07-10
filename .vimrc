@@ -223,7 +223,7 @@ if has('vim_starting')
 		let g:lightline = {}
 		let g:lightline['colorscheme'] = 'github'
 		let g:lightline['enable'] = { 'statusline': 1, 'tabline': 0, }
-		let g:lightline['separator'] = { 'left': nr2char(0xe0b0), 'right': nr2char(0xe0b2), }
+		let g:lightline['separator'] = { 'left': nr2char(0xe0b0), }
 	endif
 
 	if s:is_installed('rbtnn/vim-colors-github')
