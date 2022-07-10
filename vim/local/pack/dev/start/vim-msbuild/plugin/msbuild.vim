@@ -7,13 +7,17 @@ let g:loaded_msbuild = 1
 
 let g:msbuild_projectfile = get(g:, 'msbuild_projectfile', "findfile('msbuild.xml', ';')")
 
-function! MSBuild(q_args, cwd) abort
-	let path = eval(g:msbuild_projectfile)
-	let cmd = ['msbuild']
-	if filereadable(path)
-		let cmd += ['/nologo', path, a:q_args]
+function! MSBuild(projectfile, args, cwd) abort
+	let path = a:projectfile
+	if type([]) == type(a:args)
+		let cmd = ['msbuild']
+		if filereadable(path)
+			let cmd += ['/nologo', path] + a:args
+		else
+			let cmd += ['/nologo'] + a:args
+		endif
 	else
-		let cmd += ['/nologo', a:q_args]
+		let cmd = printf('msbuild /nologo %s %s', a:args, path)
 	endif
 	call setqflist([], 'r')
 	let job = job_start(cmd, {
@@ -72,5 +76,5 @@ function! MSBuildComp(A, L, P) abort
 	return xs
 endfunction
 
-command! -complete=customlist,MSBuildComp -nargs=* MSBuild :call MSBuild(<q-args>, getcwd())
+command! -complete=customlist,MSBuildComp -nargs=* MSBuild :call MSBuild(eval(g:msbuild_projectfile), <q-args>, getcwd())
 
