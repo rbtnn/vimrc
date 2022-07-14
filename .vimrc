@@ -238,7 +238,7 @@ if has('vim_starting')
 		set background=light
 		colorscheme github
 		if has('gui_running') || &termguicolors
-			let g:terminal_ansi_colors[7] = '#000000'
+			let g:terminal_ansi_colors[7] = (&background == 'dark') ? '#ffffff' : '#000000'
 		endif
 	endif
 

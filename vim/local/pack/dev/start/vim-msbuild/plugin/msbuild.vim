@@ -8,42 +8,54 @@ let g:loaded_msbuild = 1
 let g:msbuild_projectfile = get(g:, 'msbuild_projectfile', "findfile('msbuild.xml', ';')")
 
 function! MSBuild(projectfile, args, cwd) abort
-	let path = a:projectfile
-	if type([]) == type(a:args)
-		let cmd = ['msbuild']
-		if filereadable(path)
-			let cmd += ['/nologo', path] + a:args
+	if exists('g:loaded_qficonv')
+		let path = a:projectfile
+		if type([]) == type(a:args)
+			let cmd = ['msbuild']
+			if filereadable(path)
+				let cmd += ['/nologo', path] + a:args
+			else
+				let cmd += ['/nologo'] + a:args
+			endif
 		else
-			let cmd += ['/nologo'] + a:args
+			let cmd = printf('msbuild /nologo %s %s', a:args, path)
 		endif
+		call setqflist([], 'r')
+		let job = job_start(cmd, {
+			\ 'out_cb': function('s:out_cb'),
+			\ 'err_io': 'out',
+			\ 'cwd': a:cwd,
+			\ })
+		call s:waitting(job)
+		copen
 	else
-		let cmd = printf('msbuild /nologo %s %s', a:args, path)
-	endif
-	call setqflist([], 'r')
-	let job = job_start(cmd, {
-		\ 'out_cb': function('s:out_cb'),
-		\ 'err_io': 'out',
-		\ 'cwd': a:cwd,
-		\ })
-	try
-		while 'run' == job_status(job)
-			sleep 10m
-		endwhile
-	catch /^Vim:Interrupt$/
-		call job_stop(job, 'kill')
 		echohl ErrorMsg
-		echo 'Interrupt!'
+		echo '[msbuild] Please install rbtnn/vim-qficonv!'
+		echohl None
+	endif
+endfunction
+
+function s:waitting(job) abort
+	try
+		let i = 0
+		while 'run' == job_status(a:job)
+			let i = (i + 1) % 4
+			redraw
+			echo '[msbuild] The job is running ' .. ['-', '\', '|', '/'][i]
+			sleep 50m
+		endwhile
+		redraw
+		echo '[msbuild] The job has finished!'
+	catch /^Vim:Interrupt$/
+		call job_stop(a:job, 'kill')
+		echohl ErrorMsg
+		echo '[msbuild] Interrupt!'
 		echohl None
 	endtry
-	copen
 endfunction
 
 function s:out_cb(ch, msg) abort
-	if g:loaded_qficonv
-		let line = qficonv#encoding#iconv_utf8(a:msg, 'shift_jis')
-	else
-		let line = a:msg
-	endif
+	let line = a:msg
 	let m = matchlist(line, '^\s*\([^(]\+\)(\(\d\+\),\(\d\+\)): \(.*\)\[\(.*\)\]$')
 	if !empty(m)
 		let path = m[1]
@@ -51,13 +63,13 @@ function s:out_cb(ch, msg) abort
 			let path = expand(fnamemodify(m[5], ':h') .. '/' .. m[1])
 		endif
 		let x = [{
-			\ 'filename': path,
+			\ 'filename': qficonv#encoding#iconv_utf8(path, 'shift_jis'),
 			\ 'lnum': m[2],
 			\ 'col': m[3],
-			\ 'text': printf('%s[%s]', m[4], m[5]),
+			\ 'text': qficonv#encoding#iconv_utf8(printf('%s[%s]', m[4], m[5]), 'shift_jis'),
 			\ }]
 	else
-		let x = [{ 'text': line, }]
+		let x = [{ 'text': qficonv#encoding#iconv_utf8(line, 'shift_jis'), }]
 	endif
 	call setqflist(x, 'a')
 endfunction
