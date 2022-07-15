@@ -234,7 +234,7 @@ if has('vim_starting')
 			\ | highlight!       TabSideBarLabel   guifg=#00a700 guibg=NONE    gui=BOLD cterm=NONE
 			\ | highlight!       CursorIM          guifg=NONE    guibg=#d70000
 			\ | highlight!       SpecialKey        guifg=#eaebec guibg=NONE    gui=NONE
-		let g:github_colors_soft = 1
+		let g:github_colors_soft = 0
 		set background=light
 		colorscheme github
 		if has('gui_running') || &termguicolors

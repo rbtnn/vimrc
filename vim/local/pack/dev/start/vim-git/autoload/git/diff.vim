@@ -3,6 +3,7 @@ function! git#diff#main(q_args) abort
 	let cmd = 'git --no-pager diff --numstat -w ' .. a:q_args
 	let rootdir = git#utils#get_rootdir('.', 'git')
 	let winid = git#utils#create_popupwin(rootdir, [])
+	let curr_filename = matchstr((&filetype == 'diff') ? get(getbufline(bufnr(), 1), 0, '') : expand('%:p'), '[^\/]\+$')
 	if -1 != winid
 		call popup_setoptions(winid, {
 			\ 'filter': function('git#diff#popup_filter', [rootdir]),
@@ -10,6 +11,16 @@ function! git#diff#main(q_args) abort
 			\ })
 		let lines = git#utils#system(cmd, rootdir)
 		call popup_settext(winid, lines)
+		if !empty(curr_filename)
+			let lnum = 1
+			for line in lines
+				if line =~# '[\/]' .. curr_filename .. '$'
+					call win_execute(winid, printf('call setpos(".", [0, %d, 1, 0])', lnum))
+					break
+				endif
+				let lnum += 1
+			endfor
+		endif
 	endif
 endfunction
 
@@ -47,17 +58,19 @@ function! git#diff#popup_callback(rootdir, q_args, winid, result) abort
 			let path = a:rootdir .. '/' .. trim(split(line, "\t")[2])
 			let cmd = 'git --no-pager diff -w ' .. a:q_args .. ' -- ' .. path
 			call git#utils#open_diffwindow()
-			call git#diff#setlines(a:rootdir, cmd)
+			call git#diff#setlines(a:rootdir, cmd, v:false)
 			setlocal nolist
-			execute printf('nnoremap <silent><buffer>R    :<C-u>call git#diff#setlines(%s, %s)<cr>', string(a:rootdir), string(cmd))
+			execute printf('nnoremap <silent><buffer>R    :<C-u>call git#diff#setlines(%s, %s, v:true)<cr>', string(a:rootdir), string(cmd))
 		endif
 	endif
 endfunction
 
-function! git#diff#setlines(rootdir, cmd) abort
+function! git#diff#setlines(rootdir, cmd, keep_pos) abort
 	let x = winsaveview()
 	let lines = git#utils#system(a:cmd, a:rootdir)
 	call git#utils#setlines(a:rootdir, a:cmd, lines)
-	call winrestview(x)
+	if a:keep_pos
+		call winrestview(x)
+	endif
 endfunction
 
