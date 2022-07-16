@@ -28,7 +28,7 @@ function s:waitting(job) abort
 			let i = (i + 1) % 4
 			redraw
 			echo '[ripgrep] The job is running ' .. ['-', '\', '|', '/'][i]
-			sleep 50m
+			sleep 10m
 		endwhile
 		redraw
 		echo '[ripgrep] The job has finished!'

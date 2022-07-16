@@ -42,7 +42,7 @@ function s:waitting(job) abort
 			let i = (i + 1) % 4
 			redraw
 			echo '[msbuild] The job is running ' .. ['-', '\', '|', '/'][i]
-			sleep 50m
+			sleep 10m
 		endwhile
 		redraw
 		echo '[msbuild] The job has finished!'
