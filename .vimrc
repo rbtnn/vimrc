@@ -153,11 +153,11 @@ endif
 
 if !has('nvim')
 	let s:term_cmd = [&shell]
-	if has('win32') && executable('wmic')
+	if has('win32') && executable('wmic') && has('gui_running')
 		function! s:out_cb(ch, mes) abort
 			if 14393 < str2nr(trim(a:mes))
-				let fg = 7
-				let bg = 2
+				let fg = 0
+				let bg = 4
 				let clr = '$e[0m'
 				let sp = '$S'
 				let path = '$P'
@@ -225,42 +225,23 @@ if s:is_installed('tyru/restart.vim')
 endif
 
 if has('vim_starting')
-	if s:is_installed('cormacrelf/vim-colors-github')
+	if s:is_installed('arcticicestudio/nord-vim')
 		if s:is_installed('itchyny/lightline.vim')
 			let g:lightline = {}
-			let g:lightline['colorscheme'] = 'github'
+			let g:lightline['colorscheme'] = 'nord'
 			let g:lightline['enable'] = { 'statusline': 1, 'tabline': 0, }
-			let g:lightline['separator'] = { 'left': nr2char(0xe0b0), }
+			if has('gui_running')
+				let g:lightline['separator'] = { 'left': nr2char(0xe0b0), }
+			endif
 		endif
-		set background=dark
-		if &background == 'dark'
-			autocmd vimrc ColorScheme      *
-				\ : highlight!       TabSideBar        guifg=#777777 guibg=NONE    gui=NONE cterm=NONE
-				\ | highlight!       TabSideBarFill    guifg=NONE    guibg=NONE    gui=NONE cterm=NONE
-				\ | highlight!       TabSideBarSel     guifg=#ffffff guibg=NONE    gui=NONE cterm=NONE
-				\ | highlight!       TabSideBarLabel   guifg=#00a700 guibg=NONE    gui=BOLD cterm=NONE
-				\ | highlight!       CursorIM          guifg=NONE    guibg=#d70000
-				\ | highlight!       SpecialKey        guifg=#333231 guibg=NONE    gui=NONE
-				\ | highlight!       EndOfBuffer       guifg=#333231 guibg=#24292e gui=NONE
-		else
-			autocmd vimrc ColorScheme      *
-				\ : highlight!       TabSideBar        guifg=#777777 guibg=NONE    gui=NONE cterm=NONE
-				\ | highlight!       TabSideBarFill    guifg=NONE    guibg=NONE    gui=NONE cterm=NONE
-				\ | highlight!       TabSideBarSel     guifg=#000000 guibg=NONE    gui=NONE cterm=NONE
-				\ | highlight!       TabSideBarLabel   guifg=#00a700 guibg=NONE    gui=BOLD cterm=NONE
-				\ | highlight!       CursorIM          guifg=NONE    guibg=#d70000
-				\ | highlight!       SpecialKey        guifg=#eaebec guibg=NONE    gui=NONE
-				\ | highlight!       EndOfBuffer       guifg=#eaebec guibg=#ffffff gui=NONE
-		endif
-		colorscheme github
-		if has('gui_running') || &termguicolors
-			let g:terminal_ansi_colors = [
-				\ '#76787b', '#f16636', '#3ebc5c', '#f18338',
-				\ '#4dacfd', '#a887e6', '#4dacfd', (&background == 'dark') ? '#ffffff' : '#000000',
-				\ '#868a8e', '#b31d28', '#59b36f', '#e36209',
-				\ '#c1daec', '#8b71c1', '#c1daec', '#fafbfc',
-				\ ]
-		endif
+		autocmd vimrc ColorScheme      *
+			\ : highlight!       TabSideBar        guifg=#777777 guibg=NONE    gui=NONE cterm=NONE
+			\ | highlight!       TabSideBarFill    guifg=NONE    guibg=NONE    gui=NONE cterm=NONE
+			\ | highlight!       TabSideBarSel     guifg=#ffffff guibg=NONE    gui=NONE cterm=NONE
+			\ | highlight!       TabSideBarLabel   guifg=#00a700 guibg=NONE    gui=BOLD cterm=NONE
+			\ | highlight!       CursorIM          guifg=NONE    guibg=#d70000
+			\ | highlight!       SpecialKey        guifg=#364054
+		colorscheme nord
 	endif
 endif
 

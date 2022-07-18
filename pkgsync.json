@@ -2,8 +2,8 @@
 	"packpath": "~/vim/github",
 	"plugins": {
 		"start": {
-			"cormacrelf": [
-				"vim-colors-github"
+			"arcticicestudio": [
+				"nord-vim"
 			],
 			"itchyny": [
 				"lightline.vim",

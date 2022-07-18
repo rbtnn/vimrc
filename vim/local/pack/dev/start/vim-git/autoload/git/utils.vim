@@ -45,7 +45,7 @@ function! git#utils#get_popupwin_options() abort
 			let width -= &tabsidebarcolumns
 		endif
 	endif
-	return {
+	let obj = {
 		\ 'wrap': 1,
 		\ 'scrollbar': 0,
 		\ 'minwidth': width, 'maxwidth': width,
@@ -53,9 +53,14 @@ function! git#utils#get_popupwin_options() abort
 		\ 'border': [],
 		\ 'padding': repeat([0], 4),
 		\ 'highlight': 'Normal',
-		\ 'borderhighlight': repeat(['Normal'], 4),
-		\ 'borderchars': borderchars_typeB,
 		\ }
+	if has('gui_running')
+		call extend(obj, {
+			\ 'borderhighlight': repeat(['Normal'], 4),
+			\ 'borderchars': borderchars_typeB,
+			\ }, 'force')
+	endif
+	return obj
 endfunction
 
 function! git#utils#get_rootdir(path, cmdname) abort
