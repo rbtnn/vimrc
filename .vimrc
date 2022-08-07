@@ -16,6 +16,14 @@ let s:vimpatch_cmdlinepum = has('patch-8.2.4325') || has('nvim')
 let $MYVIMRC = resolve($MYVIMRC)
 let $VIMRC_VIM = expand(expand('<sfile>:h') .. '/vim')
 
+function! PkgSyncSetup() abort
+	let path = expand('$VIMRC_VIM/github/pack/rbtnn/start/')
+	silent! call mkdir(path, 'p')
+	call term_start(['git', 'clone', '--depth', '1', 'https://github.com/rbtnn/vim-pkgsync.git'], {
+		\ 'cwd': path,
+		\ })
+endfunction
+
 augroup vimrc
 	autocmd!
 	" Delete unused commands, because it's an obstacle on cmdline-completion.
@@ -30,6 +38,10 @@ augroup vimrc
 		\ | endfor
 		\ | unlet s:cmdname
 	autocmd FileType     help :setlocal colorcolumn=78
+	autocmd VimEnter        *
+		\ :if !exists(':PkgSync')
+		\ |  execute 'command! -nargs=0 PkgSyncSetup :call PkgSyncSetup()'
+		\ |endif
 augroup END
 
 language messages C
