@@ -212,7 +212,11 @@ cnoremap         <C-a>               <home>
 if s:vimpatch_cmdtag
 	nnoremap <silent><C-z>    <Cmd>Terminal<cr>
 	nnoremap <silent><C-s>    <Cmd>GitDiff<cr>
+	nnoremap <silent><C-k>    <Cmd>GitLsFiles<cr>
 	nnoremap <silent><space>  <Cmd>GitLsFiles<cr>
+
+	nnoremap <silent><C-d>    <C-d>0
+	nnoremap <silent><C-u>    <C-u>0
 
 	" Move the next/previous error in quickfix.
 	nnoremap <silent><C-n>    <Cmd>cnext \| normal zz<cr>
