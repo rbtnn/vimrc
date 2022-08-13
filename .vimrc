@@ -30,7 +30,7 @@ augroup vimrc
 	autocmd CmdlineEnter     *
 		\ : for s:cmdname in [
 		\   'MANPAGER', 'Man', 'Tutor', 'VimFoldh', 'TextobjStringDefaultKeyMappings',
-		\   'UpdateRemotePlugins', 'TextobjVimfunctionnameDefaultKeyMappings',
+		\   'UpdateRemotePlugins',
 		\   'VimTweakDisableCaption', 'VimTweakDisableMaximize', 'VimTweakDisableTopMost',
 		\   'VimTweakEnableCaption', 'VimTweakEnableMaximize', 'VimTweakEnableTopMost',
 		\ ]
@@ -71,6 +71,7 @@ set matchtime=1
 set nobackup
 set nonumber
 set norelativenumber
+set noshowcmd
 set noshowmode
 set noswapfile
 set nowrap
@@ -79,12 +80,11 @@ set nowritebackup
 set nrformats&
 set pumheight=10
 set ruler
-set rulerformat&
+set rulerformat=%{&fileencoding}/%{&fileformat}
 set scrolloff&
 set sessionoptions=winpos,resize,tabpages,curdir,help
 set shiftround
 set shiftwidth=4
-set showcmd
 set showmatch
 set softtabstop=-1
 set tabstop=4
@@ -145,10 +145,7 @@ if has('vim_starting')
 	silent! source ~/.vimrc.local
 	filetype plugin indent on
 	syntax enable
-
-	if has('termguicolors') && !has('gui_running') && (has('win32') || (256 == &t_Co))
-		silent! set termguicolors
-	endif
+	packloadall
 endif
 
 " Can't use <S-space> at :terminal
@@ -161,37 +158,6 @@ cnoremap   <expr><space>             (wildmenumode() && (getcmdline() =~# '[\/]$
 " Escape from Terminal mode.
 if has('nvim')
 	tnoremap <silent><C-w>N          <C-\><C-n>
-endif
-
-if !has('nvim')
-	let s:term_cmd = [&shell]
-	if has('win32') && executable('wmic') && has('gui_running')
-		function! s:out_cb(ch, mes) abort
-			if 14393 < str2nr(trim(a:mes))
-				let fg = 0
-				let bg = 4
-				let clr = '$e[0m'
-				let sp = '$S'
-				let path = '$P'
-				let arrow = nr2char(0xe0b0)
-				let xs = ['$e[4' .. bg .. 'm', '$e[3' .. fg .. 'm', sp, path, sp, clr, '$e[3' .. bg .. 'm', arrow, clr]
-				let s:term_cmd = [&shell, '/K', 'doskey pwd=cd & doskey ls=dir /b & prompt ' .. join(xs, '')]
-			endif
-		endfunction
-		call job_start('wmic os get BuildNumber', { 'out_cb': function('s:out_cb'), })
-	endif
-	function! s:terminal() abort
-		let xs = filter(getwininfo(), { _,x -> x['terminal'] && (x['tabnr'] == tabpagenr()) })
-		if empty(xs)
-			call term_start(s:term_cmd, {
-				\ 'term_kill': 'kill',
-				\ 'term_finish': 'close',
-				\ })
-		else
-			call win_gotoid(xs[0]['winid'])
-		endif
-	endfunction
-	command! -nargs=0 Terminal :call <SID>terminal()
 endif
 
 " Emacs key mappings
@@ -210,10 +176,12 @@ cnoremap         <C-e>               <end>
 cnoremap         <C-a>               <home>
 
 if s:vimpatch_cmdtag
-	nnoremap <silent><C-z>    <Cmd>Terminal<cr>
-	nnoremap <silent><C-s>    <Cmd>GitDiff<cr>
-	nnoremap <silent><C-k>    <Cmd>GitLsFiles<cr>
-	nnoremap <silent><space>  <Cmd>GitLsFiles<cr>
+	if !has('nvim')
+		nnoremap <silent><C-z>    <Cmd>Terminal<cr>
+		nnoremap <silent><C-s>    <Cmd>GitDiff<cr>
+		nnoremap <silent><C-k>    <Cmd>GitLsFiles<cr>
+		nnoremap <silent><space>  <Cmd>GitLsFiles<cr>
+	endif
 
 	nnoremap <silent><C-d>    <C-d>0
 	nnoremap <silent><C-u>    <C-u>0
@@ -228,10 +196,6 @@ function! s:is_installed(user_and_name) abort
 	return !empty(globpath($VIMRC_VIM, 'github/pack/' .. xs[0] .. '/*/' .. xs[1]))
 endfunction
 
-if s:is_installed('rbtnn/vim-gloaded')
-	runtime OPT plugin/gloaded.vim
-endif
-
 if s:is_installed('kana/vim-operator-replace')
 	nmap     <silent>s           <Plug>(operator-replace)
 endif
@@ -241,27 +205,17 @@ if s:is_installed('tyru/restart.vim')
 endif
 
 if has('vim_starting')
-	if s:is_installed('arcticicestudio/nord-vim')
-		if s:is_installed('itchyny/lightline.vim')
-			let g:lightline = {}
-			let g:lightline['colorscheme'] = 'nord'
-			let g:lightline['enable'] = { 'statusline': 1, 'tabline': 0, }
-			if has('gui_running')
-				let g:lightline['separator'] = { 'left': nr2char(0xe0b0), }
-			endif
-		endif
-		autocmd vimrc ColorScheme      *
-			\ : highlight!       TabSideBar        guifg=#777777 guibg=NONE    gui=NONE cterm=NONE
-			\ | highlight!       TabSideBarFill    guifg=NONE    guibg=NONE    gui=NONE cterm=NONE
-			\ | highlight!       TabSideBarSel     guifg=#ffffff guibg=NONE    gui=NONE cterm=NONE
-			\ | highlight!       TabSideBarLabel   guifg=#00a700 guibg=NONE    gui=BOLD cterm=NONE
-			\ | highlight!       CursorIM          guifg=NONE    guibg=#d70000
-			\ | highlight!       SpecialKey        guifg=#364054
-		colorscheme nord
+	if has('termguicolors') && !has('gui_running') && (has('win32') || (256 == &t_Co))
+		silent! set termguicolors
 	endif
-endif
-
-if !has('vim_starting')
+	autocmd vimrc ColorScheme      *
+		\ : highlight!       TabSideBar        guifg=#777777 guibg=NONE    gui=NONE cterm=NONE
+		\ | highlight!       TabSideBarFill    guifg=NONE    guibg=NONE    gui=NONE cterm=NONE
+		\ | highlight!       TabSideBarSel     guifg=#ffffff guibg=NONE    gui=NONE cterm=NONE
+		\ | highlight!       TabSideBarLabel   guifg=#00a700 guibg=NONE    gui=BOLD cterm=NONE
+		\ | highlight!       CursorIM          guifg=NONE    guibg=#d70000
+	colorscheme habamax
+else
 	" Check whether echo-messages are not disappeared when .vimrc is read.
 	echo '.vimrc has just read!'
 endif

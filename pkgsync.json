@@ -2,11 +2,7 @@
 	"packpath": "~/vim/github",
 	"plugins": {
 		"start": {
-			"arcticicestudio": [
-				"nord-vim"
-			],
 			"itchyny": [
-				"lightline.vim",
 				"vim-cursorword"
 			],
 			"kana": [
@@ -16,11 +12,10 @@
 			],
 			"rbtnn": [
 				"vim-ambiwidth",
-				"vim-mrw",
 				"vim-pkgsync",
 				"vim-qficonv",
+				"vim-gloaded",
 				"vim-textobj-string",
-				"vim-textobj-vimfunctionname",
 				"vim-vimscript_indentexpr",
 				"vim-vimscript_lasterror",
 				"vim-vimscript_tagfunc",
@@ -31,11 +26,6 @@
 			],
 			"tyru": [
 				"restart.vim"
-			]
-		},
-		"opt": {
-			"rbtnn": [
-				"vim-gloaded"
 			]
 		}
 	}

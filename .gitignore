@@ -71,7 +71,11 @@
 .xsession-errors
 .xsession-errors.old
 .yarnrc
+.zcompdump
+.zsh_history
+.zsh_sessions/
 .zshenv
+.zshrc
 3D Objects/
 Anaconda3/
 AppData/

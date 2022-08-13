@@ -8,7 +8,7 @@ let g:loaded_ripgrep = 1
 function! Ripgrep(q_args) abort
 	if exists('g:loaded_qficonv')
 		call setqflist([], 'r')
-		let job = job_start(['rg', '--vimgrep', '--glob', '!.git', '--glob', '!.svn', '--glob', '!node_modules', '-uu'] + split(a:q_args, '\s\+') + (has('win32') ? ['.\'] : []), {
+		let job = job_start(['rg', '--vimgrep', '--glob', '!.git', '--glob', '!.svn', '--glob', '!node_modules', '-uu'] + split(a:q_args, '\s\+') + (has('win32') ? ['.\'] : ['.']), {
 			\ 'out_cb': function('s:out_cb'),
 			\ 'err_io': 'out',
 			\ })

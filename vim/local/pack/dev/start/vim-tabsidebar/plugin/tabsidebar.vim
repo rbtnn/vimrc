@@ -1,21 +1,25 @@
 
-let g:loaded_tabsidebar = 1
+if !has('vim9script')
+	finish
+endif
+
+vim9script
+
+g:loaded_tabsidebar = 1
 
 if has('tabsidebar')
-	function! TabSideBar() abort
+	def TabSideBar(): string
 		try
-			let tnr = get(g:, 'actual_curtabpage', tabpagenr())
-			let lines = ['', printf('%s- Tab %d -%s', '%#TabSideBarLabel#', tnr, '%#TabSideBar#')]
-			for x in filter(getwininfo(), { i, x -> tnr == x['tabnr'] && ('popup' != win_gettype(x['winid'])) })
-				let ft = getbufvar(x['bufnr'], '&filetype')
-				let bt = getbufvar(x['bufnr'], '&buftype')
-				let current = (tnr == tabpagenr()) && (x['winnr'] == winnr())
-				let high = (current ? '%#TabSideBarSel#' : '%#TabSideBar#')
-				let fname = fnamemodify(bufname(x['bufnr']), ':t')
-				if exists('*WebDevIconsGetFileTypeSymbol') && (&guifont =~# '^Cica')
-					let fname = (current ? '%#TabSideBarIcon#' : '') .. WebDevIconsGetFileTypeSymbol(fname) .. high .. fname
-				endif
-				let lines += [
+			var tnr = get(g:, 'actual_curtabpage', tabpagenr())
+			var lines = ['', printf('%s- Tab %d -%s', '%#TabSideBarLabel#', tnr, '%#TabSideBar#')]
+			for x in filter(getwininfo(), (i, x) => tnr == x['tabnr'] && ('popup' != win_gettype(x['winid'])))
+				var ft = getbufvar(x['bufnr'], '&filetype')
+				var bt = getbufvar(x['bufnr'], '&buftype')
+				var current = (tnr == tabpagenr()) && (x['winnr'] == winnr())
+				var high = (current ? '%#TabSideBarSel#' : '%#TabSideBar#')
+				var fname = fnamemodify(bufname(x['bufnr']), ':t')
+				#fname = (current ? '%#TabSideBarIcon#' : '') .. WebDevIconsGetFileTypeSymbol(fname) .. high .. fname
+				lines += [
 					\    high
 					\ .. ' '
 					\ .. (!empty(bt)
@@ -28,20 +32,20 @@ if has('tabsidebar')
 			endfor
 			return join(lines, "\n")
 		catch
-			let g:tab_throwpoint = v:throwpoint
-			let g:tab_exception = v:exception
+			g:tab_throwpoint = v:throwpoint
+			g:tab_exception = v:exception
 			return 'Error! Please see g:tab_throwpoint and g:tab_exception.'
 		endtry
-	endfunction
-	let g:tabsidebar_vertsplit = 1
+	enddef
+	g:tabsidebar_vertsplit = 1
 	set notabsidebaralign
 	set notabsidebarwrap
 	set showtabsidebar=2
-	set tabsidebar=%!TabSideBar()
 	set tabsidebarcolumns=20
-	for s:name in ['TabSideBar', 'TabSideBarFill', 'TabSideBarSel']
-		if !hlexists(s:name)
-			execute printf('highlight! %s guibg=NONE gui=NONE cterm=NONE', s:name)
+	&tabsidebar = '%!' .. expand('<SID>') .. 'TabSideBar()'
+	for name in ['TabSideBar', 'TabSideBarFill', 'TabSideBarSel']
+		if !hlexists(name)
+			execute printf('highlight! %s guibg=NONE gui=NONE cterm=NONE', name)
 		endif
 	endfor
 endif
