@@ -6,12 +6,9 @@ endif
 set makeencoding=char
 scriptencoding utf-8
 
-" https://github.com/vim/vim/commit/957cf67d50516ba98716f59c9e1cb6412ec1535d
-let s:vimpatch_cmdtag = has('patch-8.2.1978') || has('nvim')
-" https://github.com/vim/vim/commit/aaad995f8384a77a64efba6846c9c4ac99de0953
-let s:vimpatch_unsigned = has('patch-8.2.0860') || has('nvim')
-" https://github.com/vim/vim/commit/3908ef5017a6b4425727013588f72cc7343199b9
-let s:vimpatch_cmdlinepum = has('patch-8.2.4325') || has('nvim')
+if has('nvim')
+	finish
+endif
 
 let $MYVIMRC = resolve($MYVIMRC)
 let $VIMRC_VIM = expand(expand('<sfile>:h') .. '/vim')
@@ -89,14 +86,17 @@ set showmatch
 set softtabstop=-1
 set tabstop=4
 set tags=./tags;
-set updatetime&
+set timeout timeoutlen=500 ttimeoutlen=100
+set updatetime=500
 set wildmenu
 
-if s:vimpatch_cmdlinepum
+" https://github.com/vim/vim/commit/3908ef5017a6b4425727013588f72cc7343199b9
+if has('patch-8.2.4325')
 	set wildoptions=pum
 endif
 
-if s:vimpatch_unsigned
+" https://github.com/vim/vim/commit/aaad995f8384a77a64efba6846c9c4ac99de0953
+if has('patch-8.2.0860')
 	set nrformats-=octal
 	set nrformats+=unsigned
 endif
@@ -104,11 +104,7 @@ endif
 if has('persistent_undo')
 	set undofile
 	" https://github.com/neovim/neovim/commit/6995fad260e3e7c49e4f9dc4b63de03989411c7b
-	if has('nvim')
-		let &undodir = expand('$VIMRC_VIM/undofiles/neovim')
-	else
-		let &undodir = expand('$VIMRC_VIM/undofiles/vim')
-	endif
+	let &undodir = expand('$VIMRC_VIM/undofiles/vim')
 	silent! call mkdir(&undodir, 'p')
 else
 	set noundofile
@@ -123,21 +119,6 @@ if has('vim_starting')
 	set statusline&
 	set showtabline=0
 	set tabline&
-
-	if has('win32')
-		if has('nvim')
-			" Running nvim-qt.exe on Windows OS, never use GUI popupmenu and tabline.
-			call rpcnotify(0, 'Gui', 'Option', 'Popupmenu', 0)
-			call rpcnotify(0, 'Gui', 'Option', 'Tabline', 0)
-		else
-			" This is the same as stdpath('config') in nvim on Windows OS.
-			let s:nvim_initpath = expand('~/AppData/Local/nvim/init.vim')
-			if !filereadable(s:nvim_initpath)
-				silent! call mkdir(fnamemodify(s:nvim_initpath, ':h'), 'p')
-				call writefile(['silent! source ~/.vimrc'], s:nvim_initpath)
-			endif
-		endif
-	endif
 
 	set packpath=$VIMRC_VIM/local,$VIMRC_VIM/github
 	set runtimepath=$VIMRUNTIME
@@ -155,10 +136,6 @@ tnoremap <silent><S-space>           <space>
 " Smart space on wildmenu
 cnoremap   <expr><space>             (wildmenumode() && (getcmdline() =~# '[\/]$')) ? '<space><bs>' : '<space>'
 
-" Escape from Terminal mode.
-if has('nvim')
-	tnoremap <silent><C-w>N          <C-\><C-n>
-endif
 
 " Emacs key mappings
 if has('win32') && (&shell =~# '\<cmd\.exe$')
@@ -175,21 +152,18 @@ cnoremap         <C-f>               <right>
 cnoremap         <C-e>               <end>
 cnoremap         <C-a>               <home>
 
-if s:vimpatch_cmdtag
-	if !has('nvim')
-		nnoremap <silent><C-z>    <Cmd>Terminal<cr>
-		nnoremap <silent><C-s>    <Cmd>GitDiff<cr>
-		nnoremap <silent><C-k>    <Cmd>GitLsFiles<cr>
-		nnoremap <silent><space>  <Cmd>GitLsFiles<cr>
-	endif
-
-	nnoremap <silent><C-d>    <C-d>0
-	nnoremap <silent><C-u>    <C-u>0
-
-	" Move the next/previous error in quickfix.
+" https://github.com/vim/vim/commit/957cf67d50516ba98716f59c9e1cb6412ec1535d
+if has('patch-8.2.1978')
+	nnoremap <silent><C-z>    <Cmd>Terminal<cr>
+	nnoremap <silent><C-s>    <Cmd>GitDiff<cr>
+	nnoremap <silent><C-k>    <Cmd>GitLsFiles<cr>
+	nnoremap <silent><space>  <Cmd>GitLsFiles<cr>
 	nnoremap <silent><C-n>    <Cmd>cnext \| normal zz<cr>
 	nnoremap <silent><C-p>    <Cmd>cprevious \| normal zz<cr>
 endif
+
+nnoremap <silent><C-d>    <C-d>0
+nnoremap <silent><C-u>    <C-u>0
 
 function! s:is_installed(user_and_name) abort
 	let xs = split(a:user_and_name, '/')
