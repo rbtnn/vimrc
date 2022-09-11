@@ -12,9 +12,10 @@
 			],
 			"rbtnn": [
 				"vim-ambiwidth",
+				"vim-emphasiscursor",
+				"vim-gloaded",
 				"vim-pkgsync",
 				"vim-qficonv",
-				"vim-gloaded",
 				"vim-textobj-string",
 				"vim-vimscript_indentexpr",
 				"vim-vimscript_lasterror",

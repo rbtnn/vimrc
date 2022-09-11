@@ -134,7 +134,7 @@ endif
 tnoremap <silent><S-space>           <space>
 
 " Smart space on wildmenu
-cnoremap   <expr><space>             (wildmenumode() && (getcmdline() =~# '[\/]$')) ? '<space><bs>' : '<space>'
+cnoremap <expr><space>             (wildmenumode() && (getcmdline() =~# '[\/]$')) ? '<space><bs>' : '<space>'
 
 
 " Emacs key mappings
@@ -176,6 +176,11 @@ endif
 
 if s:is_installed('tyru/restart.vim')
 	let g:restart_sessionoptions = &sessionoptions
+endif
+
+if s:is_installed('rbtnn/vim-emphasiscursor')
+	autocmd vimrc WinEnter      *
+		\ :EmphasisCursor -count=5 -msec=30
 endif
 
 if has('vim_starting')

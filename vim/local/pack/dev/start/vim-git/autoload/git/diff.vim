@@ -2,24 +2,28 @@
 function! git#diff#main(q_args) abort
 	let cmd = 'git --no-pager diff --numstat -w ' .. a:q_args
 	let rootdir = git#utils#get_rootdir('.', 'git')
-	let winid = git#utils#create_popupwin(rootdir, [])
-	let curr_filename = matchstr((&filetype == 'diff') ? get(getbufline(bufnr(), 1), 0, '') : expand('%:p'), '[^\/]\+$')
-	if -1 != winid
-		call popup_setoptions(winid, {
-			\ 'filter': function('git#diff#popup_filter', [rootdir]),
-			\ 'callback': function('git#diff#popup_callback', [rootdir, a:q_args]),
-			\ })
-		let lines = git#utils#system(cmd, rootdir)
-		call popup_settext(winid, lines)
-		if !empty(curr_filename)
-			let lnum = 1
-			for line in lines
-				if line =~# '[\/]' .. curr_filename .. '$'
-					call win_execute(winid, printf('call setpos(".", [0, %d, 1, 0])', lnum))
-					break
-				endif
-				let lnum += 1
-			endfor
+	let lines = git#utils#system(cmd, rootdir)
+	if empty(lines)
+		echowindow printf('[git diff] %s!', 'No modified files')
+	else
+		let winid = git#utils#create_popupwin(rootdir, [])
+		if -1 != winid
+			call popup_setoptions(winid, {
+				\ 'filter': function('git#diff#popup_filter', [rootdir]),
+				\ 'callback': function('git#diff#popup_callback', [rootdir, a:q_args]),
+				\ })
+			call popup_settext(winid, lines)
+			let curr_filename = matchstr((&filetype == 'diff') ? get(getbufline(bufnr(), 1), 0, '') : expand('%:p'), '[^\/]\+$')
+			if !empty(curr_filename)
+				let lnum = 1
+				for line in lines
+					if line =~# '[\/]' .. curr_filename .. '$'
+						call win_execute(winid, printf('call setpos(".", [0, %d, 1, 0])', lnum))
+						break
+					endif
+					let lnum += 1
+				endfor
+			endif
 		endif
 	endif
 endfunction

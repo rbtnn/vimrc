@@ -1,5 +1,5 @@
 
-let g:loaded_diffview = 1
+let g:loaded_git = 1
 
 if !has('nvim') && executable('git')
 	command! -bang -nargs=0 GitLsFiles       :call git#lsfiles#main(get(t:, 'git_lsfiles_args', <q-args>))

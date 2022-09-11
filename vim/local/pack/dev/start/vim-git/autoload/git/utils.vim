@@ -4,21 +4,13 @@ scriptencoding utf-8
 function! git#utils#create_popupwin(rootdir, lines) abort
 	let tstatus = term_getstatus(bufnr())
 	if !isdirectory(a:rootdir)
-		echohl Error
-		echo printf('[git] %s!', 'The directory is not under git control')
-		echohl None
+		echowindow printf('[git] %s!', 'The directory is not under git control')
 	elseif (tstatus != 'finished') && !empty(tstatus)
-		echohl Error
-		echo printf('[git] %s!', 'Could not open on running terminal buffer')
-		echohl None
+		echowindow printf('[git] %s!', 'Could not open on running terminal buffer')
 	elseif !empty(getcmdwintype())
-		echohl Error
-		echo printf('[git] %s!', 'Could not open on command-line window')
-		echohl None
+		echowindow printf('[git] %s!', 'Could not open on command-line window')
 	elseif &modified
-		echohl Error
-		echo printf('[git] %s!', 'Could not open on modified buffer')
-		echohl None
+		echowindow printf('[git] %s!', 'Could not open on modified buffer')
 	else
 		return popup_menu(a:lines, git#utils#get_popupwin_options())
 	endif
