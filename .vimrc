@@ -178,11 +178,6 @@ if s:is_installed('tyru/restart.vim')
 	let g:restart_sessionoptions = &sessionoptions
 endif
 
-if s:is_installed('rbtnn/vim-emphasiscursor')
-	autocmd vimrc WinEnter      *
-		\ :EmphasisCursor -count=5 -msec=30
-endif
-
 if has('vim_starting')
 	if has('termguicolors') && !has('gui_running') && (has('win32') || (256 == &t_Co))
 		silent! set termguicolors

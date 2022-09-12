@@ -16,9 +16,8 @@ if has('win32') && executable('wmic') && has('gui_running')
 			const bg = 4
 			const clr = '$e[0m'
 			const sp = '$S'
-			const path = '$P'
 			const arrow = nr2char(0xe0b0)
-			const xs = ['$e[4' .. bg .. 'm', '$e[3' .. fg .. 'm', sp, path, sp, clr, '$e[3' .. bg .. 'm', arrow, clr]
+			const xs = ['$e[4' .. bg .. 'm', '$e[3' .. fg .. 'm', sp, sp, clr, '$e[3' .. bg .. 'm', arrow, clr]
 			term_cmd = [&shell, '/K', 'doskey pwd=cd & doskey ls=dir /b & prompt ' .. join(xs, '')]
 		endif
 	enddef

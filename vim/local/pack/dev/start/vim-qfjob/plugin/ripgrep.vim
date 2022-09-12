@@ -2,7 +2,7 @@
 let g:loaded_ripgrep = 1
 
 if executable('rg')
-	command! -nargs=* Ripgrep :call Ripgrep(<q-args>)
+	command! -nargs=* RipGrep :call RipGrep(<q-args>)
 
 	function! RipGrep(q_args) abort
 		let cmd = ['rg', '--vimgrep', '--glob', '!.git', '--glob', '!.svn', '--glob', '!node_modules', '-uu'] + split(a:q_args, '\s\+') + (has('win32') ? ['.\'] : ['.'])
