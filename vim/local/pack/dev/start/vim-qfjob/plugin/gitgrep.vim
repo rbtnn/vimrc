@@ -5,7 +5,7 @@ if executable('git')
 	command! -nargs=* GitGrep :call GitGrep(<q-args>)
 
 	function! GitGrep(q_args) abort
-		let cmd = ['git', '--no-pager', 'grep', '-n'] + split(a:q_args, '\s\+')
+		let cmd = ['git', '--no-pager', 'grep', '--no-color', '-n'] + split(a:q_args, '\s\+')
 		call qfjob#start('git grep', cmd, function('s:line_parser'))
 	endfunction
 

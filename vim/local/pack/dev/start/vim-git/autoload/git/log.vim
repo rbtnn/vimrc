@@ -2,7 +2,7 @@
 function! git#log#main(q_args) abort
 	let cmd = 'git --no-pager log --pretty="format:%C(yellow)%h %C(green)%cd %C(reset)%s" --date=iso -100'
 	let rootdir = git#utils#get_rootdir('.', 'git')
-	let winid = git#utils#create_popupwin(rootdir, [])
+	let winid = git#utils#create_popupwin('git log', rootdir, [])
 	if -1 != winid
 		call popup_setoptions(winid, {
 			\ 'filter': function('git#log#popup_filter', [rootdir]),

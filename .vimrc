@@ -136,7 +136,6 @@ tnoremap <silent><S-space>           <space>
 " Smart space on wildmenu
 cnoremap <expr><space>             (wildmenumode() && (getcmdline() =~# '[\/]$')) ? '<space><bs>' : '<space>'
 
-
 " Emacs key mappings
 if has('win32') && (&shell =~# '\<cmd\.exe$')
 	tnoremap <silent><C-p>           <up>
@@ -156,7 +155,7 @@ cnoremap         <C-a>               <home>
 if has('patch-8.2.1978')
 	nnoremap <silent><C-z>    <Cmd>Terminal<cr>
 	nnoremap <silent><C-s>    <Cmd>GitDiff<cr>
-	nnoremap <silent><C-k>    <Cmd>GitLsFiles<cr>
+	nnoremap <silent><C-k>    <Cmd>GitGotoRootDir<cr>
 	nnoremap <silent><space>  <Cmd>GitLsFiles<cr>
 	nnoremap <silent><C-n>    <Cmd>cnext \| normal zz<cr>
 	nnoremap <silent><C-p>    <Cmd>cprevious \| normal zz<cr>

@@ -1,7 +1,7 @@
 
 function! git#lsfiles#main(q_bang) abort
 	let rootdir = git#utils#get_rootdir('.', 'git')
-	let winid = git#utils#create_popupwin(rootdir, [])
+	let winid = git#utils#create_popupwin('git ls-files', rootdir, [])
 	if -1 != winid
 		call popup_setoptions(winid, {
 			\ 'filter': function('git#lsfiles#popup_filter', [rootdir]),
@@ -65,8 +65,10 @@ endfunction
 
 function! git#lsfiles#popup_callback(rootdir, winid, result) abort
 	if -1 != a:result
-		let line = get(getbufline(winbufnr(a:winid), a:result), 0, '')
-		let path = a:rootdir .. '/' .. trim(line)
+		let path = trim(get(getbufline(winbufnr(a:winid), a:result), 0, ''))
+		if !filereadable(path)
+			let path = a:rootdir .. '/' .. path
+		endif
 		if filereadable(path)
 			call git#utils#open_file(path, -1)
 		endif
@@ -82,6 +84,12 @@ function! s:update_window_async(rootdir, winid) abort
 	endif
 	let bnr = winbufnr(a:winid)
 	silent! call deletebufline(bnr, 1, '$')
+	let files = get(g:, 'gitlsfiles_list', [])
+	call map(files, { i, x -> expand(x) })
+	call filter(files, { i, x -> filereadable(x) })
+	if !empty(files)
+		call setbufline(bnr, 1, files)
+	endif
 	let s:job = job_start(['git', '--no-pager', 'ls-files'], {
 		\ 'callback': function('s:job_callback', [bnr, a:winid]),
 		\ 'cwd': a:rootdir,

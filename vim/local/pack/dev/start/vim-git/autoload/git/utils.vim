@@ -1,16 +1,16 @@
 
 scriptencoding utf-8
 
-function! git#utils#create_popupwin(rootdir, lines) abort
+function! git#utils#create_popupwin(title, rootdir, lines) abort
 	let tstatus = term_getstatus(bufnr())
 	if !isdirectory(a:rootdir)
-		echowindow printf('[git] %s!', 'The directory is not under git control')
+		echowindow printf('[%s] %s!', a:title, 'The directory is not under git control')
 	elseif (tstatus != 'finished') && !empty(tstatus)
-		echowindow printf('[git] %s!', 'Could not open on running terminal buffer')
+		echowindow printf('[%s] %s!', a:title, 'Could not open on running terminal buffer')
 	elseif !empty(getcmdwintype())
-		echowindow printf('[git] %s!', 'Could not open on command-line window')
+		echowindow printf('[%s] %s!', a:title, 'Could not open on command-line window')
 	elseif &modified
-		echowindow printf('[git] %s!', 'Could not open on modified buffer')
+		echowindow printf('[%s] %s!', a:title, 'Could not open on modified buffer')
 	else
 		return popup_menu(a:lines, git#utils#get_popupwin_options())
 	endif
@@ -68,6 +68,20 @@ function! git#utils#get_rootdir(path, cmdname) abort
 		call remove(xs, -1)
 	endwhile
 	return ''
+endfunction
+
+function! git#utils#goto_rootdir() abort
+	let path = expand('%:p')
+	if filereadable(path)
+		let path = fnamemodify(path, ':h')
+	else
+		let path = getcwd()
+	endif
+	let path = git#utils#get_rootdir(path, 'git')
+	if !empty(path)
+		call chdir(path)
+	endif
+	verbose pwd
 endfunction
 
 function! git#utils#open_diffwindow() abort
@@ -152,6 +166,7 @@ endfunction
 
 function! git#utils#set_cursorline(winid, lnum) abort
 	call win_execute(a:winid, printf('call setpos(".", [0, %d, 0, 0])', a:lnum))
+	call win_execute(a:winid, 'redraw')
 endfunction
 
 

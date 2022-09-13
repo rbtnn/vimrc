@@ -6,7 +6,7 @@ function! git#diff#main(q_args) abort
 	if empty(lines)
 		echowindow printf('[git diff] %s!', 'No modified files')
 	else
-		let winid = git#utils#create_popupwin(rootdir, [])
+		let winid = git#utils#create_popupwin('git diff', rootdir, [])
 		if -1 != winid
 			call popup_setoptions(winid, {
 				\ 'filter': function('git#diff#popup_filter', [rootdir]),
@@ -18,7 +18,7 @@ function! git#diff#main(q_args) abort
 				let lnum = 1
 				for line in lines
 					if line =~# '[\/]' .. curr_filename .. '$'
-						call win_execute(winid, printf('call setpos(".", [0, %d, 1, 0])', lnum))
+						call git#utils#set_cursorline(winid, lnum)
 						break
 					endif
 					let lnum += 1
