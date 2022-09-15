@@ -1,35 +1,52 @@
 
+let s:job = v:null
+let s:items = []
+
 function! qfjob#start(title, cmd, line_parser) abort
-	if exists('g:loaded_qficonv')
-		call setqflist([], 'r')
-		call job_start(a:cmd, {
-			\ 'out_cb': function('s:out_cb', [a:line_parser]),
-			\ 'exit_cb': function('s:exit_cb', [a:title]),
-			\ 'err_io': 'out',
-			\ })
-	else
-		echowindow printf('[%s] Please install rbtnn/vim-qficonv!', a:title)
+	call qfjob#stop()
+	cclose
+	let s:job = job_start(a:cmd, {
+		\ 'exit_cb': function('s:exit_cb', [a:title, a:line_parser]),
+		\ 'out_cb': function('s:out_cb'),
+		\ 'err_io': 'out',
+		\ })
+endfunction
+
+function! qfjob#stop() abort
+	if s:job != v:null
+		if 'run' == job_status(s:job)
+			call job_stop(s:job, 'kill')
+		endif
 	endif
+	let s:job = v:null
+	let s:items = []
 endfunction
 
 function! qfjob#match(path, lnum, col, text) abort
 	return {
-		\ 'filename': qficonv#encoding#iconv_utf8(a:path, 'shift_jis'),
+		\ 'filename': a:path,
 		\ 'lnum': a:lnum,
 		\ 'col': a:col,
-		\ 'text': qficonv#encoding#iconv_utf8(a:text, 'shift_jis'),
+		\ 'text': a:text,
 		\ }
 endfunction
 
 function! qfjob#do_not_match(line) abort
-	return { 'text': qficonv#encoding#iconv_utf8(a:line, 'shift_jis'), }
+	return { 'text': a:line, }
 endfunction
 
-function s:out_cb(line_parser, ch, msg) abort
-	call setqflist([call(a:line_parser, [a:msg])], 'a')
+function s:out_cb(ch, msg) abort
+	let s:items += [a:msg]
 endfunction
 
-function s:exit_cb(title, job, status) abort
+function s:exit_cb(title, line_parser, job, status) abort
+	echowindow printf('[%s] The job has finished! Please wait for building the quickfix...', a:title)
+	let xs = []
+	for item in s:items
+		let xs += [a:line_parser(item)]
+	endfor
+	call setqflist(xs)
 	copen
-	echowindow printf('[%s] The job has finished!', a:title)
+	call qfjob#stop()
 endfunction
+
