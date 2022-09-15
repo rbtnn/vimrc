@@ -26,8 +26,7 @@ augroup vimrc
 	" Delete unused commands, because it's an obstacle on cmdline-completion.
 	autocmd CmdlineEnter     *
 		\ : for s:cmdname in [
-		\   'MANPAGER', 'Man', 'Tutor', 'VimFoldh', 'TextobjStringDefaultKeyMappings',
-		\   'UpdateRemotePlugins',
+		\   'MANPAGER', 'VimFoldh', 'TextobjStringDefaultKeyMappings',
 		\   'VimTweakDisableCaption', 'VimTweakDisableMaximize', 'VimTweakDisableTopMost',
 		\   'VimTweakEnableCaption', 'VimTweakEnableMaximize', 'VimTweakEnableTopMost',
 		\ ]
@@ -146,6 +145,7 @@ if has('win32') && (&shell =~# '\<cmd\.exe$')
 	tnoremap <silent><C-a>           <home>
 	tnoremap <silent><C-u>           <esc>
 endif
+
 cnoremap         <C-b>               <left>
 cnoremap         <C-f>               <right>
 cnoremap         <C-e>               <end>
@@ -169,8 +169,14 @@ function! s:is_installed(user_and_name) abort
 	return !empty(globpath($VIMRC_VIM, 'github/pack/' .. xs[0] .. '/*/' .. xs[1]))
 endfunction
 
-if s:is_installed('kana/vim-operator-replace')
-	nmap     <silent>s           <Plug>(operator-replace)
+if s:is_installed('rbtnn/vim-textobj-string')
+	nmap <silent>ds das
+	nmap <silent>ys yas
+	nmap <silent>vs vas
+	if s:is_installed('kana/vim-operator-replace')
+		nmap <silent>s   <Plug>(operator-replace)
+		nmap <silent>ss  <Plug>(operator-replace)as
+	endif
 endif
 
 if s:is_installed('tyru/restart.vim')

@@ -87,9 +87,9 @@ function! s:update_window_async(rootdir, winid) abort
 	let files = get(g:, 'gitlsfiles_list', [])
 	call map(files, { i, x -> expand(x) })
 	call filter(files, { i, x -> filereadable(x) })
-	if !empty(files)
-		call setbufline(bnr, 1, files)
-	endif
+	for x in files
+		call s:job_callback(bnr, a:winid, v:null, x)
+	endfor
 	let s:job = job_start(['git', '--no-pager', 'ls-files'], {
 		\ 'callback': function('s:job_callback', [bnr, a:winid]),
 		\ 'cwd': a:rootdir,
