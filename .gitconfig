@@ -23,6 +23,8 @@
 	po=push -u origin
 	st=status
 	fu=fetch upstream
+	mumr=merge upstream/master
+	mumn=merge upstream/main
 
 [color]
 	diff = true
