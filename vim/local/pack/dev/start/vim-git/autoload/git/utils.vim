@@ -18,18 +18,7 @@ function! git#utils#create_popupwin(title, rootdir, lines) abort
 endfunction
 
 function! git#utils#get_popupwin_options() abort
-	" ┌──┐
-	" │  │
-	" └──┘
-	let borderchars_typeA = [
-		\ nr2char(0x2500), nr2char(0x2502), nr2char(0x2500), nr2char(0x2502),
-		\ nr2char(0x250c), nr2char(0x2510), nr2char(0x2518), nr2char(0x2514)]
-	" ╭──╮
-	" │  │
-	" ╰──╯
-	let borderchars_typeB = [
-		\ nr2char(0x2500), nr2char(0x2502), nr2char(0x2500), nr2char(0x2502),
-		\ nr2char(0x256d), nr2char(0x256e), nr2char(0x256f), nr2char(0x2570)]
+	const hiname = 'Normal'
 	let width = &columns - 4
 	let height = &lines - &cmdheight - 4
 	if has('tabsidebar')
@@ -39,22 +28,35 @@ function! git#utils#get_popupwin_options() abort
 	endif
 	let width = width * 2 / 3
 	let height = height * 2 / 3
-	let obj = {
+	let opts = {
 		\ 'wrap': 1,
 		\ 'scrollbar': 0,
-		\ 'minwidth': width, 'maxwidth': width,
-		\ 'minheight': height, 'maxheight': height,
-		\ 'border': [],
-		\ 'padding': repeat([0], 4),
-		\ 'highlight': 'Normal',
+		\ 'minwidth': width / 2, 'maxwidth': width,
+		\ 'minheight': height / 2, 'maxheight': height,
+		\ 'border': [0,0,0,0],
+		\ 'padding': repeat([1], 4),
+		\ 'highlight': hiname,
 		\ }
 	if has('gui_running') || (!has('win32') && !has('gui_running'))
-		call extend(obj, {
-			\ 'borderhighlight': repeat(['Normal'], 4),
-			\ 'borderchars': borderchars_typeA,
+		" ┌──┐
+		" │  │
+		" └──┘
+		const borderchars_typeA = [
+			\ nr2char(0x2500), nr2char(0x2502), nr2char(0x2500), nr2char(0x2502),
+			\ nr2char(0x250c), nr2char(0x2510), nr2char(0x2518), nr2char(0x2514)]
+		" ╭──╮
+		" │  │
+		" ╰──╯
+		const borderchars_typeB = [
+			\ nr2char(0x2500), nr2char(0x2502), nr2char(0x2500), nr2char(0x2502),
+			\ nr2char(0x256d), nr2char(0x256e), nr2char(0x256f), nr2char(0x2570)]
+		call extend(opts, {
+			\ 'border': [],
+			\ 'borderhighlight': repeat([hiname], 4),
+			\ 'borderchars': borderchars_typeB,
 			\ }, 'force')
 	endif
-	return obj
+	return opts
 endfunction
 
 function! git#utils#get_rootdir(path, cmdname) abort
@@ -94,7 +96,7 @@ function! git#utils#open_diffwindow() abort
 		endif
 	endfor
 	if !exists
-		new
+		botright vnew
 		setfiletype diff
 	endif
 endfunction

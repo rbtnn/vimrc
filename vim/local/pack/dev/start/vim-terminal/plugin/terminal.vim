@@ -13,12 +13,12 @@ if has('win32') && executable('wmic') && has('gui_running')
 	def OutCb(ch: channel, mes: string)
 		if 14393 < str2nr(trim(mes))
 			const fg = 0
-			const bg = 4
+			const bg = 1
 			const clr = '$e[0m'
 			const sp = '$S'
 			const arrow = nr2char(0xe0b0)
-			const xs = ['$e[4' .. bg .. 'm', '$e[3' .. fg .. 'm', sp, sp, clr, '$e[3' .. bg .. 'm', arrow, clr]
-			term_cmd = [&shell, '/K', 'doskey pwd=cd & doskey ls=dir /b & prompt ' .. join(xs, '')]
+			const xs = ['$e[4' .. bg .. 'm', '$e[3' .. fg .. 'm', sp, clr, '$e[3' .. bg .. 'm', arrow, clr]
+			term_cmd = [&shell, '/K', 'doskey pwd=cd & doskey ls=dir /b & doskey g=git $* & prompt ' .. join(xs, '')]
 		endif
 	enddef
 	job_start('wmic os get BuildNumber', { 'out_cb': OutCb, })
