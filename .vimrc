@@ -27,8 +27,6 @@ augroup vimrc
 	autocmd CmdlineEnter     *
 		\ : for s:cmdname in [
 		\   'MANPAGER', 'VimFoldh', 'TextobjStringDefaultKeyMappings',
-		\   'VimTweakDisableCaption', 'VimTweakDisableMaximize', 'VimTweakDisableTopMost',
-		\   'VimTweakEnableCaption', 'VimTweakEnableMaximize', 'VimTweakEnableTopMost',
 		\ ]
 		\ |     execute printf('silent! delcommand %s', s:cmdname)
 		\ | endfor
@@ -65,13 +63,14 @@ set list listchars=tab:<->,trail:-
 set matchpairs+=<:>
 set matchtime=1
 set nobackup
+set nonumber
+set norelativenumber
 set noshowmode
 set noswapfile
 set nowrap
 set nowrapscan
 set nowritebackup
 set nrformats&
-set number relativenumber
 set pumheight=10
 set ruler
 set rulerformat=%{&fileencoding}/%{&fileformat}
@@ -154,6 +153,8 @@ cnoremap         <C-a>               <home>
 if has('patch-8.2.1978')
 	nnoremap <silent><space>  <Cmd>Terminal<cr>
 	nnoremap <silent><C-s>    <Cmd>GitDiff<cr>
+	nnoremap <silent><C-e>    <Cmd>GitDiff --cached<cr>
+	nnoremap <silent><C-y>    <Cmd>GitDiff upstream<cr>
 	nnoremap <silent><C-f>    <Cmd>GitLsFiles<cr>
 	nnoremap <silent><C-n>    <Cmd>cnext \| normal zz<cr>
 	nnoremap <silent><C-p>    <Cmd>cprevious \| normal zz<cr>
@@ -191,9 +192,6 @@ if has('vim_starting')
 		\ | highlight!       TabSideBarSel     guifg=#ffffff guibg=NONE    gui=NONE cterm=NONE
 		\ | highlight!       TabSideBarLabel   guifg=#00a700 guibg=NONE    gui=BOLD cterm=NONE
 		\ | highlight!       CursorIM          guifg=NONE    guibg=#d70000
-		\ | highlight!       LineNr            guifg=#eeeeee guibg=#333333
-		\ | highlight!       LineNrAbove       guifg=#555555 guibg=#333333
-		\ | highlight!       LineNrBelow       guifg=#555555 guibg=#333333
 	colorscheme habamax
 else
 	" Check whether echo-messages are not disappeared when .vimrc is read.

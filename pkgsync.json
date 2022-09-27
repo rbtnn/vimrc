@@ -18,8 +18,7 @@
 				"vim-textobj-string",
 				"vim-vimscript_indentexpr",
 				"vim-vimscript_lasterror",
-				"vim-vimscript_tagfunc",
-				"vimtweak"
+				"vim-vimscript_tagfunc"
 			],
 			"thinca": [
 				"vim-qfreplace"
