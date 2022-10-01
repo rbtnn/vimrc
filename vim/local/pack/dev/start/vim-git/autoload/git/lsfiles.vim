@@ -66,9 +66,7 @@ endfunction
 function! git#lsfiles#popup_callback(rootdir, winid, result) abort
 	if -1 != a:result
 		let path = trim(get(getbufline(winbufnr(a:winid), a:result), 0, ''))
-		if !filereadable(path)
-			let path = a:rootdir .. '/' .. path
-		endif
+		let path = expand(a:rootdir .. '/' .. path)
 		if filereadable(path)
 			call git#utils#open_file(path, -1)
 		endif
