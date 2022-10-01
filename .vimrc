@@ -144,24 +144,23 @@ if has('win32') && (&shell =~# '\<cmd\.exe$')
 	tnoremap <silent><C-u>           <esc>
 endif
 
-cnoremap         <C-b>               <left>
-cnoremap         <C-f>               <right>
-cnoremap         <C-e>               <end>
-cnoremap         <C-a>               <home>
+cnoremap         <C-b>        <left>
+cnoremap         <C-f>        <right>
+cnoremap         <C-e>        <end>
+cnoremap         <C-a>        <home>
 
-" https://github.com/vim/vim/commit/957cf67d50516ba98716f59c9e1cb6412ec1535d
-if has('patch-8.2.1978')
-	nnoremap <silent><space>  <Cmd>Terminal<cr>
-	nnoremap <silent><C-s>    <Cmd>GitDiff<cr>
-	nnoremap <silent><C-e>    <Cmd>GitDiff --cached<cr>
-	nnoremap <silent><C-y>    <Cmd>GitDiff upstream<cr>
-	nnoremap <silent><C-f>    <Cmd>GitLsFiles<cr>
-	nnoremap <silent><C-n>    <Cmd>cnext \| normal zz<cr>
-	nnoremap <silent><C-p>    <Cmd>cprevious \| normal zz<cr>
-endif
+nnoremap <silent><space>      <Cmd>Terminal<cr>
 
-nnoremap <silent><C-d>    <C-d>0
-nnoremap <silent><C-u>    <C-u>0
+nnoremap <silent><C-n>        <Cmd>cnext \| normal zz<cr>
+nnoremap <silent><C-p>        <Cmd>cprevious \| normal zz<cr>
+
+nnoremap <silent><C-y>        <Cmd>GitLog<cr>
+nnoremap <silent><C-f>        <Cmd>GitLsFiles<cr>
+nnoremap <silent><C-s>        <Cmd>GitDiff<cr>
+nnoremap         <C-e>        :<C-u>GitGrep<space>
+
+nnoremap <silent><C-d>        <C-d>0
+nnoremap <silent><C-u>        <C-u>0
 
 function! s:is_installed(user_and_name) abort
 	let xs = split(a:user_and_name, '/')

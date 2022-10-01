@@ -89,7 +89,10 @@ function! git#utils#goto_rootdir() abort
 	verbose pwd
 endfunction
 
-function! git#utils#open_diffwindow() abort
+function! git#utils#open_diffwindow(rootdir, cmd, stay) abort
+	let wnr = winnr()
+	let lnum = line('.')
+
 	let exists = v:false
 	for w in filter(getwininfo(), { _, x -> x['tabnr'] == tabpagenr() })
 		if getbufvar(w['bufnr'], '&filetype', '') == 'diff'
@@ -101,28 +104,34 @@ function! git#utils#open_diffwindow() abort
 	if !exists
 		botright vnew
 		setfiletype diff
+		setlocal nolist
 	endif
-endfunction
 
-function! git#utils#setlines(rootdir, cmd, lines) abort
-	let view = winsaveview()
+	let lines = git#utils#system(a:cmd, a:rootdir)
+
 	let &l:statusline = a:cmd
-	call s:setbuflines(a:lines)
+	call s:setbuflines(lines)
 	let b:diffview = {
 		\ 'cmd': a:cmd,
 		\ 'rootdir': a:rootdir,
 		\ }
-	nnoremap  <buffer><cr>  <Cmd>:call <SID>jumpdiffline(b:diffview['rootdir'])<cr>
-	call winrestview(view)
+
+	nnoremap         <buffer><cr>  <Cmd>call <SID>jumpdiffline(b:diffview['rootdir'])<cr>
+	nnoremap         <buffer>R     <Cmd>call git#utils#open_diffwindow(b:diffview['rootdir'], b:diffview['cmd'], v:true)<cr>
 
 	" Redraw windows because the encoding process is very slowly.
 	redraw
 
 	" The lines encodes after redrawing.
-	for i in range(0, len(a:lines) - 1)
-		let a:lines[i] = qficonv#encoding#iconv_utf8(a:lines[i], 'shift_jis')
+	for i in range(0, len(lines) - 1)
+		let lines[i] = qficonv#encoding#iconv_utf8(lines[i], 'shift_jis')
 	endfor
-	call s:setbuflines(a:lines)
+	call s:setbuflines(lines)
+
+	if a:stay
+		execute printf(':%dwincmd w', wnr)
+		call cursor(lnum, 0)
+	endif
 endfunction
 
 function! git#utils#open_file(path, lnum) abort
