@@ -26,6 +26,7 @@ endfunction
 
 function! git#log#popup_filter(rootdir, winid, key) abort
 	let lnum = line('.', a:winid)
+
 	if (10 == char2nr(a:key)) || (14 == char2nr(a:key)) || (106 == char2nr(a:key))
 		" Ctrl-n or Ctrl-j or j
 		if lnum == line('$', a:winid)
@@ -35,6 +36,7 @@ function! git#log#popup_filter(rootdir, winid, key) abort
 		endif
 		let s:last_lnum = line('.', a:winid)
 		return 1
+
 	elseif (11 == char2nr(a:key)) || (16 == char2nr(a:key)) || (107 == char2nr(a:key))
 		" Ctrl-p or Ctrl-k or k
 		if lnum == 1
@@ -44,14 +46,30 @@ function! git#log#popup_filter(rootdir, winid, key) abort
 		endif
 		let s:last_lnum = line('.', a:winid)
 		return 1
+
 	elseif 100 == char2nr(a:key)
 		" d
 		call s:show_log(a:rootdir, a:winid, line('.', a:winid), v:true)
 		return 1
+
+	elseif 71 == char2nr(a:key)
+		" G
+		call git#utils#set_cursorline(a:winid, line('$', a:winid))
+		let s:last_lnum = line('.', a:winid)
+		return 1
+
+	elseif 103 == char2nr(a:key)
+		" g
+		call git#utils#set_cursorline(a:winid, 1)
+		let s:last_lnum = line('.', a:winid)
+		return 1
+
 	elseif 0x0d == char2nr(a:key)
 		return popup_filter_menu(a:winid, "\<cr>")
+
 	elseif char2nr(a:key) < 0x20
 		return popup_filter_menu(a:winid, "\<esc>")
+
 	else
 		return popup_filter_menu(a:winid, a:key)
 	endif

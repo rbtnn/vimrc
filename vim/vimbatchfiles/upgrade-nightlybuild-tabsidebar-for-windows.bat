@@ -1,15 +1,15 @@
-@echo off
+@echo on
 
 set LATEST_CMD=curl -L -s -H "Accept: application/json" https://github.com/rbtnn/nightlybuild-tabsidebar-for-windows/releases/latest
 set LATEST_OUTPUT=
 for /F "usebackq delims==" %%o in (`%LATEST_CMD%`) do (
 	set LATEST_OUTPUT=%%o
 )
-set TAGNAME=%LATEST_OUTPUT:~27,7%
-set ZIPNAME=nightlybuild-tabsidebar-for-windows-%TAGNAME%
+set VIMVER=%LATEST_OUTPUT:~27,8%
+set ZIPNAME=nightlybuild-tabsidebar-for-windows-%VIMVER%
 
 if not exist %ZIPNAME%.zip (
-	curl -s -L https://github.com/rbtnn/nightlybuild-tabsidebar-for-windows/releases/download/%TAGNAME%/nightlybuild-tabsidebar-for-windows.zip --output %ZIPNAME%.zip
+	curl -s -L https://github.com/rbtnn/nightlybuild-tabsidebar-for-windows/releases/download/%VIMVER%/nightlybuild-tabsidebar-for-windows.zip --output %ZIPNAME%.zip
 )
 
 set TASKLIST_OUTPUT=

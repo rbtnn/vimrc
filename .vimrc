@@ -149,18 +149,30 @@ cnoremap         <C-f>        <right>
 cnoremap         <C-e>        <end>
 cnoremap         <C-a>        <home>
 
-nnoremap <silent><space>      <Cmd>Terminal<cr>
-
 nnoremap <silent><C-n>        <Cmd>cnext \| normal zz<cr>
 nnoremap <silent><C-p>        <Cmd>cprevious \| normal zz<cr>
-
-nnoremap <silent><C-y>        <Cmd>GitLog<cr>
-nnoremap <silent><C-f>        <Cmd>GitLsFiles<cr>
-nnoremap <silent><C-s>        <Cmd>GitDiff<cr>
-nnoremap         <C-e>        :<C-u>GitGrep<space>
-
 nnoremap <silent><C-d>        <C-d>0
 nnoremap <silent><C-u>        <C-u>0
+
+if empty(mapcheck("\<space>", 'n'))
+	nnoremap <silent><space>  <Cmd>Terminal<cr>
+endif
+
+if empty(mapcheck("\<C-f>", 'n'))
+	nnoremap <silent><C-f>    <Cmd>GitLsFiles<cr>
+endif
+
+if empty(mapcheck("\<C-s>", 'n'))
+	nnoremap <silent><C-s>    <Cmd>GitDiff<cr>
+endif
+
+if empty(mapcheck("\<C-e>", 'n'))
+	nnoremap <silent><C-e>    <Cmd>GitLog<cr>
+endif
+
+if empty(mapcheck("\<C-y>", 'n'))
+	nnoremap <silent><C-y>    <Cmd>GitDiff upstream<cr>
+endif
 
 function! s:is_installed(user_and_name) abort
 	let xs = split(a:user_and_name, '/')

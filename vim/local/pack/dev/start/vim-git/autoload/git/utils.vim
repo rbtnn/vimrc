@@ -19,7 +19,7 @@ endfunction
 
 function! git#utils#get_popupwin_options() abort
 	const hiname = 'Normal'
-	let width = &columns - 6
+	let width = &columns - 4
 	let height = &lines - &cmdheight - 4
 	if has('tabsidebar')
 		if ((&showtabsidebar == 1) && (1 < tabpagenr('$'))) || (&showtabsidebar == 2)
@@ -34,10 +34,10 @@ function! git#utils#get_popupwin_options() abort
 		\ 'minwidth': width / 2, 'maxwidth': width,
 		\ 'minheight': height / 2, 'maxheight': height,
 		\ 'pos': 'topleft',
-		\ 'line': 2,
-		\ 'col': 3,
+		\ 'line': 1,
+		\ 'col': 1,
 		\ 'border': [0, 0, 0, 0],
-		\ 'padding': [0, 1, 0, 1],
+		\ 'padding': [0, 0, 0, 0],
 		\ 'highlight': hiname,
 		\ }
 	if has('gui_running') || (!has('win32') && !has('gui_running'))
