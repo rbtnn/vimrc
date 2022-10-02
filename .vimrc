@@ -25,9 +25,7 @@ augroup vimrc
 	autocmd!
 	" Delete unused commands, because it's an obstacle on cmdline-completion.
 	autocmd CmdlineEnter     *
-		\ : for s:cmdname in [
-		\   'MANPAGER', 'VimFoldh', 'TextobjStringDefaultKeyMappings',
-		\ ]
+		\ : for s:cmdname in ['MANPAGER', 'VimFoldh', 'TextobjStringDefaultKeyMappings']
 		\ |     execute printf('silent! delcommand %s', s:cmdname)
 		\ | endfor
 		\ | unlet s:cmdname
@@ -149,10 +147,16 @@ cnoremap         <C-f>        <right>
 cnoremap         <C-e>        <end>
 cnoremap         <C-a>        <home>
 
-nnoremap <silent><C-n>        <Cmd>cnext \| normal zz<cr>
-nnoremap <silent><C-p>        <Cmd>cprevious \| normal zz<cr>
 nnoremap <silent><C-d>        <C-d>0
 nnoremap <silent><C-u>        <C-u>0
+
+if empty(mapcheck("\<C-n>", 'n'))
+	nnoremap <silent><C-n>    <Cmd>cnext \| normal zz<cr>
+endif
+
+if empty(mapcheck("\<C-p>", 'n'))
+	nnoremap <silent><C-p>    <Cmd>cprevious \| normal zz<cr>
+endif
 
 if empty(mapcheck("\<space>", 'n'))
 	nnoremap <silent><space>  <Cmd>Terminal<cr>
