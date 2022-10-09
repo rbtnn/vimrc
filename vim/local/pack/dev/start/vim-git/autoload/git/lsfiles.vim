@@ -1,14 +1,18 @@
 
-function! git#lsfiles#main(q_bang) abort
+function! git#lsfiles#main() abort
 	let rootdir = git#utils#get_rootdir('.', 'git')
-	let winid = git#utils#create_popupwin('git ls-files', rootdir, [])
-	if -1 != winid
-		call popup_setoptions(winid, {
-			\ 'filter': function('git#lsfiles#popup_filter', [rootdir]),
-			\ 'callback': function('git#lsfiles#popup_callback', [rootdir]),
-			\ })
-		call s:set_title(winid, '')
-		call s:update_window_async(rootdir, winid)
+	if !isdirectory(rootdir)
+		echo 'The directory is not under git control!'
+	else
+		let winid = popup_menu([], git#utils#get_popupwin_options())
+		if -1 != winid
+			call popup_setoptions(winid, {
+				\ 'filter': function('git#lsfiles#popup_filter', [rootdir]),
+				\ 'callback': function('git#lsfiles#popup_callback', [rootdir]),
+				\ })
+			call s:set_title(winid, '')
+			call s:update_window_async(rootdir, winid)
+		endif
 	endif
 endfunction
 
@@ -111,8 +115,11 @@ function! s:job_callback(bnr, winid, ch, msg) abort
 endfunction
 
 function! s:set_title(winid, text) abort
+	let opts = git#utils#get_popupwin_options()
 	call popup_setoptions(a:winid, {
 		\ 'title': (empty(a:text) ? '' : ' ' .. a:text .. ' '),
+		\ 'minheight': (empty(a:text) ? opts['minheight'] : opts['minheight'] - 1),
+		\ 'maxheight': (empty(a:text) ? opts['maxheight'] : opts['maxheight'] - 1),
 		\ })
 endfunction
 

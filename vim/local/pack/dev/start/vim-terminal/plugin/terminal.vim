@@ -17,8 +17,8 @@ if has('win32') && executable('wmic') && has('gui_running')
 			const clr = '$e[0m'
 			const sp = '$S'
 			const arrow = nr2char(0xe0b0)
-			const xs = ['$e[4' .. bg .. 'm', '$e[3' .. fg .. 'm', sp, clr, '$e[3' .. bg .. 'm', arrow, clr]
-			term_cmd = [&shell, '/K', 'doskey pwd=cd & doskey ls=dir /b & doskey g=git $* & prompt ' .. join(xs, '')]
+			const xs = [' & prompt ', '$e[4' .. bg .. 'm', '$e[3' .. fg .. 'm', sp, clr, '$e[3' .. bg .. 'm', arrow, clr]
+			term_cmd = [&shell, '/K', 'doskey pwd=cd & doskey ls=dir /b & doskey g=git $* ' .. join(xs, '')]
 		endif
 	enddef
 	job_start('wmic os get BuildNumber', { 'out_cb': OutCb, })
@@ -36,5 +36,25 @@ def Terminal()
 	endif
 enddef
 
-command! -nargs=0 Terminal :call Terminal()
+def FloatingTerminal()
+	var exists_term = false
+	for winid in popup_list()
+		if get(getwininfo(winid), 0, { 'terminal': v:false })['terminal']
+			popup_close(winid)
+			exists_term = true
+		endif
+	endfor
+	if !exists_term
+		var bnr = get(term_list(), 0, -1)
+		if -1 == bnr
+			bnr = term_start(term_cmd, {
+				\   'hidden': 1,
+				\   'term_kill': 'kill',
+				\   'term_finish': 'close',
+				\ })
+		endif
+		popup_create(bnr, git#utils#get_popupwin_options())
+	endif
+enddef
 
+command! -nargs=0 Terminal :call FloatingTerminal()

@@ -11,14 +11,26 @@ if has('tabsidebar')
 	def TabSideBar(): string
 		try
 			var tnr = get(g:, 'actual_curtabpage', tabpagenr())
-			var lines = ['', printf('%s- Tab %d -%s', '%#TabSideBarLabel#', tnr, '%#TabSideBar#')]
+			var lines = []
+
+			if tnr == 1
+				lines += ['', printf('%s- Vim -%s', '%#TabSideBarLabel#', '%#TabSideBar#')]
+				lines += [printf(' %d.%d.%04d', v:version / 100, v:version % 100, v:versionlong % 10000)]
+
+				const qfinfo = getqflist({ 'nr': 0, 'size': 0, 'idx': 0 })
+				if 0 < qfinfo['nr']
+					lines += ['', printf('%s- QuickFix -%s', '%#TabSideBarLabel#', '%#TabSideBar#')]
+					lines += [printf(' %d/%d', qfinfo['idx'], qfinfo['size'])]
+				endif
+			endif
+
+			lines += ['', printf('%s- Tab %d -%s', '%#TabSideBarLabel#', tnr, '%#TabSideBar#')]
 			for x in filter(getwininfo(), (i, x) => tnr == x['tabnr'] && ('popup' != win_gettype(x['winid'])))
 				var ft = getbufvar(x['bufnr'], '&filetype')
 				var bt = getbufvar(x['bufnr'], '&buftype')
 				var current = (tnr == tabpagenr()) && (x['winnr'] == winnr())
 				var high = (current ? '%#TabSideBarSel#' : '%#TabSideBar#')
 				var fname = fnamemodify(bufname(x['bufnr']), ':t')
-				#fname = (current ? '%#TabSideBarIcon#' : '') .. WebDevIconsGetFileTypeSymbol(fname) .. high .. fname
 				lines += [
 					\    high
 					\ .. ' '

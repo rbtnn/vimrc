@@ -4,22 +4,26 @@ let s:last_cmd = ''
 let s:last_rootdir = ''
 
 function! git#log#main(q_args) abort
-	let cmd = 'git --no-pager log --pretty="format:%C(yellow)%h %C(green)%cd %C(reset)%s" --date=iso -100'
+	let cmd = 'git --no-pager log --numstat --date=iso -50'
 	let rootdir = git#utils#get_rootdir('.', 'git')
-	let winid = git#utils#create_popupwin('git log', rootdir, [])
-	if -1 != winid
-		call popup_setoptions(winid, {
-			\ 'filter': function('git#log#popup_filter', [rootdir]),
-			\ 'callback': function('git#log#popup_callback', [rootdir]),
-			\ })
-		let lines = git#utils#system(cmd, rootdir)
-		call popup_settext(winid, lines)
-		if (s:last_cmd == cmd) && (s:last_rootdir == rootdir)
-			call git#utils#set_cursorline(winid, s:last_lnum)
-		else
-			let s:last_lnum = 1
-			let s:last_cmd = cmd
-			let s:last_rootdir = rootdir
+	if !isdirectory(rootdir)
+		echo 'The directory is not under git control!'
+	else
+		let winid = popup_menu([], git#utils#get_popupwin_options())
+		if -1 != winid
+			call popup_setoptions(winid, {
+				\ 'filter': function('git#log#popup_filter', [rootdir]),
+				\ 'callback': function('git#log#popup_callback', [rootdir]),
+				\ })
+			let lines = s:build_lines(cmd, rootdir)
+			call popup_settext(winid, lines)
+			if (s:last_cmd == cmd) && (s:last_rootdir == rootdir)
+				call git#utils#set_cursorline(winid, s:last_lnum)
+			else
+				let s:last_lnum = 1
+				let s:last_cmd = cmd
+				let s:last_rootdir = rootdir
+			endif
 		endif
 	endif
 endfunction
@@ -84,6 +88,7 @@ function! s:show_log(rootdir, winid, lnum, stay) abort
 		if a:stay
 			wincmd w
 		endif
+		call popup_setoptions(a:winid, git#utils#get_popupwin_options())
 	endif
 endfunction
 
@@ -91,5 +96,48 @@ function! git#log#popup_callback(rootdir, winid, result) abort
 	if -1 != a:result
 		call s:show_log(a:rootdir, a:winid, s:last_lnum, v:false)
 	endif
+endfunction
+
+function! s:logfmt(commit, date, add, del, msg, merge) abort
+	return printf('%s %s %12s %s', a:commit, a:date, a:merge ? '' : printf('(+%d,-%d)', a:add, a:del), a:msg)
+endfunction
+
+function! s:build_lines(cmd, rootdir) abort
+	let lines = git#utils#system(a:cmd, a:rootdir)
+	let new_lines = []
+	let commit = ''
+	let date = ''
+	let add = 0
+	let del = 0
+	let msg = ''
+	let merge = v:false
+	for line in lines
+		if line =~# '^commit [a-f0-9]\+$'
+			if !empty(commit)
+				let new_lines += [s:logfmt(commit, date, add, del, msg, merge)]
+			endif
+			let commit = matchstr(line, '^commit \zs[a-f0-9]\+$')[:7]
+			let date = ''
+			let add = 0
+			let del = 0
+			let msg = ''
+			let merge = v:false
+		elseif line =~# '^Author:\s\+'
+		elseif line =~# '^Merge:\s\+'
+			let merge = v:true
+		elseif line =~# '^Date:\s\+'
+			let date = matchstr(line, '^Date:\s\+\zs.*$')[:-7]
+		elseif line =~# '^    .\+$'
+			let msg = line[4:]
+		elseif line =~# '^\d\+\t\d\+.\+$'
+			let xs = split(line, '\t')
+			let add += str2nr(xs[0])
+			let del += str2nr(xs[1])
+		endif
+	endfor
+	if !empty(commit)
+		let new_lines += [s:logfmt(commit, date, add, del, msg, merge)]
+	endif
+	return new_lines
 endfunction
 

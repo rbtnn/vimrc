@@ -1,46 +1,39 @@
 
 scriptencoding utf-8
 
-function! git#utils#create_popupwin(title, rootdir, lines) abort
+function! git#utils#can_open_in_current() abort
 	let tstatus = term_getstatus(bufnr())
-	if !isdirectory(a:rootdir)
-		echowindow printf('[%s] %s!', a:title, 'The directory is not under git control')
-	elseif (tstatus != 'finished') && !empty(tstatus)
-		echowindow printf('[%s] %s!', a:title, 'Could not open on running terminal buffer')
+	if (tstatus != 'finished') && !empty(tstatus)
+		return v:false
 	elseif !empty(getcmdwintype())
-		echowindow printf('[%s] %s!', a:title, 'Could not open on command-line window')
+		return v:false
 	elseif &modified
-		echowindow printf('[%s] %s!', a:title, 'Could not open on modified buffer')
+		return v:false
 	else
-		return popup_menu(a:lines, git#utils#get_popupwin_options())
+		return v:true
 	endif
-	return -1
 endfunction
 
 function! git#utils#get_popupwin_options() abort
 	const hiname = 'Normal'
-	let width = &columns - 4
-	let height = &lines - &cmdheight - 4
-	if has('tabsidebar')
-		if ((&showtabsidebar == 1) && (1 < tabpagenr('$'))) || (&showtabsidebar == 2)
-			let width -= &tabsidebarcolumns
-		endif
-	endif
-	let width = width * 2 / 3
-	let height = height * 2 / 3
+	let w = getwininfo(win_getid())[0]
+	let winrow = w['winrow']
+	let wincol = w['wincol']
+	let width = w['width']
+	let height = w['height']
 	let opts = {
 		\ 'wrap': 1,
-		\ 'scrollbar': 1,
-		\ 'minwidth': width / 2, 'maxwidth': width,
-		\ 'minheight': height / 2, 'maxheight': height,
+		\ 'scrollbar': 0,
+		\ 'minwidth': width, 'maxwidth': width,
+		\ 'minheight': height, 'maxheight': height,
 		\ 'pos': 'topleft',
-		\ 'line': 1,
-		\ 'col': 1,
+		\ 'line': winrow,
+		\ 'col': wincol,
 		\ 'border': [0, 0, 0, 0],
 		\ 'padding': [0, 0, 0, 0],
 		\ 'highlight': hiname,
 		\ }
-	if has('gui_running') || (!has('win32') && !has('gui_running'))
+	if 0 && (has('gui_running') || (!has('win32') && !has('gui_running')))
 		" ┌──┐
 		" │  │
 		" └──┘
@@ -56,7 +49,7 @@ function! git#utils#get_popupwin_options() abort
 		call extend(opts, {
 			\ 'border': [],
 			\ 'borderhighlight': repeat([hiname], 4),
-			\ 'borderchars': borderchars_typeB,
+			\ 'borderchars': borderchars_typeA,
 			\ }, 'force')
 	endif
 	return opts
@@ -135,11 +128,18 @@ function! git#utils#open_diffwindow(rootdir, cmd, stay) abort
 endfunction
 
 function! git#utils#open_file(path, lnum) abort
+	const ok = git#utils#can_open_in_current()
 	let bnr = s:strict_bufnr(a:path)
-	if -1 == bnr
-		execute printf('edit %s', fnameescape(a:path))
+	if bufnr() == bnr
+		" nop if current buffer is the same
+	elseif ok
+		if -1 == bnr
+			execute printf('edit %s', fnameescape(a:path))
+		else
+			silent! execute printf('buffer %d', bnr)
+		endif
 	else
-		silent! execute printf('buffer %d', bnr)
+		execute printf('new %s', fnameescape(a:path))
 	endif
 	if 0 < a:lnum
 		call cursor([a:lnum, 1])

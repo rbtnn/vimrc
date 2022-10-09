@@ -61,7 +61,14 @@ function s:exit_cb(title, line_parser, job, status) abort
 		echo printf('[%s] Interrupt!', a:title)
 	finally
 		call setqflist(xs)
-		copen
+		if 0 < len(s:items)
+			if &modified
+				new
+			endif
+			cc 1
+		else
+			echo printf('[%s] Your search returned no results.', a:title)
+		endif
 		call qfjob#stop()
 	endtry
 endfunction

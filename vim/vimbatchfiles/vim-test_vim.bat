@@ -15,7 +15,7 @@ pushd %TARGET_VIMDIR%\src\testdir
     @echo on
     rem nmake /nologo /f Make_dos.mak VIMPROG=..\vim %~1 %~2 %~3 %~4 %~5 %~6 %~7 %~8 %~9
     rem nmake /nologo /f Make_dos.mak VIMPROG=..\gvim clean newtests
-    nmake /nologo /f Make_dos.mak VIMPROG=..\gvim clean test_listdict.res
+    nmake /nologo /f Make_dos.mak VIMPROG=..\gvim clean test_tabsidebar.res
     if exist test.log type test.log
     @echo off
 popd

@@ -30,6 +30,10 @@ augroup vimrc
 		\ | endfor
 		\ | unlet s:cmdname
 	autocmd FileType     help :setlocal colorcolumn=78
+	autocmd WinLeave        *
+		\ :if 'qf' == &filetype
+		\ |  cclose
+		\ |endif
 	autocmd VimEnter        *
 		\ :if !exists(':PkgSync')
 		\ |  execute 'command! -nargs=0 PkgSyncSetup :call PkgSyncSetup()'
@@ -147,36 +151,14 @@ cnoremap         <C-f>        <right>
 cnoremap         <C-e>        <end>
 cnoremap         <C-a>        <home>
 
-nnoremap <silent><C-d>        <C-d>0
-nnoremap <silent><C-u>        <C-u>0
+nnoremap <silent><C-n>    <Cmd>cnext \| normal zz<cr>
+nnoremap <silent><C-p>    <Cmd>cprevious \| normal zz<cr>
 
-if empty(mapcheck("\<C-n>", 'n'))
-	nnoremap <silent><C-n>    <Cmd>cnext \| normal zz<cr>
-endif
+nnoremap <silent><C-f>    <Cmd>GitLsFiles<cr>
+nnoremap <silent><C-g>    <Cmd>GitDiffRecently<cr>
 
-if empty(mapcheck("\<C-p>", 'n'))
-	nnoremap <silent><C-p>    <Cmd>cprevious \| normal zz<cr>
-endif
-
-if empty(mapcheck("\<space>", 'n'))
-	nnoremap <silent><space>  <Cmd>Terminal<cr>
-endif
-
-if empty(mapcheck("\<C-f>", 'n'))
-	nnoremap <silent><C-f>    <Cmd>GitLsFiles<cr>
-endif
-
-if empty(mapcheck("\<C-s>", 'n'))
-	nnoremap <silent><C-s>    <Cmd>GitDiff<cr>
-endif
-
-if empty(mapcheck("\<C-e>", 'n'))
-	nnoremap <silent><C-e>    <Cmd>GitLog<cr>
-endif
-
-if empty(mapcheck("\<C-y>", 'n'))
-	nnoremap <silent><C-y>    <Cmd>GitDiff upstream<cr>
-endif
+nnoremap <silent><C-s>    <Cmd>Terminal<cr>
+tnoremap <silent><C-s>    <Cmd>Terminal<cr>
 
 function! s:is_installed(user_and_name) abort
 	let xs = split(a:user_and_name, '/')
