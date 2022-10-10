@@ -84,10 +84,7 @@ function! s:show_log(rootdir, winid, lnum, stay) abort
 	if !empty(line)
 		let hash = matchstr(line, '^[0-9a-f]\+\ze\s')
 		let cmd = 'git --no-pager diff -w ' .. printf('%s~1..%s', hash, hash)
-		call git#utils#open_diffwindow(a:rootdir, cmd, v:false)
-		if a:stay
-			wincmd w
-		endif
+		call git#utils#open_diffwindow(a:rootdir, cmd, a:stay)
 		call popup_setoptions(a:winid, git#utils#get_popupwin_options())
 	endif
 endfunction

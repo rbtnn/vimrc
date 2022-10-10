@@ -5,30 +5,31 @@ function! git#diff#recently() abort
 	if empty(s:recently)
 		echo 'You still haven''t used :GitDiff even once!'
 	else
-		let winid = popup_menu(s:recently['lines'], git#utils#get_popupwin_options())
-		if -1 != winid
-			call popup_setoptions(winid, {
-				\ 'filter': function('git#diff#popup_filter', [s:recently['rootdir'], s:recently['q_args']]),
-				\ 'callback': function('git#diff#popup_callback', [s:recently['rootdir'], s:recently['q_args']]),
-				\ })
-			call git#utils#set_cursorline(winid, s:recently['lnum'])
+		let cmd = 'git --no-pager diff --numstat -w ' .. s:recently['q_args']
+		let lines = git#utils#system(cmd, s:recently['rootdir'])
+		if empty(lines)
+			echo 'No modified files!'
+		else
+			let winid = popup_menu(lines, git#utils#get_popupwin_options())
+			if -1 != winid
+				call popup_setoptions(winid, {
+					\ 'filter': function('git#diff#popup_filter', [s:recently['rootdir'], s:recently['q_args']]),
+					\ 'callback': function('git#diff#popup_callback', [s:recently['rootdir'], s:recently['q_args']]),
+					\ })
+				call git#utils#set_cursorline(winid, s:recently['lnum'])
+			endif
 		endif
 	endif
 endfunction
 
 function! git#diff#main(q_args) abort
-	let cmd = 'git --no-pager diff --numstat -w ' .. a:q_args
 	let rootdir = git#utils#get_rootdir('.', 'git')
-	let lines = git#utils#system(cmd, rootdir)
-	if empty(lines)
-		echo 'No modified files!'
-	elseif !isdirectory(rootdir)
+	if !isdirectory(rootdir)
 		echo 'The directory is not under git control!'
 	else
 		let s:recently = {
 			\ 'lnum': 1,
 			\ 'rootdir': rootdir,
-			\ 'lines': lines,
 			\ 'q_args': a:q_args,
 			\ }
 		call git#diff#recently()
@@ -91,10 +92,7 @@ function! s:show_diff(rootdir, q_args, winid, lnum, stay) abort
 	if !empty(line)
 		let path = a:rootdir .. '/' .. trim(split(line, "\t")[2])
 		let cmd = 'git --no-pager diff -w ' .. a:q_args .. ' -- ' .. path
-		call git#utils#open_diffwindow(a:rootdir, cmd, v:false)
-		if a:stay
-			wincmd w
-		endif
+		call git#utils#open_diffwindow(a:rootdir, cmd, a:stay)
 		call popup_setoptions(a:winid, git#utils#get_popupwin_options())
 	endif
 endfunction

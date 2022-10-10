@@ -2,7 +2,11 @@
 	"packpath": "~/vim/github",
 	"plugins": {
 		"start": {
+			"KeitaNakamura": [
+				"neodark.vim"
+			],
 			"itchyny": [
+				"lightline.vim",
 				"vim-cursorword"
 			],
 			"kana": [

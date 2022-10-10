@@ -189,7 +189,21 @@ if has('vim_starting')
 		\ | highlight!       TabSideBarSel     guifg=#ffffff guibg=NONE    gui=NONE cterm=NONE
 		\ | highlight!       TabSideBarLabel   guifg=#00a700 guibg=NONE    gui=BOLD cterm=NONE
 		\ | highlight!       CursorIM          guifg=NONE    guibg=#d70000
-	colorscheme habamax
+	if s:is_installed('KeitaNakamura/neodark.vim')
+		if s:is_installed('itchyny/lightline.vim')
+			let g:lightline = {}
+			let g:lightline['colorscheme'] = 'neodark'
+			let g:lightline['enable'] = { 'statusline': 1, 'tabline': 0, }
+			let g:lightline['separator'] = { 'left': nr2char(0xe0b0), }
+		endif
+		autocmd vimrc ColorScheme      *
+			\ : highlight!       SpecialKey        guifg=#263748 guibg=NONE    gui=NONE cterm=NONE
+			\ | highlight!       EndOfBuffer       guifg=#263748 guibg=NONE    gui=NONE cterm=NONE
+			\ | highlight!       NonText           guifg=#263748 guibg=NONE    gui=NONE cterm=NONE
+		colorscheme neodark
+	else
+		colorscheme habamax
+	endif
 else
 	" Check whether echo-messages are not disappeared when .vimrc is read.
 	echo '.vimrc has just read!'
