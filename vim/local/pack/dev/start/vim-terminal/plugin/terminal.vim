@@ -15,9 +15,7 @@ if has('win32') && executable('wmic') && has('gui_running')
 			const fg = 0
 			const bg = 1
 			const clr = '$e[0m'
-			const sp = '$S'
-			const arrow = nr2char(0xe0b0)
-			const xs = [' & prompt ', '$e[4' .. bg .. 'm', '$e[3' .. fg .. 'm', sp, clr, '$e[3' .. bg .. 'm', arrow, clr]
+			const xs = [' & prompt ', '$e[4' .. bg .. 'm', '$e[3' .. fg .. 'm', '$', clr]
 			term_cmd = [&shell, '/K', 'doskey pwd=cd & doskey ls=dir /b & doskey g=git $* ' .. join(xs, '')]
 		endif
 	enddef
@@ -45,7 +43,7 @@ def FloatingTerminal()
 		endif
 	endfor
 	if !exists_term
-		var bnr = get(term_list(), 0, -1)
+		var bnr = get(filter(term_list(), (i, x) => term_getstatus(x) != 'finished'), 0, -1)
 		if -1 == bnr
 			bnr = term_start(term_cmd, {
 				\   'hidden': 1,

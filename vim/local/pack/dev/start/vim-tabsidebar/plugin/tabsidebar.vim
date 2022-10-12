@@ -19,10 +19,9 @@ if has('tabsidebar')
 					lines += ['', printf('%s- QuickFix -%s', '%#TabSideBarLabel#', '%#TabSideBar#')]
 					lines += [printf(' %d/%d', qfinfo['idx'], qfinfo['size'])]
 				endif
-				lines += ['', printf('%s- TabPage -%s', '%#TabSideBarLabel#', '%#TabSideBar#')]
 			endif
 
-			lines += ['', printf('%s(%d)', '%#TabSideBar#', tnr)]
+			lines += ['', printf('%s- TabPage %d -%s', '%#TabSideBarLabel#', tnr, '%#TabSideBar#')]
 			for x in filter(getwininfo(), (i, x) => tnr == x['tabnr'] && ('popup' != win_gettype(x['winid'])))
 				var ft = getbufvar(x['bufnr'], '&filetype')
 				var bt = getbufvar(x['bufnr'], '&buftype')
@@ -47,7 +46,7 @@ if has('tabsidebar')
 			return 'Error! Please see g:tab_throwpoint and g:tab_exception.'
 		endtry
 	enddef
-	g:tabsidebar_vertsplit = 1
+	g:tabsidebar_vertsplit = 0
 	set notabsidebaralign
 	set notabsidebarwrap
 	set showtabsidebar=2
