@@ -12,10 +12,10 @@ var term_cmd = [&shell]
 if has('win32') && executable('wmic') && has('gui_running')
 	def OutCb(ch: channel, mes: string)
 		if 14393 < str2nr(trim(mes))
-			const fg = 0
-			const bg = 1
+			const fg = 1
+			const bg = 0
 			const clr = '$e[0m'
-			const xs = [' & prompt ', '$e[4' .. bg .. 'm', '$e[3' .. fg .. 'm', '$', clr]
+			const xs = [' & prompt ', '$e[4' .. bg .. 'm', '$e[3' .. fg .. 'm', '$$', clr]
 			term_cmd = [&shell, '/K', 'doskey pwd=cd & doskey ls=dir /b & doskey g=git $* ' .. join(xs, '')]
 		endif
 	enddef
