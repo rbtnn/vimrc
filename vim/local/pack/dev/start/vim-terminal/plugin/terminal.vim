@@ -55,4 +55,4 @@ def FloatingTerminal()
 	endif
 enddef
 
-command! -nargs=0 Terminal :call FloatingTerminal()
+command! -nargs=0 FloatingTerminal :call FloatingTerminal()

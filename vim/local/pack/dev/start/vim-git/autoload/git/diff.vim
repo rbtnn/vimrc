@@ -12,6 +12,9 @@ function! git#diff#recently() abort
 		else
 			let winid = popup_menu(lines, git#utils#get_popupwin_options())
 			if -1 != winid
+				call win_execute(winid, 'call clearmatches()')
+				call win_execute(winid, 'call matchadd("diffAdded", "^\\zs\\d\\+\\ze")')
+				call win_execute(winid, 'call matchadd("diffRemoved", "^\\d\\+\\s\\+\\zs\\d\\+\\ze")')
 				call popup_setoptions(winid, {
 					\ 'filter': function('git#diff#popup_filter', [s:recently['rootdir'], s:recently['q_args']]),
 					\ 'callback': function('git#diff#popup_callback', [s:recently['rootdir'], s:recently['q_args']]),

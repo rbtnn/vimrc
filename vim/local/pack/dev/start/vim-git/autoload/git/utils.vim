@@ -19,8 +19,8 @@ function! git#utils#get_popupwin_options() abort
 	let w = getwininfo(win_getid())[0]
 	let winrow = w['winrow']
 	let wincol = w['wincol']
-	let width = w['width']
-	let height = w['height']
+	let width = w['width'] - 2
+	let height = w['height'] - 2
 	let opts = {
 		\ 'wrap': 1,
 		\ 'scrollbar': 0,
@@ -33,7 +33,7 @@ function! git#utils#get_popupwin_options() abort
 		\ 'padding': [0, 0, 0, 0],
 		\ 'highlight': hiname,
 		\ }
-	if 0 && (has('gui_running') || (!has('win32') && !has('gui_running')))
+	if has('gui_running') || (!has('win32') && !has('gui_running'))
 		" ┌──┐
 		" │  │
 		" └──┘
@@ -95,7 +95,11 @@ function! git#utils#open_diffwindow(rootdir, cmd, stay) abort
 		endif
 	endfor
 	if !exists
-		botright vnew
+		if &lines < &columns / 2
+			botright vnew
+		else
+			botright new
+		endif
 		setfiletype diff
 		setlocal nolist
 	endif
