@@ -186,10 +186,10 @@ if has('vim_starting')
 			let g:lightline['enable'] = { 'statusline': 1, 'tabline': 0, }
 		endif
 		autocmd vimrc ColorScheme      *
-			\ : highlight!       TabSideBar        guifg=#777777 guibg=NONE    gui=NONE cterm=NONE
-			\ | highlight!       TabSideBarFill    guifg=NONE    guibg=NONE    gui=NONE cterm=NONE
-			\ | highlight!       TabSideBarSel     guifg=#ffffff guibg=NONE    gui=NONE cterm=NONE
-			\ | highlight!       TabSideBarLabel   guifg=#639ee9 guibg=NONE    gui=NONE cterm=NONE
+			\ : highlight!       TabSideBar        guifg=#777777 guibg=#0f1f28 gui=NONE cterm=NONE
+			\ | highlight!       TabSideBarFill    guifg=NONE    guibg=#0f1f28 gui=NONE cterm=NONE
+			\ | highlight!       TabSideBarSel     guifg=#ffffff guibg=#0f1f28 gui=NONE cterm=NONE
+			\ | highlight!       TabSideBarLabel   guifg=#639ee9 guibg=#0f1f28 gui=NONE cterm=NONE
 			\ | highlight!       CursorIM          guifg=NONE    guibg=#d70000
 			\ | highlight!       SpecialKey        guifg=#263748 guibg=NONE    gui=NONE cterm=NONE
 		colorscheme neodark
