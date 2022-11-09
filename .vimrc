@@ -156,6 +156,10 @@ nnoremap <silent><C-g>    <Cmd>GitDiffRecently<cr>
 nnoremap <silent><C-s>    <Cmd>FloatingTerminal<cr>
 tnoremap <silent><C-s>    <Cmd>FloatingTerminal<cr>
 
+if has('tabsidebar')
+	nnoremap <silent><space>  <Cmd>let &showtabsidebar = (&showtabsidebar == 0) ? 2 : 0<cr>
+endif
+
 function! s:is_installed(user_and_name) abort
 	let xs = split(a:user_and_name, '/')
 	return !empty(globpath($VIMRC_VIM, 'github/pack/' .. xs[0] .. '/*/' .. xs[1]))

@@ -16,11 +16,15 @@ endfunction
 
 function! git#utils#get_popupwin_options() abort
 	const hiname = 'Normal'
-	let w = getwininfo(win_getid())[0]
-	let winrow = w['winrow']
-	let wincol = w['wincol']
-	let width = w['width'] - 2
-	let height = w['height'] - 2
+	let winrow = 1
+	let wincol = 1
+	let width = &columns - 2
+	let height = &lines - &cmdheight - 2
+	if has('tabsidebar')
+		if (2 == &showtabsidebar) || ((1 == &showtabsidebar) && (1 < tabpagenr('$')))
+			let width -= &tabsidebarcolumns
+		endif
+	endif
 	let opts = {
 		\ 'wrap': 1,
 		\ 'scrollbar': 0,

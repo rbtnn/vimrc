@@ -13,7 +13,7 @@ if has('tabsidebar')
 		if rest < 0
 			rest = 0
 		endif
-		return '%#TabSideBarLabel#' .. repeat('=', rest / 2) .. text .. repeat('=', rest / 2 + (rest % 2)) .. '%#TabSideBar#'
+		return '%#TabSideBarLabel#' .. repeat(' ', rest / 2) .. text .. repeat(' ', rest / 2 + (rest % 2)) .. '%#TabSideBar#'
 	enddef
 
 	def TabSideBar(): string
@@ -23,11 +23,11 @@ if has('tabsidebar')
 		if tnr == 1
 			const qfinfo = getqflist({ 'nr': 0, 'size': 0, 'idx': 0 })
 			if 0 < qfinfo['nr']
-				lines += ['', TabSideBarLabel(' QuickFix ')]
+				lines += ['', TabSideBarLabel(' QUICKFIX ')]
 				lines += [printf(' %d/%d', qfinfo['idx'], qfinfo['size'])]
 			endif
 		endif
-		lines += ['', TabSideBarLabel(printf(' TabPage %d ', tnr)), '']
+		lines += ['', TabSideBarLabel(printf(' TABPAGE %d ', tnr)), '']
 		for x in filter(getwininfo(), (i, x) => tnr == x['tabnr'] && ('popup' != win_gettype(x['winid'])))
 			var ft = getbufvar(x['bufnr'], '&filetype')
 			var bt = getbufvar(x['bufnr'], '&buftype')
@@ -50,7 +50,7 @@ if has('tabsidebar')
 	g:tabsidebar_vertsplit = 0
 	set notabsidebaralign
 	set notabsidebarwrap
-	set showtabsidebar=2
+	set showtabsidebar=0
 	set tabsidebarcolumns=20
 	&tabsidebar = '%!' .. expand('<SID>') .. 'TabSideBar()'
 	for name in ['TabSideBar', 'TabSideBarFill', 'TabSideBarSel']

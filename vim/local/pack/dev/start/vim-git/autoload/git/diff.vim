@@ -65,7 +65,7 @@ function! git#diff#popup_filter(rootdir, q_args, winid, key) abort
 	elseif 100 == char2nr(a:key)
 		" d
 		call s:show_diff(a:rootdir, a:q_args, a:winid, line('.', a:winid), v:true)
-		return 1
+		return popup_filter_menu(a:winid, "\<esc>")
 
 	elseif 71 == char2nr(a:key)
 		" G
@@ -79,13 +79,9 @@ function! git#diff#popup_filter(rootdir, q_args, winid, key) abort
 		let s:recently['lnum'] = line('.', a:winid)
 		return 1
 
-	elseif 111 == char2nr(a:key)
-		" o
+	elseif 0x0d == char2nr(a:key)
 		call s:open_file(a:rootdir, a:winid, line('.', a:winid))
 		return popup_filter_menu(a:winid, "\<esc>")
-
-	elseif 0x0d == char2nr(a:key)
-		return popup_filter_menu(a:winid, "\<cr>")
 
 	elseif char2nr(a:key) < 0x20
 		return popup_filter_menu(a:winid, "\<esc>")
@@ -95,18 +91,27 @@ function! git#diff#popup_filter(rootdir, q_args, winid, key) abort
 	endif
 endfunction
 
-function! s:open_file(rootdir, winid, lnum) abort
+function! s:resolve(rootdir, winid, lnum) abort
 	let line = get(getbufline(winbufnr(a:winid), a:lnum), 0, '')
-	let path = a:rootdir .. '/' .. trim(split(line, "\t")[2])
-	if !empty(line) && filereadable(path)
+	if !empty(line)
+		let path = expand(a:rootdir .. '/' .. trim(get(split(line, "\t") ,2, '')))
+		if filereadable(path)
+			return path
+		endif
+	endif
+	return ''
+endfunction
+
+function! s:open_file(rootdir, winid, lnum) abort
+	let path = s:resolve(a:rootdir, a:winid, a:lnum)
+	if !empty(path)
 		call git#utils#open_file(path, -1)
 	endif
 endfunction
 
 function! s:show_diff(rootdir, q_args, winid, lnum, stay) abort
-	let line = get(getbufline(winbufnr(a:winid), a:lnum), 0, '')
-	if !empty(line)
-		let path = a:rootdir .. '/' .. trim(split(line, "\t")[2])
+	let path = s:resolve(a:rootdir, a:winid, a:lnum)
+	if !empty(path)
 		let cmd = 'git --no-pager diff -w ' .. a:q_args .. ' -- ' .. path
 		call git#utils#open_diffwindow(a:rootdir, cmd, a:stay)
 		call popup_setoptions(a:winid, git#utils#get_popupwin_options())
