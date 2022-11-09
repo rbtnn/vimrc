@@ -48,6 +48,7 @@ set cmdheight=1
 set cmdwinheight=5
 set complete-=t
 set completeslash=slash
+set cursorline
 set fileformats=unix,dos
 set foldlevelstart=999
 set foldmethod=indent
@@ -196,6 +197,8 @@ if has('vim_starting')
 			\ | highlight!       TabSideBarLabel   guifg=#639ee9 guibg=#0f1f28 gui=NONE cterm=NONE
 			\ | highlight!       CursorIM          guifg=NONE    guibg=#d70000
 			\ | highlight!       SpecialKey        guifg=#263748 guibg=NONE    gui=NONE cterm=NONE
+			\ | highlight! link  PmenuSel          CursorLine
+			\ | highlight! link  Pmenu             Normal
 		colorscheme neodark
 	endif
 else
