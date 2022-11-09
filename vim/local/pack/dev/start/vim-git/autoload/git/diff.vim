@@ -76,6 +76,11 @@ function! git#diff#popup_filter(rootdir, q_args, winid, key) abort
 		let s:recently['lnum'] = line('.', a:winid)
 		return 1
 
+	elseif 111 == char2nr(a:key)
+		" o
+		call s:open_file(a:rootdir, a:winid, line('.', a:winid))
+		return popup_filter_menu(a:winid, "\<esc>")
+
 	elseif 0x0d == char2nr(a:key)
 		return popup_filter_menu(a:winid, "\<cr>")
 
@@ -84,6 +89,14 @@ function! git#diff#popup_filter(rootdir, q_args, winid, key) abort
 
 	else
 		return popup_filter_menu(a:winid, a:key)
+	endif
+endfunction
+
+function! s:open_file(rootdir, winid, lnum) abort
+	let line = get(getbufline(winbufnr(a:winid), a:lnum), 0, '')
+	let path = a:rootdir .. '/' .. trim(split(line, "\t")[2])
+	if !empty(line) && filereadable(path)
+		call git#utils#open_file(path, -1)
 	endif
 endfunction
 
