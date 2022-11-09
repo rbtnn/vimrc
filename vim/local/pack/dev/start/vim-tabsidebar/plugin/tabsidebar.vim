@@ -8,43 +8,44 @@ vim9script
 g:loaded_tabsidebar = 1
 
 if has('tabsidebar')
+	def TabSideBarLabel(text: string): string
+		var rest = &tabsidebarcolumns - len(text)
+		if rest < 0
+			rest = 0
+		endif
+		return '%#TabSideBarLabel#' .. repeat('=', rest / 2) .. text .. repeat('=', rest / 2 + (rest % 2)) .. '%#TabSideBar#'
+	enddef
+
 	def TabSideBar(): string
-		try
-			var tnr = get(g:, 'actual_curtabpage', tabpagenr())
-			var lines = []
+		var tnr = get(g:, 'actual_curtabpage', tabpagenr())
+		var lines = []
 
-			if tnr == 1
-				const qfinfo = getqflist({ 'nr': 0, 'size': 0, 'idx': 0 })
-				if 0 < qfinfo['nr']
-					lines += ['', printf('%s- QuickFix -%s', '%#TabSideBarLabel#', '%#TabSideBar#')]
-					lines += [printf(' %d/%d', qfinfo['idx'], qfinfo['size'])]
-				endif
+		if tnr == 1
+			const qfinfo = getqflist({ 'nr': 0, 'size': 0, 'idx': 0 })
+			if 0 < qfinfo['nr']
+				lines += ['', TabSideBarLabel(' QuickFix ')]
+				lines += [printf(' %d/%d', qfinfo['idx'], qfinfo['size'])]
 			endif
-
-			lines += ['', printf('%s- TabPage %d -%s', '%#TabSideBarLabel#', tnr, '%#TabSideBar#')]
-			for x in filter(getwininfo(), (i, x) => tnr == x['tabnr'] && ('popup' != win_gettype(x['winid'])))
-				var ft = getbufvar(x['bufnr'], '&filetype')
-				var bt = getbufvar(x['bufnr'], '&buftype')
-				var current = (tnr == tabpagenr()) && (x['winnr'] == winnr())
-				var high = (current ? '%#TabSideBarSel#' : '%#TabSideBar#')
-				var fname = fnamemodify(bufname(x['bufnr']), ':t')
-				lines += [
-					\    high
-					\ .. ' '
-					\ .. (!empty(bt)
-					\      ? printf('[%s]', bt == 'nofile' ? ft : bt)
-					\      : (empty(bufname(x['bufnr']))
-					\          ? '[No Name]'
-					\          : fname))
-					\ .. (getbufvar(x['bufnr'], '&modified') && empty(bt) ? '[+]' : '')
-					\ ]
-			endfor
-			return join(lines, "\n")
-		catch
-			g:tab_throwpoint = v:throwpoint
-			g:tab_exception = v:exception
-			return 'Error! Please see g:tab_throwpoint and g:tab_exception.'
-		endtry
+		endif
+		lines += ['', TabSideBarLabel(printf(' TabPage %d ', tnr)), '']
+		for x in filter(getwininfo(), (i, x) => tnr == x['tabnr'] && ('popup' != win_gettype(x['winid'])))
+			var ft = getbufvar(x['bufnr'], '&filetype')
+			var bt = getbufvar(x['bufnr'], '&buftype')
+			var current = (tnr == tabpagenr()) && (x['winnr'] == winnr())
+			var high = (current ? '%#TabSideBarSel#' : '%#TabSideBar#')
+			var fname = fnamemodify(bufname(x['bufnr']), ':t')
+			lines += [
+				\    high
+				\ .. ' '
+				\ .. (!empty(bt)
+				\      ? printf('[%s]', bt == 'nofile' ? ft : bt)
+				\      : (empty(bufname(x['bufnr']))
+				\          ? '[No Name]'
+				\          : fname))
+				\ .. (getbufvar(x['bufnr'], '&modified') && empty(bt) ? '[+]' : '')
+				\ ]
+		endfor
+		return join(lines, "\n")
 	enddef
 	g:tabsidebar_vertsplit = 0
 	set notabsidebaralign
