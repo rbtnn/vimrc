@@ -16,23 +16,34 @@ endfunction
 
 function! git#utils#get_popupwin_options() abort
 	const hiname = 'Normal'
-	let winrow = 1
-	let wincol = 1
-	let width = &columns - 2
-	let height = &lines - &cmdheight - 2
+	let width = get(g:, 'git_utils_popupwin_width', 80)
+	let height = get(g:, 'git_utils_popupwin_width', 30)
+	let d = 0
 	if has('tabsidebar')
 		if (2 == &showtabsidebar) || ((1 == &showtabsidebar) && (1 < tabpagenr('$')))
-			let width -= &tabsidebarcolumns
+			let d = &tabsidebarcolumns
 		endif
+	endif
+	if &columns - d < width
+		let width = &columns - d
+	endif
+	if &lines - &cmdheight < height
+		let height = &lines - &cmdheight
+	endif
+	let width -= 2
+	let height -= 2
+	if width < 4
+		let width = 4
+	endif
+	if height < 4
+		let height = 4
 	endif
 	let opts = {
 		\ 'wrap': 1,
 		\ 'scrollbar': 0,
 		\ 'minwidth': width, 'maxwidth': width,
 		\ 'minheight': height, 'maxheight': height,
-		\ 'pos': 'topleft',
-		\ 'line': winrow,
-		\ 'col': wincol,
+		\ 'pos': 'center',
 		\ 'border': [0, 0, 0, 0],
 		\ 'padding': [0, 0, 0, 0],
 		\ 'highlight': hiname,
@@ -139,7 +150,7 @@ function! git#utils#open_file(path, lnum) abort
 	const ok = git#utils#can_open_in_current()
 	let bnr = s:strict_bufnr(a:path)
 	if bufnr() == bnr
-		" nop if current buffer is the same
+	" nop if current buffer is the same
 	elseif ok
 		if -1 == bnr
 			execute printf('edit %s', fnameescape(a:path))

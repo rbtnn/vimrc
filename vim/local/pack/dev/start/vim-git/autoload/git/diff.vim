@@ -65,7 +65,7 @@ function! git#diff#popup_filter(rootdir, q_args, winid, key) abort
 	elseif 100 == char2nr(a:key)
 		" d
 		call s:show_diff(a:rootdir, a:q_args, a:winid, line('.', a:winid), v:true)
-		return popup_filter_menu(a:winid, "\<esc>")
+		return 1
 
 	elseif 71 == char2nr(a:key)
 		" G

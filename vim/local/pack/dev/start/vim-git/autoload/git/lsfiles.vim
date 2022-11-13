@@ -89,12 +89,6 @@ function! s:update_window_async(rootdir, winid) abort
 	endif
 	let bnr = winbufnr(a:winid)
 	silent! call deletebufline(bnr, 1, '$')
-	let files = get(g:, 'gitlsfiles_list', [])
-	call map(files, { i, x -> expand(x) })
-	call filter(files, { i, x -> filereadable(x) })
-	for x in files
-		call s:job_callback(bnr, a:winid, v:null, x)
-	endfor
 	let s:job = job_start(['git', '--no-pager', 'ls-files'], {
 		\ 'callback': function('s:job_callback', [bnr, a:winid]),
 		\ 'cwd': a:rootdir,
@@ -121,12 +115,9 @@ function! s:set_title(winid, text) abort
 	let opts = git#utils#get_popupwin_options()
 	call popup_setoptions(a:winid, {
 		\ 'title': (empty(a:text) ? '' : ' ' .. a:text .. ' '),
-		\ 'minheight': (empty(a:text) ? opts['minheight'] : opts['minheight'] - 1),
-		\ 'maxheight': (empty(a:text) ? opts['maxheight'] : opts['maxheight'] - 1),
 		\ })
 endfunction
 
 function! s:get_title(winid) abort
 	return trim(get(popup_getoptions(a:winid), 'title', ''))
 endfunction
-
