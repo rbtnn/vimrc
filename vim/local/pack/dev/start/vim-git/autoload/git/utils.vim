@@ -17,7 +17,7 @@ endfunction
 function! git#utils#get_popupwin_options() abort
 	const hiname = 'Normal'
 	let width = get(g:, 'git_utils_popupwin_width', 80)
-	let height = get(g:, 'git_utils_popupwin_width', 30)
+	let height = get(g:, 'git_utils_popupwin_height', 30)
 	let d = 0
 	if has('tabsidebar')
 		if (2 == &showtabsidebar) || ((1 == &showtabsidebar) && (1 < tabpagenr('$')))
