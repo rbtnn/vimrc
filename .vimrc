@@ -48,7 +48,6 @@ set cmdheight=1
 set cmdwinheight=5
 set complete-=t
 set completeslash=slash
-set cursorline
 set fileformats=unix,dos
 set foldlevelstart=999
 set foldmethod=indent
@@ -62,6 +61,7 @@ set list listchars=tab:\ \ >,trail:-
 set matchpairs+=<:>
 set matchtime=1
 set nobackup
+set nocursorline
 set nonumber
 set norelativenumber
 set noshowmode
@@ -113,8 +113,41 @@ if has('vim_starting')
 	set hlsearch
 	set laststatus=2
 	set statusline&
-	set showtabline=0
-	set tabline&
+
+	function! s:pretty_bufname(bnr) abort
+		let name = bufname(a:bnr)
+		if filereadable(name)
+			return fnamemodify(name, ':t')
+		else
+			if empty(name)
+				let name = 'NO NAME'
+			endif
+			return '[' .. name .. ']'
+		endif
+	endfunction
+
+	function! TabLineJumplist() abort
+		let [js, i] = getjumplist()
+		let ctrl_o = []
+		let ctrl_i = []
+		if 0 <= i - 1
+			let fname = s:pretty_bufname(js[i - 1]['bufnr'])
+			let ctrl_o = [printf('CTRL-O: %s(%d)', fname, js[i - 1]['lnum'])]
+		endif
+		if i + 1 < len(js)
+			let fname = s:pretty_bufname(js[i + 1]['bufnr'])
+			let ctrl_i = [printf('CTRL-I: %s(%d)', fname, js[i + 1]['lnum'])]
+		endif
+		return printf('%s JUMPLIST %s %s %s', '%#IncSearch#', '%#StatusLine#', join(ctrl_i + ctrl_o, ', '), '%#StatusLineNC#')
+	endfunction
+
+	set showtabline=2
+	set tabline=%!TabLineJumplist()
+
+	augroup tabline-jumplist
+		autocmd!
+		autocmd CursorMoved * :redrawtabline
+	augroup END
 
 	set packpath=$VIMRC_VIM/local,$VIMRC_VIM/github
 	set runtimepath=$VIMRUNTIME
@@ -205,4 +238,3 @@ else
 	" Check whether echo-messages are not disappeared when .vimrc is read.
 	echo '.vimrc has just read!'
 endif
-
