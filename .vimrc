@@ -158,7 +158,7 @@ nnoremap <silent><C-s>    <Cmd>FloatingTerminal<cr>
 tnoremap <silent><C-s>    <Cmd>FloatingTerminal<cr>
 
 if has('tabsidebar')
-	nnoremap <silent><space>  <Cmd>let &showtabsidebar = (&showtabsidebar == 0) ? 2 : 0<cr>
+	nnoremap <silent><C-z>  <Cmd>let &showtabsidebar = (&showtabsidebar == 0) ? 2 : 0<cr>
 endif
 
 function! s:is_installed(user_and_name) abort
@@ -177,7 +177,7 @@ if s:is_installed('rbtnn/vim-textobj-string')
 endif
 
 if s:is_installed('rbtnn/vim-mrw')
-	nnoremap <silent><C-z>    <Cmd>MRW -filename-only<cr>
+	nnoremap <silent><space>    <Cmd>MRW -filename-only<cr>
 endif
 
 if s:is_installed('tyru/restart.vim')
