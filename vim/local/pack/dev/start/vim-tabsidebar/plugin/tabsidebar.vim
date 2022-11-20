@@ -47,7 +47,7 @@ if has('tabsidebar')
 		endfor
 		return join(lines, "\n")
 	enddef
-	g:tabsidebar_vertsplit = 0
+	g:tabsidebar_vertsplit = 1
 	set notabsidebaralign
 	set notabsidebarwrap
 	set showtabsidebar=0

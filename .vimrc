@@ -57,7 +57,7 @@ set ignorecase
 set incsearch
 set isfname-==
 set keywordprg=:help
-set list listchars=tab:\ \ >,trail:-
+set list listchars=tab:\ \ \|,trail:-
 set matchpairs+=<:>
 set matchtime=1
 set nobackup
@@ -113,41 +113,8 @@ if has('vim_starting')
 	set hlsearch
 	set laststatus=2
 	set statusline&
-
-	function! s:pretty_bufname(bnr) abort
-		let name = bufname(a:bnr)
-		if filereadable(name)
-			return fnamemodify(name, ':t')
-		else
-			if empty(name)
-				let name = 'NO NAME'
-			endif
-			return '[' .. name .. ']'
-		endif
-	endfunction
-
-	function! TabLineJumplist() abort
-		let [js, i] = getjumplist()
-		let ctrl_o = []
-		let ctrl_i = []
-		if 0 <= i - 1
-			let fname = s:pretty_bufname(js[i - 1]['bufnr'])
-			let ctrl_o = [printf('CTRL-O: %s(%d)', fname, js[i - 1]['lnum'])]
-		endif
-		if i + 1 < len(js)
-			let fname = s:pretty_bufname(js[i + 1]['bufnr'])
-			let ctrl_i = [printf('CTRL-I: %s(%d)', fname, js[i + 1]['lnum'])]
-		endif
-		return printf('%s JUMPLIST %s %s %s', '%#IncSearch#', '%#StatusLine#', join(ctrl_i + ctrl_o, ', '), '%#StatusLineNC#')
-	endfunction
-
-	set showtabline=2
-	set tabline=%!TabLineJumplist()
-
-	augroup tabline-jumplist
-		autocmd!
-		autocmd CursorMoved * :redrawtabline
-	augroup END
+	set showtabline=0
+	set tabline&
 
 	set packpath=$VIMRC_VIM/local,$VIMRC_VIM/github
 	set runtimepath=$VIMRUNTIME
@@ -209,6 +176,10 @@ if s:is_installed('rbtnn/vim-textobj-string')
 	endif
 endif
 
+if s:is_installed('rbtnn/vim-mrw')
+	nnoremap <silent><C-z>    <Cmd>MRW -filename-only<cr>
+endif
+
 if s:is_installed('tyru/restart.vim')
 	let g:restart_sessionoptions = &sessionoptions
 endif
@@ -217,23 +188,13 @@ if has('vim_starting')
 	if has('termguicolors') && !has('gui_running') && (has('win32') || (256 == &t_Co))
 		silent! set termguicolors
 	endif
-	if s:is_installed('KeitaNakamura/neodark.vim')
-		if s:is_installed('itchyny/lightline.vim')
-			let g:lightline = {}
-			let g:lightline['colorscheme'] = 'neodark'
-			let g:lightline['enable'] = { 'statusline': 1, 'tabline': 0, }
-		endif
-		autocmd vimrc ColorScheme      *
-			\ : highlight!       TabSideBar        guifg=#777777 guibg=#0f1f28 gui=NONE cterm=NONE
-			\ | highlight!       TabSideBarFill    guifg=NONE    guibg=#0f1f28 gui=NONE cterm=NONE
-			\ | highlight!       TabSideBarSel     guifg=#ffffff guibg=#0f1f28 gui=NONE cterm=NONE
-			\ | highlight!       TabSideBarLabel   guifg=#639ee9 guibg=#0f1f28 gui=NONE cterm=NONE
-			\ | highlight!       CursorIM          guifg=NONE    guibg=#d70000
-			\ | highlight!       SpecialKey        guifg=#263748 guibg=NONE    gui=NONE cterm=NONE
-			\ | highlight! link  PmenuSel          CursorLine
-			\ | highlight! link  Pmenu             Normal
-		colorscheme neodark
-	endif
+	autocmd vimrc ColorScheme      *
+		\ : highlight!       TabSideBar        guifg=#777777 guibg=NONE    gui=NONE cterm=NONE
+		\ | highlight!       TabSideBarFill    guifg=NONE    guibg=NONE    gui=NONE cterm=NONE
+		\ | highlight!       TabSideBarSel     guifg=#ffffff guibg=NONE    gui=NONE cterm=NONE
+		\ | highlight!       TabSideBarLabel   guifg=#00a700 guibg=NONE    gui=BOLD cterm=NONE
+		\ | highlight!       CursorIM          guifg=NONE    guibg=#d70000
+	colorscheme habamax
 else
 	" Check whether echo-messages are not disappeared when .vimrc is read.
 	echo '.vimrc has just read!'
