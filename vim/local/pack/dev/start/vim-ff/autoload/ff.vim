@@ -1,4 +1,6 @@
 
+let g:ff_sources = get(g:, 'ff_sources', ['mrw', 'buffer', 'script', 'ls-files'])
+
 let s:cachedrootdir = ''
 let s:cachedlines = []
 let s:maxlength = 0
@@ -9,23 +11,32 @@ function! ff#main(q_bang) abort
 	if ('!' == a:q_bang) || (s:cachedrootdir != rootdir) || empty(s:cachedlines)
 		let lines = []
 
-		if exists('g:loaded_mrw')
-			for x in mrw#read_cachefile()
-				let line = expand(x['path'])
-				if filereadable(line)
-					let lines += [line]
-				endif
+		if -1 != index(g:ff_sources, 'mrw')
+			if exists('g:loaded_mrw')
+				for path in map(mrw#read_cachefile(), { i,x -> x['path'] })
+					call s:extend_line(lines, path)
+				endfor
+			endif
+		endif
+
+		if -1 != index(g:ff_sources, 'buffer')
+			for path in map(getbufinfo(), { i,x -> x['name'] })
+				call s:extend_line(lines, path)
 			endfor
 		endif
 
-		if isdirectory(rootdir) && executable('git')
-			for line in map(git#utils#system('git --no-pager ls-files', rootdir), { i,x -> expand(rootdir .. '/' .. x) })
-				if -1 == index(lines, line)
-					if filereadable(line)
-						let lines += [line]
-					endif
-				endif
+		if -1 != index(g:ff_sources, 'script')
+			for path in map(getscriptinfo(), { i,x -> x['name'] })
+				call s:extend_line(lines, path)
 			endfor
+		endif
+
+		if -1 != index(g:ff_sources, 'ls-files')
+			if isdirectory(rootdir) && executable('git')
+				for path in map(git#utils#system('git --no-pager ls-files', rootdir), { i,x -> rootdir .. '/' .. x })
+					call s:extend_line(lines, path)
+				endfor
+			endif
 		endif
 
 		let s:maxlength = 0
@@ -50,6 +61,15 @@ function! ff#main(q_bang) abort
 			\ 'filter': function('ff#popup_filter', [rootdir]),
 			\ 'callback': function('ff#popup_callback'),
 			\ })
+	endif
+endfunction
+
+function! s:extend_line(lines, path) abort
+	let path = fnamemodify(a:path, ':p:gs!\\!/!')
+	if -1 == index(a:lines, path)
+		if filereadable(path)
+			call extend(a:lines, [path])
+		endif
 	endif
 endfunction
 
