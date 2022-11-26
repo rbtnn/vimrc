@@ -16,7 +16,7 @@ endfunction
 
 function! git#utils#get_popupwin_options() abort
 	const hiname = 'Normal'
-	let width = get(g:, 'git_utils_popupwin_width', 80)
+	let width = get(g:, 'git_utils_popupwin_width', 120)
 	let height = get(g:, 'git_utils_popupwin_height', 30)
 	let d = 0
 	if has('tabsidebar')
@@ -39,7 +39,7 @@ function! git#utils#get_popupwin_options() abort
 		let height = 4
 	endif
 	let opts = {
-		\ 'wrap': 1,
+		\ 'wrap': 0,
 		\ 'scrollbar': 0,
 		\ 'minwidth': width, 'maxwidth': width,
 		\ 'minheight': height, 'maxheight': height,

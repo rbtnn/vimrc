@@ -151,14 +151,14 @@ cnoremap         <C-a>        <home>
 nnoremap <silent><C-n>    <Cmd>cnext \| normal zz<cr>
 nnoremap <silent><C-p>    <Cmd>cprevious \| normal zz<cr>
 
-nnoremap <silent><C-f>    <Cmd>GitLsFiles<cr>
+nnoremap <silent><C-f>    <Cmd>FF<cr>
 nnoremap <silent><C-g>    <Cmd>GitDiffRecently<cr>
 
 nnoremap <silent><C-s>    <Cmd>FloatingTerminal<cr>
 tnoremap <silent><C-s>    <Cmd>FloatingTerminal<cr>
 
 if has('tabsidebar')
-	nnoremap <silent><C-z>  <Cmd>let &showtabsidebar = (&showtabsidebar == 0) ? 2 : 0<cr>
+	nnoremap <silent><space>  <Cmd>let &showtabsidebar = (&showtabsidebar == 0) ? 2 : 0<cr>
 endif
 
 function! s:is_installed(user_and_name) abort
@@ -174,10 +174,6 @@ if s:is_installed('rbtnn/vim-textobj-string')
 		nmap <silent>s   <Plug>(operator-replace)
 		nmap <silent>ss  <Plug>(operator-replace)as
 	endif
-endif
-
-if s:is_installed('rbtnn/vim-mrw')
-	nnoremap <silent><space>    <Cmd>MRW -filename-only<cr>
 endif
 
 if s:is_installed('tyru/restart.vim')
