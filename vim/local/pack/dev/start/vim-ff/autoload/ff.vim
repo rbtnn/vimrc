@@ -4,54 +4,62 @@ let g:ff_sources = get(g:, 'ff_sources', ['mrw', 'buffer', 'script', 'ls-files']
 let s:ctx = get(s:, 'ctx', {})
 
 function! ff#main(q_bang) abort
-	let rootdir = git#utils#get_rootdir('.', 'git')
-
-	if ('!' == a:q_bang) || (get(s:ctx, 'rootdir', '') != rootdir) || empty(s:ctx)
-		let lines = []
-
-		if -1 != index(g:ff_sources, 'mrw')
-			if exists('g:loaded_mrw')
-				for path in map(mrw#read_cachefile(), { i,x -> x['path'] })
-					call s:extend_line(lines, path)
-				endfor
-			endif
-		endif
-
-		if -1 != index(g:ff_sources, 'buffer')
-			for path in map(getbufinfo(), { i,x -> x['name'] })
-				call s:extend_line(lines, path)
-			endfor
-		endif
-
-		if -1 != index(g:ff_sources, 'script')
-			for path in map(getscriptinfo(), { i,x -> x['name'] })
-				call s:extend_line(lines, path)
-			endfor
-		endif
-
-		if -1 != index(g:ff_sources, 'ls-files')
-			if isdirectory(rootdir) && executable('git')
-				for path in map(git#utils#system('git --no-pager ls-files', rootdir), { i,x -> rootdir .. '/' .. x })
-					call s:extend_line(lines, path)
-				endfor
-			endif
-		endif
-
-		let s:ctx = {
-			\ 'rootdir': rootdir,
-			\ 'lines': lines,
-			\ 'query': '',
-			\ }
-	endif
-
 	let winid = popup_menu([], git#utils#get_popupwin_options())
 	if -1 != winid
-		call s:update_lines(winid)
+		let rootdir = git#utils#get_rootdir('.', 'git')
 		call popup_setoptions(winid, {
-			\ 'filter': function('ff#popup_filter', [rootdir]),
-			\ 'callback': function('ff#popup_callback'),
+			\ 'filter': function('s:popup_filter', [rootdir]),
+			\ 'callback': function('s:popup_callback'),
 			\ })
+
+		if ('!' == a:q_bang) || (get(s:ctx, 'rootdir', '') != rootdir) || empty(s:ctx)
+			let s:ctx = {
+				\ 'rootdir': rootdir,
+				\ 'lines': [],
+				\ 'query': '',
+				\ }
+
+			if -1 != index(g:ff_sources, 'mrw')
+				if exists('g:loaded_mrw')
+					for path in map(mrw#read_cachefile(), { i,x -> x['path'] })
+						call s:extend_line(s:ctx['lines'], path)
+					endfor
+				endif
+			endif
+
+			if -1 != index(g:ff_sources, 'buffer')
+				for path in map(getbufinfo(), { i,x -> x['name'] })
+					call s:extend_line(s:ctx['lines'], path)
+				endfor
+			endif
+
+			if -1 != index(g:ff_sources, 'script')
+				for path in map(getscriptinfo(), { i,x -> x['name'] })
+					call s:extend_line(s:ctx['lines'], path)
+				endfor
+			endif
+
+			if -1 != index(g:ff_sources, 'ls-files')
+				if isdirectory(rootdir) && executable('git')
+					if exists('s:job')
+						call job_stop(s:job)
+						unlet s:job
+					endif
+					let s:job = job_start(['git', '--no-pager', 'ls-files'], {
+						\ 'callback': function('s:job_callback', [winid, s:ctx['lines'], rootdir]),
+						\ 'cwd': rootdir,
+						\ })
+				endif
+			endif
+		endif
+
+		call s:update_lines(winid)
 	endif
+endfunction
+
+function! s:job_callback(winid, lines, rootdir, ch, msg) abort
+	call s:extend_line(a:lines, a:rootdir .. '/' .. a:msg)
+	call s:update_title(a:winid)
 endfunction
 
 function! s:extend_line(lines, path) abort
@@ -61,6 +69,16 @@ function! s:extend_line(lines, path) abort
 			call extend(a:lines, [path])
 		endif
 	endif
+endfunction
+
+function! s:update_title(winid) abort
+	let n = line('$', a:winid)
+	if empty(get(getbufline(winbufnr(a:winid), 1), 0, ''))
+		let n = 0
+	endif
+	call popup_setoptions(a:winid, {
+		\ 'title': printf(' [%d/%d] %s ', n, len(s:ctx['lines']), (empty(s:ctx['query']) ? '' : '/' .. s:ctx['query'] .. '/')),
+		\ })
 endfunction
 
 function! s:update_lines(winid) abort
@@ -101,14 +119,12 @@ function! s:update_lines(winid) abort
 		endtry
 	endif
 
-	call popup_setoptions(a:winid, {
-		\ 'title': printf(' [%d/%d] %s ', lnum, len(s:ctx['lines']), (empty(s:ctx['query']) ? '' : '/' .. s:ctx['query'] .. '/')),
-		\ })
+	call s:update_title(a:winid)
 
 	call git#utils#set_cursorline(a:winid, 1)
 endfunction
 
-function! ff#popup_filter(rootdir, winid, key) abort
+function! s:popup_filter(rootdir, winid, key) abort
 	let xs = split(s:ctx['query'], '\zs')
 	let lnum = line('.', a:winid)
 	if 21 == char2nr(a:key)
@@ -159,7 +175,7 @@ function! ff#popup_filter(rootdir, winid, key) abort
 	endif
 endfunction
 
-function! ff#popup_callback(winid, result) abort
+function! s:popup_callback(winid, result) abort
 	if -1 != a:result
 		let line = trim(get(getbufline(winbufnr(a:winid), a:result), 0, ''))
 		let m = matchlist(line, '^\(.\+\)\[\(.\+\)\]$')
