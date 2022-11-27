@@ -1,14 +1,12 @@
 
 let g:ff_sources = get(g:, 'ff_sources', ['mrw', 'buffer', 'script', 'ls-files'])
 
-let s:cachedrootdir = ''
-let s:cachedlines = []
-let s:maxlength = 0
+let s:ctx = get(s:, 'ctx', {})
 
 function! ff#main(q_bang) abort
 	let rootdir = git#utils#get_rootdir('.', 'git')
 
-	if ('!' == a:q_bang) || (s:cachedrootdir != rootdir) || empty(s:cachedlines)
+	if ('!' == a:q_bang) || (get(s:ctx, 'rootdir', '') != rootdir) || empty(s:ctx)
 		let lines = []
 
 		if -1 != index(g:ff_sources, 'mrw')
@@ -39,23 +37,15 @@ function! ff#main(q_bang) abort
 			endif
 		endif
 
-		let s:maxlength = 0
-		for path in lines
-			let fname = fnamemodify(path, ':t')
-			if s:maxlength < len(fname)
-				let s:maxlength = len(fname)
-			endif
-		endfor
-		let s:maxlength += 1
-		let s:cachedrootdir = rootdir
-		let s:cachedlines = lines
+		let s:ctx = {
+			\ 'rootdir': rootdir,
+			\ 'lines': lines,
+			\ 'query': '',
+			\ }
 	endif
 
 	let winid = popup_menu([], git#utils#get_popupwin_options())
 	if -1 != winid
-		call win_execute(winid, 'call clearmatches()')
-		call win_execute(winid, 'call matchadd("SpecialKey", "\\[.\\+\\]$")')
-		call s:set_title(winid, '')
 		call s:update_lines(winid)
 		call popup_setoptions(winid, {
 			\ 'filter': function('ff#popup_filter', [rootdir]),
@@ -75,41 +65,57 @@ endfunction
 
 function! s:update_lines(winid) abort
 	let bnr = winbufnr(a:winid)
-	let title = s:get_title(a:winid)
 	let lnum = 0
-	silent! call deletebufline(bnr, 1, '$')
-	for path in s:cachedlines
-		try
+	let xs = []
+	let maxlen = 0
+	try
+		silent! call deletebufline(bnr, 1, '$')
+
+		for path in s:ctx['lines']
 			let fname = fnamemodify(path, ':t')
 			let dir = fnamemodify(path, ':h')
-			if empty(title) || (fname =~ title)
-				let lnum += 1
-				call setbufline(bnr, lnum, printf('%-' .. s:maxlength .. 's[%s]', fname, dir))
+			if empty(s:ctx['query']) || (fname =~ s:ctx['query'])
+				let xs += [[fname, dir]]
+				if maxlen < len(fname)
+					let maxlen = len(fname)
+				endif
 			endif
+		endfor
+
+		for x in xs
+			let lnum += 1
+			call setbufline(bnr, lnum, printf('%-' .. maxlen .. 's [%s]', x[0], x[1]))
+		endfor
+	catch
+		echohl Error
+		echo v:exception
+		echohl None
+	endtry
+
+	call win_execute(a:winid, 'call clearmatches()')
+	call win_execute(a:winid, 'call matchadd("SpecialKey", "\\[.\\+\\]$")')
+	if !empty(s:ctx['query'])
+		try
+			call win_execute(a:winid, 'call matchadd("Constant", "\\c" .. ' .. string(s:ctx['query']) .. ' .. "\\%<' .. maxlen .. 'v")')
 		catch
 		endtry
-	endfor
-endfunction
+	endif
 
-function! s:set_title(winid, text) abort
-	let opts = git#utils#get_popupwin_options()
 	call popup_setoptions(a:winid, {
-		\ 'title': (empty(a:text) ? '' : ' ' .. a:text .. ' '),
+		\ 'title': printf(' [%d/%d] %s ', lnum, len(s:ctx['lines']), (empty(s:ctx['query']) ? '' : '/' .. s:ctx['query'] .. '/')),
 		\ })
-endfunction
 
-function! s:get_title(winid) abort
-	return trim(get(popup_getoptions(a:winid), 'title', ''))
+	call git#utils#set_cursorline(a:winid, 1)
 endfunction
 
 function! ff#popup_filter(rootdir, winid, key) abort
-	let xs = split(s:get_title(a:winid), '\zs')
+	let xs = split(s:ctx['query'], '\zs')
 	let lnum = line('.', a:winid)
 	if 21 == char2nr(a:key)
 		" Ctrl-u
 		if 0 < len(xs)
 			call remove(xs, 0, -1)
-			call s:set_title(a:winid, join(xs, ''))
+			let s:ctx['query'] = join(xs, '')
 			call s:update_lines(a:winid)
 		endif
 		return 1
@@ -133,7 +139,7 @@ function! ff#popup_filter(rootdir, winid, key) abort
 		" Ctrl-h or bs
 		if 0 < len(xs)
 			call remove(xs, -1)
-			call s:set_title(a:winid, join(xs, ''))
+			let s:ctx['query'] = join(xs, '')
 			call s:update_lines(a:winid)
 		endif
 		return 1
@@ -141,7 +147,7 @@ function! ff#popup_filter(rootdir, winid, key) abort
 		return popup_filter_menu(a:winid, "\<cr>")
 	elseif (0x21 <= char2nr(a:key)) && (char2nr(a:key) <= 0x7f)
 		let xs += [a:key]
-		call s:set_title(a:winid, join(xs, ''))
+		let s:ctx['query'] = join(xs, '')
 		call s:update_lines(a:winid)
 		return 1
 	elseif 0x0d == char2nr(a:key)

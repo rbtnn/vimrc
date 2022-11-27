@@ -151,7 +151,7 @@ cnoremap         <C-a>        <home>
 nnoremap <silent><C-n>    <Cmd>cnext \| normal zz<cr>
 nnoremap <silent><C-p>    <Cmd>cprevious \| normal zz<cr>
 
-nnoremap <silent><C-f>    <Cmd>FF!<cr>
+nnoremap <silent><C-f>    <Cmd>FF<cr>
 nnoremap <silent><C-g>    <Cmd>GitDiffRecently<cr>
 
 nnoremap <silent><C-s>    <Cmd>FloatingTerminal<cr>
