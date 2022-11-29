@@ -2,57 +2,59 @@
 let g:ff_sources = get(g:, 'ff_sources', ['mrw', 'buffer', 'script', 'ls-files'])
 let g:mrw_path = expand('~/.ffmrw')
 
-let s:ctx = get(s:, 'ctx', {})
-
 function! ff#main(q_bang) abort
 	let winid = popup_menu([], git#utils#get_popupwin_options())
 	if -1 != winid
 		let rootdir = git#utils#get_rootdir('.', 'git')
+
 		call popup_setoptions(winid, {
 			\ 'filter': function('s:popup_filter', [rootdir]),
 			\ 'callback': function('s:popup_callback'),
 			\ })
 
-		if ('!' == a:q_bang) || (get(s:ctx, 'rootdir', '') != rootdir) || empty(s:ctx)
-			let s:ctx = {
-				\ 'rootdir': rootdir,
-				\ 'lines': [],
-				\ 'query': '',
-				\ }
+		let s:ctx = get(s:, 'ctx', {
+			\ 'lines': [],
+			\ 'lsfiles_caches': {},
+			\ 'query': '',
+			\ })
 
-			if -1 != index(g:ff_sources, 'mrw')
-				for path in ff#read_mrwfile()
-					call s:extend_line(s:ctx['lines'], path)
-				endfor
-			endif
+		let s:ctx['lines'] = []
 
-			if -1 != index(g:ff_sources, 'buffer')
-				for path in map(getbufinfo(), { i,x -> x['name'] })
-					call s:extend_line(s:ctx['lines'], path)
-				endfor
-			endif
+		if -1 != index(g:ff_sources, 'mrw')
+			for path in ff#read_mrwfile()
+				call s:extend_line(s:ctx['lines'], path)
+			endfor
+		endif
 
-			if -1 != index(g:ff_sources, 'script')
-				for path in map(getscriptinfo(), { i,x -> x['name'] })
-					call s:extend_line(s:ctx['lines'], path)
-				endfor
-			endif
+		if -1 != index(g:ff_sources, 'buffer')
+			for path in map(getbufinfo(), { i,x -> x['name'] })
+				call s:extend_line(s:ctx['lines'], path)
+			endfor
+		endif
 
-			if -1 != index(g:ff_sources, 'ls-files')
-				if isdirectory(rootdir) && executable('git')
+		if -1 != index(g:ff_sources, 'script')
+			for path in map(getscriptinfo(), { i,x -> x['name'] })
+				call s:extend_line(s:ctx['lines'], path)
+			endfor
+		endif
+
+		if -1 != index(g:ff_sources, 'ls-files')
+			if isdirectory(rootdir) && executable('git')
+				if ('!' == a:q_bang) || !has_key(s:ctx['lsfiles_caches'], rootdir)
 					if exists('s:job')
 						call job_stop(s:job)
 						unlet s:job
 					endif
+					let s:ctx['lsfiles_caches'][rootdir] = []
 					let s:job = job_start(['git', '--no-pager', 'ls-files'], {
-						\ 'callback': function('s:job_callback', [winid, s:ctx['lines'], rootdir]),
+						\ 'callback': function('s:job_callback', [rootdir, winid, s:ctx['lsfiles_caches'][rootdir]]),
 						\ 'cwd': rootdir,
 						\ })
 				endif
 			endif
 		endif
 
-		call s:update_lines(winid)
+		call s:update_lines(rootdir, winid)
 	endif
 endfunction
 
@@ -94,9 +96,9 @@ function! s:fix_path(path) abort
 	return fnamemodify(resolve(a:path), ':p:gs?\\?/?')
 endfunction
 
-function! s:job_callback(winid, lines, rootdir, ch, msg) abort
+function! s:job_callback(rootdir, winid, lines, ch, msg) abort
 	call s:extend_line(a:lines, a:rootdir .. '/' .. a:msg)
-	call s:update_title(a:winid)
+	call s:update_title(a:rootdir, a:winid)
 endfunction
 
 function! s:extend_line(lines, path) abort
@@ -108,31 +110,39 @@ function! s:extend_line(lines, path) abort
 	endif
 endfunction
 
-function! s:update_title(winid) abort
+function! s:update_title(rootdir, winid) abort
 	let n = line('$', a:winid)
 	if empty(get(getbufline(winbufnr(a:winid), 1), 0, ''))
 		let n = 0
 	endif
 	call popup_setoptions(a:winid, {
-		\ 'title': printf(' [%d/%d] %s ', n, len(s:ctx['lines']), (empty(s:ctx['query']) ? '' : '/' .. s:ctx['query'] .. '/')),
-		\ })
+		\ 'title': printf(
+		\    ' [%d/%d/%d] %s ',
+		\    n,
+		\    len(s:ctx['lines']),
+		\    len(get(s:ctx['lsfiles_caches'], a:rootdir, [])),
+		\    (empty(s:ctx['query']) ? '' : '/' .. s:ctx['query'] .. '/')
+		\ ), })
 endfunction
 
-function! s:update_lines(winid) abort
+function! s:update_lines(rootdir, winid) abort
 	let bnr = winbufnr(a:winid)
 	let lnum = 0
 	let xs = []
 	let maxlen = 0
+	let lines = []
 	try
 		silent! call deletebufline(bnr, 1, '$')
-
-		for path in s:ctx['lines']
-			let fname = fnamemodify(path, ':t')
-			let dir = fnamemodify(path, ':h')
-			if empty(s:ctx['query']) || (fname =~ s:ctx['query'])
-				let xs += [[fname, dir]]
-				if maxlen < len(fname)
-					let maxlen = len(fname)
+		for path in s:ctx['lines'] + get(s:ctx['lsfiles_caches'], a:rootdir, [])
+			if -1 == index(lines, path)
+				let lines += [path]
+				let fname = fnamemodify(path, ':t')
+				let dir = fnamemodify(path, ':h')
+				if empty(s:ctx['query']) || (fname =~ s:ctx['query'])
+					let xs += [[fname, dir]]
+					if maxlen < len(fname)
+						let maxlen = len(fname)
+					endif
 				endif
 			endif
 		endfor
@@ -150,6 +160,7 @@ function! s:update_lines(winid) abort
 
 	call win_execute(a:winid, 'call clearmatches()')
 	call win_execute(a:winid, 'call matchadd("SpecialKey", "\\[.\\+\\]$")')
+
 	if !empty(s:ctx['query'])
 		try
 			call win_execute(a:winid, 'call matchadd("Constant", "\\c" .. ' .. string(s:ctx['query']) .. ' .. "\\%<' .. maxlen .. 'v")')
@@ -157,8 +168,7 @@ function! s:update_lines(winid) abort
 		endtry
 	endif
 
-	call s:update_title(a:winid)
-
+	call s:update_title(a:rootdir, a:winid)
 	call git#utils#set_cursorline(a:winid, 1)
 endfunction
 
@@ -170,7 +180,7 @@ function! s:popup_filter(rootdir, winid, key) abort
 		if 0 < len(xs)
 			call remove(xs, 0, -1)
 			let s:ctx['query'] = join(xs, '')
-			call s:update_lines(a:winid)
+			call s:update_lines(a:rootdir, a:winid)
 		endif
 		return 1
 	elseif (10 == char2nr(a:key)) || (14 == char2nr(a:key))
@@ -194,7 +204,7 @@ function! s:popup_filter(rootdir, winid, key) abort
 		if 0 < len(xs)
 			call remove(xs, -1)
 			let s:ctx['query'] = join(xs, '')
-			call s:update_lines(a:winid)
+			call s:update_lines(a:rootdir, a:winid)
 		endif
 		return 1
 	elseif 0x20 == char2nr(a:key)
@@ -202,7 +212,7 @@ function! s:popup_filter(rootdir, winid, key) abort
 	elseif (0x21 <= char2nr(a:key)) && (char2nr(a:key) <= 0x7f)
 		let xs += [a:key]
 		let s:ctx['query'] = join(xs, '')
-		call s:update_lines(a:winid)
+		call s:update_lines(a:rootdir, a:winid)
 		return 1
 	elseif 0x0d == char2nr(a:key)
 		return popup_filter_menu(a:winid, "\<cr>")
