@@ -1,5 +1,6 @@
 
 let g:ff_sources = get(g:, 'ff_sources', ['mrw', 'buffer', 'script', 'ls-files'])
+let g:mrw_path = expand('~/.ffmrw')
 
 let s:ctx = get(s:, 'ctx', {})
 
@@ -20,11 +21,9 @@ function! ff#main(q_bang) abort
 				\ }
 
 			if -1 != index(g:ff_sources, 'mrw')
-				if exists('g:loaded_mrw')
-					for path in map(mrw#read_cachefile(), { i,x -> x['path'] })
-						call s:extend_line(s:ctx['lines'], path)
-					endfor
-				endif
+				for path in ff#read_mrwfile()
+					call s:extend_line(s:ctx['lines'], path)
+				endfor
 			endif
 
 			if -1 != index(g:ff_sources, 'buffer')
@@ -57,13 +56,51 @@ function! ff#main(q_bang) abort
 	endif
 endfunction
 
+function! ff#mrw_bufwritepost() abort
+	let path = s:fix_path(g:mrw_path)
+	let lines = ff#read_mrwfile()
+	let fullpath = s:fix_path(expand('<afile>'))
+	if fullpath != path
+		let p = v:false
+		if filereadable(path)
+			if filereadable(fullpath)
+				if 0 < len(get(lines, 0, ''))
+					if fullpath != s:fix_path(get(lines, 0, ''))
+						let p = v:true
+					endif
+				else
+					let p = v:true
+				endif
+			endif
+		else
+			let p = v:true
+		endif
+		if p
+			call writefile([fullpath] + filter(lines, { i,x -> x != fullpath }), path)
+		endif
+	endif
+endfunction
+
+function! ff#read_mrwfile() abort
+	let path = s:fix_path(g:mrw_path)
+	if filereadable(path)
+		return readfile(path)
+	else
+		return []
+	endif
+endfunction
+
+function! s:fix_path(path) abort
+	return fnamemodify(resolve(a:path), ':p:gs?\\?/?')
+endfunction
+
 function! s:job_callback(winid, lines, rootdir, ch, msg) abort
 	call s:extend_line(a:lines, a:rootdir .. '/' .. a:msg)
 	call s:update_title(a:winid)
 endfunction
 
 function! s:extend_line(lines, path) abort
-	let path = fnamemodify(a:path, ':p:gs!\\!/!')
+	let path = s:fix_path(a:path)
 	if -1 == index(a:lines, path)
 		if filereadable(path)
 			call extend(a:lines, [path])
@@ -102,7 +139,8 @@ function! s:update_lines(winid) abort
 
 		for x in xs
 			let lnum += 1
-			call setbufline(bnr, lnum, printf('%-' .. maxlen .. 's [%s]', x[0], x[1]))
+			let d = strdisplaywidth(x[0]) - len(split(x[0], '\zs'))
+			call setbufline(bnr, lnum, printf('%-' .. (maxlen + d) .. 's [%s]', x[0], x[1]))
 		endfor
 	catch
 		echohl Error

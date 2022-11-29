@@ -190,7 +190,11 @@ if has('vim_starting')
 		\ | highlight!       TabSideBarSel     guifg=#ffffff guibg=NONE    gui=NONE cterm=NONE
 		\ | highlight!       TabSideBarLabel   guifg=#00a700 guibg=NONE    gui=BOLD cterm=NONE
 		\ | highlight!       CursorIM          guifg=NONE    guibg=#d70000
-	colorscheme habamax
+	if s:is_installed('ackyshake/Spacegray.vim')
+		colorscheme spacegray
+	else
+		colorscheme habamax
+	endif
 else
 	" Check whether echo-messages are not disappeared when .vimrc is read.
 	echo '.vimrc has just read!'

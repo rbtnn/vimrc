@@ -2,6 +2,9 @@
 	"packpath": "~/vim/github",
 	"plugins": {
 		"start": {
+			"ackyshake": [
+				"Spacegray.vim"
+			],
 			"itchyny": [
 				"vim-cursorword"
 			],
@@ -13,7 +16,6 @@
 			"rbtnn": [
 				"vim-ambiwidth",
 				"vim-gloaded",
-				"vim-mrw",
 				"vim-pkgsync",
 				"vim-qficonv",
 				"vim-textobj-string",
