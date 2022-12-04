@@ -117,11 +117,11 @@ function! s:update_title(rootdir, winid) abort
 	endif
 	call popup_setoptions(a:winid, {
 		\ 'title': printf(
-		\    ' [%d/%d/%d] %s ',
+		\    ' matched:%d, ls-files:%d, others:%d, pattern:%s ',
 		\    n,
-		\    len(s:ctx['lines']),
 		\    len(get(s:ctx['lsfiles_caches'], a:rootdir, [])),
-		\    (empty(s:ctx['query']) ? '' : '/' .. s:ctx['query'] .. '/')
+		\    len(s:ctx['lines']),
+		\    string(s:ctx['query'])
 		\ ), })
 endfunction
 

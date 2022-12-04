@@ -47,11 +47,11 @@ if has('tabsidebar')
 		endfor
 		return join(lines, "\n")
 	enddef
-	g:tabsidebar_vertsplit = 1
+	g:tabsidebar_vertsplit = 0
 	set notabsidebaralign
 	set notabsidebarwrap
-	set showtabsidebar=0
-	set tabsidebarcolumns=20
+	set showtabsidebar=2
+	set tabsidebarcolumns=16
 	&tabsidebar = '%!' .. expand('<SID>') .. 'TabSideBar()'
 	for name in ['TabSideBar', 'TabSideBarFill', 'TabSideBarSel']
 		if !hlexists(name)

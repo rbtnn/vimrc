@@ -157,10 +157,6 @@ nnoremap <silent><C-g>    <Cmd>GitDiffRecently<cr>
 nnoremap <silent><C-s>    <Cmd>FloatingTerminal<cr>
 tnoremap <silent><C-s>    <Cmd>FloatingTerminal<cr>
 
-if has('tabsidebar')
-	nnoremap <silent><space>  <Cmd>let &showtabsidebar = (&showtabsidebar == 0) ? 2 : 0<cr>
-endif
-
 function! s:is_installed(user_and_name) abort
 	let xs = split(a:user_and_name, '/')
 	return !empty(globpath($VIMRC_VIM, 'github/pack/' .. xs[0] .. '/*/' .. xs[1]))
@@ -185,10 +181,10 @@ if has('vim_starting')
 		silent! set termguicolors
 	endif
 	autocmd vimrc ColorScheme      *
-		\ : highlight!       TabSideBar        guifg=#777777 guibg=NONE    gui=NONE cterm=NONE
-		\ | highlight!       TabSideBarFill    guifg=NONE    guibg=NONE    gui=NONE cterm=NONE
-		\ | highlight!       TabSideBarSel     guifg=#ffffff guibg=NONE    gui=NONE cterm=NONE
-		\ | highlight!       TabSideBarLabel   guifg=#00a700 guibg=NONE    gui=BOLD cterm=NONE
+		\ : highlight!       TabSideBar        guifg=#777777 guibg=#303537    gui=NONE cterm=NONE
+		\ | highlight!       TabSideBarFill    guifg=NONE    guibg=#303537    gui=NONE cterm=NONE
+		\ | highlight!       TabSideBarSel     guifg=#ffffff guibg=#303537    gui=NONE cterm=NONE
+		\ | highlight!       TabSideBarLabel   guifg=#00a700 guibg=#303537    gui=BOLD cterm=NONE
 		\ | highlight!       CursorIM          guifg=NONE    guibg=#d70000
 	if s:is_installed('ackyshake/Spacegray.vim')
 		colorscheme spacegray
