@@ -124,3 +124,16 @@ function! git#diff#popup_callback(rootdir, q_args, winid, result) abort
 	endif
 endfunction
 
+function! git#diff#comp(ArgLead, CmdLine, CursorPos) abort
+	let rootdir = git#utils#get_rootdir('.', 'git')
+	let xs = ['--cached', 'HEAD']
+	if isdirectory(rootdir)
+		if isdirectory(rootdir .. '/.git/refs/heads')
+			let xs += readdir(rootdir .. '/.git/refs/heads')
+		endif
+		if isdirectory(rootdir .. '/.git/refs/tags')
+			let xs += readdir(rootdir .. '/.git/refs/tags')
+		endif
+	endif
+	return filter(xs, { i,x -> -1 != match(x, a:ArgLead) })
+endfunction
