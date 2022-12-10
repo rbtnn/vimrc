@@ -151,11 +151,8 @@ cnoremap         <C-a>        <home>
 nnoremap <silent><C-n>    <Cmd>cnext \| normal zz<cr>
 nnoremap <silent><C-p>    <Cmd>cprevious \| normal zz<cr>
 
-nnoremap <silent><C-f>    <Cmd>FF<cr>
+nnoremap <silent><space>  <Cmd>FF<cr>
 nnoremap <silent><C-g>    <Cmd>GitDiffRecently<cr>
-
-nnoremap <silent><C-s>    <Cmd>FloatingTerminal<cr>
-tnoremap <silent><C-s>    <Cmd>FloatingTerminal<cr>
 
 function! s:is_installed(user_and_name) abort
 	let xs = split(a:user_and_name, '/')
@@ -186,8 +183,15 @@ if has('vim_starting')
 		\ | highlight!       TabSideBarSel     guifg=#ffffff guibg=#303537    gui=NONE cterm=NONE
 		\ | highlight!       TabSideBarLabel   guifg=#00a700 guibg=#303537    gui=BOLD cterm=NONE
 		\ | highlight!       CursorIM          guifg=NONE    guibg=#d70000
-	if s:is_installed('ackyshake/Spacegray.vim')
-		colorscheme spacegray
+	if s:is_installed('morhetz/gruvbox')
+		if s:is_installed('itchyny/lightline.vim')
+			let g:lightline = {}
+			let g:lightline['colorscheme'] = 'gruvbox'
+			let g:lightline['enable'] = { 'statusline': 1, 'tabline': 0, }
+		endif
+		let g:gruvbox_contrast_dark = 'hard'
+		let g:gruvbox_italic = 0
+		colorscheme gruvbox
 	else
 		colorscheme habamax
 	endif

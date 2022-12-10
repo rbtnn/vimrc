@@ -2,10 +2,8 @@
 	"packpath": "~/vim/github",
 	"plugins": {
 		"start": {
-			"ackyshake": [
-				"Spacegray.vim"
-			],
 			"itchyny": [
+				"lightline.vim",
 				"vim-cursorword"
 			],
 			"kana": [
@@ -13,8 +11,12 @@
 				"vim-operator-user",
 				"vim-textobj-user"
 			],
+			"morhetz": [
+				"gruvbox"
+			],
 			"rbtnn": [
 				"vim-ambiwidth",
+				"vim-colors-github",
 				"vim-gloaded",
 				"vim-pkgsync",
 				"vim-qficonv",
