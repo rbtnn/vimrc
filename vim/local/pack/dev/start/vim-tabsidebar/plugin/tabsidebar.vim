@@ -20,13 +20,13 @@ if has('tabsidebar')
 		var tnr = get(g:, 'actual_curtabpage', tabpagenr())
 		var lines = []
 
-		if tnr == 1
-			const qfinfo = getqflist({ 'nr': 0, 'size': 0, 'idx': 0 })
-			if 0 < qfinfo['nr']
-				lines += ['', TabSideBarLabel(' QUICKFIX ')]
-				lines += [printf(' %d/%d', qfinfo['idx'], qfinfo['size'])]
-			endif
-		endif
+		#if tnr == 1
+		#	const qfinfo = getqflist({ 'nr': 0, 'size': 0, 'idx': 0 })
+		#	if 0 < qfinfo['nr']
+		#		lines += ['', TabSideBarLabel(' QUICKFIX ')]
+		#		lines += [printf(' %d/%d', qfinfo['idx'], qfinfo['size'])]
+		#	endif
+		#endif
 		lines += ['', TabSideBarLabel(printf(' TABPAGE %d ', tnr)), '']
 		for x in filter(getwininfo(), (i, x) => tnr == x['tabnr'] && ('popup' != win_gettype(x['winid'])))
 			var ft = getbufvar(x['bufnr'], '&filetype')

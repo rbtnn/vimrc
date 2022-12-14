@@ -15,7 +15,6 @@ function! git#utils#can_open_in_current() abort
 endfunction
 
 function! git#utils#get_popupwin_options() abort
-	const hiname = 'Normal'
 	let width = get(g:, 'git_utils_popupwin_width', 120)
 	let height = get(g:, 'git_utils_popupwin_height', 30)
 	let d = 0
@@ -46,7 +45,6 @@ function! git#utils#get_popupwin_options() abort
 		\ 'pos': 'center',
 		\ 'border': [0, 0, 0, 0],
 		\ 'padding': [0, 0, 0, 0],
-		\ 'highlight': hiname,
 		\ }
 	if has('gui_running') || (!has('win32') && !has('gui_running'))
 		" ┌──┐
@@ -63,7 +61,7 @@ function! git#utils#get_popupwin_options() abort
 			\ nr2char(0x256d), nr2char(0x256e), nr2char(0x256f), nr2char(0x2570)]
 		call extend(opts, {
 			\ 'border': [],
-			\ 'borderhighlight': repeat([hiname], 4),
+			\ 'borderhighlight': repeat(['PopupBorder'], 4),
 			\ 'borderchars': borderchars_typeA,
 			\ }, 'force')
 	endif

@@ -174,27 +174,8 @@ if s:is_installed('tyru/restart.vim')
 endif
 
 if has('vim_starting')
-	if has('termguicolors') && !has('gui_running') && (has('win32') || (256 == &t_Co))
-		silent! set termguicolors
-	endif
-	autocmd vimrc ColorScheme      *
-		\ : highlight!       TabSideBar        guifg=#777777 guibg=#303537    gui=NONE cterm=NONE
-		\ | highlight!       TabSideBarFill    guifg=NONE    guibg=#303537    gui=NONE cterm=NONE
-		\ | highlight!       TabSideBarSel     guifg=#ffffff guibg=#303537    gui=NONE cterm=NONE
-		\ | highlight!       TabSideBarLabel   guifg=#00a700 guibg=#303537    gui=BOLD cterm=NONE
-		\ | highlight!       CursorIM          guifg=NONE    guibg=#d70000
-	if s:is_installed('morhetz/gruvbox')
-		if s:is_installed('itchyny/lightline.vim')
-			let g:lightline = {}
-			let g:lightline['colorscheme'] = 'gruvbox'
-			let g:lightline['enable'] = { 'statusline': 1, 'tabline': 0, }
-		endif
-		let g:gruvbox_contrast_dark = 'hard'
-		let g:gruvbox_italic = 0
-		colorscheme gruvbox
-	else
-		colorscheme habamax
-	endif
+	set termguicolors
+	colorscheme mycolorscheme
 else
 	" Check whether echo-messages are not disappeared when .vimrc is read.
 	echo '.vimrc has just read!'

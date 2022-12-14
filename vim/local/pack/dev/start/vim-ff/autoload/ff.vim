@@ -1,10 +1,24 @@
 
 let g:ff_sources = get(g:, 'ff_sources', ['mrw', 'buffer', 'script', 'ls-files'])
 let g:ff_mrw_path = get(g:, 'ff_mrw_path', expand('~/.ffmrw'))
-let g:ff_match_highlight = get(g:, 'ff_match_highlight', 'Special')
+let g:ff_match_highlight = get(g:, 'ff_match_highlight', 'IncSearch')
+
+let s:subwinid = get(s:, 'subwinid', -1)
 
 function! ff#main(q_bang) abort
 	let winid = popup_menu([], git#utils#get_popupwin_options())
+	let pos = popup_getpos(winid)
+	let s:subwinid = popup_create('text', {
+		\ 'line': pos['line'] - 3,
+		\ 'col': pos['col'],
+		\ 'padding': [0, 0, 0, 0],
+		\ 'border': [],
+		\ 'highlight': 'Normal',
+		\ 'borderhighlight': repeat(['PopupBorder'], 4),
+		\ 'borderchars': [
+		\ nr2char(0x2500), nr2char(0x2502), nr2char(0x2500), nr2char(0x2502),
+		\ nr2char(0x250c), nr2char(0x2510), nr2char(0x2518), nr2char(0x2514)]
+		\ })
 	if -1 != winid
 		let rootdir = git#utils#get_rootdir('.', 'git')
 
@@ -64,11 +78,9 @@ function! s:create_context(rootdir, winid, force) abort
 	let s:ctx['lines'] = []
 
 	if -1 != index(g:ff_sources, 'mrw')
-		if exists('g:loaded_mrw')
-			for path in ff#read_mrwfile()
-				call s:extend_line(s:ctx['lines'], path)
-			endfor
-		endif
+		for path in ff#read_mrwfile()
+			call s:extend_line(s:ctx['lines'], path)
+		endfor
 	endif
 
 	if -1 != index(g:ff_sources, 'buffer')
@@ -130,8 +142,12 @@ function! s:update_title(rootdir, winid) abort
 	if empty(get(getbufline(winbufnr(a:winid), 1), 0, ''))
 		let n = 0
 	endif
-	call popup_setoptions(a:winid, {
-		\ 'title': empty(s:ctx['query']) ? printf(' %d files ', n) : (' ' .. s:ctx['query'] .. ' '), })
+	let text = empty(s:ctx['query']) ? printf(' %d files ', n) : (' ' .. s:ctx['query'] .. ' ')
+	if v:false
+		call popup_setoptions(a:winid, { 'title': text, })
+	else
+		call popup_settext(s:subwinid, text)
+	endif
 endfunction
 
 function! s:update_lines(rootdir, winid) abort
@@ -246,6 +262,10 @@ function! s:popup_callback(winid, result) abort
 				call git#utils#open_file(path, -1)
 			endif
 		endif
+	endif
+	if -1 != s:subwinid
+		call popup_close(s:subwinid)
+		let s:subwinid = -1
 	endif
 endfunction
 
