@@ -30,7 +30,7 @@ function! git#utils#get_popupwin_options() abort
 		let height = &lines - &cmdheight
 	endif
 	let width -= 2
-	let height -= 2
+	let height -= 4
 	if width < 4
 		let width = 4
 	endif
@@ -62,7 +62,7 @@ function! git#utils#get_popupwin_options() abort
 		call extend(opts, {
 			\ 'border': [],
 			\ 'borderhighlight': repeat(['PopupBorder'], 4),
-			\ 'borderchars': borderchars_typeA,
+			\ 'borderchars': borderchars_typeB,
 			\ }, 'force')
 	endif
 	return opts

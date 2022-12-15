@@ -8,16 +8,19 @@ let s:subwinid = get(s:, 'subwinid', -1)
 function! ff#main(q_bang) abort
 	let winid = popup_menu([], git#utils#get_popupwin_options())
 	let pos = popup_getpos(winid)
-	let s:subwinid = popup_create('text', {
+	let s:subwinid = popup_create('', {
 		\ 'line': pos['line'] - 3,
 		\ 'col': pos['col'],
 		\ 'padding': [0, 0, 0, 0],
 		\ 'border': [],
+		\ 'width': pos['width'] - 2,
+		\ 'minwidth': pos['width'] - 2,
+		\ 'title': ' SEARCH TEXT ',
 		\ 'highlight': 'Normal',
 		\ 'borderhighlight': repeat(['PopupBorder'], 4),
 		\ 'borderchars': [
-		\ nr2char(0x2500), nr2char(0x2502), nr2char(0x2500), nr2char(0x2502),
-		\ nr2char(0x250c), nr2char(0x2510), nr2char(0x2518), nr2char(0x2514)]
+		\   nr2char(0x2500), nr2char(0x2502), nr2char(0x2500), nr2char(0x2502),
+		\   nr2char(0x256d), nr2char(0x256e), nr2char(0x256f), nr2char(0x2570)]
 		\ })
 	if -1 != winid
 		let rootdir = git#utils#get_rootdir('.', 'git')
@@ -142,11 +145,11 @@ function! s:update_title(rootdir, winid) abort
 	if empty(get(getbufline(winbufnr(a:winid), 1), 0, ''))
 		let n = 0
 	endif
-	let text = empty(s:ctx['query']) ? printf(' %d files ', n) : (' ' .. s:ctx['query'] .. ' ')
-	if v:false
-		call popup_setoptions(a:winid, { 'title': text, })
+	if empty(s:ctx['query'])
+		call popup_hide(s:subwinid)
 	else
-		call popup_settext(s:subwinid, text)
+		call popup_show(s:subwinid)
+		call popup_settext(s:subwinid, ' ' .. s:ctx['query'] .. ' ')
 	endif
 endfunction
 
