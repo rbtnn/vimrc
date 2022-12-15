@@ -175,7 +175,7 @@ endif
 
 if has('vim_starting')
 	set termguicolors
-	colorscheme mycolorscheme
+	colorscheme fire
 else
 	" Check whether echo-messages are not disappeared when .vimrc is read.
 	echo '.vimrc has just read!'

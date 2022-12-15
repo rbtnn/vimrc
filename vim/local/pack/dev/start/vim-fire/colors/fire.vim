@@ -4,7 +4,7 @@ if exists("syntax_on")
 	syntax reset
 endif
 
-let g:colors_name = 'mycolorscheme'
+let g:colors_name = 'fire'
 
 if !(has('termguicolors') && &termguicolors) && !has('gui_running') && &t_Co != 256
 	finish
@@ -17,43 +17,54 @@ function! s:high(name, fg, ...) abort
 	execute printf('highlight! %s guifg=%s guibg=%s gui=%s cterm=%s', a:name, a:fg, bg, gui, cterm)
 endfunction
 
-let s:base_fg = '#dedede'
-let s:base_bg = '#10131a'
-let s:vim_border = '#000000'
-let s:popup_border = '#00ffff'
-let s:positive_color = '#cecece'
-let s:negative_color = '#444444'
-let s:color_1 = '#be4141'
-let s:color_2 = '#bebe41'
-let s:color_3 = '#41be41'
-let s:color_4 = '#55be55'
-let s:color_5 = '#555555'
+function! s:rgb(r, g, b, ...) abort
+	let r = float2nr(a:r * get(a:000, 0, 1.0))
+	let g = float2nr(a:g * get(a:000, 0, 1.0))
+	let b = float2nr(a:b * get(a:000, 0, 1.0))
+	return printf('#%02x%02x%02x', r > 255 ? 255 : r, g > 255 ? 255 : g, b > 255 ? 255 : b)
+endfunction
+
+function! s:accent_color(n) abort
+	return s:rgb(0xdc, 0x50, 0x50, a:n)
+endfunction
+
+let s:base_fg = s:rgb(204, 204, 204)
+let s:base_bg = s:rgb(8, 8, 8)
+let s:vim_border = s:rgb(15, 15, 15)
+let s:popup_border = s:accent_color(1.0)
+let s:positive_color = s:rgb(224, 224, 224)
+let s:negative_color = s:rgb(44, 44, 44)
+let s:added_color = s:rgb(0x55, 0xbe, 0x55, 0.8)
+let s:removed_color = s:accent_color(0.9)
+let s:search_color = s:accent_color(1.1)
+let s:color_1 = s:accent_color(0.9)
+let s:color_2 = s:accent_color(0.6)
 
 call s:high('Normal',           s:base_fg,            s:base_bg)
 
-call s:high('Search',           s:color_4,            'NONE',       'UNDERLINE,BOLD')
-call s:high('IncSearch',        s:color_4,            'NONE',       'BOLD')
+call s:high('Search',           s:search_color,            'NONE',       'UNDERLINE,BOLD')
+call s:high('IncSearch',        s:search_color,            'NONE',       'BOLD')
 
-call s:high('Statement',        s:color_2)
-call s:high('String',           s:color_1)
-call s:high('Constant',         s:color_1)
-call s:high('PreProc',          s:base_fg)
-call s:high('Keyword',          s:base_fg)
+call s:high('Statement',        s:color_1)
+call s:high('Keyword',          s:color_1)
+call s:high('Type',             s:color_1)
+call s:high('String',           s:color_2)
+call s:high('Constant',         s:color_2)
+call s:high('PreProc',          s:color_2)
 call s:high('Identifier',       s:base_fg)
 call s:high('Special',          s:base_fg)
-call s:high('Type',             s:base_fg)
 
-call s:high('Folded',           s:color_5)
-call s:high('SpecialKey',       s:color_5)
-call s:high('Comment',          s:color_5)
-call s:high('NonText',          s:color_5)
+call s:high('Folded',           s:negative_color)
+call s:high('SpecialKey',       s:negative_color)
+call s:high('Comment',          s:negative_color)
+call s:high('NonText',          s:negative_color)
 
 call s:high('Pmenu',            s:negative_color,     s:base_bg)
 call s:high('PmenuSel',         s:base_fg,            s:base_bg,    'UNDERLINE,BOLD')
 call s:high('PopupBorder',      s:popup_border)
 
-call s:high('diffAdded',        s:color_3)
-call s:high('diffRemoved',      s:color_1)
+call s:high('diffAdded',        s:added_color)
+call s:high('diffRemoved',      s:removed_color)
 
 call s:high('QuickFixLine',     'NONE',               'NONE',       'UNDERLINE,BOLD')
 
