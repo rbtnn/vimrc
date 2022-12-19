@@ -13,6 +13,7 @@
 				"vim-pkgsync",
 				"vim-qficonv",
 				"vim-textobj-string",
+				"vim-vimfmt",
 				"vim-vimscript_indentexpr",
 				"vim-vimscript_lasterror",
 				"vim-vimscript_tagfunc"
