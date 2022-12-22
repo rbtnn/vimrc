@@ -40,6 +40,7 @@ function! git#utils#get_popupwin_options() abort
   let opts = {
     \ 'wrap': 0,
     \ 'scrollbar': 0,
+    \ 'highlight': 'Normal',
     \ 'minwidth': width, 'maxwidth': width,
     \ 'minheight': height, 'maxheight': height,
     \ 'pos': 'center',

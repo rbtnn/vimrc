@@ -173,8 +173,59 @@ if s:is_installed('tyru/restart.vim')
 endif
 
 if has('vim_starting')
+  if has('tabsidebar')
+    function! s:TabSideBarLabel(text) abort
+      let rest = &tabsidebarcolumns - len(a:text)
+      if rest < 0
+        rest = 0
+      endif
+      return '%#TabSideBarLabel#' .. repeat(' ', rest / 2) .. a:text .. repeat(' ', rest / 2 + (rest % 2)) .. '%#TabSideBar#'
+    endfunction
+
+    function! TabSideBar() abort
+      let tnr = get(g:, 'actual_curtabpage', tabpagenr())
+      let lines = []
+      let lines += ['', s:TabSideBarLabel(printf(' TABPAGE %d ', tnr)), '']
+      for x in filter(getwininfo(), { i,x -> tnr == x['tabnr'] && ('popup' != win_gettype(x['winid']))})
+        let ft = getbufvar(x['bufnr'], '&filetype')
+        let bt = getbufvar(x['bufnr'], '&buftype')
+        let current = (tnr == tabpagenr()) && (x['winnr'] == winnr())
+        let high = (current ? '%#TabSideBarSel#' : '%#TabSideBar#')
+        let fname = fnamemodify(bufname(x['bufnr']), ':t')
+        let lines += [
+          \    high
+          \ .. ' '
+          \ .. (!empty(bt)
+          \      ? printf('[%s]', bt == 'nofile' ? ft : bt)
+          \      : (empty(bufname(x['bufnr']))
+          \          ? '[No Name]'
+          \          : fname))
+          \ .. (getbufvar(x['bufnr'], '&modified') && empty(bt) ? '[+]' : '')
+          \ ]
+      endfor
+      return join(lines, "\n")
+    endfunction
+    let g:tabsidebar_vertsplit = 0
+    set notabsidebaralign
+    set notabsidebarwrap
+    set showtabsidebar=2
+    set tabsidebarcolumns=16
+    set tabsidebar=%!TabSideBar()
+    for name in ['TabSideBar', 'TabSideBarFill', 'TabSideBarSel']
+      if !hlexists(name)
+        execute printf('highlight! %s guibg=NONE gui=NONE cterm=NONE', name)
+      endif
+    endfor
+  endif
   set termguicolors
-  colorscheme fire
+  autocmd vimrc ColorScheme      *
+    \ : highlight!       TabSideBar        guifg=#777777 guibg=#171717 gui=NONE cterm=NONE
+    \ | highlight!       TabSideBarFill    guifg=NONE    guibg=#171717 gui=NONE cterm=NONE
+    \ | highlight!       TabSideBarSel     guifg=#ffffff guibg=#171717 gui=NONE cterm=NONE
+    \ | highlight!       TabSideBarLabel   guifg=#00a700 guibg=#171717 gui=BOLD cterm=NONE
+    \ | highlight!       CursorIM          guifg=NONE    guibg=#d70000
+    \ | highlight!       PopupBorder       guifg=#88ee88 guibg=NONE
+  colorscheme habamax
 else
   " Check whether echo-messages are not disappeared when .vimrc is read.
   echo '.vimrc has just read!'
