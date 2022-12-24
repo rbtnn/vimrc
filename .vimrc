@@ -267,22 +267,8 @@ augroup ff-mrw
 augroup END
 
 function! s:ff() abort
-  let winid = popup_menu([], s:get_popupwin_options())
-  let pos = popup_getpos(winid)
-  let s:subwinid = popup_create('', {
-    \ 'line': pos['line'] - 3,
-    \ 'col': pos['col'],
-    \ 'padding': [0, 0, 0, 0],
-    \ 'border': [],
-    \ 'width': pos['width'] - 2,
-    \ 'minwidth': pos['width'] - 2,
-    \ 'title': ' SEARCH TEXT ',
-    \ 'highlight': 'Normal',
-    \ 'borderhighlight': repeat(['PopupBorder'], 4),
-    \ 'borderchars': [
-    \   nr2char(0x2500), nr2char(0x2502), nr2char(0x2500), nr2char(0x2502),
-    \   nr2char(0x256d), nr2char(0x256e), nr2char(0x256f), nr2char(0x2570)]
-    \ })
+  let winid = popup_menu([], s:get_popupwin_options_main())
+  let s:subwinid = popup_create('', s:get_popupwin_options_sub(winid))
   if -1 != winid
     let rootdir = s:get_rootdir('.', 'git')
 
@@ -609,9 +595,9 @@ function! s:job_exit_cb(rootdir, winid, ch, msg) abort
   call s:update_title(a:rootdir, a:winid)
 endfunction
 
-function! s:get_popupwin_options() abort
-  let width = get(g:, 'git_utils_popupwin_width', 120)
-  let height = get(g:, 'git_utils_popupwin_height', 30)
+function! s:get_popupwin_options_main() abort
+  let width = 120
+  let height = 30
   let d = 0
   if has('tabsidebar')
     if (2 == &showtabsidebar) || ((1 == &showtabsidebar) && (1 < tabpagenr('$')))
@@ -635,13 +621,26 @@ function! s:get_popupwin_options() abort
   let opts = {
     \ 'wrap': 0,
     \ 'scrollbar': 0,
-    \ 'highlight': 'Normal',
     \ 'minwidth': width, 'maxwidth': width,
     \ 'minheight': height, 'maxheight': height,
     \ 'pos': 'center',
-    \ 'border': [0, 0, 0, 0],
-    \ 'padding': [0, 0, 0, 0],
     \ }
+  return s:apply_popupwin_border(opts)
+endfunction
+
+function! s:get_popupwin_options_sub(main_winid) abort
+  let pos = popup_getpos(a:main_winid)
+  let opts = {
+    \ 'line': pos['line'] - 3,
+    \ 'col': pos['col'],
+    \ 'width': pos['width'] - 2,
+    \ 'minwidth': pos['width'] - 2,
+    \ 'title': ' SEARCH TEXT ',
+    \ }
+  return s:apply_popupwin_border(opts)
+endfunction
+
+function! s:apply_popupwin_border(opts) abort
   if has('gui_running') || (!has('win32') && !has('gui_running'))
     " ┌──┐
     " │  │
@@ -655,13 +654,15 @@ function! s:get_popupwin_options() abort
     const borderchars_typeB = [
       \ nr2char(0x2500), nr2char(0x2502), nr2char(0x2500), nr2char(0x2502),
       \ nr2char(0x256d), nr2char(0x256e), nr2char(0x256f), nr2char(0x2570)]
-    call extend(opts, {
+    call extend(a:opts, {
+      \ 'highlight': 'Normal',
       \ 'border': [],
+      \ 'padding': [0, 0, 0, 0],
       \ 'borderhighlight': repeat(['PopupBorder'], 4),
-      \ 'borderchars': borderchars_typeB,
+      \ 'borderchars': borderchars_typeA,
       \ }, 'force')
   endif
-  return opts
+  return a:opts
 endfunction
 
 function! s:get_rootdir(path, cmdname) abort
@@ -687,7 +688,7 @@ function! s:gitdiff(q_args) abort
     if empty(lines)
       echo 'No modified files!'
     else
-      let winid = popup_menu(lines, s:get_popupwin_options())
+      let winid = popup_menu(lines, s:get_popupwin_options_main())
       if -1 != winid
         call win_execute(winid, 'call clearmatches()')
         call win_execute(winid, 'call matchadd("diffAdded", "^\\zs\\d\\+\\ze")')
@@ -726,7 +727,7 @@ function! s:show_diff(rootdir, q_args, winid, lnum, stay) abort
   if !empty(path)
     let cmd = 'git --no-pager diff -w ' .. a:q_args .. ' -- ' .. path
     call s:open_gitdiffwindow(a:rootdir, cmd, a:stay)
-    call popup_setoptions(a:winid, s:get_popupwin_options())
+    call popup_setoptions(a:winid, s:get_popupwin_options_main())
   endif
 endfunction
 
