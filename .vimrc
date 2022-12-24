@@ -107,6 +107,21 @@ endif
 let &cedit = "\<C-q>"
 let g:vim_indent_cont = &g:shiftwidth
 
+function! s:is_installed(user_and_name) abort
+  let xs = split(a:user_and_name, '/')
+  return !empty(globpath($VIMRC_VIM, 'github/pack/' .. xs[0] .. '/*/' .. xs[1]))
+endfunction
+
+if s:is_installed('nathanaelkane/vim-indent-guides')
+  let g:indent_guides_enable_on_vim_startup = 1
+  let g:indent_guides_default_mapping = 0
+  let g:indent_guides_auto_colors = 0
+endif
+
+if s:is_installed('tyru/restart.vim')
+  let g:restart_sessionoptions = &sessionoptions
+endif
+
 if has('vim_starting')
   set hlsearch
   set laststatus=2
@@ -152,11 +167,6 @@ nnoremap <silent><C-p>    <Cmd>cprevious \| normal zz<cr>
 nnoremap <silent><space>  <Cmd>FF<cr>
 nnoremap <silent><C-g>    <Cmd>GitDiff<cr>
 
-function! s:is_installed(user_and_name) abort
-  let xs = split(a:user_and_name, '/')
-  return !empty(globpath($VIMRC_VIM, 'github/pack/' .. xs[0] .. '/*/' .. xs[1]))
-endfunction
-
 if s:is_installed('rbtnn/vim-textobj-string')
   nmap <silent>ds das
   nmap <silent>ys yas
@@ -167,55 +177,7 @@ if s:is_installed('rbtnn/vim-textobj-string')
   endif
 endif
 
-if s:is_installed('tyru/restart.vim')
-  let g:restart_sessionoptions = &sessionoptions
-endif
-
 if has('vim_starting')
-  if has('tabsidebar')
-    function! s:TabSideBarLabel(text) abort
-      let rest = &tabsidebarcolumns - len(a:text)
-      if rest < 0
-        rest = 0
-      endif
-      return '%#TabSideBarLabel#' .. repeat(' ', rest / 2) .. a:text .. repeat(' ', rest / 2 + (rest % 2)) .. '%#TabSideBar#'
-    endfunction
-
-    function! TabSideBar() abort
-      let tnr = get(g:, 'actual_curtabpage', tabpagenr())
-      let lines = []
-      let lines += ['', s:TabSideBarLabel(printf(' TABPAGE %d ', tnr)), '']
-      for x in filter(getwininfo(), { i,x -> tnr == x['tabnr'] && ('popup' != win_gettype(x['winid']))})
-        let ft = getbufvar(x['bufnr'], '&filetype')
-        let bt = getbufvar(x['bufnr'], '&buftype')
-        let current = (tnr == tabpagenr()) && (x['winnr'] == winnr())
-        let high = (current ? '%#TabSideBarSel#' : '%#TabSideBar#')
-        let fname = fnamemodify(bufname(x['bufnr']), ':t')
-        let lines += [
-          \    high
-          \ .. ' '
-          \ .. (!empty(bt)
-          \      ? printf('[%s]', bt == 'nofile' ? ft : bt)
-          \      : (empty(bufname(x['bufnr']))
-          \          ? '[No Name]'
-          \          : fname))
-          \ .. (getbufvar(x['bufnr'], '&modified') && empty(bt) ? '[+]' : '')
-          \ ]
-      endfor
-      return join(lines, "\n")
-    endfunction
-    let g:tabsidebar_vertsplit = 0
-    set notabsidebaralign
-    set notabsidebarwrap
-    set showtabsidebar=2
-    set tabsidebarcolumns=16
-    set tabsidebar=%!TabSideBar()
-    for name in ['TabSideBar', 'TabSideBarFill', 'TabSideBarSel']
-      if !hlexists(name)
-        execute printf('highlight! %s guibg=NONE gui=NONE cterm=NONE', name)
-      endif
-    endfor
-  endif
   set termguicolors
   if s:is_installed('itchyny/lightline.vim')
     let g:lightline = { 'colorscheme': 'apprentice' }
@@ -230,37 +192,56 @@ if has('vim_starting')
       \ | highlight!       PopupBorder       guifg=#87875f guibg=NONE
       \ | highlight!       diffRemoved       guifg=#af5f5f guibg=NONE
       \ | highlight!       diffAdded         guifg=#5f875f guibg=NONE
-
-    function! ColorIndents() abort
-      if exists('w:colorindents')
-        for x in w:colorindents
-          silent! call matchdelete(x)
-        endfor
-      endif
-      let w:colorindents = []
-      let indent = '\%(' .. repeat(' ', &shiftwidth) .. '\|\t\)'
-      for i in range(0, 10)
-        let w:colorindents += [
-          \ matchadd('Indent' .. (i % 2 + 1), '^' .. repeat(indent, i) .. '\zs' .. indent .. '\ze')
-          \ ]
-      endfor
-    endfunction
-    augroup color-indents
-      autocmd!
-      autocmd ColorScheme        *
-        \ : highlight!   Indent1     guifg=#3a3a3a guibg=#2a2a2a
-        \ | highlight!   Indent2     guifg=#3f3f3f guibg=#2f2f2f
-      autocmd BufEnter,WinEnter  *
-        \ : call ColorIndents()
-    augroup END
-
+      \ | highlight!       IndentGuidesOdd   guifg=#3a3a3a guibg=#2a2a2a
+      \ | highlight!       IndentGuidesEven  guifg=#3f3f3f guibg=#2f2f2f
     colorscheme apprentice
   endif
 endif
 
-" ------------------------------------------------
-"
-" ------------------------------------------------
+if has('tabsidebar')
+  function! s:TabSideBarLabel(text) abort
+    let rest = &tabsidebarcolumns - len(a:text)
+    if rest < 0
+      rest = 0
+    endif
+    return '%#TabSideBarLabel#' .. repeat(' ', rest / 2) .. a:text .. repeat(' ', rest / 2 + (rest % 2)) .. '%#TabSideBar#'
+  endfunction
+
+  function! TabSideBar() abort
+    let tnr = get(g:, 'actual_curtabpage', tabpagenr())
+    let lines = []
+    let lines += ['', s:TabSideBarLabel(printf(' TABPAGE %d ', tnr)), '']
+    for x in filter(getwininfo(), { i,x -> tnr == x['tabnr'] && ('popup' != win_gettype(x['winid']))})
+      let ft = getbufvar(x['bufnr'], '&filetype')
+      let bt = getbufvar(x['bufnr'], '&buftype')
+      let current = (tnr == tabpagenr()) && (x['winnr'] == winnr())
+      let high = (current ? '%#TabSideBarSel#' : '%#TabSideBar#')
+      let fname = fnamemodify(bufname(x['bufnr']), ':t')
+      let lines += [
+        \    high
+        \ .. ' '
+        \ .. (!empty(bt)
+        \      ? printf('[%s]', bt == 'nofile' ? ft : bt)
+        \      : (empty(bufname(x['bufnr']))
+        \          ? '[No Name]'
+        \          : fname))
+        \ .. (getbufvar(x['bufnr'], '&modified') && empty(bt) ? '[+]' : '')
+        \ ]
+    endfor
+    return join(lines, "\n")
+  endfunction
+  let g:tabsidebar_vertsplit = 0
+  set notabsidebaralign
+  set notabsidebarwrap
+  set showtabsidebar=2
+  set tabsidebarcolumns=16
+  set tabsidebar=%!TabSideBar()
+  for name in ['TabSideBar', 'TabSideBarFill', 'TabSideBarSel']
+    if !hlexists(name)
+      execute printf('highlight! %s guibg=NONE gui=NONE cterm=NONE', name)
+    endif
+  endfor
+endif
 
 command! -nargs=0                                  FF        :call s:ff()
 if executable('git')
@@ -306,7 +287,7 @@ function! s:ff() abort
     let rootdir = s:get_rootdir('.', 'git')
 
     call popup_setoptions(winid, {
-      \ 'filter': function('s:popup_filter', [rootdir]),
+      \ 'filter': function('s:common_popup_filter', ['ff', rootdir, '']),
       \ 'callback': function('s:popup_callback'),
       \ })
 
@@ -340,57 +321,95 @@ function! s:mrw_bufwritepost() abort
   endif
 endfunction
 
-function! s:popup_filter(rootdir, winid, key) abort
-  let xs = split(s:ctx['query'], '\zs')
+function! s:common_popup_filter(kind, rootdir, q_args, winid, key) abort
   let lnum = line('.', a:winid)
-  if 21 == char2nr(a:key)
-    " Ctrl-u
-    if 0 < len(xs)
-      call remove(xs, 0, -1)
-      let s:ctx['query'] = join(xs, '')
-      call s:update_lines(a:rootdir, a:winid)
-    endif
-    return 1
-  elseif 33 == char2nr(a:key)
-    " !
-    call s:create_context(a:rootdir, a:winid, v:true)
-    call s:update_lines(a:rootdir, a:winid)
-    return 1
-
-  elseif (10 == char2nr(a:key)) || (14 == char2nr(a:key))
-    " Ctrl-n or Ctrl-j
-    if lnum == line('$', a:winid)
-      call s:set_cursorline(a:winid, 1)
-    else
-      call s:set_cursorline(a:winid, lnum + 1)
-    endif
-    return 1
-  elseif (11 == char2nr(a:key)) || (16 == char2nr(a:key))
-    " Ctrl-p or Ctrl-k
-    if lnum == 1
+  if a:kind == 'gitdiff'
+    if (10 == char2nr(a:key)) || (14 == char2nr(a:key)) || (106 == char2nr(a:key))
+      " Ctrl-n or Ctrl-j or j
+      if lnum == line('$', a:winid)
+        call s:set_cursorline(a:winid, 1)
+      else
+        call s:set_cursorline(a:winid, lnum + 1)
+      endif
+      return 1
+    elseif (11 == char2nr(a:key)) || (16 == char2nr(a:key)) || (107 == char2nr(a:key))
+      " Ctrl-p or Ctrl-k or k
+      if lnum == 1
+        call s:set_cursorline(a:winid, line('$', a:winid))
+      else
+        call s:set_cursorline(a:winid, lnum - 1)
+      endif
+      return 1
+    elseif 100 == char2nr(a:key)
+      " d
+      call s:show_diff(a:rootdir, a:q_args, a:winid, line('.', a:winid), v:true)
+      return 1
+    elseif 71 == char2nr(a:key)
+      " G
       call s:set_cursorline(a:winid, line('$', a:winid))
-    else
-      call s:set_cursorline(a:winid, lnum - 1)
+      return 1
+    elseif 103 == char2nr(a:key)
+      " g
+      call s:set_cursorline(a:winid, 1)
+      return 1
+    elseif 0x0d == char2nr(a:key)
+      let path = s:resolve(a:rootdir, a:winid, lnum)
+      if !empty(path)
+        call s:open_file(path, -1)
+      endif
+      return popup_filter_menu(a:winid, "\<esc>")
     endif
-    return 1
-  elseif ("\x80kb" == a:key) || (8 == char2nr(a:key))
-    " Ctrl-h or bs
-    if 0 < len(xs)
-      call remove(xs, -1)
+  else
+    let xs = split(s:ctx['query'], '\zs')
+    if 21 == char2nr(a:key)
+      " Ctrl-u
+      if 0 < len(xs)
+        call remove(xs, 0, -1)
+        let s:ctx['query'] = join(xs, '')
+        call s:update_lines(a:rootdir, a:winid)
+      endif
+      return 1
+    elseif 33 == char2nr(a:key)
+      " !
+      call s:create_context(a:rootdir, a:winid, v:true)
+      call s:update_lines(a:rootdir, a:winid)
+      return 1
+    elseif (10 == char2nr(a:key)) || (14 == char2nr(a:key))
+      " Ctrl-n or Ctrl-j
+      if lnum == line('$', a:winid)
+        call s:set_cursorline(a:winid, 1)
+      else
+        call s:set_cursorline(a:winid, lnum + 1)
+      endif
+      return 1
+    elseif (11 == char2nr(a:key)) || (16 == char2nr(a:key))
+      " Ctrl-p or Ctrl-k
+      if lnum == 1
+        call s:set_cursorline(a:winid, line('$', a:winid))
+      else
+        call s:set_cursorline(a:winid, lnum - 1)
+      endif
+      return 1
+    elseif ("\x80kb" == a:key) || (8 == char2nr(a:key))
+      " Ctrl-h or bs
+      if 0 < len(xs)
+        call remove(xs, -1)
+        let s:ctx['query'] = join(xs, '')
+        call s:update_lines(a:rootdir, a:winid)
+      endif
+      return 1
+    elseif 0x20 == char2nr(a:key)
+      return popup_filter_menu(a:winid, "\<cr>")
+    elseif (0x21 <= char2nr(a:key)) && (char2nr(a:key) <= 0x7f)
+      let xs += [a:key]
       let s:ctx['query'] = join(xs, '')
       call s:update_lines(a:rootdir, a:winid)
+      return 1
+    elseif 0x0d == char2nr(a:key)
+      return popup_filter_menu(a:winid, "\<cr>")
     endif
-    return 1
-  elseif 0x20 == char2nr(a:key)
-    return popup_filter_menu(a:winid, "\<cr>")
-  elseif (0x21 <= char2nr(a:key)) && (char2nr(a:key) <= 0x7f)
-    let xs += [a:key]
-    let s:ctx['query'] = join(xs, '')
-    call s:update_lines(a:rootdir, a:winid)
-    return 1
-  elseif 0x0d == char2nr(a:key)
-    return popup_filter_menu(a:winid, "\<cr>")
-  elseif char2nr(a:key) < 0x20
+  endif
+  if char2nr(a:key) < 0x20
     return popup_filter_menu(a:winid, "\<esc>")
   else
     return popup_filter_menu(a:winid, a:key)
@@ -674,62 +693,11 @@ function! s:gitdiff(q_args) abort
         call win_execute(winid, 'call matchadd("diffAdded", "^\\zs\\d\\+\\ze")')
         call win_execute(winid, 'call matchadd("diffRemoved", "^\\d\\+\\s\\+\\zs\\d\\+\\ze")')
         call popup_setoptions(winid, {
-          \ 'filter': function('s:gitdiff_popup_filter', [rootdir, a:q_args]),
+          \ 'filter': function('s:common_popup_filter', ['gitdiff', rootdir, a:q_args]),
           \ 'callback': function('s:gitdiff_popup_callback', [rootdir, a:q_args]),
           \ })
       endif
     endif
-  endif
-endfunction
-
-function! s:gitdiff_popup_filter(rootdir, q_args, winid, key) abort
-  let lnum = line('.', a:winid)
-
-  if (10 == char2nr(a:key)) || (14 == char2nr(a:key)) || (106 == char2nr(a:key))
-    " Ctrl-n or Ctrl-j or j
-    if lnum == line('$', a:winid)
-      call s:set_cursorline(a:winid, 1)
-    else
-      call s:set_cursorline(a:winid, lnum + 1)
-    endif
-    return 1
-
-  elseif (11 == char2nr(a:key)) || (16 == char2nr(a:key)) || (107 == char2nr(a:key))
-    " Ctrl-p or Ctrl-k or k
-    if lnum == 1
-      call s:set_cursorline(a:winid, line('$', a:winid))
-    else
-      call s:set_cursorline(a:winid, lnum - 1)
-    endif
-    return 1
-
-  elseif 100 == char2nr(a:key)
-    " d
-    call s:show_diff(a:rootdir, a:q_args, a:winid, line('.', a:winid), v:true)
-    return 1
-
-  elseif 71 == char2nr(a:key)
-    " G
-    call s:set_cursorline(a:winid, line('$', a:winid))
-    return 1
-
-  elseif 103 == char2nr(a:key)
-    " g
-    call s:set_cursorline(a:winid, 1)
-    return 1
-
-  elseif 0x0d == char2nr(a:key)
-    let path = s:resolve(a:rootdir, a:winid, lnum)
-    if !empty(path)
-      call s:open_file(path, -1)
-    endif
-    return popup_filter_menu(a:winid, "\<esc>")
-
-  elseif char2nr(a:key) < 0x20
-    return popup_filter_menu(a:winid, "\<esc>")
-
-  else
-    return popup_filter_menu(a:winid, a:key)
   endif
 endfunction
 
