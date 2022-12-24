@@ -58,7 +58,7 @@ set ignorecase
 set incsearch
 set isfname-==
 set keywordprg=:help
-set list listchars=tab:\ \ \|,trail:-
+set list listchars=trail:-
 set matchpairs+=<:>
 set matchtime=1
 set nobackup
@@ -98,7 +98,6 @@ endif
 
 if has('persistent_undo')
   set undofile
-  " https://github.com/neovim/neovim/commit/6995fad260e3e7c49e4f9dc4b63de03989411c7b
   let &undodir = expand('$VIMRC_VIM/undofiles/vim')
   silent! call mkdir(&undodir, 'p')
 else
@@ -218,14 +217,45 @@ if has('vim_starting')
     endfor
   endif
   set termguicolors
-  autocmd vimrc ColorScheme      *
-    \ : highlight!       TabSideBar        guifg=#777777 guibg=#171717 gui=NONE cterm=NONE
-    \ | highlight!       TabSideBarFill    guifg=NONE    guibg=#171717 gui=NONE cterm=NONE
-    \ | highlight!       TabSideBarSel     guifg=#ffffff guibg=#171717 gui=NONE cterm=NONE
-    \ | highlight!       TabSideBarLabel   guifg=#00a700 guibg=#171717 gui=BOLD cterm=NONE
-    \ | highlight!       CursorIM          guifg=NONE    guibg=#d70000
-    \ | highlight!       PopupBorder       guifg=#88ee88 guibg=NONE
-  colorscheme habamax
+  if s:is_installed('itchyny/lightline.vim')
+    let g:lightline = { 'colorscheme': 'apprentice' }
+  endif
+  if s:is_installed('romainl/Apprentice')
+    autocmd vimrc ColorScheme      *
+      \ : highlight!       TabSideBar        guifg=#777777 guibg=#212121 gui=NONE cterm=NONE
+      \ | highlight!       TabSideBarFill    guifg=NONE    guibg=#212121 gui=NONE cterm=NONE
+      \ | highlight!       TabSideBarSel     guifg=#bcbcbc guibg=#212121 gui=NONE cterm=NONE
+      \ | highlight!       TabSideBarLabel   guifg=#5f875f guibg=#212121 gui=BOLD cterm=NONE
+      \ | highlight!       CursorIM          guifg=NONE    guibg=#d70000
+      \ | highlight!       PopupBorder       guifg=#87875f guibg=NONE
+      \ | highlight!       diffRemoved       guifg=#af5f5f guibg=NONE
+      \ | highlight!       diffAdded         guifg=#5f875f guibg=NONE
+
+    function! ColorIndents() abort
+      if exists('w:colorindents')
+        for x in w:colorindents
+          silent! call matchdelete(x)
+        endfor
+      endif
+      let w:colorindents = []
+      let indent = '\%(' .. repeat(' ', &shiftwidth) .. '\|\t\)'
+      for i in range(0, 10)
+        let w:colorindents += [
+          \ matchadd('Indent' .. (i % 2 + 1), '^' .. repeat(indent, i) .. '\zs' .. indent .. '\ze')
+          \ ]
+      endfor
+    endfunction
+    augroup color-indents
+      autocmd!
+      autocmd ColorScheme        *
+        \ : highlight!   Indent1     guifg=#3a3a3a guibg=#2a2a2a
+        \ | highlight!   Indent2     guifg=#3f3f3f guibg=#2f2f2f
+      autocmd BufEnter,WinEnter  *
+        \ : call ColorIndents()
+    augroup END
+
+    colorscheme apprentice
+  endif
 else
   " Check whether echo-messages are not disappeared when .vimrc is read.
   echo '.vimrc has just read!'

@@ -2,6 +2,9 @@
 	"packpath": "~/vim/github",
 	"plugins": {
 		"start": {
+			"itchyny": [
+				"lightline.vim"
+			],
 			"kana": [
 				"vim-operator-replace",
 				"vim-operator-user",
@@ -17,6 +20,9 @@
 				"vim-vimscript_indentexpr",
 				"vim-vimscript_lasterror",
 				"vim-vimscript_tagfunc"
+			],
+			"romainl": [
+				"Apprentice"
 			],
 			"thinca": [
 				"vim-qfreplace"
