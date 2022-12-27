@@ -18,6 +18,7 @@
 				"vim-gloaded",
 				"vim-pkgsync",
 				"vim-qficonv",
+				"vim-qfjob",
 				"vim-textobj-string",
 				"vim-vimfmt",
 				"vim-vimscript_indentexpr",
