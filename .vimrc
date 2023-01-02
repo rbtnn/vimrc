@@ -729,12 +729,13 @@ if has('popupwin')
   function! s:create_context(winid, force) abort
     let s:ctx = get(s:, 'ctx', {
       \ 'lines': [],
-      \ 'rootdir': gitdiff#get_rootdir(),
       \ 'lsfiles_caches': {},
+      \ 'rootdir': '',
       \ 'query': '',
       \ })
 
     let s:ctx['lines'] = []
+    let s:ctx['rootdir'] = gitdiff#get_rootdir()
 
     for path in s:read_mrwfile()
       call s:extend_line(s:ctx['lines'], path)
