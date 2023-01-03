@@ -54,7 +54,7 @@ set ignorecase
 set incsearch
 set isfname-==
 set keywordprg=:help
-set list listchars=tab:\ \ ,trail:-
+set list listchars=tab:\ \|,trail:-
 set matchpairs+=<:>
 set matchtime=1
 set nobackup
@@ -113,12 +113,6 @@ function! s:is_installed(user_and_name) abort
   return !empty(globpath($VIMRC_VIM, 'github/pack/' .. xs[0] .. '/*/' .. xs[1]))
 endfunction
 
-if s:is_installed('nathanaelkane/vim-indent-guides')
-  let g:indent_guides_enable_on_vim_startup = 1
-  let g:indent_guides_default_mapping = 0
-  let g:indent_guides_auto_colors = 0
-endif
-
 if s:is_installed('tyru/restart.vim')
   let g:restart_sessionoptions = &sessionoptions
 endif
@@ -176,7 +170,8 @@ if s:is_installed('rbtnn/vim-textobj-string')
 endif
 
 if s:is_installed('rbtnn/vim-gitdiff')
-  nnoremap <silent><C-g>    <Cmd>GitDiff -w<cr>
+  nnoremap <silent><C-s>    <Cmd>GitDiffNumStat -w<cr>
+  nnoremap <silent><C-g>    <Cmd>GitDiffVimDiffCurrent<cr>
 endif
 
 if s:is_installed('rbtnn/vim-qfjob')
@@ -359,21 +354,18 @@ endif
 if has('vim_starting')
   set termguicolors
   if s:is_installed('itchyny/lightline.vim')
-    let g:lightline = { 'colorscheme': 'apprentice' }
+    let g:lightline = { 'colorscheme': 'nightfly' }
   endif
-  if s:is_installed('romainl/Apprentice')
+  if s:is_installed('bluz71/vim-nightfly-colors')
     autocmd vimrc ColorScheme      *
-      \ : highlight!       TabSideBar        guifg=#777777 guibg=#212121 gui=NONE cterm=NONE
-      \ | highlight!       TabSideBarFill    guifg=NONE    guibg=#212121 gui=NONE cterm=NONE
-      \ | highlight!       TabSideBarSel     guifg=#bcbcbc guibg=#212121 gui=NONE cterm=NONE
-      \ | highlight!       TabSideBarLabel   guifg=#5f875f guibg=#212121 gui=BOLD cterm=NONE
+      \ : highlight!       TabSideBar        guifg=#777777 guibg=#2c3043 gui=NONE cterm=NONE
+      \ | highlight!       TabSideBarFill    guifg=NONE    guibg=#2c3043 gui=NONE cterm=NONE
+      \ | highlight!       TabSideBarSel     guifg=#bcbcbc guibg=#2c3043 gui=NONE cterm=NONE
+      \ | highlight!       TabSideBarLabel   guifg=#82aaff guibg=#2c3043 gui=BOLD cterm=NONE
       \ | highlight!       CursorIM          guifg=NONE    guibg=#d70000
-      \ | highlight!       PopupBorder       guifg=#87875f guibg=NONE
-      \ | highlight!       diffRemoved       guifg=#af5f5f guibg=NONE
-      \ | highlight!       diffAdded         guifg=#5f875f guibg=NONE
-      \ | highlight!       IndentGuidesOdd   guifg=#3a3a3a guibg=#2a2a2a
-      \ | highlight!       IndentGuidesEven  guifg=#3f3f3f guibg=#2f2f2f
-    colorscheme apprentice
+      \ | highlight!       PopupBorder       guifg=#82aaff guibg=NONE
+      \ | highlight!       SpecialKey        guifg=#223344 guibg=NONE
+    colorscheme nightfly
   endif
 endif
 

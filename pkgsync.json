@@ -2,6 +2,9 @@
 	"packpath": "~/vim/github",
 	"plugins": {
 		"start": {
+			"bluz71": [
+				"vim-nightfly-colors"
+			],
 			"itchyny": [
 				"lightline.vim"
 			],
@@ -9,9 +12,6 @@
 				"vim-operator-replace",
 				"vim-operator-user",
 				"vim-textobj-user"
-			],
-			"nathanaelkane": [
-				"vim-indent-guides"
 			],
 			"rbtnn": [
 				"vim-ambiwidth",
@@ -25,9 +25,6 @@
 				"vim-vimscript_indentexpr",
 				"vim-vimscript_lasterror",
 				"vim-vimscript_tagfunc"
-			],
-			"romainl": [
-				"Apprentice"
 			],
 			"thinca": [
 				"vim-qfreplace"
