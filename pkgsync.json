@@ -2,9 +2,6 @@
 	"packpath": "~/vim/github",
 	"plugins": {
 		"start": {
-			"bluz71": [
-				"vim-nightfly-colors"
-			],
 			"itchyny": [
 				"lightline.vim"
 			],
@@ -28,6 +25,9 @@
 			],
 			"thinca": [
 				"vim-qfreplace"
+			],
+			"tomasr": [
+				"molokai"
 			],
 			"tyru": [
 				"restart.vim"
