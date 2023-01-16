@@ -55,7 +55,7 @@ set ignorecase
 set incsearch
 set isfname-==
 set keywordprg=:help
-set list listchars=tab:\ \|,trail:-
+set list listchars=tab:\ \ \|,trail:-
 set matchpairs+=<:>
 set matchtime=1
 set nobackup
@@ -690,7 +690,6 @@ if has('popupwin')
 
     function! s:open_file(path, lnum) abort
         if s:can_open_in_current()
-            echo printf('edit %s', fnameescape(a:path))
             execute printf('edit %s', fnameescape(a:path))
         else
             execute printf('new %s', fnameescape(a:path))
