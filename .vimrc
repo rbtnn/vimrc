@@ -183,8 +183,9 @@ if s:is_installed('rbtnn/vim-qfjob')
     command! -nargs=*                                           RipGrep           :call s:ripgrep(<q-args>)
 
     if has('win32') && executable('msbuild')
-        command! -complete=customlist,MSBuildRunTaskComp -nargs=* MSBuildRunTask    :call s:msbuild_runtask(eval(g:msbuild_projectfile), <q-args>)
-        command!                                         -nargs=1 MSBuildNewProject :call s:msbuild_newproject(<q-args>)
+        command! -complete=customlist,MSBuildRunTaskComp -nargs=* MSBuildRunTask      :call s:msbuild_runtask(eval(g:msbuild_projectfile), <q-args>)
+        command!                                         -nargs=1 MSBuildNewProjectCS :call s:msbuild_newproject('cs', <q-args>)
+        command!                                         -nargs=1 MSBuildNewProjectVB :call s:msbuild_newproject('vb', <q-args>)
     endif
     let g:msbuild_projectfile = get(g:, 'msbuild_projectfile', "findfile('msbuild.xml', ';')")
 
@@ -297,7 +298,7 @@ if s:is_installed('rbtnn/vim-qfjob')
         return xs
     endfunction
 
-    function! s:msbuild_newproject(q_args) abort
+    function! s:msbuild_newproject(ext, q_args) abort
         const projectname = trim(a:q_args)
         if isdirectory(projectname)
             echohl Error
@@ -305,20 +306,37 @@ if s:is_installed('rbtnn/vim-qfjob')
             echohl None
         elseif projectname =~# '^[a-zA-Z0-9_-]\+$'
             call mkdir(expand(projectname .. '/src'), 'p')
-            call writefile([
-                \   "using System;",
-                \   "using System.IO;",
-                \   "using System.Text;",
-                \   "using System.Text.RegularExpressions;",
-                \   "using System.Collections.Generic;",
-                \   "using System.Linq;",
-                \   "",
-                \   "class Prog {",
-                \   "\tstatic void Main(string[] args) {",
-                \   "\t\tConsole.WriteLine(\"Hello\");",
-                \   "\t}",
-                \   "}",
-                \ ], expand(projectname .. '/src/Main.cs'))
+            if 'cs' == a:ext
+                call writefile([
+                    \   "using System;",
+                    \   "using System.IO;",
+                    \   "using System.Text;",
+                    \   "using System.Text.RegularExpressions;",
+                    \   "using System.Collections.Generic;",
+                    \   "using System.Linq;",
+                    \   "",
+                    \   "class Prog {",
+                    \   "\tstatic void Main(string[] args) {",
+                    \   "\t\tConsole.WriteLine(\"Hello\");",
+                    \   "\t}",
+                    \   "}",
+                    \ ], expand(projectname .. '/src/Main.cs'))
+            else
+                call writefile([
+                    \   "Imports System",
+                    \   "Imports System.IO",
+                    \   "Imports System.Text",
+                    \   "Imports System.Text.RegularExpressions",
+                    \   "Imports System.Collections.Generic",
+                    \   "Imports System.Linq",
+                    \   "",
+                    \   "Module Prog",
+                    \   "\tSub Main()",
+                    \   "\t\tCall Console.WriteLine(\"Hello\")",
+                    \   "\tEnd Sub",
+                    \   "End Module",
+                    \ ], expand(projectname .. '/src/Main.vb'))
+            endif
             call writefile([
                 \   "<Project ToolsVersion=\"4.0\" xmlns=\"http://schemas.microsoft.com/developer/msbuild/2003\">",
                 \   "\t<PropertyGroup>",
@@ -328,11 +346,11 @@ if s:is_installed('rbtnn/vim-qfjob')
                 \   "\t\t<References></References>",
                 \   "\t</PropertyGroup>",
                 \   "\t<ItemGroup>",
-                \   "\t\t<Compile Include=\"src\\*.cs\" />",
+                \   "\t\t<Compile Include=\"src\\*." .. a:ext .. "\" />",
                 \   "\t</ItemGroup>",
                 \   "\t<Target Name=\"Build\">",
                 \   "\t\t<MakeDir Directories=\"$(OutputPath)\" Condition=\"!Exists('$(OutputPath)')\" />",
-                \   "\t\t<Csc",
+                \   "\t\t<" .. (a:ext == 'cs' ? 'Csc' : 'Vbc'),
                 \   "\t\t\tSources=\"@(Compile)\"",
                 \   "\t\t\tTargetType=\"$(OutputType)\"",
                 \   "\t\t\tReferences=\"$(References)\"",
