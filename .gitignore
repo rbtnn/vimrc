@@ -1,4 +1,3 @@
-
 .CFUserTextEncoding
 .ICEauthority
 .Trash/
@@ -58,6 +57,7 @@
 .rnd
 .rustup/
 .sh_history
+.sqlite_history
 .ssh/
 .subversion/
 .sudo_as_admin_successful
@@ -115,12 +115,12 @@ _viminfo
 examples.desktop
 go/
 init.local.cmd
+nightlybuild-tabsidebar-for-windows/
 node_modules/
 ntuser.*
 python_games/
 tags
 tags-jp
-nightlybuild-tabsidebar-for-windows/
 vterm.lib
 yarn.lock
 スタート メニュー/

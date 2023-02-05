@@ -384,6 +384,7 @@ if has('vim_starting')
             \ | highlight!       TabSideBarFill           guifg=NONE    guibg=#2b2d2e gui=NONE cterm=NONE
             \ | highlight!       TabSideBarSel            guifg=#bcbcbc guibg=#2b2d2e gui=NONE cterm=NONE
             \ | highlight!       TabSideBarLabel          guifg=#66d9ff guibg=#2b2d2e gui=BOLD cterm=NONE
+            \ | highlight!       TabSideBarModified       guifg=#ff6666 guibg=#2b2d2e gui=BOLD cterm=NONE
             \ | highlight!       CursorIM                 guifg=NONE    guibg=#d70000
             \ | highlight!       LsFilesPopupBorder       guifg=#66d9ff guibg=NONE
             \ | highlight!       SpecialKey               guifg=#223344 guibg=NONE
@@ -416,16 +417,18 @@ if has('tabsidebar')
             let ft = getbufvar(x['bufnr'], '&filetype')
             let bt = getbufvar(x['bufnr'], '&buftype')
             let current = (tnr == tabpagenr()) && (x['winnr'] == winnr())
-            let high = (current ? '%#TabSideBarSel#' : '%#TabSideBar#')
+            let high1 = (current ? '%#TabSideBarSel#' : '%#TabSideBar#')
+            let high2 = '%#TabSideBarModified#'
             let fname = fnamemodify(bufname(x['bufnr']), ':t')
             let lines += [
-                \    high
+                \    high1
                 \ .. ' '
                 \ .. (!empty(bt)
                 \      ? printf('[%s]', bt == 'nofile' ? ft : bt)
                 \      : (empty(bufname(x['bufnr']))
                 \          ? '[No Name]'
                 \          : fname))
+                \ .. high2
                 \ .. (getbufvar(x['bufnr'], '&modified') && empty(bt) ? '[+]' : '')
                 \ ]
         endfor
