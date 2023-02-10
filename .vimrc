@@ -404,7 +404,7 @@ if has('tabsidebar')
     function! s:TabSideBarLabel(text) abort
         let rest = &tabsidebarcolumns - len(a:text)
         if rest < 0
-            rest = 0
+            let rest = 0
         endif
         return '%#TabSideBarLabel#' .. repeat(' ', rest / 2) .. a:text .. repeat(' ', rest / 2 + (rest % 2)) .. '%#TabSideBar#'
     endfunction
