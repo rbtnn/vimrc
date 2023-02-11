@@ -216,7 +216,7 @@ if s:is_installed('rbtnn/vim-qfjob')
     endfunction
 
     function s:iconv(text) abort
-        if exists('g:loaded_qficonv') && (len(a:text) < 500)
+        if has('win32') && exists('g:loaded_qficonv') && (len(a:text) < 500)
             return qficonv#encoding#iconv_utf8(a:text, 'shift_jis')
         else
             return a:text
