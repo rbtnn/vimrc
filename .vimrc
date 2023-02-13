@@ -160,6 +160,17 @@ cnoremap         <C-a>        <home>
 nnoremap <silent><C-n>    <Cmd>cnext \| normal zz<cr>
 nnoremap <silent><C-p>    <Cmd>cprevious \| normal zz<cr>
 
+if has('win32')
+    let g:vimrc_vcvarsall_batpath = get(g:, 'vimrc_vcvarsall_batpath', 'C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvarsall.bat')
+    function! s:TerminalWithVcvarsall(q_args) abort
+        call term_start(['cmd.exe', '/nologo', '/k', g:vimrc_vcvarsall_batpath, empty(a:q_args) ? 'x86' : a:q_args], {
+            \ })
+    endfunction
+    if filereadable(g:vimrc_vcvarsall_batpath)
+        command! -nargs=?     TerminalWithVcvarsall           :call s:TerminalWithVcvarsall(<q-args>)
+    endif
+endif
+
 if s:is_installed('rbtnn/vim-textobj-string')
     nmap <silent>ds das
     nmap <silent>ys yas
