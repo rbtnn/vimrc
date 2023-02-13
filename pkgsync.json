@@ -2,6 +2,9 @@
 	"packpath": "~/vim/github",
 	"plugins": {
 		"start": {
+			"haya14busa": [
+				"vim-operator-flashy"
+			],
 			"itchyny": [
 				"lightline.vim"
 			],
