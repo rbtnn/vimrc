@@ -2,6 +2,9 @@
 	"packpath": "~/vim/github",
 	"plugins": {
 		"start": {
+			"ajmwagar": [
+				"vim-deus"
+			],
 			"itchyny": [
 				"lightline.vim"
 			],
@@ -26,9 +29,6 @@
 			],
 			"thinca": [
 				"vim-qfreplace"
-			],
-			"tomasr": [
-				"molokai"
 			],
 			"tyru": [
 				"restart.vim"

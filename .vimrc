@@ -351,7 +351,7 @@ if s:is_installed('rbtnn/vim-qfjob')
             call writefile([
                 \   "<Project ToolsVersion=\"4.0\" xmlns=\"http://schemas.microsoft.com/developer/msbuild/2003\">",
                 \   "\t<PropertyGroup>",
-                \   "\t\t<AssemblyName>Main.exe</AssemblyName>",
+                \   "\t\t<AssemblyName>Prog.exe</AssemblyName>",
                 \   "\t\t<OutputPath>bin\\</OutputPath>",
                 \   "\t\t<OutputType>exe</OutputType>",
                 \   "\t\t<References></References>",
@@ -386,28 +386,24 @@ endif
 
 if has('vim_starting')
     set termguicolors
-    if s:is_installed('tomasr/molokai')
+    if s:is_installed('ajmwagar/vim-deus')
         if s:is_installed('itchyny/lightline.vim')
-            let g:lightline = { 'colorscheme': 'molokai' }
+            let g:lightline = { 'colorscheme': 'deus' }
         endif
         autocmd vimrc ColorScheme      *
             \ : highlight!       TabSideBar               guifg=#777777 guibg=#2b2d2e gui=NONE cterm=NONE
             \ | highlight!       TabSideBarFill           guifg=NONE    guibg=#2b2d2e gui=NONE cterm=NONE
             \ | highlight!       TabSideBarSel            guifg=#bcbcbc guibg=#2b2d2e gui=NONE cterm=NONE
-            \ | highlight!       TabSideBarLabel          guifg=#66d9ff guibg=#2b2d2e gui=BOLD cterm=NONE
+            \ | highlight!       TabSideBarLabel          guifg=#fe8019 guibg=#2b2d2e gui=BOLD cterm=NONE
             \ | highlight!       TabSideBarModified       guifg=#ff6666 guibg=#2b2d2e gui=BOLD cterm=NONE
             \ | highlight!       CursorIM                 guifg=NONE    guibg=#d70000
-            \ | highlight!       LsFilesPopupBorder       guifg=#66d9ff guibg=NONE
-            \ | highlight!       SpecialKey               guifg=#223344 guibg=NONE
-            \ | highlight! link  diffAdded         Identifier
-            \ | highlight! link  diffRemoved       Special
-            \ | highlight!       DiffText                                      gui=NONE
-            \ | highlight!       Macro                                         gui=NONE
-            \ | highlight!       SpecialKey                                    gui=NONE
-            \ | highlight!       Special                                       gui=NONE
-            \ | highlight!       StorageClass                                  gui=NONE
-            \ | highlight!       Tag                                           gui=NONE
-        colorscheme molokai
+            \ | highlight! link  LsFilesPopupBorder       deusOrange
+            \ | highlight! link  StatusLine               deusOrange
+            \ | highlight! link  StatusLineNC             deusBlue
+            \ | highlight! link  StatusLineTerm           deusOrange
+            \ | highlight! link  StatusLineTermNC         deusBlue
+        let g:deus_italic = 0
+        colorscheme deus
     endif
 endif
 
