@@ -5,6 +5,9 @@
 			"ajmwagar": [
 				"vim-deus"
 			],
+			"haya14busa": [
+				"vim-operator-flashy"
+			],
 			"itchyny": [
 				"lightline.vim"
 			],

@@ -175,10 +175,16 @@ if s:is_installed('rbtnn/vim-textobj-string')
     nmap <silent>ds das
     nmap <silent>ys yas
     nmap <silent>vs vas
-    if s:is_installed('kana/vim-operator-replace')
-        nmap <silent>s   <Plug>(operator-replace)
-        nmap <silent>ss  <Plug>(operator-replace)as
-    endif
+endif
+
+if s:is_installed('kana/vim-operator-replace')
+    nmap <silent>s   <Plug>(operator-replace)
+    nmap <silent>ss  <Plug>(operator-replace)as
+endif
+
+if s:is_installed('haya14busa/vim-operator-flashy')
+    map  <silent>y   <Plug>(operator-flashy)
+    nmap <silent>Y   <Plug>(operator-flashy)$
 endif
 
 if s:is_installed('rbtnn/vim-lsfiles')
