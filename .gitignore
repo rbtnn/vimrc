@@ -63,6 +63,7 @@
 .sudo_as_admin_successful
 .templateengine/
 .themes/
+.thumbnails/
 .vim/
 .viminfo
 .vimrc.*
@@ -98,6 +99,8 @@ MicrosoftEdgeBackups/
 Movies/
 Music/
 My Documents/
+My project (1)/
+My project/
 NetHood/
 OneDrive/
 Pictures/
@@ -121,6 +124,7 @@ ntuser.*
 python_games/
 tags
 tags-jp
+vrchat-avatars/
 vterm.lib
 yarn.lock
 スタート メニュー/
