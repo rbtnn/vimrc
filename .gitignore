@@ -122,6 +122,7 @@ nightlybuild-tabsidebar-for-windows/
 node_modules/
 ntuser.*
 python_games/
+source/
 tags
 tags-jp
 vrchat-avatars/
