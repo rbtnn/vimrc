@@ -18,14 +18,14 @@
 			],
 			"rbtnn": [
 				"vim-ambiwidth",
+				"vim-colors-github",
 				"vim-gitdiff",
 				"vim-gloaded",
-				"vim-mrw",
+				"vim-lsfiles",
 				"vim-pkgsync",
 				"vim-qficonv",
 				"vim-qfjob",
 				"vim-textobj-string",
-				"vim-vimfmt",
 				"vim-vimscript_indentexpr",
 				"vim-vimscript_lasterror",
 				"vim-vimscript_tagfunc"
