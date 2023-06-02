@@ -40,8 +40,8 @@ if s:is_installed('haya14busa/vim-operator-flashy')
     nmap <silent>Y   <Plug>(operator-flashy)$
 endif
 
-if s:is_installed('rbtnn/vim-mrw')
-    nnoremap <silent><space>  <Cmd>MRW -filename-only<cr>
+if s:is_installed('rbtnn/vim-lsfiles')
+    nnoremap <silent><space>  <Cmd>LsFiles<cr>
 endif
 
 if s:is_installed('rbtnn/vim-gitdiff')
@@ -49,7 +49,7 @@ if s:is_installed('rbtnn/vim-gitdiff')
 endif
 
 if has('vim_starting')
-    if s:is_installed('ajmwagar/vim-deus')
+    if 0 && s:is_installed('ajmwagar/vim-deus')
         if s:is_installed('itchyny/lightline.vim')
             let g:lightline = { 'colorscheme': 'deus' }
         endif
@@ -67,6 +67,24 @@ if has('vim_starting')
             \ | highlight! link  StatusLineTermNC         deusBlue
         let g:deus_italic = 0
         colorscheme deus
+    endif
+    if s:is_installed('rbtnn/vim-colors-github')
+        if s:is_installed('itchyny/lightline.vim')
+            let g:lightline = { 'colorscheme': 'github' }
+        endif
+        autocmd vimrc-plugins ColorScheme      *
+            \ : highlight!       TabSideBar               guifg=#777777 guibg=#2b2d2e gui=NONE cterm=NONE
+            \ | highlight!       TabSideBarFill           guifg=NONE    guibg=#2b2d2e gui=NONE cterm=NONE
+            \ | highlight!       TabSideBarSel            guifg=#bcbcbc guibg=#2b2d2e gui=NONE cterm=NONE
+            \ | highlight!       TabSideBarLabel          guifg=#fe8019 guibg=#2b2d2e gui=BOLD cterm=NONE
+            \ | highlight!       TabSideBarModified       guifg=#ff6666 guibg=#2b2d2e gui=BOLD cterm=NONE
+            \ | highlight!       CursorIM                 guifg=NONE    guibg=#d70000
+            \ | highlight!       Comment                  guifg=#bbbbbb guibg=NONE
+            \ | highlight!       Error                    guifg=#d73a49 guibg=NONE
+            \ | highlight! link  LsFilesPopupBorder       Type
+        set background=light
+        let g:github_colors_soft = 0
+        colorscheme github
     endif
 endif
 
