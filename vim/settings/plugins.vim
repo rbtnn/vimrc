@@ -41,11 +41,12 @@ if s:is_installed('haya14busa/vim-operator-flashy')
 endif
 
 if s:is_installed('rbtnn/vim-lsfiles')
+    let g:lsfiles_height = 20
     nnoremap <silent><space>  <Cmd>LsFiles<cr>
 endif
 
 if s:is_installed('rbtnn/vim-gitdiff')
-    nnoremap <silent><C-s>    <Cmd>execute 'GitDiffNumStat' get(g:, 'gitdiff_args', '-w')<cr>
+    nnoremap <silent><C-s>    <Cmd>GitDiffNumStat -w<cr>
 endif
 
 if has('vim_starting')
@@ -81,7 +82,7 @@ if has('vim_starting')
             \ | highlight!       CursorIM                 guifg=NONE    guibg=#d70000
             \ | highlight!       Comment                  guifg=#bbbbbb guibg=NONE
             \ | highlight!       Error                    guifg=#d73a49 guibg=NONE
-            \ | highlight! link  LsFilesPopupBorder       Type
+            \ | highlight! link  LsFilesPopupBorder       Question
         set background=light
         let g:github_colors_soft = 0
         colorscheme github

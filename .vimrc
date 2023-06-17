@@ -9,6 +9,15 @@ if has('vim_starting')
     set packpath=$VIMRC_VIM/local,$VIMRC_VIM/github
     set runtimepath=$VIMRUNTIME
 
+    if has('win32') && has('gui_running')
+        " https://github.com/yuru7/udev-gothic
+        set guifont=UDEV_Gothic:h12:cSHIFTJIS:qDRAFT
+        set linespace=0
+    endif
+    if !filereadable(expand('%'))
+        cd ~
+    endif
+
     silent! source ~/.vimrc.local
 
     filetype plugin indent on
