@@ -20,6 +20,7 @@ set complete-=t
 set completeslash=slash
 set diffopt+=iwhiteall
 set expandtab shiftwidth=4 tabstop=4
+set fileencodings=ucs-bom,utf-8,cp932
 set fileformats=unix,dos
 set foldlevelstart=999
 set foldmethod=indent
