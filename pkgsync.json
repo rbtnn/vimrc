@@ -16,11 +16,15 @@
 				"vim-operator-user",
 				"vim-textobj-user"
 			],
+			"ntpeters": [
+				"vim-better-whitespace"
+			],
 			"rbtnn": [
 				"vim-ambiwidth",
 				"vim-colors-github",
 				"vim-gitdiff",
 				"vim-gloaded",
+				"vim-lseek",
 				"vim-lsfiles",
 				"vim-pkgsync",
 				"vim-qficonv",
@@ -32,6 +36,9 @@
 			],
 			"thinca": [
 				"vim-qfreplace"
+			],
+			"tomasr": [
+				"molokai"
 			],
 			"tyru": [
 				"restart.vim"
