@@ -1,0 +1,1 @@
+ssh-keygen -t ed25519 -C "naru123456789@gmail.com"

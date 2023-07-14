@@ -63,6 +63,8 @@ if has('vim_starting')
             \ | highlight!       CursorIM                 guifg=NONE    guibg=#d70000
             \ | highlight! link  LsFilesPopupBorder       WildMenu
             \ | highlight!       Special                                              gui=NONE
+            \ | highlight!       Macro                                                gui=NONE
+            \ | highlight!       StorageClass                                         gui=NONE
             \ | highlight! link  DiffAdd                  Identifier
             \ | highlight! link  DiffDelete               Special
         colorscheme molokai

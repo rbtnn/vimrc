@@ -14,9 +14,6 @@ if has('vim_starting')
         set guifont=UDEV_Gothic:h12:cSHIFTJIS:qDRAFT
         set linespace=0
     endif
-    if !filereadable(expand('%'))
-        cd ~
-    endif
 
     silent! source ~/.vimrc.local
 
