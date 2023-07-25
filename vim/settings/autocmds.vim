@@ -15,9 +15,9 @@ augroup vimrc-autocmds
         \ |     execute printf('silent! delcommand %s', s:cmdname)
         \ | endfor
         \ | unlet s:cmdname
-    autocmd InsertEnter     *
+    autocmd InsertEnter            *
         \ : set noimdisable
-    autocmd InsertLeave     *
+    autocmd InsertLeave,VimEnter   *
         \ : set imdisable
     autocmd FileType help :setlocal colorcolumn=78
 augroup END
