@@ -22,7 +22,7 @@ cnoremap         <C-f>        <right>
 cnoremap         <C-e>        <end>
 cnoremap         <C-a>        <home>
 
-nnoremap <silent><C-n>    <Cmd>cnext \| normal zz<cr>
+nnoremap <silent><C-n>    <Cmd>cnext     \| normal zz<cr>
 nnoremap <silent><C-p>    <Cmd>cprevious \| normal zz<cr>
 
 nnoremap <silent><C-j>         gt

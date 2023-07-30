@@ -61,14 +61,16 @@ if has('vim_starting')
             \ | highlight!       TabSideBarLabel          guifg=#fe8019 guibg=#2b2d2e gui=BOLD cterm=NONE
             \ | highlight!       TabSideBarModified       guifg=#ff6666 guibg=#2b2d2e gui=BOLD cterm=NONE
             \ | highlight!       CursorIM                 guifg=NONE    guibg=#d70000
-            \ | highlight! link  LsFilesPopupBorder       WildMenu
+            \ | highlight!       LsFilesPopupBorder       guifg=#a6e22e guibg=NONE    gui=BOLD cterm=NONE
             \ | highlight!       Special                                              gui=NONE
             \ | highlight!       Macro                                                gui=NONE
             \ | highlight!       StorageClass                                         gui=NONE
             \ | highlight! link  DiffAdd                  Identifier
             \ | highlight! link  DiffDelete               Special
         colorscheme molokai
-    elseif s:is_installed('ajmwagar/vim-deus')
+    endif
+
+    if v:false && s:is_installed('ajmwagar/vim-deus')
         if s:is_installed('itchyny/lightline.vim')
             let g:lightline = { 'colorscheme': 'deus' }
         endif
@@ -86,7 +88,9 @@ if has('vim_starting')
             \ | highlight! link  StatusLineTermNC         deusBlue
         let g:deus_italic = 0
         colorscheme deus
-    elseif s:is_installed('rbtnn/vim-colors-github')
+    endif
+
+    if v:false && s:is_installed('rbtnn/vim-colors-github')
         if s:is_installed('itchyny/lightline.vim')
             let g:lightline = { 'colorscheme': 'github' }
         endif
@@ -107,40 +111,6 @@ if has('vim_starting')
 endif
 
 if s:is_installed('rbtnn/vim-qfjob')
-    command! -nargs=*                                           GitGrep           :call s:gitgrep(<q-args>)
-    command! -nargs=*                                           RipGrep           :call s:ripgrep(<q-args>)
-
-    if has('win32') && executable('msbuild')
-        command! -complete=customlist,MSBuildRunTaskComp -nargs=* MSBuild      :call s:msbuild(eval(g:msbuild_projectfile), <q-args>)
-    endif
-    let g:msbuild_projectfile = get(g:, 'msbuild_projectfile', "findfile('msbuild.xml', ';')")
-
-    function! s:gitgrep(q_args) abort
-        let cmd = ['git', '--no-pager', 'grep', '--no-color', '-n', '--column'] + split(a:q_args, '\s\+')
-        call qfjob#start(cmd, {
-            \ 'title': 'git grep',
-            \ 'line_parser': function('s:gitgrep_line_parser'),
-            \ })
-    endfunction
-
-    function s:gitgrep_line_parser(line) abort
-        let m = matchlist(a:line, '^\(.\{-\}\):\(\d\+\):\(\d\+\):\(.*\)$')
-        if !empty(m)
-            let path = m[1]
-            if !filereadable(path) && (path !~# '^[A-Z]:')
-                let path = expand(fnamemodify(path, ':h') .. '/' .. m[1])
-            endif
-            return {
-                \ 'filename': s:iconv(path),
-                \ 'lnum': m[2],
-                \ 'col': m[3],
-                \ 'text': s:iconv(m[4]),
-                \ }
-        else
-            return { 'text': s:iconv(a:line), }
-        endif
-    endfunction
-
     function s:iconv(text) abort
         if has('win32') && exists('g:loaded_qficonv') && (len(a:text) < 500)
             return qficonv#encoding#iconv_utf8(a:text, 'shift_jis')
@@ -149,78 +119,117 @@ if s:is_installed('rbtnn/vim-qfjob')
         endif
     endfunction
 
-    function! s:ripgrep(q_args) abort
-        let cmd = ['rg', '--vimgrep', '--glob', '!.git', '--glob', '!.svn', '--glob', '!node_modules', '-uu'] + split(a:q_args, '\s\+') + (has('win32') ? ['.\'] : ['.'])
-        call qfjob#start(cmd, {
-            \ 'title': 'ripgrep',
-            \ 'line_parser': function('s:ripgrep_line_parser'),
-            \ })
-    endfunction
+    if executable('git')
+        command! -nargs=*                                           GitGrep      :call s:gitgrep(<q-args>)
 
-    function s:ripgrep_line_parser(line) abort
-        let m = matchlist(a:line, '^\s*\(.\{-\}\):\(\d\+\):\(\d\+\):\(.*\)$')
-        if !empty(m)
-            let path = m[1]
-            if !filereadable(path) && (path !~# '^[A-Z]:')
-                let path = expand(fnamemodify(m[5], ':h') .. '/' .. m[1])
-            endif
-            return {
-                \ 'filename': s:iconv(path),
-                \ 'lnum': m[2],
-                \ 'col': m[3],
-                \ 'text': s:iconv(m[4]),
-                \ }
-        else
-            return { 'text': s:iconv(a:line), }
-        endif
-    endfunction
+        function! s:gitgrep(q_args) abort
+            let cmd = ['git', '--no-pager', 'grep', '--no-color', '-n', '--column'] + split(a:q_args, '\s\+')
+            call qfjob#start(cmd, {
+                \ 'title': 'git grep',
+                \ 'line_parser': function('s:gitgrep_line_parser'),
+                \ })
+        endfunction
 
-    function! s:msbuild(projectfile, args) abort
-        if type([]) == type(a:args)
-            let cmd = ['msbuild']
-            if filereadable(a:projectfile)
-                let cmd += ['/nologo', a:projectfile] + a:args
-            else
-                let cmd += ['/nologo'] + a:args
-            endif
-        else
-            let cmd = printf('msbuild /nologo %s %s', a:args, a:projectfile)
-        endif
-        call qfjob#start(cmd, {
-            \ 'title': 'msbuild',
-            \ 'line_parser': function('s:msbuild_runtask_line_parser', [a:projectfile]),
-            \ })
-    endfunction
-
-    function s:msbuild_runtask_line_parser(projectfile, line) abort
-        let m = matchlist(a:line, '^\s*\([^(]\+\)(\(\d\+\),\(\d\+\)): \(.*\)$')
-        if !empty(m)
-            let path = m[1]
-            if !filereadable(path) && (path !~# '^[A-Z]:')
-                let path = expand(fnamemodify(a:projectfile, ':h') .. '/' .. m[1])
-            endif
-            return {
-                \ 'filename': s:iconv(path),
-                \ 'lnum': m[2],
-                \ 'col': m[3],
-                \ 'text': s:iconv(m[4]),
-                \ }
-        else
-            return { 'text': s:iconv(a:line), }
-        endif
-    endfunction
-
-    function! MSBuildRunTaskComp(A, L, P) abort
-        let xs = []
-        let path = eval(g:msbuild_projectfile)
-        if filereadable(path)
-            for line in readfile(path)
-                let m = matchlist(line, '<Target\s\+Name="\([^"]\+\)"')
-                if !empty(m)
-                    let xs += ['/t:' .. m[1]]
+        function s:gitgrep_line_parser(line) abort
+            let m = matchlist(a:line, '^\(.\{-\}\):\(\d\+\):\(\d\+\):\(.*\)$')
+            if !empty(m)
+                let path = m[1]
+                if !filereadable(path) && (path !~# '^[A-Z]:')
+                    let path = expand(fnamemodify(path, ':h') .. '/' .. m[1])
                 endif
-            endfor
-        endif
-        return xs
-    endfunction
+                return {
+                    \ 'filename': s:iconv(path),
+                    \ 'lnum': m[2],
+                    \ 'col': m[3],
+                    \ 'text': s:iconv(m[4]),
+                    \ }
+            else
+                return { 'text': s:iconv(a:line), }
+            endif
+        endfunction
+    endif
+
+    if executable('rg')
+        command! -nargs=*                                           RipGrep      :call s:ripgrep(<q-args>)
+
+        function! s:ripgrep(q_args) abort
+            let cmd = ['rg', '--vimgrep', '--glob', '!.git', '--glob', '!.svn', '--glob', '!node_modules', '-uu'] + split(a:q_args, '\s\+') + (has('win32') ? ['.\'] : ['.'])
+            call qfjob#start(cmd, {
+                \ 'title': 'ripgrep',
+                \ 'line_parser': function('s:ripgrep_line_parser'),
+                \ })
+        endfunction
+
+        function s:ripgrep_line_parser(line) abort
+            let m = matchlist(a:line, '^\s*\(.\{-\}\):\(\d\+\):\(\d\+\):\(.*\)$')
+            if !empty(m)
+                let path = m[1]
+                if !filereadable(path) && (path !~# '^[A-Z]:')
+                    let path = expand(fnamemodify(m[5], ':h') .. '/' .. m[1])
+                endif
+                return {
+                    \ 'filename': s:iconv(path),
+                    \ 'lnum': m[2],
+                    \ 'col': m[3],
+                    \ 'text': s:iconv(m[4]),
+                    \ }
+            else
+                return { 'text': s:iconv(a:line), }
+            endif
+        endfunction
+    endif
+
+    if has('win32') && executable('msbuild')
+        command! -nargs=* -complete=customlist,MSBuildRunTaskComp   MSBuild      :call s:msbuild(eval(g:msbuild_projectfile), <q-args>)
+        let g:msbuild_projectfile = get(g:, 'msbuild_projectfile', "findfile('msbuild.xml', ';')")
+
+        function! s:msbuild(projectfile, args) abort
+            if type([]) == type(a:args)
+                let cmd = ['msbuild']
+                if filereadable(a:projectfile)
+                    let cmd += ['/nologo', a:projectfile] + a:args
+                else
+                    let cmd += ['/nologo'] + a:args
+                endif
+            else
+                let cmd = printf('msbuild /nologo %s %s', a:args, a:projectfile)
+            endif
+            call qfjob#start(cmd, {
+                \ 'title': 'msbuild',
+                \ 'line_parser': function('s:msbuild_runtask_line_parser', [a:projectfile]),
+                \ })
+        endfunction
+
+        function s:msbuild_runtask_line_parser(projectfile, line) abort
+            let m = matchlist(a:line, '^\s*\([^(]\+\)(\(\d\+\),\(\d\+\)): \(.*\)$')
+            if !empty(m)
+                let path = m[1]
+                if !filereadable(path) && (path !~# '^[A-Z]:')
+                    let path = expand(fnamemodify(a:projectfile, ':h') .. '/' .. m[1])
+                endif
+                return {
+                    \ 'filename': s:iconv(path),
+                    \ 'lnum': m[2],
+                    \ 'col': m[3],
+                    \ 'text': s:iconv(m[4]),
+                    \ }
+            else
+                return { 'text': s:iconv(a:line), }
+            endif
+        endfunction
+
+        function! MSBuildRunTaskComp(A, L, P) abort
+            let xs = []
+            let path = eval(g:msbuild_projectfile)
+            if filereadable(path)
+                for line in readfile(path)
+                    let m = matchlist(line, '<Target\s\+Name="\([^"]\+\)"')
+                    if !empty(m)
+                        let xs += ['/t:' .. m[1]]
+                    endif
+                endfor
+            endif
+            return xs
+        endfunction
+    endif
 endif
