@@ -44,8 +44,7 @@ for s:plugin in s:installed_plugins
         let s:x = split(s:setting, '[\/]')[-1]
         let s:y = split(s:plugin, '[\/]')[-1]
         if (s:x == s:y .. '.vim') || (s:x == s:y)
-            echo 'source' s:x
-            execute 'source' s:x
+            execute 'source' s:setting
         endif
     endfor
 endfor
