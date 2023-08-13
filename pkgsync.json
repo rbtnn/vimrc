@@ -2,9 +2,6 @@
 	"packpath": "~/vim/github",
 	"plugins": {
 		"start": {
-			"ajmwagar": [
-				"vim-deus"
-			],
 			"haya14busa": [
 				"vim-operator-flashy"
 			],
@@ -16,12 +13,14 @@
 				"vim-operator-user",
 				"vim-textobj-user"
 			],
+			"mattn": [
+				"vim-molder"
+			],
 			"ntpeters": [
 				"vim-better-whitespace"
 			],
 			"rbtnn": [
 				"vim-ambiwidth",
-				"vim-colors-github",
 				"vim-gitdiff",
 				"vim-gloaded",
 				"vim-lseek",
