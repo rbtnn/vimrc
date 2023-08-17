@@ -7,6 +7,10 @@ let s:delcmds = [
     \ 'StripWhitespaceOnChangedLines', 'ToggleStripWhitespaceOnSave', 'ToggleWhitespace',
     \ ]
 
+augroup vimrc-plugins
+    autocmd!
+augroup END
+
 augroup vimrc-autocmds
     autocmd!
     " Delete unused commands, because it's an obstacle on cmdline-completion.

@@ -6,7 +6,8 @@
 				"vim-operator-flashy"
 			],
 			"itchyny": [
-				"lightline.vim"
+				"lightline.vim",
+				"vim-parenmatch"
 			],
 			"kana": [
 				"vim-operator-replace",
