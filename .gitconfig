@@ -1,3 +1,9 @@
+#[url "git@github.com:"]
+#    pushInsteadOf = git://github.com/
+#    pushInsteadOf = https://github.com/
+#
+#[credential]
+#    helper = wincred
 
 [user]
 	name = rbtnn
@@ -19,12 +25,10 @@
 	ci=commit
 	co=checkout
 	ls=ls-files
-	lg=log --pretty=\"format:%C(yellow)%h %C(green)%cd %C(reset)%s\" --date=iso
+	lg=log -10 --pretty=\"format:%C(yellow)%h %C(green)%cd %C(reset)%s\" --date=iso
 	po=push -u origin
 	st=status
 	fu=fetch upstream
-	mumr=merge upstream/master
-	mumn=merge upstream/main
 
 [color]
 	diff = true
@@ -41,15 +45,6 @@
 [include]
 	path = ~/.gitconfig.local
 
-#[url "git@github.com:"]
-#    pushInsteadOf = git://github.com/
-#    pushInsteadOf = https://github.com/
-#
-#[credential]
-#    helper = wincred
-
-[filter "lfs"]
-	required = true
-	clean = git-lfs clean -- %f
-	smudge = git-lfs smudge -- %f
-	process = git-lfs filter-process
+[pager]
+	log = false
+	diff = false
