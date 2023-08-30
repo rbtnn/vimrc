@@ -1,10 +1,8 @@
 if has('vim_starting')
     autocmd vimrc-plugins ColorScheme      *
         \ : highlight!       TabSideBar               guifg=#777777 guibg=#2b2d2e gui=NONE cterm=NONE
-        \ | highlight!       TabSideBarLabel          guifg=#de6009 guibg=#2b2d2e gui=NONE cterm=NONE
         \ | highlight!       TabSideBarCurTab         guifg=#777777 guibg=#3b3d3e gui=NONE cterm=NONE
         \ | highlight!       TabSideBarCurTabSel      guifg=#bcbcbc guibg=#3b3d3e gui=BOLD cterm=NONE
-        \ | highlight!       TabSideBarCurTabLabel    guifg=#fe8019 guibg=#3b3d3e gui=BOLD cterm=NONE
         \ | highlight!       TabSideBarFill           guifg=NONE    guibg=#2b2d2e gui=NONE cterm=NONE
         \ | highlight!       CursorIM                 guifg=NONE    guibg=#d70000
         \ | highlight!       LsFilesPopupBorder       guifg=#3b3d3e guibg=NONE    gui=BOLD cterm=NONE

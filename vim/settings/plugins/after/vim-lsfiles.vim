@@ -1,2 +1,2 @@
-let g:lsfiles_height = 20
+let g:lsfiles_height = &lines * 2 / 3
 nnoremap <silent><space>  <Cmd>LsFiles<cr>
