@@ -24,7 +24,6 @@
 				"vim-ambiwidth",
 				"vim-gitdiff",
 				"vim-gloaded",
-				"vim-lseek",
 				"vim-lsfiles",
 				"vim-pkgsync",
 				"vim-qficonv",
