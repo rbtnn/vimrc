@@ -3,7 +3,7 @@ if has('tabsidebar')
     function! TabSideBar() abort
         let tnr = get(g:, 'actual_curtabpage', tabpagenr())
         let lines = []
-        let lines += ['']
+        let lines += [tnr == tabpagenr() ? '%#TabSideBarCurTab#' : '%#TabSideBar#']
         for x in filter(getwininfo(), { i,x -> tnr == x['tabnr'] && ('popup' != win_gettype(x['winid']))})
             let ft = getbufvar(x['bufnr'], '&filetype')
             let bt = getbufvar(x['bufnr'], '&buftype')
