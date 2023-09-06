@@ -36,11 +36,11 @@
 			"thinca": [
 				"vim-qfreplace"
 			],
+			"tomasr": [
+				"molokai"
+			],
 			"tyru": [
 				"restart.vim"
-			],
-			"wadackel": [
-				"vim-dogrun"
 			]
 		}
 	}

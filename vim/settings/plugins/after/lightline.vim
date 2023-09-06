@@ -1,2 +1,2 @@
-"let g:lightline = { 'colorscheme': 'molokai', }
-let g:lightline = { 'colorscheme': 'dogrun', }
+let g:lightline = { 'colorscheme': 'molokai', }
+"let g:lightline = { 'colorscheme': 'dogrun', }
