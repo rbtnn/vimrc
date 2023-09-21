@@ -26,7 +26,6 @@ set foldlevelstart=999
 set foldmethod=indent
 set grepformat&
 set grepprg=internal
-set ignorecase
 set incsearch
 set isfname-==
 set keywordprg=:help
@@ -35,6 +34,7 @@ set matchpairs+=<:>
 set matchtime=1
 set nobackup
 set nocursorline
+set noignorecase
 set nonumber
 set norelativenumber
 set noshowmode
