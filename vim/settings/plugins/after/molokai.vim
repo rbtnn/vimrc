@@ -12,5 +12,6 @@ if has('vim_starting')
         \ | highlight!       StorageClass                                         gui=NONE
         \ | highlight! link  DiffAdd                  Identifier
         \ | highlight! link  DiffDelete               Special
+        \ | highlight!       DiffText                 gui=bold
     colorscheme molokai
 endif
