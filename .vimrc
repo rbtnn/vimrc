@@ -15,11 +15,6 @@ if has('vim_starting')
         set linespace=0
     endif
 
-    if isdirectory(expand('$VIMRC_VIM/develop'))
-        nnoremap <silent><C-s>    <Cmd>GitDiffHistory<cr>
-        nnoremap <silent><space>  <Cmd>LsFiles<cr>
-    endif
-
     silent! source ~/.vimrc.local
 
     if isdirectory($VIMRC_PKGSYNC_DIR)

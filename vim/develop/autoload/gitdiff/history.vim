@@ -11,8 +11,8 @@ function! gitdiff#history#exec() abort
         let opts = {
             \ 'title': s:make_title(context),
             \ }
-        call gitdiff#popupwin#apply_size(opts)
-        call gitdiff#popupwin#apply_border(opts, 'GitDiffPopupBorder')
+        call popupwin#apply_size(opts)
+        call popupwin#apply_border(opts, 'GitDiffPopupBorder')
         let winid = popup_menu(map(deepcopy(context['history']), { _,x -> empty(x) ? s:EMPTY : x }), opts)
         call win_execute(winid, 'setfiletype ' .. s:FT)
         call popup_setoptions(winid, {
@@ -35,17 +35,17 @@ function! s:popup_filter(winid, key) abort
     if (10 == char2nr(a:key)) || (14 == char2nr(a:key))
         " Ctrl-n or Ctrl-j
         if lnum == line('$', a:winid)
-            call gitdiff#popupwin#set_cursorline(a:winid, 1)
+            call popupwin#set_cursorline(a:winid, 1)
         else
-            call gitdiff#popupwin#set_cursorline(a:winid, lnum + 1)
+            call popupwin#set_cursorline(a:winid, lnum + 1)
         endif
         return 1
     elseif (11 == char2nr(a:key)) || (16 == char2nr(a:key))
         " Ctrl-p or Ctrl-k
         if lnum == 1
-            call gitdiff#popupwin#set_cursorline(a:winid, line('$', a:winid))
+            call popupwin#set_cursorline(a:winid, line('$', a:winid))
         else
-            call gitdiff#popupwin#set_cursorline(a:winid, lnum - 1)
+            call popupwin#set_cursorline(a:winid, lnum - 1)
         endif
         return 1
     elseif 0x20 == char2nr(a:key)

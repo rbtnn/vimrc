@@ -22,12 +22,9 @@
 			],
 			"rbtnn": [
 				"vim-ambiwidth",
-				"vim-gitdiff",
 				"vim-gloaded",
-				"vim-lsfiles",
 				"vim-pkgsync",
 				"vim-qficonv",
-				"vim-qfjob",
 				"vim-textobj-string",
 				"vim-vimscript_indentexpr",
 				"vim-vimscript_lasterror",

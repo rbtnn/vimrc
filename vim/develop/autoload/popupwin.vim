@@ -12,7 +12,7 @@ const s:borderchars_typeB = [
     \ nr2char(0x2500), nr2char(0x2502), nr2char(0x2500), nr2char(0x2502),
     \ nr2char(0x256d), nr2char(0x256e), nr2char(0x256f), nr2char(0x2570)]
 
-function! gitdiff#popupwin#apply_border(opts, hlname) abort
+function! popupwin#apply_border(opts, hlname) abort
     if has('gui_running') || (!has('win32') && !has('gui_running'))
         if hlexists(a:hlname)
             call extend(a:opts, {
@@ -20,14 +20,14 @@ function! gitdiff#popupwin#apply_border(opts, hlname) abort
                 \ 'border': [],
                 \ 'padding': [0, 0, 0, 0],
                 \ 'borderhighlight': repeat([a:hlname], 4),
-                \ 'borderchars': get(g:, 'gitdiff_popupwin_border_type', 1) ? s:borderchars_typeA : s:borderchars_typeB,
+                \ 'borderchars': get(g:, 'popupwin_border_type', 0) ? s:borderchars_typeA : s:borderchars_typeB,
                 \ }, 'force')
         endif
     endif
     return a:opts
 endfunction
 
-function! gitdiff#popupwin#apply_size(opts) abort
+function! popupwin#apply_size(opts) abort
     let width = 120
     let height = 20 + 4
     let subwindow_height = 3
@@ -61,7 +61,7 @@ function! gitdiff#popupwin#apply_size(opts) abort
     return a:opts
 endfunction
 
-function! gitdiff#popupwin#set_cursorline(winid, lnum) abort
+function! popupwin#set_cursorline(winid, lnum) abort
     call win_execute(a:winid, printf('call setpos(".", [0, %d, 0, 0])', a:lnum))
     call win_execute(a:winid, 'redraw')
 endfunction

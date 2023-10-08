@@ -29,3 +29,9 @@ nnoremap <silent><C-j>         gt
 nnoremap <silent><C-k>         gT
 tnoremap <silent><C-j>    <C-w>gt
 tnoremap <silent><C-k>    <C-w>gT
+
+if isdirectory(expand('$VIMRC_VIM/develop'))
+    nnoremap <silent><C-s>    <Cmd>GitDiffHistory<cr>
+    nnoremap <silent><space>  <Cmd>LsFiles<cr>
+endif
+

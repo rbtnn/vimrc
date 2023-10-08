@@ -81,15 +81,15 @@ function! s:open_numstatwindow(context, use_cached) abort
     let opts = {
         \ 'title': s:make_title(s:FT_NUMSTAT, a:use_cached, a:context['cmd']),
         \ }
-    call gitdiff#popupwin#apply_size(opts)
-    call gitdiff#popupwin#apply_border(opts, 'GitDiffPopupBorder')
+    call popupwin#apply_size(opts)
+    call popupwin#apply_border(opts, 'GitDiffPopupBorder')
     let winid = popup_menu(lines, opts)
     call win_execute(winid, 'setfiletype ' .. s:FT_NUMSTAT)
     call popup_setoptions(winid, {
         \ 'filter': function('s:popup_filter'),
         \ 'callback': function('s:popup_callback'),
         \ })
-    call gitdiff#popupwin#set_cursorline(winid, a:context['last_cursor_position'])
+    call popupwin#set_cursorline(winid, a:context['last_cursor_position'])
 endfunction
 
 function! s:make_title(ft, use_cached, cmd) abort
@@ -104,17 +104,17 @@ function! s:popup_filter(winid, key) abort
     if (10 == char2nr(a:key)) || (14 == char2nr(a:key))
         " Ctrl-n or Ctrl-j
         if lnum == line('$', a:winid)
-            call gitdiff#popupwin#set_cursorline(a:winid, 1)
+            call popupwin#set_cursorline(a:winid, 1)
         else
-            call gitdiff#popupwin#set_cursorline(a:winid, lnum + 1)
+            call popupwin#set_cursorline(a:winid, lnum + 1)
         endif
         return 1
     elseif (11 == char2nr(a:key)) || (16 == char2nr(a:key))
         " Ctrl-p or Ctrl-k
         if lnum == 1
-            call gitdiff#popupwin#set_cursorline(a:winid, line('$', a:winid))
+            call popupwin#set_cursorline(a:winid, line('$', a:winid))
         else
-            call gitdiff#popupwin#set_cursorline(a:winid, lnum - 1)
+            call popupwin#set_cursorline(a:winid, lnum - 1)
         endif
         return 1
     elseif 0x21 == char2nr(a:key)
