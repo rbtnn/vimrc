@@ -33,8 +33,12 @@
 				"vim-vimscript_lasterror",
 				"vim-vimscript_tagfunc"
 			],
+			"sgur": [
+				"vim-textobj-parameter"
+			],
 			"thinca": [
-				"vim-qfreplace"
+				"vim-qfreplace",
+				"vim-textobj-between"
 			],
 			"tomasr": [
 				"molokai"

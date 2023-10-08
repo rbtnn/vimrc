@@ -7,12 +7,17 @@ source $VIMRC_VIM/settings/autocmds.vim
 
 if has('vim_starting')
     set packpath=$VIMRC_VIM/local,$VIMRC_VIM/github
-    set runtimepath=$VIMRUNTIME
+    set runtimepath=$VIMRC_VIM/develop,$VIMRUNTIME
 
     if has('win32') && has('gui_running')
         " https://github.com/yuru7/udev-gothic
         set guifont=UDEV_Gothic:h12:cSHIFTJIS:qDRAFT
         set linespace=0
+    endif
+
+    if isdirectory(expand('$VIMRC_VIM/develop'))
+        nnoremap <silent><C-s>    <Cmd>GitDiffHistory<cr>
+        nnoremap <silent><space>  <Cmd>LsFiles<cr>
     endif
 
     silent! source ~/.vimrc.local
