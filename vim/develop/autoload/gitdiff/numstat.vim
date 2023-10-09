@@ -26,13 +26,13 @@ function! gitdiff#numstat#exec(q_bang, q_args) abort
             let context['files'] = {}
             let ok = v:true
             let error_lines = []
-            for x in filter(gitdiff#system#exec(context['cmd'], context['rootdir']), { _,x -> !empty(x) })
+            for x in filter(utils#system#exec(context['cmd'], context['rootdir']), { _,x -> !empty(x) })
                 let m = split(x, '\t')
                 if 3 == len(m)
                     let context['files'][m[2]] = {
                         \ 'added': str2nr(m[0]),
                         \ 'removed': str2nr(m[1]),
-                        \ 'cmd': 'git --no-pager diff ' .. a:q_args .. ' -- ' .. expand(context['rootdir'] .. '/' .. m[2]),
+                        \ 'cmd': 'git --no-pager diff ' .. a:q_args .. ' -- ' .. expand(context['rootdir'] .. '/' .. s:fix_path(m[2])),
                         \ 'cached': [],
                         \ }
                 else
@@ -81,15 +81,15 @@ function! s:open_numstatwindow(context, use_cached) abort
     let opts = {
         \ 'title': s:make_title(s:FT_NUMSTAT, a:use_cached, a:context['cmd']),
         \ }
-    call popupwin#apply_size(opts)
-    call popupwin#apply_border(opts, 'GitDiffPopupBorder')
+    call utils#popupwin#apply_size(opts)
+    call utils#popupwin#apply_border(opts, 'GitDiffPopupBorder')
     let winid = popup_menu(lines, opts)
     call win_execute(winid, 'setfiletype ' .. s:FT_NUMSTAT)
     call popup_setoptions(winid, {
         \ 'filter': function('s:popup_filter'),
         \ 'callback': function('s:popup_callback'),
         \ })
-    call popupwin#set_cursorline(winid, a:context['last_cursor_position'])
+    call utils#popupwin#set_cursorline(winid, a:context['last_cursor_position'])
 endfunction
 
 function! s:make_title(ft, use_cached, cmd) abort
@@ -104,17 +104,17 @@ function! s:popup_filter(winid, key) abort
     if (10 == char2nr(a:key)) || (14 == char2nr(a:key))
         " Ctrl-n or Ctrl-j
         if lnum == line('$', a:winid)
-            call popupwin#set_cursorline(a:winid, 1)
+            call utils#popupwin#set_cursorline(a:winid, 1)
         else
-            call popupwin#set_cursorline(a:winid, lnum + 1)
+            call utils#popupwin#set_cursorline(a:winid, lnum + 1)
         endif
         return 1
     elseif (11 == char2nr(a:key)) || (16 == char2nr(a:key))
         " Ctrl-p or Ctrl-k
         if lnum == 1
-            call popupwin#set_cursorline(a:winid, line('$', a:winid))
+            call utils#popupwin#set_cursorline(a:winid, line('$', a:winid))
         else
-            call popupwin#set_cursorline(a:winid, lnum - 1)
+            call utils#popupwin#set_cursorline(a:winid, lnum - 1)
         endif
         return 1
     elseif 0x21 == char2nr(a:key)
@@ -148,13 +148,25 @@ function! s:popup_callback(winid, result) abort
     endif
 endfunction
 
+function! s:fix_path(path) abort
+    let s = a:path
+    let m = matchlist(s, '^\(.*\){\([^}]*\) => \([^}]*\)}\(.*\)$')
+    if !empty(m)
+        let s = m[1] .. m[3] .. m[4]
+        if filereadable(s)
+            return s
+        endif
+    endif
+    return s
+endfunction
+
 function! s:open_diffwindow(path, use_cached) abort
     let context = gitdiff#get_current_context()
     let cmd = context['files'][a:path]['cmd']
     if a:use_cached && !empty(context['files'][a:path]['cached'])
         let lines = context['files'][a:path]['cached']
     else
-        let lines = gitdiff#system#exec(cmd, context['rootdir'])
+        let lines = utils#system#exec(cmd, context['rootdir'])
     endif
 
     let exists = v:false
@@ -191,7 +203,7 @@ function! s:open_diffwindow(path, use_cached) abort
         " Redraw windows because the encoding process is very slowly.
         redraw
         for i in range(0, len(lines) - 1)
-            let lines[i] = qficonv#encoding#iconv_utf8(lines[i], 'shift_jis')
+            let lines[i] = utils#iconv#exec(lines[i])
         endfor
         call s:setbuflines(lines)
     endif

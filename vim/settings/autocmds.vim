@@ -1,6 +1,7 @@
 
 let s:delcmds = [
-    \ 'MANPAGER', 'Man', 'Tutor', 'VimFoldh', 'TextobjStringDefaultKeyMappings',
+    \ 'MANPAGER', 'Man', 'Tutor', 'VimFoldh',
+    \ 'TextobjBetweenDefaultKeyMappings', 'TextobjParameterDefaultKeyMappings', 'TextobjStringDefaultKeyMappings',
     \ 'CurrentLineWhitespaceOff', 'CurrentLineWhitespaceOn', 'DisableStripWhitespaceOnSave',
     \ 'DisableWhitespace', 'EnableStripWhitespaceOnSave', 'EnableWhitespace',
     \ 'NextTrailingWhitespace', 'PrevTrailingWhitespace', 'StripWhitespace',
@@ -20,5 +21,10 @@ augroup vimrc-autocmds
         \ | endfor
         \ | unlet s:cmdname
     autocmd FileType help :setlocal colorcolumn=78
+    autocmd CmdlineEnter *
+        \ : if getcmdtype() == ':'
+        \ |     set ignorecase
+        \ | endif
+    autocmd CmdlineLeave * :set noignorecase
 augroup END
 

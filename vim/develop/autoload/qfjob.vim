@@ -38,14 +38,6 @@ function! qfjob#stop(id) abort
     let s:qfjobs[a:id] = v:null
 endfunction
 
-function s:iconv(text) abort
-    if has('win32') && exists('g:loaded_qficonv') && (len(a:text) < 500)
-        return qficonv#encoding#iconv_utf8(a:text, 'shift_jis')
-    else
-        return a:text
-    endif
-endfunction
-
 function s:out_cb(items, ch, msg, ...) abort
     if has('nvim')
         call extend(a:items, a:msg)
@@ -60,7 +52,7 @@ function s:exit_cb(items, id, opts, ...) abort
     try
         if has_key(a:opts, 'line_parser')
             for item in a:items
-                let xs += [a:opts.line_parser(function('s:iconv'), item)]
+                let xs += [a:opts.line_parser(item)]
                 redraw
                 echo printf('[%s] The job has finished! Please wait to build the quickfix... (%d%%)', title, len(xs) * 100 / len(a:items))
             endfor

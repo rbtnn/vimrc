@@ -3,6 +3,10 @@ function! gitdiff#history() abort
     call gitdiff#history#exec()
 endfunction
 
+function! gitdiff#history_first() abort
+    call gitdiff#history#exec_first()
+endfunction
+
 function! gitdiff#numstat(q_bang, q_args) abort
     call gitdiff#numstat#exec(a:q_bang, a:q_args)
 endfunction

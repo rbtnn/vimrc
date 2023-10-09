@@ -1,3 +1,6 @@
+
+let g:loaded_develop_msbuild = 1
+
 if has('win32') && executable('msbuild')
     command! -nargs=* -complete=customlist,MSBuildRunTaskComp   MSBuild      :call s:msbuild(eval(g:msbuild_projectfile), <q-args>)
 
@@ -20,7 +23,7 @@ if has('win32') && executable('msbuild')
             \ })
     endfunction
 
-    function s:line_parser(projectfile, ic, line) abort
+    function s:line_parser(projectfile, line) abort
         let m = matchlist(a:line, '^\s*\([^(]\+\)(\(\d\+\),\(\d\+\)): \(.*\)$')
         if !empty(m)
             let path = m[1]
@@ -28,13 +31,13 @@ if has('win32') && executable('msbuild')
                 let path = expand(fnamemodify(a:projectfile, ':h') .. '/' .. m[1])
             endif
             return {
-                \ 'filename': a:ic(path),
+                \ 'filename': utils#iconv#exec(path),
                 \ 'lnum': m[2],
                 \ 'col': m[3],
-                \ 'text': a:ic(m[4]),
+                \ 'text': utils#iconv#exec(m[4]),
                 \ }
         else
-            return { 'text': a:ic(a:line), }
+            return { 'text': utils#iconv#exec(a:line), }
         endif
     endfunction
 

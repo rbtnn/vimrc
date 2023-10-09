@@ -58,17 +58,17 @@ function! s:popup_filter(rootdir, winid, key) abort
     elseif (10 == char2nr(a:key)) || (14 == char2nr(a:key))
         " Ctrl-n or Ctrl-j
         if lnum == line('$', a:winid)
-            call popupwin#set_cursorline(a:winid, 1)
+            call utils#popupwin#set_cursorline(a:winid, 1)
         else
-            call popupwin#set_cursorline(a:winid, lnum + 1)
+            call utils#popupwin#set_cursorline(a:winid, lnum + 1)
         endif
         return 1
     elseif (11 == char2nr(a:key)) || (16 == char2nr(a:key))
         " Ctrl-p or Ctrl-k
         if lnum == 1
-            call popupwin#set_cursorline(a:winid, line('$', a:winid))
+            call utils#popupwin#set_cursorline(a:winid, line('$', a:winid))
         else
-            call popupwin#set_cursorline(a:winid, lnum - 1)
+            call utils#popupwin#set_cursorline(a:winid, lnum - 1)
         endif
         return 1
     elseif ("\x80kb" == a:key) || (8 == char2nr(a:key))
@@ -107,8 +107,8 @@ function! s:get_popupwin_options_main(rootdir, n) abort
         \   len(lsfiles#data#get_paths(a:rootdir)),
         \   (-1.0 == elapsed_time ? '' : printf(' (elapsed_time: %f)', elapsed_time))),
         \ }
-    call popupwin#apply_size(opts)
-    call popupwin#apply_border(opts, 'LsFilesPopupBorder')
+    call utils#popupwin#apply_size(opts)
+    call utils#popupwin#apply_border(opts, 'LsFilesPopupBorder')
     return opts
 endfunction
 
@@ -122,7 +122,7 @@ function! s:get_popupwin_options_sub(main_winid, hidden) abort
         \ 'minwidth': width,
         \ 'hidden': a:hidden,
         \ }
-    return popupwin#apply_border(opts, 'LsFilesPopupBorder')
+    return utils#popupwin#apply_border(opts, 'LsFilesPopupBorder')
 endfunction
 
 function! s:can_open_in_current() abort

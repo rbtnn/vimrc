@@ -11,8 +11,8 @@ function! gitdiff#history#exec() abort
         let opts = {
             \ 'title': s:make_title(context),
             \ }
-        call popupwin#apply_size(opts)
-        call popupwin#apply_border(opts, 'GitDiffPopupBorder')
+        call utils#popupwin#apply_size(opts)
+        call utils#popupwin#apply_border(opts, 'GitDiffPopupBorder')
         let winid = popup_menu(map(deepcopy(context['history']), { _,x -> empty(x) ? s:EMPTY : x }), opts)
         call win_execute(winid, 'setfiletype ' .. s:FT)
         call popup_setoptions(winid, {
@@ -26,6 +26,22 @@ function! gitdiff#history#exec() abort
     endtry
 endfunction
 
+function! gitdiff#history#exec_first() abort
+    let context = gitdiff#get_current_context()
+    let xs = map(deepcopy(context['history']), { _,x -> empty(x) ? s:EMPTY : x })
+    if !empty(xs)
+        if xs[0] == s:EMPTY
+            call gitdiff#numstat#exec('', '')
+        else
+            call gitdiff#numstat#exec('', xs[0])
+        endif
+    else
+        echohl Error
+        echo printf('[gitdiff] %s', 'No history!')
+        echohl None
+    endif
+endfunction
+
 function! s:make_title(context) abort
     return printf(' [%s] %s', s:FT, a:context['rootdir'])
 endfunction
@@ -35,17 +51,17 @@ function! s:popup_filter(winid, key) abort
     if (10 == char2nr(a:key)) || (14 == char2nr(a:key))
         " Ctrl-n or Ctrl-j
         if lnum == line('$', a:winid)
-            call popupwin#set_cursorline(a:winid, 1)
+            call utils#popupwin#set_cursorline(a:winid, 1)
         else
-            call popupwin#set_cursorline(a:winid, lnum + 1)
+            call utils#popupwin#set_cursorline(a:winid, lnum + 1)
         endif
         return 1
     elseif (11 == char2nr(a:key)) || (16 == char2nr(a:key))
         " Ctrl-p or Ctrl-k
         if lnum == 1
-            call popupwin#set_cursorline(a:winid, line('$', a:winid))
+            call utils#popupwin#set_cursorline(a:winid, line('$', a:winid))
         else
-            call popupwin#set_cursorline(a:winid, lnum - 1)
+            call utils#popupwin#set_cursorline(a:winid, lnum - 1)
         endif
         return 1
     elseif 0x20 == char2nr(a:key)

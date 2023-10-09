@@ -1,3 +1,6 @@
+
+let g:loaded_develop_gitgrep = 1
+
 if executable('git')
     command! -nargs=* GitGrep :call s:gitgrep(<q-args>)
 
@@ -9,7 +12,7 @@ if executable('git')
             \ })
     endfunction
 
-    function s:line_parser(ic, line) abort
+    function s:line_parser(line) abort
         let m = matchlist(a:line, '^\(.\{-\}\):\(\d\+\):\(\d\+\):\(.*\)$')
         if !empty(m)
             let path = m[1]
@@ -17,13 +20,13 @@ if executable('git')
                 let path = expand(fnamemodify(path, ':h') .. '/' .. m[1])
             endif
             return {
-                \ 'filename': a:ic(path),
+                \ 'filename': utils#iconv#exec(path),
                 \ 'lnum': m[2],
                 \ 'col': m[3],
-                \ 'text': a:ic(m[4]),
+                \ 'text': utils#iconv#exec(m[4]),
                 \ }
         else
-            return { 'text': a:ic(a:line), }
+            return { 'text': utils#iconv#exec(a:line), }
         endif
     endfunction
 endif

@@ -1,3 +1,6 @@
+
+let g:loaded_develop_dotnet = 1
+
 if executable('dotnet')
     command! -nargs=* DotnetRun         :call s:dotnet_run(<q-args>)
     command! -nargs=* DotnetFormat      :call s:dotnet_format(<q-args>)
@@ -24,17 +27,17 @@ if executable('dotnet')
             \ })
     endfunction
 
-    function s:line_parser(ic, line) abort
+    function s:line_parser(line) abort
         let m = matchlist(a:line, '^\s*\([^(]\+\)(\(\d\+\),\(\d\+\)): \(.*\)$')
         if !empty(m)
             return {
-                \ 'filename': a:ic(m[1]),
+                \ 'filename': utils#iconv#exec(m[1]),
                 \ 'lnum': m[2],
                 \ 'col': m[3],
-                \ 'text': a:ic(m[4]),
+                \ 'text': utils#iconv#exec(m[4]),
                 \ }
         else
-            return { 'text': a:ic(a:line), }
+            return { 'text': utils#iconv#exec(a:line), }
         endif
     endfunction
 endif
