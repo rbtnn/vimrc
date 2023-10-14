@@ -33,6 +33,7 @@
 .ghost/
 .git-for-windows-updater
 .gitconfig.local
+.gnupg/
 .gstreamer-0.10/
 .gtkrc-2.0
 .keras/
