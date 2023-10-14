@@ -32,7 +32,7 @@ function! gitdiff#numstat#exec(q_bang, q_args) abort
                     let context['files'][m[2]] = {
                         \ 'added': str2nr(m[0]),
                         \ 'removed': str2nr(m[1]),
-                        \ 'cmd': 'git --no-pager diff ' .. a:q_args .. ' -- ' .. expand(context['rootdir'] .. '/' .. s:fix_path(m[2])),
+                        \ 'cmd': printf('git --no-pager diff %s -- "%s"', a:q_args, expand(context['rootdir'] .. '/' .. s:fix_path(m[2]))),
                         \ 'cached': [],
                         \ }
                 else
