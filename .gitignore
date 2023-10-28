@@ -44,6 +44,7 @@
 .mono/
 .motd_shown
 .mozilla/
+.mrd
 .mrw
 .multirust/
 .netrc

@@ -32,6 +32,7 @@ tnoremap <silent><C-k>    <C-w>gT
 
 if isdirectory(expand('$VIMRC_VIM/develop'))
     nnoremap <silent><C-s>    <Cmd>GitDiffHistoryFirst<cr>
+    nnoremap <silent><C-k>    <Cmd>MRD<cr>
     nnoremap <silent><space>  <Cmd>LsFiles<cr>
 endif
 
