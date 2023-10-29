@@ -4,6 +4,7 @@ if has('vim_starting')
         \ | highlight!       TabSideBarCurTab         guifg=#777777 guibg=#3b3d3e gui=NONE cterm=NONE
         \ | highlight!       TabSideBarCurTabSel      guifg=#bcbcbc guibg=#3b3d3e gui=BOLD cterm=NONE
         \ | highlight!       TabSideBarFill           guifg=NONE    guibg=#2b2d2e gui=NONE cterm=NONE
+        \ | highlight!       Cursor                   guifg=NONE    guibg=#d7d700
         \ | highlight!       CursorIM                 guifg=NONE    guibg=#d70000
         \ | highlight!       LsFilesPopupBorder       guifg=#a6e22e guibg=NONE    gui=NONE cterm=NONE
         \ | highlight!       GitDiffPopupBorder       guifg=#a6e22e guibg=NONE    gui=NONE cterm=NONE
