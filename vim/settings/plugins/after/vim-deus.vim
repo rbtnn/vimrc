@@ -6,7 +6,7 @@ if has('vim_starting')
         \ | highlight!       TabSideBarSel            guifg=#bcbcbc guibg=#2b2d2e gui=NONE cterm=NONE
         \ | highlight!       TabSideBarModified       guifg=#ff6666 guibg=#2b2d2e gui=BOLD cterm=NONE
         \ | highlight!       CursorIM                 guifg=NONE    guibg=#d70000
-        \ | highlight! link  LsFilesPopupBorder       deusOrange
+        \ | highlight! link  VimrcDevPopupBorder      deusOrange
         \ | highlight! link  StatusLine               deusOrange
         \ | highlight! link  StatusLineNC             deusBlue
         \ | highlight! link  StatusLineTerm           deusOrange

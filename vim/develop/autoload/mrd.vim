@@ -1,13 +1,14 @@
 
 let s:mrd_path = expand('~/.mrd')
+let s:lineinfo_len = 2
 
 function! mrd#exec() abort
     try
         let opts = {
-            \ 'title': ' most recent directories ',
+            \ 'title': ' [most recent directories] ',
             \ }
         call utils#popupwin#apply_size(opts)
-        call utils#popupwin#apply_border(opts, 'GitDiffPopupBorder')
+        call utils#popupwin#apply_border(opts, 'VimrcDevPopupBorder')
         let winid = popup_menu(mrd#get_directories(), opts)
         call popup_setoptions(winid, {
             \ 'filter': function('s:popup_filter'),
@@ -37,7 +38,15 @@ function! mrd#get_directories() abort
     if !filereadable(s:mrd_path)
         call mrd#update_dir()
     endif
-    return readfile(s:mrd_path)
+    let xs = []
+    for x in readfile(s:mrd_path)
+        let lineinfo = ''
+        if s:fix_path(getcwd()) == x
+            let lineinfo = '*'
+        endif
+        let xs += [printf('%-' .. s:lineinfo_len .. 's%s', lineinfo, x)]
+    endfor
+    return xs
 endfunction
 
 function! s:fix_path(x) abort
@@ -78,10 +87,11 @@ endfunction
 function! s:popup_callback(winid, result) abort
     if -1 != a:result
         let lnum = a:result
-        let path = trim(get(getbufline(winbufnr(a:winid), lnum), 0, ''))
+        let path = trim(get(getbufline(winbufnr(a:winid), lnum), 0, '')[(s:lineinfo_len - 1):])
         if isdirectory(path)
+            lcd .
             call chdir(path)
-            echo getcwd()
+            verbose pwd
         endif
     endif
 endfunction

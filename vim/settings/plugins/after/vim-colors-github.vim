@@ -8,7 +8,7 @@ if has('vim_starting')
         \ | highlight!       CursorIM                 guifg=NONE    guibg=#d70000
         \ | highlight!       Comment                  guifg=#bbbbbb guibg=NONE
         \ | highlight!       Error                    guifg=#d73a49 guibg=NONE
-        \ | highlight! link  LsFilesPopupBorder       Question
+        \ | highlight! link  VimrcDevPopupBorder      Question
     set background=light
     let g:github_colors_soft = 0
     colorscheme github

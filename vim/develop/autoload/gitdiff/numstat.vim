@@ -82,7 +82,7 @@ function! s:open_numstatwindow(context, use_cached) abort
         \ 'title': s:make_title(s:FT_NUMSTAT, a:use_cached, a:context['cmd']),
         \ }
     call utils#popupwin#apply_size(opts)
-    call utils#popupwin#apply_border(opts, 'GitDiffPopupBorder')
+    call utils#popupwin#apply_border(opts, 'VimrcDevPopupBorder')
     let winid = popup_menu(lines, opts)
     call win_execute(winid, 'setfiletype ' .. s:FT_NUMSTAT)
     call popup_setoptions(winid, {

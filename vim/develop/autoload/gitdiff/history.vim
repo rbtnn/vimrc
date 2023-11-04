@@ -5,15 +5,13 @@ let s:EMPTY = '(empty)'
 function! gitdiff#history#exec() abort
     try
         let context = gitdiff#get_current_context()
-        if empty(context['history'])
-            throw 'No history!'
-        endif
         let opts = {
             \ 'title': s:make_title(context),
             \ }
+        let xs = s:get_history(context)
         call utils#popupwin#apply_size(opts)
-        call utils#popupwin#apply_border(opts, 'GitDiffPopupBorder')
-        let winid = popup_menu(map(deepcopy(context['history']), { _,x -> empty(x) ? s:EMPTY : x }), opts)
+        call utils#popupwin#apply_border(opts, 'VimrcDevPopupBorder')
+        let winid = popup_menu(xs, opts)
         call win_execute(winid, 'setfiletype ' .. s:FT)
         call popup_setoptions(winid, {
             \ 'filter': function('s:popup_filter'),
@@ -28,17 +26,20 @@ endfunction
 
 function! gitdiff#history#exec_first() abort
     let context = gitdiff#get_current_context()
-    let xs = map(deepcopy(context['history']), { _,x -> empty(x) ? s:EMPTY : x })
-    if !empty(xs)
-        if xs[0] == s:EMPTY
-            call gitdiff#numstat#exec('', '')
-        else
-            call gitdiff#numstat#exec('', xs[0])
-        endif
+    let xs = s:get_history(context)
+    if xs[0] == s:EMPTY
+        call gitdiff#numstat#exec('', '')
     else
-        echohl Error
-        echo printf('[gitdiff] %s', 'No history!')
-        echohl None
+        call gitdiff#numstat#exec('', xs[0])
+    endif
+endfunction
+
+function! s:get_history(context) abort
+    let xs = map(deepcopy(a:context['history']), { _,x -> empty(x) ? s:EMPTY : x })
+    if empty(xs)
+        return ['-w']
+    else
+        return xs
     endif
 endfunction
 

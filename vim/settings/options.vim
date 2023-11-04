@@ -29,7 +29,7 @@ set grepprg=internal
 set incsearch
 set isfname-==
 set keywordprg=:help
-set list listchars=tab:\ \ \|,trail:-
+set list listchars=tab:-->
 set matchpairs+=<:>
 set matchtime=1
 set nobackup
