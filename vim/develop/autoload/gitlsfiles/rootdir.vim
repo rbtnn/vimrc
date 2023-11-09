@@ -1,5 +1,5 @@
 
-function! lsfiles#rootdir#get(path = '.', cmdname = 'git') abort
+function! gitlsfiles#rootdir#get(path = '.', cmdname = 'git') abort
     let xs = split(fnamemodify(a:path, ':p'), '[\/]')
     let prefix = (has('mac') || has('linux')) ? '/' : ''
     while !empty(xs)

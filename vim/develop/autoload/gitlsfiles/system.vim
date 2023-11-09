@@ -1,5 +1,5 @@
 
-function lsfiles#system#exec(cmd, cwd) abort
+function gitlsfiles#system#exec(cmd, cwd) abort
     let lines = []
     if has('nvim')
         let job = jobstart(a:cmd, {

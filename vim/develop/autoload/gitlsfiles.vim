@@ -1,7 +1,7 @@
 
 let s:subwinid = get(s:, 'subwinid', -1)
 
-function! lsfiles#exec(q_bang) abort
+function! gitlsfiles#exec(q_bang) abort
     let g:lsfiles_height = get(g:, 'lsfiles_height', 10)
     let g:lsfiles_ignore_exts = get(g:, 'lsfiles_ignore_exts', [
         \ 'exe', 'o', 'obj', 'xls', 'doc', 'xlsx', 'docx', 'dll', 'png', 'jpg', 'ico', 'pdf', 'mp3', 'zip',
@@ -11,7 +11,7 @@ function! lsfiles#exec(q_bang) abort
     let g:lsfiles_maximum = get(g:, 'lsfiles_maximum', 100)
 
     let cmd_name = ''
-    let rootdir = lsfiles#rootdir#get('.', 'git')
+    let rootdir = gitlsfiles#rootdir#get('.', 'git')
     if isdirectory(rootdir)
         if executable('git')
             let cmd_name = 'git'
@@ -29,11 +29,11 @@ function! lsfiles#exec(q_bang) abort
         let winid = popup_menu([], s:get_popupwin_options_main(rootdir, 0))
         let s:subwinid = popup_create('', s:get_popupwin_options_sub(winid, v:true))
         if -1 != winid
-            call lsfiles#data#set_cmd_name(rootdir, cmd_name)
+            call gitlsfiles#data#set_cmd_name(rootdir, cmd_name)
             if a:q_bang == '!'
-                call lsfiles#data#set_paths(rootdir, [])
-                call lsfiles#data#set_query(rootdir, '')
-                call lsfiles#data#set_elapsed_time(rootdir, -1.0)
+                call gitlsfiles#data#set_paths(rootdir, [])
+                call gitlsfiles#data#set_query(rootdir, '')
+                call gitlsfiles#data#set_elapsed_time(rootdir, -1.0)
             endif
             call popup_setoptions(winid, {
                 \ 'filter': function('s:popup_filter', [rootdir]),
@@ -46,12 +46,12 @@ endfunction
 
 function! s:popup_filter(rootdir, winid, key) abort
     let lnum = line('.', a:winid)
-    let xs = split(lsfiles#data#get_query(a:rootdir), '\zs')
+    let xs = split(gitlsfiles#data#get_query(a:rootdir), '\zs')
     if 21 == char2nr(a:key)
         " Ctrl-u
         if 0 < len(xs)
             call remove(xs, 0, -1)
-            call lsfiles#data#set_query(a:rootdir, join(xs, ''))
+            call gitlsfiles#data#set_query(a:rootdir, join(xs, ''))
             call s:search_lsfiles(a:rootdir, a:winid)
         endif
         return 1
@@ -75,7 +75,7 @@ function! s:popup_filter(rootdir, winid, key) abort
         " Ctrl-h or bs
         if 0 < len(xs)
             call remove(xs, -1)
-            call lsfiles#data#set_query(a:rootdir, join(xs, ''))
+            call gitlsfiles#data#set_query(a:rootdir, join(xs, ''))
             call s:search_lsfiles(a:rootdir, a:winid)
         endif
         return 1
@@ -83,7 +83,7 @@ function! s:popup_filter(rootdir, winid, key) abort
         return popup_filter_menu(a:winid, "\<cr>")
     elseif (0x21 <= char2nr(a:key)) && (char2nr(a:key) <= 0x7f)
         let xs += [a:key]
-        call lsfiles#data#set_query(a:rootdir, join(xs, ''))
+        call gitlsfiles#data#set_query(a:rootdir, join(xs, ''))
         call s:search_lsfiles(a:rootdir, a:winid)
         return 1
     elseif 0x0d == char2nr(a:key)
@@ -98,13 +98,13 @@ function! s:popup_filter(rootdir, winid, key) abort
 endfunction
 
 function! s:get_popupwin_options_main(rootdir, n) abort
-    "let elapsed_time = lsfiles#data#get_elapsed_time(a:rootdir)
+    "let elapsed_time = gitlsfiles#data#get_elapsed_time(a:rootdir)
     let elapsed_time = -1.0
     let opts = {
         \ 'title': printf(' [%s] %d/%d%s ',
         \   fnamemodify(a:rootdir, ':t'),
         \   a:n,
-        \   len(lsfiles#data#get_paths(a:rootdir)),
+        \   len(gitlsfiles#data#get_paths(a:rootdir)),
         \   (-1.0 == elapsed_time ? '' : printf(' (elapsed_time: %f)', elapsed_time))),
         \ }
     call utils#popupwin#apply_size(opts)
@@ -169,19 +169,19 @@ function! s:search_lsfiles(rootdir, winid) abort
     call popup_settext(a:winid, 'Please wait for listing files in the repository...')
     redraw
     let start_time = reltime()
-    let cmd_name = lsfiles#data#get_cmd_name(a:rootdir)
-    let query_text = lsfiles#data#get_query(a:rootdir)
+    let cmd_name = gitlsfiles#data#get_cmd_name(a:rootdir)
+    let query_text = gitlsfiles#data#get_query(a:rootdir)
     let cmd = ['git', '--no-pager', 'ls-files']
-    if empty(lsfiles#data#get_paths(a:rootdir))
-        call lsfiles#data#set_paths(a:rootdir, lsfiles#system#exec(cmd, a:rootdir))
+    if empty(gitlsfiles#data#get_paths(a:rootdir))
+        call gitlsfiles#data#set_paths(a:rootdir, gitlsfiles#system#exec(cmd, a:rootdir))
     endif
-    let filtered_paths = filter(copy(lsfiles#data#get_paths(a:rootdir)), { _, x -> s:filter_query_text(x, query_text) })
+    let filtered_paths = filter(copy(gitlsfiles#data#get_paths(a:rootdir)), { _, x -> s:filter_query_text(x, query_text) })
     let n = g:lsfiles_maximum - 1
     if n < 1
         let n = 1
     endif
     call popup_settext(a:winid, filtered_paths[:n])
-    call lsfiles#data#set_elapsed_time(a:rootdir, reltimefloat(reltime(start_time)))
+    call gitlsfiles#data#set_elapsed_time(a:rootdir, reltimefloat(reltime(start_time)))
     call popup_setoptions(a:winid, s:get_popupwin_options_main(a:rootdir, len(filtered_paths)))
     if empty(query_text)
         call popup_hide(s:subwinid)
