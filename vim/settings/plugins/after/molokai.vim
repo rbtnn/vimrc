@@ -1,4 +1,5 @@
 if has('vim_starting')
+    "let g:lightline = { 'colorscheme': 'molokai', }
     autocmd vimrc-plugins ColorScheme      *
         \ : highlight!       TabSideBar               guifg=#777777 guibg=#2b2d2e gui=NONE cterm=NONE
         \ | highlight!       TabSideBarCurTab         guifg=#777777 guibg=#3b3d3e gui=NONE cterm=NONE

@@ -38,7 +38,7 @@ if has('vim_starting')
             for s:plugin in sort(split(globpath($VIMRC_VIM, 'github/pack/*/*/*'), '\n'))
                 let s:x = split(s:setting, '[\/]')[-1]
                 let s:y = split(s:plugin, '[\/]')[-1]
-                if (s:x == s:y .. '.vim') || (s:x == s:y)
+                if (tolower(s:x) == tolower(s:y .. '.vim')) || (tolower(s:x) == tolower(s:y))
                     execute 'source' s:setting
                 endif
             endfor

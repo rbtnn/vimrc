@@ -35,9 +35,7 @@ function! mrd#update_dir() abort
 endfunction
 
 function! mrd#get_directories() abort
-    if !filereadable(s:mrd_path)
-        call mrd#update_dir()
-    endif
+    call mrd#update_dir()
     let xs = []
     for x in readfile(s:mrd_path)
         let lineinfo = ''

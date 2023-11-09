@@ -6,8 +6,10 @@
 				"vim-operator-flashy"
 			],
 			"itchyny": [
-				"lightline.vim",
 				"vim-parenmatch"
+			],
+			"jaredgorski": [
+				"SpaceCamp"
 			],
 			"kana": [
 				"vim-operator-replace",
@@ -36,9 +38,6 @@
 			"thinca": [
 				"vim-qfreplace",
 				"vim-textobj-between"
-			],
-			"tomasr": [
-				"molokai"
 			],
 			"tyru": [
 				"restart.vim"
