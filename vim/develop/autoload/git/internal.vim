@@ -1,9 +1,24 @@
 
-function utils#system#exec(cmd, cwd) abort
+function! git#internal#get_rootdir(path = '.') abort
+    let xs = split(fnamemodify(a:path, ':p'), '[\/]')
+    let prefix = (has('mac') || has('linux')) ? '/' : ''
+    while !empty(xs)
+        let path = prefix .. join(xs + ['.git'], '/')
+        if isdirectory(path) || filereadable(path)
+            return prefix .. join(xs, '/')
+        endif
+        call remove(xs, -1)
+    endwhile
+    return ''
+endfunction
+
+function git#internal#system(subcmd) abort
+    let cmd_prefix = ['git', '--no-pager']
+    let cwd = git#internal#get_rootdir()
     let lines = []
     if has('nvim')
-        let job = jobstart(a:cmd, {
-            \ 'cwd': a:cwd,
+        let job = jobstart(cmd_prefix + a:subcmd, {
+            \ 'cwd': cwd,
             \ 'on_stdout': function('s:system_onevent', [{ 'lines': lines, }]),
             \ 'on_stderr': function('s:system_onevent', [{ 'lines': lines, }]),
             \ })
@@ -11,8 +26,8 @@ function utils#system#exec(cmd, cwd) abort
     else
         let path = tempname()
         try
-            let job = job_start(a:cmd, {
-                \ 'cwd': a:cwd,
+            let job = job_start(cmd_prefix + a:subcmd, {
+                \ 'cwd': cwd,
                 \ 'out_io': 'file',
                 \ 'out_name': path,
                 \ 'err_io': 'out',
@@ -31,7 +46,10 @@ function utils#system#exec(cmd, cwd) abort
     return lines
 endfunction
 
+
+
 function s:system_onevent(d, job, data, event) abort
     let a:d['lines'] += a:data
-    sleep 10m
+    sleep 1m
 endfunction
+

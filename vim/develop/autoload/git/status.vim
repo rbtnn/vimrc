@@ -1,17 +1,15 @@
 
-let s:FT = 'gitdiff-history'
-let s:EMPTY = '(empty)'
+let s:FT = 'gitstatus'
 
-function! gitdiff#history#exec() abort
+function! git#status#exec() abort
     try
-        let context = gitdiff#get_current_context()
         let opts = {
-            \ 'title': s:make_title(context),
+            \ 'title': printf(' [%s] A:add, C:checkout, D:diff ', s:FT),
             \ }
-        let xs = s:get_history(context)
         call utils#popupwin#apply_size(opts)
         call utils#popupwin#apply_border(opts, 'VimrcDevPopupBorder')
-        let winid = popup_menu(xs, opts)
+        let winid = popup_menu([], opts)
+        call s:reload_lines(winid)
         call win_execute(winid, 'setfiletype ' .. s:FT)
         call popup_setoptions(winid, {
             \ 'filter': function('s:popup_filter'),
@@ -19,32 +17,15 @@ function! gitdiff#history#exec() abort
             \ })
     catch
         echohl Error
-        echo printf('[gitdiff] %s', v:exception)
+        echo printf('[%s] %s', s:FT, v:exception)
         echohl None
     endtry
 endfunction
 
-function! gitdiff#history#exec_first() abort
-    let context = gitdiff#get_current_context()
-    let xs = s:get_history(context)
-    if xs[0] == s:EMPTY
-        call gitdiff#numstat#exec('', '')
-    else
-        call gitdiff#numstat#exec('', xs[0])
-    endif
-endfunction
-
-function! s:get_history(context) abort
-    let xs = map(deepcopy(a:context['history']), { _,x -> empty(x) ? s:EMPTY : x })
-    if empty(xs)
-        return ['-w']
-    else
-        return xs
-    endif
-endfunction
-
-function! s:make_title(context) abort
-    return printf(' [%s] %s', s:FT, a:context['rootdir'])
+function! s:reload_lines(winid) abort
+    let rootdir = git#internal#get_rootdir()
+    let lines = filter(git#internal#system('status -s'), { _,x -> !empty(x) })
+    call popup_settext(a:winid, lines)
 endfunction
 
 function! s:popup_filter(winid, key) abort
@@ -65,6 +46,20 @@ function! s:popup_filter(winid, key) abort
             call utils#popupwin#set_cursorline(a:winid, lnum - 1)
         endif
         return 1
+    elseif 65 == char2nr(a:key)
+        " A
+        let rootdir = git#internal#get_rootdir()
+        call git#internal#system(printf('add "%s"', s:get_current_path(a:winid, lnum)))
+        call s:reload_lines(a:winid)
+        return 1
+    elseif 67 == char2nr(a:key)
+        " C
+        echo 'git checkout '
+        return 1
+    elseif 68 == char2nr(a:key)
+        " D
+        echo 'git diff '
+        return 1
     elseif 0x20 == char2nr(a:key)
         return popup_filter_menu(a:winid, "\<cr>")
     elseif 0x0d == char2nr(a:key)
@@ -78,14 +73,25 @@ function! s:popup_filter(winid, key) abort
     endif
 endfunction
 
-function! s:popup_callback(winid, result) abort
-    if -1 != a:result
-        let lnum = a:result
-        let q_args = trim(get(getbufline(winbufnr(a:winid), lnum), 0, ''))
-        if q_args == s:EMPTY
-            call gitdiff#numstat#exec('', '')
-        else
-            call gitdiff#numstat#exec('', q_args)
+function! s:get_current_path(winid, lnum) abort
+    if -1 != a:lnum
+        let rootdir = git#internal#get_rootdir()
+        let line = get(getbufline(winbufnr(a:winid), a:lnum), 0, '')[3:]
+        if -1 != stridx(line, ' -> ')
+            let line = split(line, ' -> ')[1]
+        endif
+        let path = expand(rootdir .. '/' .. line)
+        if filereadable(path)
+            return path
         endif
     endif
+    return ''
 endfunction
+
+function! s:popup_callback(winid, result) abort
+    let path = s:get_current_path(a:winid, a:result)
+    if !empty(path)
+        execute printf('edit %s', fnameescape(path))
+    endif
+endfunction
+

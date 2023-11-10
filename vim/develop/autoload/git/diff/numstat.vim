@@ -4,9 +4,9 @@ let s:FT_DIFF = 'diff'
 
 
 
-function! gitdiff#numstat#exec(q_bang, q_args) abort
+function! git#diff#numstat#exec(q_bang, q_args) abort
     try
-        let context = gitdiff#get_current_context()
+        let context = git#diff#get_current_context()
         let i = index(context['history'], a:q_args)
         if -1 != i
             call remove(context['history'], i)
@@ -22,17 +22,17 @@ function! gitdiff#numstat#exec(q_bang, q_args) abort
         if !use_cache
             let context['last_cursor_position'] = 1
             let context['q_args'] = a:q_args
-            let context['cmd'] = 'git --no-pager diff --numstat ' .. a:q_args
+            let context['cmd'] = ['diff', '--numstat', a:q_args]
             let context['files'] = {}
             let ok = v:true
             let error_lines = []
-            for x in filter(utils#system#exec(context['cmd'], context['rootdir']), { _,x -> !empty(x) })
+            for x in filter(git#internal#system(context['cmd']), { _,x -> !empty(x) })
                 let m = split(x, '\t')
                 if 3 == len(m)
                     let context['files'][m[2]] = {
                         \ 'added': str2nr(m[0]),
                         \ 'removed': str2nr(m[1]),
-                        \ 'cmd': printf('git --no-pager diff %s -- "%s"', a:q_args, expand(context['rootdir'] .. '/' .. s:fix_path(m[2]))),
+                        \ 'cmd': ['diff', a:q_args, '--', expand(context['rootdir'] .. '/' .. s:fix_path(m[2]))],
                         \ 'cached': [],
                         \ }
                 else
@@ -60,8 +60,8 @@ endfunction
 
 
 function! s:bufferkeymap_enter() abort
-    let rootdir = gitdiff#rootdir#get()
-    call gitdiff#diff#jumpdiffline(rootdir)
+    let rootdir = git#internal#get_rootdir()
+    call git#diff#diff#jumpdiffline(rootdir)
 endfunction
 
 function! s:bufferkeymap_bang() abort
@@ -119,8 +119,8 @@ function! s:popup_filter(winid, key) abort
         return 1
     elseif 0x21 == char2nr(a:key)
         call popup_close(a:winid)
-        let context = gitdiff#get_current_context()
-        call gitdiff#numstat('!', context['q_args'])
+        let context = git#diff#get_current_context()
+        call git#diff#numstat('!', context['q_args'])
         return 1
     elseif 0x20 == char2nr(a:key)
         return popup_filter_menu(a:winid, "\<cr>")
@@ -140,7 +140,7 @@ function! s:popup_callback(winid, result) abort
         let lnum = a:result
         let line = trim(get(getbufline(winbufnr(a:winid), lnum), 0, ''))
         let path = trim(get(split(line, "\t") , 2, ''))
-        let context = gitdiff#get_current_context()
+        let context = git#diff#get_current_context()
         if has_key(context['files'], path)
             let context['last_cursor_position'] = lnum
             call s:open_diffwindow(path, v:true)
@@ -161,12 +161,12 @@ function! s:fix_path(path) abort
 endfunction
 
 function! s:open_diffwindow(path, use_cached) abort
-    let context = gitdiff#get_current_context()
+    let context = git#diff#get_current_context()
     let cmd = context['files'][a:path]['cmd']
     if a:use_cached && !empty(context['files'][a:path]['cached'])
         let lines = context['files'][a:path]['cached']
     else
-        let lines = utils#system#exec(cmd, context['rootdir'])
+        let lines = git#internal#system(cmd)
     endif
 
     let exists = v:false

@@ -1,18 +1,18 @@
 
-function! gitdiff#history() abort
-    call gitdiff#history#exec()
+function! git#diff#history() abort
+    call git#diff#history#exec()
 endfunction
 
-function! gitdiff#history_first() abort
-    call gitdiff#history#exec_first()
+function! git#diff#history_first() abort
+    call git#diff#history#exec_first()
 endfunction
 
-function! gitdiff#numstat(q_bang, q_args) abort
-    call gitdiff#numstat#exec(a:q_bang, a:q_args)
+function! git#diff#numstat(q_bang, q_args) abort
+    call git#diff#numstat#exec(a:q_bang, a:q_args)
 endfunction
 
-function! gitdiff#get_current_context() abort
-    let rootdir = gitdiff#rootdir#get()
+function! git#diff#get_current_context() abort
+    let rootdir = git#internal#get_rootdir()
     if !isdirectory(rootdir)
         throw 'The directory is not under git control!'
     endif

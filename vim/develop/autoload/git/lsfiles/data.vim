@@ -10,17 +10,17 @@ function! s:init(rootdir) abort
     endif
 endfunction
 
-function! gitlsfiles#data#get_query(rootdir) abort
+function! git#lsfiles#data#get_query(rootdir) abort
     let d = s:init(a:rootdir)
     return get(d, 'query', '')
 endfunction
 
-function! gitlsfiles#data#set_query(rootdir, query_text) abort
+function! git#lsfiles#data#set_query(rootdir, query_text) abort
     let d = s:init(a:rootdir)
     let d['query'] = a:query_text
 endfunction
 
-function! gitlsfiles#data#get_paths(rootdir) abort
+function! git#lsfiles#data#get_paths(rootdir) abort
     let d = s:init(a:rootdir)
     return get(d, 'paths', [])
 endfunction
@@ -40,27 +40,27 @@ function! s:filtered(path) abort
     endif
 endfunction
 
-function! gitlsfiles#data#set_paths(rootdir, paths) abort
+function! git#lsfiles#data#set_paths(rootdir, paths) abort
     let d = s:init(a:rootdir)
     let d['paths'] = filter(a:paths, { _,x -> s:filtered(x) })
 endfunction
 
-function! gitlsfiles#data#get_elapsed_time(rootdir) abort
+function! git#lsfiles#data#get_elapsed_time(rootdir) abort
     let d = s:init(a:rootdir)
     return get(d, 'elapsed_time', -1.0)
 endfunction
 
-function! gitlsfiles#data#set_elapsed_time(rootdir, elapsed_time) abort
+function! git#lsfiles#data#set_elapsed_time(rootdir, elapsed_time) abort
     let d = s:init(a:rootdir)
     let d['elapsed_time'] = a:elapsed_time
 endfunction
 
-function! gitlsfiles#data#get_cmd_name(rootdir) abort
+function! git#lsfiles#data#get_cmd_name(rootdir) abort
     let d = s:init(a:rootdir)
     return get(d, 'cmd_name', '')
 endfunction
 
-function! gitlsfiles#data#set_cmd_name(rootdir, cmd_name) abort
+function! git#lsfiles#data#set_cmd_name(rootdir, cmd_name) abort
     let d = s:init(a:rootdir)
     let d['cmd_name'] = a:cmd_name
 endfunction

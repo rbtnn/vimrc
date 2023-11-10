@@ -1,5 +1,5 @@
 
-function! gitdiff#diff#jumpdiffline(rootdir) abort
+function! git#diff#diff#jumpdiffline(rootdir) abort
     let x = s:calc_lnum(a:rootdir)
     if !empty(x)
         if filereadable(x['path'])
