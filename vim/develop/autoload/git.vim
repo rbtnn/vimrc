@@ -1,39 +1,40 @@
 
 function! git#status() abort
-    try
-        if !isdirectory(git#internal#get_rootdir())
-            throw 'The directory is not under git control!'
-        endif
+    if isdirectory(git#internal#get_rootdir())
         call git#status#exec()
-    catch
-        echohl Error
-        echo printf('[git] %s %s', v:exception, v:throwpoint)
-        echohl None
-    endtry
+    else
+        call git#internal#echo('The directory is not under git control!')
+    endif
+endfunction
+
+function! git#grep(q_args) abort
+    if isdirectory(git#internal#get_rootdir())
+        call git#grep#exec(a:q_args)
+    else
+        call git#internal#echo('The directory is not under git control!')
+    endif
 endfunction
 
 function! git#blame() abort
-    try
-        if !isdirectory(git#internal#get_rootdir())
-            throw 'The directory is not under git control!'
-        endif
+    if isdirectory(git#internal#get_rootdir())
         echo trim(get(git#internal#system(['blame', '-L', line('.') .. ',' .. line('.'), '--', expand('%')]), 0, ''))
-    catch
-        echohl Error
-        echo printf('[git] %s %s', v:exception, v:throwpoint)
-        echohl None
-    endtry
+    else
+        call git#internal#echo('The directory is not under git control!')
+    endif
 endfunction
 
 function! git#lsfiles(q_bang) abort
-    try
-        if !isdirectory(git#internal#get_rootdir())
-            throw 'The directory is not under git control!'
-        endif
+    if isdirectory(git#internal#get_rootdir())
         call git#lsfiles#exec(a:q_bang)
-    catch
-        echohl Error
-        echo printf('[git] %s %s', v:exception, v:throwpoint)
-        echohl None
-    endtry
+    else
+        call git#internal#echo('The directory is not under git control!')
+    endif
+endfunction
+
+function! git#diff(q_bang) abort
+    if isdirectory(git#internal#get_rootdir())
+        call git#diff#numstat#exec('!', a:q_bang)
+    else
+        call git#internal#echo('The directory is not under git control!')
+    endif
 endfunction

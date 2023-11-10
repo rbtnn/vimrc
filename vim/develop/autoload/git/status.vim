@@ -2,29 +2,22 @@
 let s:FT = 'gitstatus'
 
 function! git#status#exec() abort
-    try
-        let opts = {
-            \ 'title': printf(' [%s] A:add, C:checkout, D:diff ', s:FT),
-            \ }
-        call utils#popupwin#apply_size(opts)
-        call utils#popupwin#apply_border(opts, 'VimrcDevPopupBorder')
-        let winid = popup_menu([], opts)
-        call s:reload_lines(winid)
-        call win_execute(winid, 'setfiletype ' .. s:FT)
-        call popup_setoptions(winid, {
-            \ 'filter': function('s:popup_filter'),
-            \ 'callback': function('s:popup_callback'),
-            \ })
-    catch
-        echohl Error
-        echo printf('[%s] %s', s:FT, v:exception)
-        echohl None
-    endtry
+    let opts = {
+        \ 'title': printf(' [git] A:"add", R:"restore --staged", D:"diff -w", C:"diff --cached -w" '),
+        \ }
+    call utils#popupwin#apply_size(opts)
+    call utils#popupwin#apply_border(opts, 'VimrcDevPopupBorder')
+    let winid = popup_menu([], opts)
+    call s:reload_lines(winid)
+    call win_execute(winid, 'setfiletype ' .. s:FT)
+    call popup_setoptions(winid, {
+        \ 'filter': function('s:popup_filter'),
+        \ 'callback': function('s:popup_callback'),
+        \ })
 endfunction
 
 function! s:reload_lines(winid) abort
-    let rootdir = git#internal#get_rootdir()
-    let lines = filter(git#internal#system('status -s'), { _,x -> !empty(x) })
+    let lines = filter(git#internal#system(['status', '-s']), { _,x -> !empty(x) })
     call popup_settext(a:winid, lines)
 endfunction
 
@@ -46,19 +39,19 @@ function! s:popup_filter(winid, key) abort
             call utils#popupwin#set_cursorline(a:winid, lnum - 1)
         endif
         return 1
-    elseif 65 == char2nr(a:key)
-        " A
-        let rootdir = git#internal#get_rootdir()
-        call git#internal#system(printf('add "%s"', s:get_current_path(a:winid, lnum)))
+    elseif char2nr('A') == char2nr(a:key)
+        call git#internal#system(['add', s:get_current_path(a:winid, lnum)])
         call s:reload_lines(a:winid)
         return 1
-    elseif 67 == char2nr(a:key)
-        " C
-        echo 'git checkout '
-        return 1
-    elseif 68 == char2nr(a:key)
-        " D
-        echo 'git diff '
+    elseif char2nr('C') == char2nr(a:key)
+        call git#diff#open_diffwindow(['--cached', '-w'], s:get_current_path(a:winid, lnum))
+        return popup_filter_menu(a:winid, "\<esc>")
+    elseif char2nr('D') == char2nr(a:key)
+        call git#diff#open_diffwindow(['-w'], s:get_current_path(a:winid, lnum))
+        return popup_filter_menu(a:winid, "\<esc>")
+    elseif char2nr('R') == char2nr(a:key)
+        call git#internal#system(['restore', '--staged', s:get_current_path(a:winid, lnum)])
+        call s:reload_lines(a:winid)
         return 1
     elseif 0x20 == char2nr(a:key)
         return popup_filter_menu(a:winid, "\<cr>")

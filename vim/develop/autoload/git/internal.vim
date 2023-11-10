@@ -1,4 +1,8 @@
 
+function! git#internal#echo(text) abort
+    echo printf('[git] %s', a:text)
+endfunction
+
 function! git#internal#get_rootdir(path = '.') abort
     let xs = split(fnamemodify(a:path, ':p'), '[\/]')
     let prefix = (has('mac') || has('linux')) ? '/' : ''

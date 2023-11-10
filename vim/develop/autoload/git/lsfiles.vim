@@ -101,8 +101,7 @@ function! s:get_popupwin_options_main(rootdir, n) abort
     "let elapsed_time = git#lsfiles#data#get_elapsed_time(a:rootdir)
     let elapsed_time = -1.0
     let opts = {
-        \ 'title': printf(' [%s] %d/%d%s ',
-        \   fnamemodify(a:rootdir, ':t'),
+        \ 'title': printf(' [git] %d/%d%s ',
         \   a:n,
         \   len(git#lsfiles#data#get_paths(a:rootdir)),
         \   (-1.0 == elapsed_time ? '' : printf(' (elapsed_time: %f)', elapsed_time))),

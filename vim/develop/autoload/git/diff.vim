@@ -1,24 +1,72 @@
 
-function! git#diff#history() abort
-    call git#diff#history#exec()
-endfunction
+function! git#diff#open_diffwindow(args, path) abort
+    let exists = v:false
+    for w in filter(getwininfo(), { _, x -> x['tabnr'] == tabpagenr() })
+        if 'diff' == getbufvar(w['bufnr'], '&filetype', '')
+            execute printf('%dwincmd w', w['winnr'])
+            let exists = v:true
+            break
+        endif
+    endfor
+    let lines = git#internal#system(['diff'] + a:args + ['--', a:path])
+    if empty(lines)
+        call git#internal#echo('No modified')
+        if exists
+            close
+        endif
+    else
+        if !exists
+            if !&modified && &modifiable && empty(&buftype) && !filereadable(bufname())
+                " use the current buffer.
+            else
+                if &lines < &columns / 2
+                    botright vnew
+                else
+                    botright new
+                endif
+            endif
+        endif
+        setfiletype diff
+        setlocal nolist
+        let &l:statusline = printf('[git] diff %s -- %s', join(a:args), a:path)
+        call s:setbuflines(lines)
 
-function! git#diff#history_first() abort
-    call git#diff#history#exec_first()
-endfunction
+        nnoremap <buffer><cr>  <Cmd>call <SID>bufferkeymap_enter()<cr>
+        nnoremap <buffer>!     <Cmd>call <SID>bufferkeymap_bang()<cr>
+        nnoremap <buffer><C-o> <nop>
+        nnoremap <buffer><C-i> <nop>
 
-function! git#diff#numstat(q_bang, q_args) abort
-    call git#diff#numstat#exec(a:q_bang, a:q_args)
-endfunction
-
-function! git#diff#get_current_context() abort
-    let rootdir = git#internal#get_rootdir()
-    if !isdirectory(rootdir)
-        throw 'The directory is not under git control!'
+        " The lines encodes after redrawing.
+        if get(g:, 'gitdiff_enabled_qficonv', v:false)
+            " Redraw windows because the encoding process is very slowly.
+            redraw
+            for i in range(0, len(lines) - 1)
+                let lines[i] = utils#iconv#exec(lines[i])
+            endfor
+            call s:setbuflines(lines)
+        endif
+        let b:gitdiff_current_args = a:args
+        let b:gitdiff_current_path = a:path
     endif
-    let s:gitdiff = get(s:, 'gitdiff', {})
-    let s:gitdiff[rootdir] = get(s:gitdiff, rootdir, {})
-    let s:gitdiff[rootdir]['rootdir'] = rootdir
-    let s:gitdiff[rootdir]['history'] = get(s:gitdiff[rootdir], 'history', [])
-    return s:gitdiff[rootdir]
+endfunction
+
+
+
+function! s:bufferkeymap_enter() abort
+    call git#diff#diff#jumpdiffline()
+endfunction
+
+function! s:bufferkeymap_bang() abort
+    let wnr = winnr()
+    let lnum = line('.')
+    call git#diff#open_diffwindow(b:gitdiff_current_args, b:gitdiff_current_path)
+    execute printf(':%dwincmd w', wnr)
+    call cursor(lnum, 0)
+endfunction
+
+function! s:setbuflines(lines) abort
+    setlocal modifiable noreadonly
+    silent! call deletebufline(bufnr(), 1, '$')
+    call setbufline(bufnr(), 1, a:lines)
+    setlocal buftype=nofile nomodifiable readonly
 endfunction

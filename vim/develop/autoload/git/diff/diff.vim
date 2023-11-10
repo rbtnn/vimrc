@@ -1,6 +1,6 @@
 
-function! git#diff#diff#jumpdiffline(rootdir) abort
-    let x = s:calc_lnum(a:rootdir)
+function! git#diff#diff#jumpdiffline() abort
+    let x = s:calc_lnum()
     if !empty(x)
         if filereadable(x['path'])
             if s:find_window_by_path(x['path'])
@@ -13,7 +13,7 @@ function! git#diff#diff#jumpdiffline(rootdir) abort
     endif
 endfunction
 
-function! s:calc_lnum(rootdir) abort
+function! s:calc_lnum() abort
     let lines = getbufline(bufnr(), 1, '$')
     let curr_lnum = line('.')
     let lnum = -1
@@ -59,7 +59,7 @@ function! s:calc_lnum(rootdir) abort
             for i in [1, 3, 5]
                 if '+' == m[i]
                     let lnum = str2nr(m[i + 1]) + n1 + n3
-                    return { 'lnum': lnum, 'path': expand(a:rootdir .. '/' .. relpath) }
+                    return { 'lnum': lnum, 'path': expand(git#internal#get_rootdir() .. '/' .. relpath) }
                 endif
             endfor
         endif
