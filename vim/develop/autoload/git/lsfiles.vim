@@ -59,7 +59,7 @@ function! s:get_popupwin_options_main(rootdir, n) abort
         \   (-1.0 == elapsed_time ? '' : printf(' (elapsed_time: %f)', elapsed_time))),
         \ }
     call utils#popupwin#apply_size(opts)
-    call utils#popupwin#apply_border(opts, 'VimrcDevPopupBorder')
+    call utils#popupwin#apply_border(opts)
     return opts
 endfunction
 
@@ -73,7 +73,7 @@ function! s:get_popupwin_options_sub(main_winid, hidden) abort
         \ 'minwidth': width,
         \ 'hidden': a:hidden,
         \ }
-    return utils#popupwin#apply_border(opts, 'VimrcDevPopupBorder')
+    return utils#popupwin#apply_border(opts)
 endfunction
 
 function! s:can_open_in_current() abort

@@ -27,8 +27,9 @@ function! git#diff#numstat#exec(q_bang, q_args) abort
     if ok
         if empty(context['files'])
             call git#internal#echo('No modified files!')
+        else
+            call s:open_numstatwindow(context)
         endif
-        call s:open_numstatwindow(context)
     else
         throw join(error_lines, "\n")
     endif
@@ -46,7 +47,7 @@ function! s:open_numstatwindow(context) abort
         \ 'title': printf(' [%s] %s ', git#internal#branch_name(), join(a:context['cmd'])),
         \ }
     call utils#popupwin#apply_size(opts)
-    call utils#popupwin#apply_border(opts, 'VimrcDevPopupBorder')
+    call utils#popupwin#apply_border(opts)
     let winid = popup_menu(lines, opts)
     call win_execute(winid, 'setfiletype ' .. s:FT_NUMSTAT)
     call popup_setoptions(winid, {

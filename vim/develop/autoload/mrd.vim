@@ -8,7 +8,7 @@ function! mrd#exec() abort
             \ 'title': ' [most recent directories] ',
             \ }
         call utils#popupwin#apply_size(opts)
-        call utils#popupwin#apply_border(opts, 'VimrcDevPopupBorder')
+        call utils#popupwin#apply_border(opts)
         let winid = popup_menu(mrd#get_directories(), opts)
         call popup_setoptions(winid, {
             \ 'filter': function('s:popup_filter'),

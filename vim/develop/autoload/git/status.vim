@@ -6,7 +6,7 @@ function! git#status#exec() abort
         \ 'title': printf(' [%s] A:"add", R:"restore --staged", D:"diff -w", C:"diff --cached -w" ', git#internal#branch_name()),
         \ }
     call utils#popupwin#apply_size(opts)
-    call utils#popupwin#apply_border(opts, 'VimrcDevPopupBorder')
+    call utils#popupwin#apply_border(opts)
     let winid = popup_menu([], opts)
     if s:reload_lines(winid)
         call win_execute(winid, 'setfiletype ' .. s:FT)

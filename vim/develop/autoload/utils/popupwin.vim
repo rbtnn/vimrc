@@ -12,14 +12,35 @@ const s:borderchars_typeB = [
     \ nr2char(0x2500), nr2char(0x2502), nr2char(0x2500), nr2char(0x2502),
     \ nr2char(0x256d), nr2char(0x256e), nr2char(0x256f), nr2char(0x2570)]
 
-function! utils#popupwin#apply_border(opts, hlname) abort
+const s:hlname = 'VimrcDevPopupBorder'
+
+function! utils#popupwin#notification(msg) abort
     if has('gui_running') || (!has('win32') && !has('gui_running'))
-        if hlexists(a:hlname)
+        if hlexists(s:hlname)
+            call popup_notification(a:msg, {
+                \ 'highlight': 'Normal',
+                \ 'pos': 'center',
+                \ 'border': [],
+                \ 'padding': [1, 1, 1, 1],
+                \ 'borderhighlight': repeat([s:hlname], 4),
+                \ 'borderchars': get(g:, 'popupwin_border_type', 0) ? s:borderchars_typeA : s:borderchars_typeB,
+                \ })
+        else
+            echo a:msg
+        endif
+    else
+        echo a:msg
+    endif
+endfunction
+
+function! utils#popupwin#apply_border(opts) abort
+    if has('gui_running') || (!has('win32') && !has('gui_running'))
+        if hlexists(s:hlname)
             call extend(a:opts, {
                 \ 'highlight': 'Normal',
                 \ 'border': [],
                 \ 'padding': [0, 0, 0, 0],
-                \ 'borderhighlight': repeat([a:hlname], 4),
+                \ 'borderhighlight': repeat([s:hlname], 4),
                 \ 'borderchars': get(g:, 'popupwin_border_type', 0) ? s:borderchars_typeA : s:borderchars_typeB,
                 \ }, 'force')
         endif
