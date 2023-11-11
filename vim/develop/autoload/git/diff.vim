@@ -60,8 +60,10 @@ function! s:bufferkeymap_bang() abort
     let wnr = winnr()
     let lnum = line('.')
     call git#diff#open_diffwindow(b:gitdiff_current_args, b:gitdiff_current_path)
-    execute printf(':%dwincmd w', wnr)
-    call cursor(lnum, 0)
+    if &filetype == 'diff'
+        execute printf(':%dwincmd w', wnr)
+        call cursor(lnum, 0)
+    endif
 endfunction
 
 function! s:setbuflines(lines) abort

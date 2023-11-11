@@ -11,7 +11,7 @@ if has('vim_starting')
 
     if has('win32') && has('gui_running')
         " https://github.com/yuru7/udev-gothic
-        set guifont=UDEV_Gothic:h12:cSHIFTJIS:qDRAFT
+        set guifont=UDEV_Gothic:h14:cSHIFTJIS:qDRAFT
         set linespace=0
     endif
 
