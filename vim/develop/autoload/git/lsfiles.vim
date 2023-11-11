@@ -2,45 +2,20 @@
 let s:subwinid = get(s:, 'subwinid', -1)
 
 function! git#lsfiles#exec(q_bang) abort
-    let g:lsfiles_height = get(g:, 'lsfiles_height', 10)
-    let g:lsfiles_ignore_exts = get(g:, 'lsfiles_ignore_exts', [
-        \ 'exe', 'o', 'obj', 'xls', 'doc', 'xlsx', 'docx', 'dll', 'png', 'jpg', 'ico', 'pdf', 'mp3', 'zip',
-        \ 'ttf', 'gif', 'otf', 'wav', 'm4a', 'ai', 'tgz'
-        \ ])
-    let g:lsfiles_ignore_patterns = get(g:, 'lsfiles_ignore_patterns', [])
-    let g:lsfiles_maximum = get(g:, 'lsfiles_maximum', 100)
-
-    let cmd_name = ''
     let rootdir = git#internal#get_rootdir()
-    if isdirectory(rootdir)
-        if executable('git')
-            let cmd_name = 'git'
-        else
-            echohl Error
-            echo   '[lsfiles] Could not execute git command!'
-            echohl None
+    let winid = popup_menu([], s:get_popupwin_options_main(rootdir, 0))
+    let s:subwinid = popup_create('', s:get_popupwin_options_sub(winid, v:true))
+    if -1 != winid
+        if a:q_bang == '!'
+            call git#lsfiles#data#set_paths(rootdir, [])
+            call git#lsfiles#data#set_query(rootdir, '')
+            call git#lsfiles#data#set_elapsed_time(rootdir, -1.0)
         endif
-    else
-        echohl Error
-        echo   '[lsfiles] There is not a git repository: ' getcwd()
-        echohl None
-    endif
-    if !empty(cmd_name)
-        let winid = popup_menu([], s:get_popupwin_options_main(rootdir, 0))
-        let s:subwinid = popup_create('', s:get_popupwin_options_sub(winid, v:true))
-        if -1 != winid
-            call git#lsfiles#data#set_cmd_name(rootdir, cmd_name)
-            if a:q_bang == '!'
-                call git#lsfiles#data#set_paths(rootdir, [])
-                call git#lsfiles#data#set_query(rootdir, '')
-                call git#lsfiles#data#set_elapsed_time(rootdir, -1.0)
-            endif
-            call popup_setoptions(winid, {
-                \ 'filter': function('s:popup_filter', [rootdir]),
-                \ 'callback': function('s:popup_callback', [rootdir]),
-                \ })
-            call s:search_lsfiles(rootdir, winid)
-        endif
+        call popup_setoptions(winid, {
+            \ 'filter': function('s:popup_filter', [rootdir]),
+            \ 'callback': function('s:popup_callback', [rootdir]),
+            \ })
+        call s:search_lsfiles(rootdir, winid)
     endif
 endfunction
 
@@ -55,22 +30,6 @@ function! s:popup_filter(rootdir, winid, key) abort
             call s:search_lsfiles(a:rootdir, a:winid)
         endif
         return 1
-    elseif (10 == char2nr(a:key)) || (14 == char2nr(a:key))
-        " Ctrl-n or Ctrl-j
-        if lnum == line('$', a:winid)
-            call utils#popupwin#set_cursorline(a:winid, 1)
-        else
-            call utils#popupwin#set_cursorline(a:winid, lnum + 1)
-        endif
-        return 1
-    elseif (11 == char2nr(a:key)) || (16 == char2nr(a:key))
-        " Ctrl-p or Ctrl-k
-        if lnum == 1
-            call utils#popupwin#set_cursorline(a:winid, line('$', a:winid))
-        else
-            call utils#popupwin#set_cursorline(a:winid, lnum - 1)
-        endif
-        return 1
     elseif ("\x80kb" == a:key) || (8 == char2nr(a:key))
         " Ctrl-h or bs
         if 0 < len(xs)
@@ -79,21 +38,13 @@ function! s:popup_filter(rootdir, winid, key) abort
             call s:search_lsfiles(a:rootdir, a:winid)
         endif
         return 1
-    elseif 0x20 == char2nr(a:key)
-        return popup_filter_menu(a:winid, "\<cr>")
     elseif (0x21 <= char2nr(a:key)) && (char2nr(a:key) <= 0x7f)
         let xs += [a:key]
         call git#lsfiles#data#set_query(a:rootdir, join(xs, ''))
         call s:search_lsfiles(a:rootdir, a:winid)
         return 1
-    elseif 0x0d == char2nr(a:key)
-        return popup_filter_menu(a:winid, "\<cr>")
     else
-        if char2nr(a:key) < 0x20
-            return popup_filter_menu(a:winid, "\<esc>")
-        else
-            return popup_filter_menu(a:winid, a:key)
-        endif
+        return utils#popupwin#common_filter(a:winid, a:key)
     endif
 endfunction
 
@@ -101,7 +52,8 @@ function! s:get_popupwin_options_main(rootdir, n) abort
     "let elapsed_time = git#lsfiles#data#get_elapsed_time(a:rootdir)
     let elapsed_time = -1.0
     let opts = {
-        \ 'title': printf(' [git] %d/%d%s ',
+        \ 'title': printf(' [%s] %d/%d%s ',
+        \   git#internal#branch_name(),
         \   a:n,
         \   len(git#lsfiles#data#get_paths(a:rootdir)),
         \   (-1.0 == elapsed_time ? '' : printf(' (elapsed_time: %f)', elapsed_time))),
@@ -168,13 +120,12 @@ function! s:search_lsfiles(rootdir, winid) abort
     call popup_settext(a:winid, 'Please wait for listing files in the repository...')
     redraw
     let start_time = reltime()
-    let cmd_name = git#lsfiles#data#get_cmd_name(a:rootdir)
     let query_text = git#lsfiles#data#get_query(a:rootdir)
     if empty(git#lsfiles#data#get_paths(a:rootdir))
         call git#lsfiles#data#set_paths(a:rootdir, git#internal#system(['ls-files']))
     endif
     let filtered_paths = filter(copy(git#lsfiles#data#get_paths(a:rootdir)), { _, x -> s:filter_query_text(x, query_text) })
-    let n = g:lsfiles_maximum - 1
+    let n = g:git_lsfiles_maximum - 1
     if n < 1
         let n = 1
     endif

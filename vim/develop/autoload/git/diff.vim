@@ -37,7 +37,7 @@ function! git#diff#open_diffwindow(args, path) abort
         nnoremap <buffer><C-i> <nop>
 
         " The lines encodes after redrawing.
-        if get(g:, 'gitdiff_enabled_qficonv', v:false)
+        if get(g:, 'git_enabled_qficonv', v:false)
             " Redraw windows because the encoding process is very slowly.
             redraw
             for i in range(0, len(lines) - 1)

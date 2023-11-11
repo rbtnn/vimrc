@@ -2,11 +2,11 @@
 let g:loaded_develop_git = 1
 
 if executable('git')
-    command!                                            GitStatus    :call git#status()
-    command! -nargs=*                                   GitGrep      :call git#grep(<q-args>)
-    command! -nargs=0                                   GitBlame     :call git#blame()
-    command! -nargs=*                                   GitLsFiles   :call git#lsfiles(<q-bang>)
-    command! -nargs=* -complete=customlist,GitDiffComp  GitDiff      :call git#diff(<q-args>)
+    command!       -nargs=0                                   GitStatus    :call git#status()
+    command!       -nargs=*                                   GitGrep      :call git#grep(<q-args>)
+    command!       -nargs=0                                   GitBlame     :call git#blame()
+    command! -bang -nargs=0                                   GitLsFiles   :call git#lsfiles(<q-bang>)
+    command!       -nargs=* -complete=customlist,GitDiffComp  GitDiff      :call git#diff(<q-args>)
 
     function! GitDiffComp(ArgLead, CmdLine, CursorPos) abort
         let rootdir = gitdiff#rootdir#get()

@@ -26,7 +26,7 @@ function! git#diff#numstat#exec(q_bang, q_args) abort
     endfor
     if ok
         if empty(context['files'])
-            throw 'No modified files!'
+            call git#internal#echo('No modified files!')
         endif
         call s:open_numstatwindow(context)
     else
@@ -43,7 +43,7 @@ function! s:open_numstatwindow(context) abort
         let lines += [printf("%d\t%d\t%s", file['added'], file['removed'], key)]
     endfor
     let opts = {
-        \ 'title': printf(' [git] %s ', join(a:context['cmd'])),
+        \ 'title': printf(' [%s] %s ', git#internal#branch_name(), join(a:context['cmd'])),
         \ }
     call utils#popupwin#apply_size(opts)
     call utils#popupwin#apply_border(opts, 'VimrcDevPopupBorder')
@@ -56,37 +56,12 @@ function! s:open_numstatwindow(context) abort
 endfunction
 
 function! s:popup_filter(context, winid, key) abort
-    let lnum = line('.', a:winid)
-    if (10 == char2nr(a:key)) || (14 == char2nr(a:key))
-        " Ctrl-n or Ctrl-j
-        if lnum == line('$', a:winid)
-            call utils#popupwin#set_cursorline(a:winid, 1)
-        else
-            call utils#popupwin#set_cursorline(a:winid, lnum + 1)
-        endif
-        return 1
-    elseif (11 == char2nr(a:key)) || (16 == char2nr(a:key))
-        " Ctrl-p or Ctrl-k
-        if lnum == 1
-            call utils#popupwin#set_cursorline(a:winid, line('$', a:winid))
-        else
-            call utils#popupwin#set_cursorline(a:winid, lnum - 1)
-        endif
-        return 1
-    elseif 0x21 == char2nr(a:key)
+    if char2nr('!') == char2nr(a:key)
         call popup_close(a:winid)
         call git#diff#numstat#exec('!', a:context['q_args'])
         return 1
-    elseif 0x20 == char2nr(a:key)
-        return popup_filter_menu(a:winid, "\<cr>")
-    elseif 0x0d == char2nr(a:key)
-        return popup_filter_menu(a:winid, "\<cr>")
     else
-        if char2nr(a:key) < 0x20
-            return popup_filter_menu(a:winid, "\<esc>")
-        else
-            return popup_filter_menu(a:winid, a:key)
-        endif
+        return utils#popupwin#common_filter(a:winid, a:key)
     endif
 endfunction
 
