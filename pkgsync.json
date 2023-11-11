@@ -2,14 +2,15 @@
 	"packpath": "~/vim/github",
 	"plugins": {
 		"start": {
+			"bluz71": [
+				"vim-moonfly-colors"
+			],
 			"haya14busa": [
 				"vim-operator-flashy"
 			],
 			"itchyny": [
+				"lightline.vim",
 				"vim-parenmatch"
-			],
-			"jaredgorski": [
-				"SpaceCamp"
 			],
 			"kana": [
 				"vim-operator-replace",
@@ -34,6 +35,9 @@
 			],
 			"sgur": [
 				"vim-textobj-parameter"
+			],
+			"t9md": [
+				"vim-quickhl"
 			],
 			"thinca": [
 				"vim-qfreplace",

@@ -33,6 +33,5 @@ nnoremap <silent><C-p>    <Cmd>cprevious \| normal zz<cr>
 if isdirectory(expand('$VIMRC_VIM/develop'))
     nnoremap <silent><C-s>    <Cmd>GitStatus<cr>
     nnoremap <silent><C-f>    <Cmd>GitLsFiles<cr>
-    nnoremap <silent><space>  <Cmd>MRD<cr>
 endif
 
