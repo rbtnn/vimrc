@@ -132,9 +132,15 @@ function! s:search_lsfiles(rootdir, winid) abort
     call popup_settext(a:winid, filtered_paths[:n])
     call git#lsfiles#data#set_elapsed_time(a:rootdir, reltimefloat(reltime(start_time)))
     call popup_setoptions(a:winid, s:get_popupwin_options_main(a:rootdir, len(filtered_paths)))
+    if g:git_enabled_match_query
+        call win_execute(a:winid, 'call clearmatches()')
+    endif
     if empty(query_text)
         call popup_hide(s:subwinid)
     else
+        if g:git_enabled_match_query
+            call win_execute(a:winid, printf('silent call matchadd(''Question'', ''%s'')', query_text))
+        endif
         call popup_show(s:subwinid)
         call popup_settext(s:subwinid, ' ' .. query_text .. ' ')
         call popup_setoptions(s:subwinid, s:get_popupwin_options_sub(a:winid, v:false))
