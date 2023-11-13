@@ -139,7 +139,7 @@ function! s:search_lsfiles(rootdir, winid) abort
         call popup_hide(s:subwinid)
     else
         if g:git_enabled_match_query
-            call win_execute(a:winid, printf('silent call matchadd(''Question'', ''%s'')', query_text))
+            call win_execute(a:winid, printf('silent call matchadd(''Question'', ''%s'')', '\c' .. query_text))
         endif
         call popup_show(s:subwinid)
         call popup_settext(s:subwinid, ' ' .. query_text .. ' ')
