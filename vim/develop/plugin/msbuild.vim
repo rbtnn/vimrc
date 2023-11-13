@@ -15,7 +15,7 @@ if has('win32') && executable('msbuild')
                 let cmd += ['/nologo'] + a:args
             endif
         else
-            let cmd = printf('msbuild /nologo %s %s', a:args, a:projectfile)
+            let cmd = printf('msbuild /nologo %s "%s"', a:args, a:projectfile)
         endif
         call qfjob#start(cmd, {
             \ 'title': 'msbuild',
