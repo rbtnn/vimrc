@@ -1,3 +1,4 @@
+scriptencoding utf-8
 let $MYVIMRC = resolve($MYVIMRC)
 let $VIMRC_VIM = expand(expand('<sfile>:h') .. '/vim')
 let $VIMRC_PKGSYNC_DIR = expand('$VIMRC_VIM/github/pack/rbtnn/start/vim-pkgsync')
@@ -10,9 +11,14 @@ if has('vim_starting')
     set runtimepath=$VIMRC_VIM/develop,$VIMRUNTIME
 
     if has('win32') && has('gui_running')
-        " https://github.com/yuru7/udev-gothic
-        set guifont=UDEV_Gothic:h14:cSHIFTJIS:qDRAFT
         set linespace=0
+        if filereadable(expand('$USERPROFILE/AppData/Local/Microsoft/Windows/Fonts/UDEVGothic-Regular.ttf'))
+            \ || filereadable(expand('C:/Windows/Fonts/UDEVGothic-Regular.ttf'))
+            " https://github.com/yuru7/udev-gothic
+            set guifont=UDEV_Gothic:h16:cSHIFTJIS:qDRAFT
+        else
+            set guifont=ＭＳ_ゴシック:h18:cSHIFTJIS:qDRAFT
+        endif
     endif
 
     silent! source ~/.vimrc.local

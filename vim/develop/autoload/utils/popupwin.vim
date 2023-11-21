@@ -1,16 +1,11 @@
 
-" ┌──┐
-" │  │
-" └──┘
-const s:borderchars_typeA = [
-    \ nr2char(0x2500), nr2char(0x2502), nr2char(0x2500), nr2char(0x2502),
-    \ nr2char(0x250c), nr2char(0x2510), nr2char(0x2518), nr2char(0x2514)]
-" ╭──╮
-" │  │
-" ╰──╯
-const s:borderchars_typeB = [
-    \ nr2char(0x2500), nr2char(0x2502), nr2char(0x2500), nr2char(0x2502),
-    \ nr2char(0x256d), nr2char(0x256e), nr2char(0x256f), nr2char(0x2570)]
+const s:borderchars_list = {
+    \   '_': ['-', '|', '-', '|', '+', '+', '+', '+'],
+    \   'A': [nr2char(0x2500), nr2char(0x2502), nr2char(0x2500), nr2char(0x2502),
+    \         nr2char(0x250c), nr2char(0x2510), nr2char(0x2518), nr2char(0x2514)],
+    \   'B': [nr2char(0x2500), nr2char(0x2502), nr2char(0x2500), nr2char(0x2502),
+    \         nr2char(0x256d), nr2char(0x256e), nr2char(0x256f), nr2char(0x2570)],
+    \ }
 
 const s:hlname = 'VimrcDevPopupBorder'
 
@@ -23,7 +18,7 @@ function! utils#popupwin#notification(msg) abort
                 \ 'border': [],
                 \ 'padding': [1, 1, 1, 1],
                 \ 'borderhighlight': repeat([s:hlname], 4),
-                \ 'borderchars': get(g:, 'popupwin_border_type', 0) ? s:borderchars_typeA : s:borderchars_typeB,
+                \ 'borderchars': s:borderchars_list['_'],
                 \ })
         else
             echo a:msg
@@ -41,7 +36,7 @@ function! utils#popupwin#apply_border(opts) abort
                 \ 'border': [],
                 \ 'padding': [0, 0, 0, 0],
                 \ 'borderhighlight': repeat([s:hlname], 4),
-                \ 'borderchars': get(g:, 'popupwin_border_type', 0) ? s:borderchars_typeA : s:borderchars_typeB,
+                \ 'borderchars': s:borderchars_list['_'],
                 \ }, 'force')
         endif
     endif
