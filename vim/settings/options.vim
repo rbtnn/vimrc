@@ -52,6 +52,7 @@ set shiftround
 set showcmd
 set showmatch
 set softtabstop=-1
+set synmaxcol=300
 set tags=./tags;
 set timeout timeoutlen=500 ttimeoutlen=100
 set updatetime=500
