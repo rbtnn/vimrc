@@ -9,7 +9,7 @@ if executable('git')
     command!       -nargs=* -complete=customlist,GitDiffComp  GitDiff      :call git#diff(<q-args>)
 
     function! GitDiffComp(ArgLead, CmdLine, CursorPos) abort
-        let rootdir = gitdiff#rootdir#get()
+        let rootdir = git#internal#get_rootdir()
         let xs = ['--cached', 'HEAD']
         if isdirectory(rootdir)
             if isdirectory(rootdir .. '/.git/refs/heads')
