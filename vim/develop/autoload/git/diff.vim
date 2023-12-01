@@ -19,17 +19,13 @@ function! git#diff#open_diffwindow(args, path) abort
             if !&modified && &modifiable && empty(&buftype) && !filereadable(bufname())
                 " use the current buffer.
             else
-                if &lines < &columns / 2
-                    botright vnew
-                else
-                    botright new
-                endif
+                new
             endif
         endif
         setfiletype diff
         setlocal nolist
         let &l:statusline = printf('[git] diff %s -- %s', join(a:args), a:path)
-        call s:setbuflines(lines)
+        call git#internal#setbuflines(lines)
 
         nnoremap <buffer><cr>  <Cmd>call <SID>bufferkeymap_enter()<cr>
         nnoremap <buffer>!     <Cmd>call <SID>bufferkeymap_bang()<cr>
@@ -43,7 +39,7 @@ function! git#diff#open_diffwindow(args, path) abort
             for i in range(0, len(lines) - 1)
                 let lines[i] = utils#iconv#exec(lines[i])
             endfor
-            call s:setbuflines(lines)
+            call git#internal#setbuflines(lines)
         endif
         let b:gitdiff_current_args = a:args
         let b:gitdiff_current_path = a:path
@@ -64,11 +60,4 @@ function! s:bufferkeymap_bang() abort
         execute printf(':%dwincmd w', wnr)
         call cursor(lnum, 0)
     endif
-endfunction
-
-function! s:setbuflines(lines) abort
-    setlocal modifiable noreadonly
-    silent! call deletebufline(bufnr(), 1, '$')
-    call setbufline(bufnr(), 1, a:lines)
-    setlocal buftype=nofile nomodifiable readonly
 endfunction

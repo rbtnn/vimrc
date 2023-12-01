@@ -7,7 +7,7 @@ source $VIMRC_VIM/settings/options.vim
 source $VIMRC_VIM/settings/autocmds.vim
 
 if has('vim_starting')
-    set packpath=$VIMRC_VIM/local,$VIMRC_VIM/github
+    set packpath=$VIMRC_VIM/github
     set runtimepath=$VIMRC_VIM/develop,$VIMRUNTIME
 
     if has('win32') && has('gui_running')

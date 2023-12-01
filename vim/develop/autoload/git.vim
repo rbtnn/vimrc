@@ -17,6 +17,15 @@ function! git#grep(q_args) abort
     endif
 endfunction
 
+function! git#show(q_args) abort
+    if isdirectory(git#internal#get_rootdir())
+        call git#config#init()
+        call git#show#exec(a:q_args)
+    else
+        call git#internal#echo('The directory is not under git control!')
+    endif
+endfunction
+
 function! git#blame() abort
     if isdirectory(git#internal#get_rootdir())
         call git#config#init()

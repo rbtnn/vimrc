@@ -13,6 +13,13 @@ function! git#internal#branch_name() abort
     endif
 endfunction
 
+function! git#internal#setbuflines(lines) abort
+    setlocal modifiable noreadonly
+    silent! call deletebufline(bufnr(), 1, '$')
+    call setbufline(bufnr(), 1, a:lines)
+    setlocal buftype=nofile nomodifiable readonly
+endfunction
+
 function! git#internal#get_rootdir(path = '.') abort
     let xs = split(fnamemodify(a:path, ':p'), '[\/]')
     let prefix = (has('mac') || has('linux')) ? '/' : ''

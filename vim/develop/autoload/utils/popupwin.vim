@@ -61,7 +61,7 @@ function! utils#popupwin#apply_size(opts) abort
         \ 'minwidth': width, 'maxwidth': width,
         \ 'minheight': height, 'maxheight': height,
         \ 'pos': 'botleft',
-        \ 'line': &lines,
+        \ 'line': &lines - &cmdheight,
         \ 'col': 1,
         \ }, 'force')
     return a:opts

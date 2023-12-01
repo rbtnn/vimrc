@@ -57,20 +57,35 @@ function! s:open_numstatwindow(context) abort
 endfunction
 
 function! s:popup_filter(context, winid, key) abort
+    let lnum = line('.', a:winid)
     if char2nr('!') == char2nr(a:key)
         call popup_close(a:winid)
         call git#diff#numstat#exec('!', a:context['q_args'])
+        return 1
+    elseif char2nr('D') == char2nr(a:key)
+        call git#diff#open_diffwindow(a:context['q_args'], s:get_current_path(a:winid, lnum))
         return 1
     else
         return utils#popupwin#common_filter(a:winid, a:key)
     endif
 endfunction
 
+function! s:get_current_path(winid, lnum) abort
+    if -1 != a:lnum
+        let rootdir = git#internal#get_rootdir()
+        let line = trim(get(getbufline(winbufnr(a:winid), a:lnum), 0, ''))
+        let path = trim(get(split(line, "\t") , 2, ''))
+        let path = expand(rootdir .. '/' .. path)
+        if filereadable(path)
+            return path
+        endif
+    endif
+    return ''
+endfunction
+
 function! s:popup_callback(context, winid, result) abort
     if -1 != a:result
-        let lnum = a:result
-        let line = trim(get(getbufline(winbufnr(a:winid), lnum), 0, ''))
-        let path = trim(get(split(line, "\t") , 2, ''))
+        let path = s:get_current_path(a:winid, a:result) abort
         if has_key(a:context['files'], path)
             call git#diff#open_diffwindow(a:context['q_args'], path)
         endif
