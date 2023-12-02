@@ -52,8 +52,11 @@ function s:exit_cb(items, id, opts, ...) abort
     try
         if has_key(a:opts, 'line_parser')
             for item in a:items
-                let xs += [a:opts.line_parser(item)]
-                redraw
+                let x = a:opts.line_parser(item)
+                if !empty(x)
+                    let xs += [x]
+                    redraw
+                endif
                 echo printf('[%s] The job has finished! Please wait to build the quickfix... (%d%%)', title, len(xs) * 100 / len(a:items))
             endfor
         endif

@@ -6,6 +6,7 @@ if executable('rg')
 
     function! s:ripgrep(q_args) abort
         let cmd = ['rg', '--vimgrep', '--glob', '!.git', '--glob', '!.svn', '--glob', '!node_modules', '-uu'] + split(a:q_args, '\s\+') + (has('win32') ? ['.\'] : ['.'])
+        call vimrc#init()
         call qfjob#start(cmd, {
             \ 'title': 'ripgrep',
             \ 'line_parser': function('s:line_parser'),
@@ -19,12 +20,24 @@ if executable('rg')
             if !filereadable(path) && (path !~# '^[A-Z]:')
                 let path = expand(fnamemodify(m[5], ':h') .. '/' .. m[1])
             endif
-            return {
-                \ 'filename': utils#iconv#exec(path),
-                \ 'lnum': m[2],
-                \ 'col': m[3],
-                \ 'text': utils#iconv#exec(m[4]),
-                \ }
+            let filename = fnamemodify(path, ':t')
+            let ok = v:true
+            for pat in g:ripgrep_ignore_patterns
+                if filename =~# pat
+                    let ok = v:false
+                    break
+                endif
+            endfor
+            if ok
+                return {
+                    \ 'filename': utils#iconv#exec(path),
+                    \ 'lnum': m[2],
+                    \ 'col': m[3],
+                    \ 'text': utils#iconv#exec(m[4]),
+                    \ }
+            else
+                return {}
+            endif
         else
             return { 'text': utils#iconv#exec(a:line), }
         endif
