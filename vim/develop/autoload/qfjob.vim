@@ -2,11 +2,11 @@
 let s:qfjobs = get(s:, 'qfjobs', {})
 
 function! qfjob#start(cmd, ...) abort
+    call qfjob#kill_jobs()
+    cclose
     let id = sha256(tempname())
     let items = []
     let opts = get(a:000, 0, {})
-    call qfjob#stop(id)
-    cclose
     if has('nvim')
         let s:qfjobs[id] = jobstart(a:cmd, {
             \ 'cwd': get(opts, 'cwd', getcwd()),
@@ -23,6 +23,22 @@ function! qfjob#start(cmd, ...) abort
             \ })
     endif
     return id
+endfunction
+
+function! qfjob#show_jobs() abort
+    for key in keys(s:qfjobs)
+        if s:qfjobs[key] != v:null
+            echo s:qfjobs[key]
+        endif
+    endfor
+endfunction
+
+function! qfjob#kill_jobs() abort
+    for key in keys(s:qfjobs)
+        if s:qfjobs[key] != v:null
+            call job_stop(s:qfjobs[key], 'kill')
+        endif
+    endfor
 endfunction
 
 function! qfjob#stop(id) abort
