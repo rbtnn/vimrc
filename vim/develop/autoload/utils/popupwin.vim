@@ -46,21 +46,25 @@ function! utils#popupwin#apply_border(opts) abort
 endfunction
 
 function! utils#popupwin#apply_size(opts) abort
-    let maxwidth = &columns / 3
-    let height = &lines / 3
-    let subwindow_height = 3
+    let maxwidth = &columns - 5
     if has('tabsidebar')
         if (2 == &showtabsidebar) || ((1 == &showtabsidebar) && (1 < tabpagenr('$')))
             let maxwidth -= &tabsidebarcolumns
         endif
     endif
+    let minwidth = 120
+    if maxwidth < minwidth
+        let minwidth = maxwidth
+    endif
+    let height = &lines / 3
+    let subwindow_height = 3
     if &lines - subwindow_height < height
         let height = &lines - subwindow_height
     endif
     call extend(a:opts, {
         \ 'wrap': 0,
         \ 'scrollbar': 1,
-        \ 'minwidth': 120, 'maxwidth': maxwidth,
+        \ 'minwidth': minwidth, 'maxwidth': maxwidth,
         \ 'minheight': height, 'maxheight': height,
         \ 'pos': 'center',
         \ }, 'force')
