@@ -6,19 +6,21 @@ const s:borderchars_list = {
     \   'B': [nr2char(0x2500), nr2char(0x2502), nr2char(0x2500), nr2char(0x2502),
     \         nr2char(0x256d), nr2char(0x256e), nr2char(0x256f), nr2char(0x2570)],
     \ }
+const s:borderchars_selected = 'B'
 
-const s:hlname = 'VimrcDevPopupBorder'
+const s:hlname1 = 'VimrcDevPopupBorder'
+const s:hlname2 = 'NonText'
 
 function! utils#popupwin#notification(msg) abort
     if has('gui_running') || (!has('win32') && !has('gui_running'))
-        if hlexists(s:hlname)
+        if hlexists(s:hlname1)
             call popup_notification(a:msg, {
-                \ 'highlight': 'Normal',
+                \ 'highlight': s:hlname2,
                 \ 'pos': 'center',
                 \ 'border': [],
                 \ 'padding': [1, 1, 1, 1],
-                \ 'borderhighlight': repeat([s:hlname], 4),
-                \ 'borderchars': s:borderchars_list['_'],
+                \ 'borderhighlight': repeat([s:hlname1], 4),
+                \ 'borderchars': s:borderchars_list[s:borderchars_selected],
                 \ })
         else
             echo a:msg
@@ -30,13 +32,13 @@ endfunction
 
 function! utils#popupwin#apply_border(opts) abort
     if has('gui_running') || (!has('win32') && !has('gui_running'))
-        if hlexists(s:hlname)
+        if hlexists(s:hlname1)
             call extend(a:opts, {
-                \ 'highlight': 'Normal',
+                \ 'highlight': s:hlname2,
                 \ 'border': [],
-                \ 'padding': [0, 0, 0, 0],
-                \ 'borderhighlight': repeat([s:hlname], 4),
-                \ 'borderchars': s:borderchars_list['_'],
+                \ 'padding': [0, 1, 0, 1],
+                \ 'borderhighlight': repeat([s:hlname1], 4),
+                \ 'borderchars': s:borderchars_list[s:borderchars_selected],
                 \ }, 'force')
         endif
     endif
@@ -44,12 +46,12 @@ function! utils#popupwin#apply_border(opts) abort
 endfunction
 
 function! utils#popupwin#apply_size(opts) abort
-    let width = &columns - 3
+    let maxwidth = &columns / 3
     let height = &lines / 3
     let subwindow_height = 3
     if has('tabsidebar')
         if (2 == &showtabsidebar) || ((1 == &showtabsidebar) && (1 < tabpagenr('$')))
-            let width -= &tabsidebarcolumns
+            let maxwidth -= &tabsidebarcolumns
         endif
     endif
     if &lines - subwindow_height < height
@@ -58,18 +60,16 @@ function! utils#popupwin#apply_size(opts) abort
     call extend(a:opts, {
         \ 'wrap': 0,
         \ 'scrollbar': 1,
-        \ 'minwidth': width, 'maxwidth': width,
+        \ 'minwidth': 120, 'maxwidth': maxwidth,
         \ 'minheight': height, 'maxheight': height,
-        \ 'pos': 'botleft',
-        \ 'line': &lines - &cmdheight,
-        \ 'col': 1,
+        \ 'pos': 'center',
         \ }, 'force')
     return a:opts
 endfunction
 
 function! utils#popupwin#set_cursorline(winid, lnum) abort
     call win_execute(a:winid, printf('call setpos(".", [0, %d, 0, 0])', a:lnum))
-    call win_execute(a:winid, 'redraw')
+    "call win_execute(a:winid, 'redraw')
 endfunction
 
 function! utils#popupwin#common_filter(winid, key) abort

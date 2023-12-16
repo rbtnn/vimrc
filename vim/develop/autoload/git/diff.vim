@@ -19,7 +19,7 @@ function! git#diff#open_diffwindow(args, path) abort
             if !&modified && &modifiable && empty(&buftype) && !filereadable(bufname())
                 " use the current buffer.
             else
-                new
+                botright vnew
             endif
         endif
         setfiletype diff

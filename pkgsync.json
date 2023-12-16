@@ -35,9 +35,6 @@
 			"sgur": [
 				"vim-textobj-parameter"
 			],
-			"t9md": [
-				"vim-quickhl"
-			],
 			"thinca": [
 				"vim-fontzoom",
 				"vim-qfreplace",

@@ -46,7 +46,7 @@ endfunction
 
 function! git#diff(q_bang) abort
     if isdirectory(git#internal#get_rootdir())
-        call vimrc#config#init()
+        call vimrc#init()
         call git#diff#numstat#exec('!', a:q_bang)
     else
         call git#internal#echo('The directory is not under git control!')

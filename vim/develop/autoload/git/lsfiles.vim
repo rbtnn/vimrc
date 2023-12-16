@@ -4,7 +4,7 @@ let s:subwinid = get(s:, 'subwinid', -1)
 function! git#lsfiles#exec(q_bang) abort
     let rootdir = git#internal#get_rootdir()
     let winid = popup_menu([], s:get_popupwin_options_main(rootdir, 0))
-    let s:subwinid = popup_create('', s:get_popupwin_options_sub(winid, v:true))
+    let s:subwinid = popup_create('', s:get_popupwin_options_sub(winid))
     if -1 != winid
         if a:q_bang == '!'
             call git#lsfiles#data#set_paths(rootdir, [])
@@ -52,8 +52,7 @@ function! s:get_popupwin_options_main(rootdir, n) abort
     "let elapsed_time = git#lsfiles#data#get_elapsed_time(a:rootdir)
     let elapsed_time = -1.0
     let opts = {
-        \ 'title': printf(' [%s] %d/%d%s ',
-        \   git#internal#branch_name(),
+        \ 'title': printf(' %d/%d%s ',
         \   a:n,
         \   len(git#lsfiles#data#get_paths(a:rootdir)),
         \   (-1.0 == elapsed_time ? '' : printf(' (elapsed_time: %f)', elapsed_time))),
@@ -63,15 +62,14 @@ function! s:get_popupwin_options_main(rootdir, n) abort
     return opts
 endfunction
 
-function! s:get_popupwin_options_sub(main_winid, hidden) abort
+function! s:get_popupwin_options_sub(main_winid) abort
     let pos = popup_getpos(a:main_winid)
-    let width = pos['width'] - 2 + pos['scrollbar']
+    let width = pos['width'] - 4 + pos['scrollbar']
     let opts = {
         \ 'line': pos['line'] - 3,
         \ 'col': pos['col'],
         \ 'width': width,
         \ 'minwidth': width,
-        \ 'hidden': a:hidden,
         \ }
     return utils#popupwin#apply_border(opts)
 endfunction
@@ -135,14 +133,11 @@ function! s:search_lsfiles(rootdir, winid) abort
     if g:git_enabled_match_query
         call win_execute(a:winid, 'call clearmatches()')
     endif
-    if empty(query_text)
-        call popup_hide(s:subwinid)
-    else
+    if !empty(query_text)
         if g:git_enabled_match_query
             call win_execute(a:winid, printf('silent call matchadd(''Question'', ''%s'')', '\c' .. query_text))
         endif
-        call popup_show(s:subwinid)
-        call popup_settext(s:subwinid, ' ' .. query_text .. ' ')
-        call popup_setoptions(s:subwinid, s:get_popupwin_options_sub(a:winid, v:false))
     endif
+    call popup_settext(s:subwinid, ' ' .. query_text .. ' ')
+    call popup_setoptions(s:subwinid, s:get_popupwin_options_sub(a:winid))
 endfunction

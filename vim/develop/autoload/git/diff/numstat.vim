@@ -44,7 +44,7 @@ function! s:open_numstatwindow(context) abort
         let lines += [printf("%d\t%d\t%s", file['added'], file['removed'], key)]
     endfor
     let opts = {
-        \ 'title': printf(' [%s] %s ', git#internal#branch_name(), join(a:context['cmd'])),
+        \ 'title': printf(' %s ', join(a:context['cmd'])),
         \ }
     call utils#popupwin#apply_size(opts)
     call utils#popupwin#apply_border(opts)
@@ -85,8 +85,8 @@ endfunction
 
 function! s:popup_callback(context, winid, result) abort
     if -1 != a:result
-        let path = s:get_current_path(a:winid, a:result) abort
-        if has_key(a:context['files'], path)
+        let path = s:get_current_path(a:winid, a:result)
+        if filereadable(path)
             call git#diff#open_diffwindow(a:context['q_args'], path)
         endif
     endif
