@@ -1,12 +1,13 @@
 
 const s:borderchars_list = {
-    \   '_': ['-', '|', '-', '|', '+', '+', '+', '+'],
+    \   '_': ['-', '|', '-', '|', '*', '*', '*', '*'],
     \   'A': [nr2char(0x2500), nr2char(0x2502), nr2char(0x2500), nr2char(0x2502),
     \         nr2char(0x250c), nr2char(0x2510), nr2char(0x2518), nr2char(0x2514)],
     \   'B': [nr2char(0x2500), nr2char(0x2502), nr2char(0x2500), nr2char(0x2502),
     \         nr2char(0x256d), nr2char(0x256e), nr2char(0x256f), nr2char(0x2570)],
     \ }
-const s:borderchars_selected = 'B'
+
+const s:borderchars_selected = '_'
 
 const s:hlname1 = 'VimrcDevPopupBorder'
 const s:hlname2 = 'NonText'

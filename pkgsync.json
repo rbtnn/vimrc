@@ -16,6 +16,9 @@
 				"vim-operator-user",
 				"vim-textobj-user"
 			],
+			"lambdalisue": [
+				"nerdfont.vim"
+			],
 			"mattn": [
 				"vim-molder"
 			],
