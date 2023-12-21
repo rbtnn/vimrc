@@ -135,7 +135,7 @@ function! s:search_lsfiles(rootdir, winid) abort
     endif
     if !empty(query_text)
         if g:git_enabled_match_query
-            call win_execute(a:winid, printf('silent call matchadd(''Question'', ''%s'')', '\c' .. query_text))
+            call win_execute(a:winid, printf('silent call matchadd(''Search'', ''%s'')', '\c' .. query_text))
         endif
     endif
     call popup_settext(s:subwinid, ' ' .. query_text .. ' ')

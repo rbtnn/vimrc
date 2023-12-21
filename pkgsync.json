@@ -2,9 +2,6 @@
 	"packpath": "~/vim/github",
 	"plugins": {
 		"start": {
-			"bluz71": [
-				"vim-moonfly-colors"
-			],
 			"haya14busa": [
 				"vim-operator-flashy"
 			],
@@ -42,6 +39,9 @@
 				"vim-fontzoom",
 				"vim-qfreplace",
 				"vim-textobj-between"
+			],
+			"tyrannicaltoucan": [
+				"vim-deep-space"
 			],
 			"tyru": [
 				"restart.vim"

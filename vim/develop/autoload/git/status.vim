@@ -2,11 +2,11 @@
 let s:FT = 'gitstatus'
 
 let s:map = {
-    \ 'A': { 'regex': '^.[MD]$', 'cmd': ['add'], },
+    \ 'A': { 'regex': '^\(.[MD]\|??\)$', 'cmd': ['add'], },
     \ 'C': { 'regex': '^M.$', 'cmd': ['diff', '--cached', '-w'], },
     \ 'D': { 'regex': '^.M$', 'cmd': ['diff', '-w'], },
     \ 'R': { 'regex': '^.[MD]$', 'cmd': ['restore'], },
-    \ 'S': { 'regex': '^[MD].$', 'cmd': ['restore', '--staged'], },
+    \ 'S': { 'regex': '^[AMD].$', 'cmd': ['restore', '--staged'], },
     \ }
 
 function! git#status#exec() abort
