@@ -80,12 +80,16 @@ function s:exit_cb(items, id, opts, ...) abort
         redraw
         echo printf('[%s] Interrupt!', title)
     finally
-        call setqflist(xs)
-        let bnr = bufnr()
-        silent! copen
-        if has_key(a:opts, 'keep_cursor')
-            if a:opts.keep_cursor
-                call win_gotoid(bufwinid(bnr))
+        if empty(xs)
+            echo printf('[%s] No result', title)
+        else
+            call setqflist(xs)
+            let bnr = bufnr()
+            silent! copen
+            if has_key(a:opts, 'keep_cursor')
+                if a:opts.keep_cursor
+                    call win_gotoid(bufwinid(bnr))
+                endif
             endif
         endif
         call qfjob#stop(a:id)

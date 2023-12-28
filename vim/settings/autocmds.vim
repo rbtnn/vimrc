@@ -6,12 +6,6 @@ let s:delcmds = [
     \ 'DisableWhitespace', 'EnableStripWhitespaceOnSave', 'EnableWhitespace',
     \ 'NextTrailingWhitespace', 'PrevTrailingWhitespace', 'StripWhitespace',
     \ 'StripWhitespaceOnChangedLines', 'ToggleStripWhitespaceOnSave', 'ToggleWhitespace',
-    \ 'QuickhlCwordDisable', 'QuickhlCwordEnable', 'QuickhlCwordToggle', 'QuickhlManualAdd',
-    \ 'QuickhlManualColors', 'QuickhlManualDelete', 'QuickhlManualDisable', 'QuickhlManualEnable',
-    \ 'QuickhlManualGoToNext', 'QuickhlManualGoToPrev', 'QuickhlManualList', 'QuickhlManualLock',
-    \ 'QuickhlManualLockToggle', 'QuickhlManualLockWindow', 'QuickhlManualLockWindowToggle',
-    \ 'QuickhlManualUnlock', 'QuickhlManualUnlockWindow', 'QuickhlTagDisable', 'QuickhlTagEnable',
-    \ 'QuickhlTagToggle',
     \ ]
 
 augroup vimrc-plugins
