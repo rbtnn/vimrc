@@ -18,7 +18,6 @@ set cmdheight=1
 set cmdwinheight=5
 set complete-=t
 set completeslash=slash
-set cursorline
 set diffopt+=iwhiteall
 set expandtab shiftwidth=4 tabstop=4
 set fileencodings=ucs-bom,utf-8,cp932
@@ -34,6 +33,7 @@ set list listchars=tab:-->
 set matchpairs+=<:>
 set matchtime=1
 set nobackup
+set nocursorline
 set noignorecase
 set nonumber
 set norelativenumber

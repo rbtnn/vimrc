@@ -1,11 +1,16 @@
 
-let s:mrd_path = expand('~/.mrd')
+let s:old_mrd_path = expand('~/.mrd')
+let s:mrd_path = expand('~/vim/.mrd')
 let s:lineinfo_len = 2
+
+if filereadable(s:old_mrd_path)
+    call rename(s:old_mrd_path, s:mrd_path)
+endif
 
 function! mrd#exec() abort
     try
         let opts = {
-            \ 'title': ' [most recent directories] ',
+            \ 'title': ' [mrd] ',
             \ }
         call utils#popupwin#apply_size(opts)
         call utils#popupwin#apply_border(opts)
@@ -16,7 +21,7 @@ function! mrd#exec() abort
             \ })
     catch
         echohl Error
-        echo printf('[most recent directories] %s', v:exception)
+        echo printf('[mrd] %s', v:exception)
         echohl None
     endtry
 endfunction

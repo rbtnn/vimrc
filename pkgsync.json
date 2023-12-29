@@ -36,15 +36,22 @@
 				"vim-textobj-parameter"
 			],
 			"thinca": [
-				"vim-fontzoom",
 				"vim-qfreplace",
 				"vim-textobj-between"
 			],
-			"tyrannicaltoucan": [
-				"vim-deep-space"
+			"tomasr": [
+				"molokai"
 			],
 			"tyru": [
 				"restart.vim"
+			]
+		},
+		"opt": {
+			"cormacrelf": [
+				"vim-colors-github"
+			],
+			"tyrannicaltoucan": [
+				"vim-deep-space"
 			]
 		}
 	}

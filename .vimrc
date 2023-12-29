@@ -70,3 +70,4 @@ endif
 source $VIMRC_VIM/settings/mappings.vim
 source $VIMRC_VIM/settings/tabsidebar.vim
 source $VIMRC_VIM/settings/vcvarsallterminal.vim
+source $VIMRC_VIM/settings/colorscheme.vim
