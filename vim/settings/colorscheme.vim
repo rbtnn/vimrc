@@ -1,5 +1,16 @@
 function! s:colorscheme(colors_name) abort
-    if a:colors_name == 'molokai'
+    if a:colors_name == 'palenight'
+        colorscheme palenight
+        highlight!       TabSideBar               guifg=#777777 guibg=#292d3e gui=NONE cterm=NONE
+        highlight!       TabSideBarFill           guifg=NONE    guibg=#292d3e gui=NONE cterm=NONE
+        highlight!       TabSideBarNerdFont       guifg=#82b1ff guibg=#292d3e gui=NONE cterm=NONE
+        highlight!       TabSideBarCurTab         guifg=#777777 guibg=#393d4e gui=NONE cterm=NONE
+        highlight!       TabSideBarCurTabSel      guifg=#bcbcbc guibg=#393d4e gui=BOLD cterm=NONE
+        highlight!       TabSideBarCurrNerdFont   guifg=#82b1ff guibg=#393d4e gui=NONE cterm=NONE
+        highlight!       CursorLine                             guibg=NONE
+        highlight!       VimrcDevPopupBorder      guifg=#ffcb6b guibg=NONE    gui=NONE cterm=NONE
+        let g:lightline = { 'colorscheme': 'palenight' }
+    elseif a:colors_name == 'molokai'
         colorscheme molokai
         highlight!       TabSideBar               guifg=#777777 guibg=#1b1d1e gui=NONE cterm=NONE
         highlight!       TabSideBarFill           guifg=NONE    guibg=#1b1d1e gui=NONE cterm=NONE
@@ -8,6 +19,7 @@ function! s:colorscheme(colors_name) abort
         highlight!       TabSideBarCurTabSel      guifg=#bcbcbc guibg=#3b3d3e gui=BOLD cterm=NONE
         highlight!       TabSideBarCurrNerdFont   guifg=#a6e22e guibg=#3b3d3e gui=NONE cterm=NONE
         highlight!       Cursor                   guifg=#ffffff guibg=#d700d7
+        highlight!       CursorLine                             guibg=NONE
         highlight!       VimrcDevPopupBorder      guifg=#a6e22e guibg=NONE    gui=NONE cterm=NONE
         highlight!       Special                                              gui=NONE
         highlight!       Macro                                                gui=NONE
@@ -45,6 +57,9 @@ function! s:colorscheme(colors_name) abort
         let g:parenmatch_highlight = 0
         highlight! link  ParenMatch  MatchParen
     endif
+    if exists('g:loaded_lightline')
+        call lightline#enable()
+    endif
 endfunction
 
-call s:colorscheme('molokai')
+call s:colorscheme('palenight')

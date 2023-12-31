@@ -10,7 +10,7 @@ const s:borderchars_list = {
 const s:borderchars_selected = '_'
 
 const s:hlname1 = 'VimrcDevPopupBorder'
-const s:hlname2 = 'NonText'
+const s:hlname2 = 'Normal'
 
 function! utils#popupwin#notification(msg) abort
     if has('gui_running') || (!has('win32') && !has('gui_running'))

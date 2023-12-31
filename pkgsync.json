@@ -2,15 +2,20 @@
 	"packpath": "~/vim/github",
 	"plugins": {
 		"start": {
+			"drewtempelmeyer": [
+				"palenight.vim"
+			],
 			"haya14busa": [
 				"vim-operator-flashy"
 			],
 			"itchyny": [
+				"lightline.vim",
 				"vim-parenmatch"
 			],
 			"kana": [
 				"vim-operator-replace",
 				"vim-operator-user",
+				"vim-textobj-line",
 				"vim-textobj-user"
 			],
 			"lambdalisue": [
@@ -30,7 +35,8 @@
 				"vim-textobj-string",
 				"vim-vimscript_indentexpr",
 				"vim-vimscript_lasterror",
-				"vim-vimscript_tagfunc"
+				"vim-vimscript_tagfunc",
+				"vimtweak"
 			],
 			"sgur": [
 				"vim-textobj-parameter"
