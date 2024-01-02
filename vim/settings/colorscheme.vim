@@ -9,6 +9,7 @@ function! s:colorscheme(colors_name) abort
         highlight!       TabSideBarCurrNerdFont   guifg=#82b1ff guibg=#393d4e gui=NONE cterm=NONE
         highlight!       CursorLine                             guibg=NONE
         highlight!       VimrcDevPopupBorder      guifg=#ffcb6b guibg=NONE    gui=NONE cterm=NONE
+        highlight!       VimrcDevPopupWin         guifg=#ffffff guibg=#000000 gui=NONE cterm=NONE
         let g:lightline = { 'colorscheme': 'palenight' }
     elseif a:colors_name == 'molokai'
         colorscheme molokai

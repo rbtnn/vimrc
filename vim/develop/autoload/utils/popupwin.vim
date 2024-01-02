@@ -10,7 +10,7 @@ const s:borderchars_list = {
 const s:borderchars_selected = '_'
 
 const s:hlname1 = 'VimrcDevPopupBorder'
-const s:hlname2 = 'Normal'
+const s:hlname2 = 'VimrcDevPopupWin'
 
 function! utils#popupwin#notification(msg) abort
     if has('gui_running') || (!has('win32') && !has('gui_running'))
@@ -31,20 +31,31 @@ function! utils#popupwin#notification(msg) abort
     endif
 endfunction
 
-function! utils#popupwin#apply_border(opts) abort
+function! utils#popupwin#apply_highlight(opts) abort
     if has('gui_running') || (!has('win32') && !has('gui_running'))
-        if hlexists(s:hlname1)
-            call extend(a:opts, {
-                \ 'highlight': s:hlname2,
-                \ 'border': [],
-                \ 'padding': [0, 1, 0, 1],
-                \ 'borderhighlight': repeat([s:hlname1], 4),
-                \ 'borderchars': s:borderchars_list[s:borderchars_selected],
-                \ }, 'force')
-        endif
+        call extend(a:opts, {
+            \ 'highlight': s:hlname2,
+            \ 'border': [0, 0, 0, 0],
+            \ 'padding': [0, 1, 0, 1],
+            \ }, 'force')
     endif
     return a:opts
 endfunction
+
+"function! utils#popupwin#apply_border(opts) abort
+"    if has('gui_running') || (!has('win32') && !has('gui_running'))
+"        if hlexists(s:hlname1)
+"            call extend(a:opts, {
+"                \ 'highlight': s:hlname2,
+"                \ 'border': [0, 0, 0, 0],
+"                \ 'padding': [0, 1, 0, 1],
+"                \ 'borderhighlight': repeat([s:hlname1], 4),
+"                \ 'borderchars': s:borderchars_list[s:borderchars_selected],
+"                \ }, 'force')
+"        endif
+"    endif
+"    return a:opts
+"endfunction
 
 function! utils#popupwin#apply_size(opts) abort
     let maxwidth = &columns - 5
@@ -57,7 +68,7 @@ function! utils#popupwin#apply_size(opts) abort
     if maxwidth < minwidth
         let minwidth = maxwidth
     endif
-    let height = &lines / 3
+    let height = &lines / 2
     let subwindow_height = 3
     if &lines - subwindow_height < height
         let height = &lines - subwindow_height

@@ -6,6 +6,8 @@ let s:delcmds = [
     \ 'DisableWhitespace', 'EnableStripWhitespaceOnSave', 'EnableWhitespace',
     \ 'NextTrailingWhitespace', 'PrevTrailingWhitespace', 'StripWhitespace',
     \ 'StripWhitespaceOnChangedLines', 'ToggleStripWhitespaceOnSave', 'ToggleWhitespace',
+    \ 'TextobjLineDefaultKeyMappings', 'VimTweakDisableCaption', 'VimTweakDisableMaximize', 'VimTweakDisableTopMost',
+    \ 'VimTweakEnableCaption', 'VimTweakEnableMaximize', 'VimTweakEnableTopMost',
     \ ]
 
 augroup vimrc-plugins

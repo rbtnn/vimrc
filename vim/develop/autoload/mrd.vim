@@ -13,7 +13,7 @@ function! mrd#exec() abort
             \ 'title': ' [mrd] ',
             \ }
         call utils#popupwin#apply_size(opts)
-        call utils#popupwin#apply_border(opts)
+        call utils#popupwin#apply_highlight(opts)
         let winid = popup_menu(mrd#get_directories(), opts)
         call popup_setoptions(winid, {
             \ 'filter': function('s:popup_filter'),

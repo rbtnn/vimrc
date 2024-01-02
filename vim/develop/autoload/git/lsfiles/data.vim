@@ -44,14 +44,3 @@ function! git#lsfiles#data#set_paths(rootdir, paths) abort
     let d = s:init(a:rootdir)
     let d['paths'] = filter(a:paths, { _,x -> s:filtered(x) })
 endfunction
-
-function! git#lsfiles#data#get_elapsed_time(rootdir) abort
-    let d = s:init(a:rootdir)
-    return get(d, 'elapsed_time', -1.0)
-endfunction
-
-function! git#lsfiles#data#set_elapsed_time(rootdir, elapsed_time) abort
-    let d = s:init(a:rootdir)
-    let d['elapsed_time'] = a:elapsed_time
-endfunction
-

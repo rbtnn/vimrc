@@ -12,7 +12,7 @@ let s:map = {
 function! git#status#exec() abort
     let opts = {}
     call utils#popupwin#apply_size(opts)
-    call utils#popupwin#apply_border(opts)
+    call utils#popupwin#apply_highlight(opts)
     let winid = popup_menu([], opts)
     if s:reload_lines(winid)
         call win_execute(winid, 'setfiletype ' .. s:FT)

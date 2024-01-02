@@ -1,15 +1,11 @@
 
-let s:subwinid = get(s:, 'subwinid', -1)
-
 function! git#lsfiles#exec(q_bang) abort
     let rootdir = git#internal#get_rootdir()
-    let winid = popup_menu([], s:get_popupwin_options_main(rootdir, 0))
-    let s:subwinid = popup_create('', s:get_popupwin_options_sub(winid))
+    let winid = popup_menu([], s:get_popupwin_options_main(rootdir))
     if -1 != winid
         if a:q_bang == '!'
             call git#lsfiles#data#set_paths(rootdir, [])
             call git#lsfiles#data#set_query(rootdir, '')
-            call git#lsfiles#data#set_elapsed_time(rootdir, -1.0)
         endif
         call popup_setoptions(winid, {
             \ 'filter': function('s:popup_filter', [rootdir]),
@@ -48,17 +44,13 @@ function! s:popup_filter(rootdir, winid, key) abort
     endif
 endfunction
 
-function! s:get_popupwin_options_main(rootdir, n) abort
-    "let elapsed_time = git#lsfiles#data#get_elapsed_time(a:rootdir)
-    let elapsed_time = -1.0
+function! s:get_popupwin_options_main(rootdir) abort
+    let query_text = git#lsfiles#data#get_query(a:rootdir)
     let opts = {
-        \ 'title': printf(' %d/%d%s ',
-        \   a:n,
-        \   len(git#lsfiles#data#get_paths(a:rootdir)),
-        \   (-1.0 == elapsed_time ? '' : printf(' (elapsed_time: %f)', elapsed_time))),
+        \ 'title': printf(' %s ', query_text)
         \ }
     call utils#popupwin#apply_size(opts)
-    call utils#popupwin#apply_border(opts)
+    call utils#popupwin#apply_highlight(opts)
     return opts
 endfunction
 
@@ -71,7 +63,7 @@ function! s:get_popupwin_options_sub(main_winid) abort
         \ 'width': width,
         \ 'minwidth': width,
         \ }
-    return utils#popupwin#apply_border(opts)
+    return utils#popupwin#apply_highlight(opts)
 endfunction
 
 function! s:can_open_in_current() abort
@@ -99,10 +91,6 @@ function! s:popup_callback(rootdir, winid, result) abort
             endif
         endif
     endif
-    if -1 != s:subwinid
-        call popup_close(s:subwinid)
-        let s:subwinid = -1
-    endif
 endfunction
 
 function! s:filter_query_text(x, y) abort
@@ -128,8 +116,7 @@ function! s:search_lsfiles(rootdir, winid) abort
         let n = 1
     endif
     call popup_settext(a:winid, filtered_paths[:n])
-    call git#lsfiles#data#set_elapsed_time(a:rootdir, reltimefloat(reltime(start_time)))
-    call popup_setoptions(a:winid, s:get_popupwin_options_main(a:rootdir, len(filtered_paths)))
+    call popup_setoptions(a:winid, s:get_popupwin_options_main(a:rootdir))
     if g:git_enabled_match_query
         call win_execute(a:winid, 'call clearmatches()')
     endif
@@ -138,6 +125,4 @@ function! s:search_lsfiles(rootdir, winid) abort
             call win_execute(a:winid, printf('silent call matchadd(''Search'', ''%s'')', '\c' .. query_text))
         endif
     endif
-    call popup_settext(s:subwinid, ' ' .. query_text .. ' ')
-    call popup_setoptions(s:subwinid, s:get_popupwin_options_sub(a:winid))
 endfunction

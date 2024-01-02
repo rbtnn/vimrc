@@ -25,13 +25,10 @@ cnoremap         <C-a>        <home>
 nnoremap <silent><C-n>    <Cmd>cnext     \| normal zz<cr>
 nnoremap <silent><C-p>    <Cmd>cprevious \| normal zz<cr>
 
-nnoremap <silent><down>       gt
-nnoremap <silent><up>         gT
-tnoremap <silent><down>  <C-w>gt
-tnoremap <silent><up>    <C-w>gT
-
 if isdirectory(expand('$VIMRC_VIM/develop'))
     nnoremap <silent><C-s>    <Cmd>GitStatus<cr>
     nnoremap <silent><C-f>    <Cmd>GitLsFiles<cr>
+    nnoremap <silent><C-z>    <Cmd>ToggleTerminal<cr>
+    tnoremap <silent><C-z>    <Cmd>ToggleTerminal<cr>
 endif
 
