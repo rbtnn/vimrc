@@ -3,10 +3,8 @@ function! s:colorscheme(colors_name) abort
         colorscheme palenight
         highlight!       TabSideBar               guifg=#777777 guibg=#292d3e gui=NONE cterm=NONE
         highlight!       TabSideBarFill           guifg=NONE    guibg=#292d3e gui=NONE cterm=NONE
-        highlight!       TabSideBarNerdFont       guifg=#82b1ff guibg=#292d3e gui=NONE cterm=NONE
         highlight!       TabSideBarCurTab         guifg=#777777 guibg=#393d4e gui=NONE cterm=NONE
         highlight!       TabSideBarCurTabSel      guifg=#bcbcbc guibg=#393d4e gui=BOLD cterm=NONE
-        highlight!       TabSideBarCurrNerdFont   guifg=#82b1ff guibg=#393d4e gui=NONE cterm=NONE
         highlight!       CursorLine                             guibg=NONE
         highlight!       VimrcDevPopupBorder      guifg=#ffcb6b guibg=NONE    gui=NONE cterm=NONE
         highlight!       VimrcDevPopupWin         guifg=#ffffff guibg=#000000 gui=NONE cterm=NONE
@@ -15,10 +13,8 @@ function! s:colorscheme(colors_name) abort
         colorscheme molokai
         highlight!       TabSideBar               guifg=#777777 guibg=#1b1d1e gui=NONE cterm=NONE
         highlight!       TabSideBarFill           guifg=NONE    guibg=#1b1d1e gui=NONE cterm=NONE
-        highlight!       TabSideBarNerdFont       guifg=#a6e22e guibg=#1b1d1e gui=NONE cterm=NONE
         highlight!       TabSideBarCurTab         guifg=#777777 guibg=#3b3d3e gui=NONE cterm=NONE
         highlight!       TabSideBarCurTabSel      guifg=#bcbcbc guibg=#3b3d3e gui=BOLD cterm=NONE
-        highlight!       TabSideBarCurrNerdFont   guifg=#a6e22e guibg=#3b3d3e gui=NONE cterm=NONE
         highlight!       Cursor                   guifg=#ffffff guibg=#d700d7
         highlight!       CursorLine                             guibg=NONE
         highlight!       VimrcDevPopupBorder      guifg=#a6e22e guibg=NONE    gui=NONE cterm=NONE
@@ -33,10 +29,8 @@ function! s:colorscheme(colors_name) abort
         colorscheme deep-space
         highlight!       TabSideBar               guifg=#777777 guibg=#1b202a gui=NONE cterm=NONE
         highlight!       TabSideBarFill           guifg=NONE    guibg=#1b202a gui=NONE cterm=NONE
-        highlight!       TabSideBarNerdFont       guifg=#a6e22e guibg=#1b202a gui=NONE cterm=NONE
         highlight!       TabSideBarCurTab         guifg=#999999 guibg=#406ca3 gui=NONE cterm=NONE
         highlight!       TabSideBarCurTabSel      guifg=#bcbcbc guibg=#406ca3 gui=BOLD cterm=NONE
-        highlight!       TabSideBarCurrNerdFont   guifg=#a6e22e guibg=#406ca3 gui=NONE cterm=NONE
         highlight!       VimrcDevPopupBorder      guifg=#a6e22e guibg=NONE    gui=NONE cterm=NONE
     elseif a:colors_name == 'github'
         let g:github_colors_soft = 0

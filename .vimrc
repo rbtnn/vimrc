@@ -31,12 +31,12 @@ if has('vim_starting')
 
     if has('win32') && has('gui_running')
         set linespace=0
-        if s:exists_font('Cica-Regular.ttf')
-            " https://github.com/miiton/Cica
-            set guifont=Cica:h16:cSHIFTJIS:qDRAFT
-        elseif s:exists_font('UDEVGothic-Regular.ttf')
+        if s:exists_font('UDEVGothic-Regular.ttf')
             " https://github.com/yuru7/udev-gothic
             set guifont=UDEV_Gothic:h16:cSHIFTJIS:qDRAFT
+        elseif s:exists_font('Cica-Regular.ttf')
+            " https://github.com/miiton/Cica
+            set guifont=Cica:h16:cSHIFTJIS:qDRAFT
         else
             set guifont=ＭＳ_ゴシック:h18:cSHIFTJIS:qDRAFT
         endif
