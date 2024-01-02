@@ -18,10 +18,8 @@ function! utils#popupwin#notification(msg) abort
             call popup_notification(a:msg, {
                 \ 'highlight': s:hlname2,
                 \ 'pos': 'center',
-                \ 'border': [],
+                \ 'border': [0, 0, 0, 0],
                 \ 'padding': [1, 1, 1, 1],
-                \ 'borderhighlight': repeat([s:hlname1], 4),
-                \ 'borderchars': s:borderchars_list[s:borderchars_selected],
                 \ })
         else
             echo a:msg
