@@ -11,6 +11,7 @@ function! git#lsfiles#exec(q_bang) abort
             \ 'filter': function('s:popup_filter', [rootdir]),
             \ 'callback': function('s:popup_callback', [rootdir]),
             \ })
+        call utils#popupwin#set_options(v:false)
         call s:search_lsfiles(rootdir, winid)
     endif
 endfunction
@@ -49,21 +50,7 @@ function! s:get_popupwin_options_main(rootdir) abort
     let opts = {
         \ 'title': printf(' %s ', query_text)
         \ }
-    call utils#popupwin#apply_size(opts)
-    call utils#popupwin#apply_highlight(opts)
     return opts
-endfunction
-
-function! s:get_popupwin_options_sub(main_winid) abort
-    let pos = popup_getpos(a:main_winid)
-    let width = pos['width'] - 4 + pos['scrollbar']
-    let opts = {
-        \ 'line': pos['line'] - 3,
-        \ 'col': pos['col'],
-        \ 'width': width,
-        \ 'minwidth': width,
-        \ }
-    return utils#popupwin#apply_highlight(opts)
 endfunction
 
 function! s:can_open_in_current() abort

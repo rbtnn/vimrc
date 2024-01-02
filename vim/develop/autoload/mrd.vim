@@ -12,13 +12,12 @@ function! mrd#exec() abort
         let opts = {
             \ 'title': ' [mrd] ',
             \ }
-        call utils#popupwin#apply_size(opts)
-        call utils#popupwin#apply_highlight(opts)
         let winid = popup_menu(mrd#get_directories(), opts)
         call popup_setoptions(winid, {
             \ 'filter': function('s:popup_filter'),
             \ 'callback': function('s:popup_callback'),
             \ })
+        call utils#popupwin#set_options(v:false)
     catch
         echohl Error
         echo printf('[mrd] %s', v:exception)

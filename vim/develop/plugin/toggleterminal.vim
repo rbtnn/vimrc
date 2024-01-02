@@ -1,7 +1,7 @@
 
-let g:loaded_develop_quickterm = 1
+let g:loaded_develop_toggleterminal = 1
 
-function! s:term_list() abort
+function! s:hide_term_list() abort
     let xs = term_list()
     let showterms = map(filter(getwininfo(), { i,x -> x['terminal'] }), { i,x -> x['bufnr'] })
     call filter(xs, { _, x -> (-1 == index(showterms, x)) && ('finished' != term_getstatus(x)) })
@@ -22,7 +22,7 @@ function! s:toggle_terminal() abort
     if 0 < winid
         call popup_close(winid)
     else
-        let xs = s:term_list()
+        let xs = s:hide_term_list()
         if !empty(xs)
             let bnr = xs[0]
         else
@@ -34,9 +34,8 @@ function! s:toggle_terminal() abort
                 \ })
         endif
         let opts = {}
-        call utils#popupwin#apply_size(opts)
-        call utils#popupwin#apply_highlight(opts)
         call popup_create(bnr, opts)
+        call utils#popupwin#set_options(v:false)
     endif
 endfunction
 

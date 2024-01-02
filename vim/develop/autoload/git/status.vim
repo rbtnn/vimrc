@@ -11,8 +11,6 @@ let s:map = {
 
 function! git#status#exec() abort
     let opts = {}
-    call utils#popupwin#apply_size(opts)
-    call utils#popupwin#apply_highlight(opts)
     let winid = popup_menu([], opts)
     if s:reload_lines(winid)
         call win_execute(winid, 'setfiletype ' .. s:FT)
@@ -20,6 +18,7 @@ function! git#status#exec() abort
             \ 'filter': function('s:popup_filter'),
             \ 'callback': function('s:popup_callback'),
             \ })
+        call utils#popupwin#set_options(v:false)
         call s:fix_cursor_pos(winid)
         call s:update_title(winid)
     else

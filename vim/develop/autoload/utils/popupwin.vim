@@ -1,16 +1,7 @@
 
-const s:borderchars_list = {
-    \   '_': ['-', '|', '-', '|', '*', '*', '*', '*'],
-    \   'A': [nr2char(0x2500), nr2char(0x2502), nr2char(0x2500), nr2char(0x2502),
-    \         nr2char(0x250c), nr2char(0x2510), nr2char(0x2518), nr2char(0x2514)],
-    \   'B': [nr2char(0x2500), nr2char(0x2502), nr2char(0x2500), nr2char(0x2502),
-    \         nr2char(0x256d), nr2char(0x256e), nr2char(0x256f), nr2char(0x2570)],
-    \ }
-
-const s:borderchars_selected = '_'
-
-const s:hlname1 = 'VimrcDevPopupBorder'
 const s:hlname2 = 'VimrcDevPopupWin'
+
+let s:current_position_index = get(s:, 'current_position_index', 0)
 
 function! utils#popupwin#notification(msg) abort
     if has('gui_running') || (!has('win32') && !has('gui_running'))
@@ -29,56 +20,67 @@ function! utils#popupwin#notification(msg) abort
     endif
 endfunction
 
-function! utils#popupwin#apply_highlight(opts) abort
-    if has('gui_running') || (!has('win32') && !has('gui_running'))
-        call extend(a:opts, {
-            \ 'highlight': s:hlname2,
-            \ 'border': [0, 0, 0, 0],
-            \ 'padding': [0, 1, 0, 1],
-            \ }, 'force')
-    endif
-    return a:opts
-endfunction
-
-"function! utils#popupwin#apply_border(opts) abort
-"    if has('gui_running') || (!has('win32') && !has('gui_running'))
-"        if hlexists(s:hlname1)
-"            call extend(a:opts, {
-"                \ 'highlight': s:hlname2,
-"                \ 'border': [0, 0, 0, 0],
-"                \ 'padding': [0, 1, 0, 1],
-"                \ 'borderhighlight': repeat([s:hlname1], 4),
-"                \ 'borderchars': s:borderchars_list[s:borderchars_selected],
-"                \ }, 'force')
-"        endif
-"    endif
-"    return a:opts
-"endfunction
-
-function! utils#popupwin#apply_size(opts) abort
-    let maxwidth = &columns - 5
-    if has('tabsidebar')
-        if (2 == &showtabsidebar) || ((1 == &showtabsidebar) && (1 < tabpagenr('$')))
-            let maxwidth -= &tabsidebarcolumns
+function! utils#popupwin#set_options(toggle_pos) abort
+    let i = a:toggle_pos ? (s:current_position_index + 1) % 5 : s:current_position_index
+    let winid = get(popup_list(), 0, -1)
+    if -1 != winid
+        let padding_width = 2
+        let maxwidth = &columns - 5 - s:get_tabsidebarcolumns()
+        let minwidth = 120
+        if maxwidth < minwidth
+            let minwidth = maxwidth
         endif
+        let height = &lines * 2 / 3
+        if &lines < height
+            let height = &lines
+        endif
+        call popup_setoptions(winid, {
+            \ 'wrap': 0,
+            \ 'scrollbar': 0,
+            \ 'minwidth': minwidth, 'maxwidth': maxwidth,
+            \ 'minheight': height, 'maxheight': height,
+            \ })
+        if has('gui_running') || (!has('win32') && !has('gui_running'))
+            call popup_setoptions(winid, {
+                \ 'highlight': s:hlname2,
+                \ 'border': [0, 0, 0, 0],
+                \ 'padding': [0, 1, 0, 1],
+                \ })
+        endif
+        let d = getwininfo(winid)[0]['width'] + s:get_tabsidebarcolumns() + padding_width - 1
+        let opts = popup_getoptions(winid)
+        if 0 == i
+            call extend(opts, {
+                \ 'pos': 'center',
+                \ }, 'force')
+        elseif 1 == i
+            call extend(opts, {
+                \ 'line': 1,
+                \ 'col': 1,
+                \ 'pos': 'topleft',
+                \ }, 'force')
+        elseif 2 == i
+            call extend(opts, {
+                \ 'line': 1,
+                \ 'col': &columns - d,
+                \ 'pos': 'topleft',
+                \ }, 'force')
+        elseif 3 == i
+            call extend(opts, {
+                \ 'line': &lines - &cmdheight,
+                \ 'col': &columns - d,
+                \ 'pos': 'botleft',
+                \ }, 'force')
+        elseif 4 == i
+            call extend(opts, {
+                \ 'line': &lines - &cmdheight,
+                \ 'col': 1,
+                \ 'pos': 'botleft',
+                \ }, 'force')
+        endif
+        call popup_setoptions(winid, opts)
+        let s:current_position_index = i
     endif
-    let minwidth = 120
-    if maxwidth < minwidth
-        let minwidth = maxwidth
-    endif
-    let height = &lines / 2
-    let subwindow_height = 3
-    if &lines - subwindow_height < height
-        let height = &lines - subwindow_height
-    endif
-    call extend(a:opts, {
-        \ 'wrap': 0,
-        \ 'scrollbar': 1,
-        \ 'minwidth': minwidth, 'maxwidth': maxwidth,
-        \ 'minheight': height, 'maxheight': height,
-        \ 'pos': 'center',
-        \ }, 'force')
-    return a:opts
 endfunction
 
 function! utils#popupwin#set_cursorline(winid, lnum) abort
@@ -104,6 +106,10 @@ function! utils#popupwin#common_filter(winid, key) abort
             call utils#popupwin#set_cursorline(a:winid, lnum - 1)
         endif
         return 1
+    elseif 0x11 == char2nr(a:key)
+        " Ctrl-q
+        call utils#popupwin#set_options(v:true)
+        return 1
     elseif 0x20 == char2nr(a:key)
         return popup_filter_menu(a:winid, "\<cr>")
     elseif 0x0d == char2nr(a:key)
@@ -116,3 +122,40 @@ function! utils#popupwin#common_filter(winid, key) abort
         endif
     endif
 endfunction
+
+function! s:get_tabsidebarcolumns() abort
+    let d = 0
+    if has('tabsidebar')
+        if (2 == &showtabsidebar) || ((1 == &showtabsidebar) && (1 < tabpagenr('$')))
+            let d = &tabsidebarcolumns
+        endif
+    endif
+    return d
+endfunction
+
+"const s:borderchars_list = {
+"    \   '_': ['-', '|', '-', '|', '*', '*', '*', '*'],
+"    \   'A': [nr2char(0x2500), nr2char(0x2502), nr2char(0x2500), nr2char(0x2502),
+"    \         nr2char(0x250c), nr2char(0x2510), nr2char(0x2518), nr2char(0x2514)],
+"    \   'B': [nr2char(0x2500), nr2char(0x2502), nr2char(0x2500), nr2char(0x2502),
+"    \         nr2char(0x256d), nr2char(0x256e), nr2char(0x256f), nr2char(0x2570)],
+"    \ }
+"
+"const s:borderchars_selected = '_'
+"
+"const s:hlname1 = 'VimrcDevPopupBorder'
+"function! utils#popupwin#apply_border(opts) abort
+"    if has('gui_running') || (!has('win32') && !has('gui_running'))
+"        if hlexists(s:hlname1)
+"            call extend(a:opts, {
+"                \ 'highlight': s:hlname2,
+"                \ 'border': [0, 0, 0, 0],
+"                \ 'padding': [0, 1, 0, 1],
+"                \ 'borderhighlight': repeat([s:hlname1], 4),
+"                \ 'borderchars': s:borderchars_list[s:borderchars_selected],
+"                \ }, 'force')
+"        endif
+"    endif
+"    return a:opts
+"endfunction
+

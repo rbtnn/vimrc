@@ -30,5 +30,6 @@ if isdirectory(expand('$VIMRC_VIM/develop'))
     nnoremap <silent><C-f>    <Cmd>GitLsFiles<cr>
     nnoremap <silent><C-z>    <Cmd>ToggleTerminal<cr>
     tnoremap <silent><C-z>    <Cmd>ToggleTerminal<cr>
+    tnoremap <silent><C-q>    <Cmd>TogglePopupWinPos<cr>
 endif
 
