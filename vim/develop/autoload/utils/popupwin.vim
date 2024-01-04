@@ -1,20 +1,22 @@
-
-const s:hlname2 = 'VimrcDevPopupWin'
+"const s:borderchars_list = {
+"    \   '_': ['-', '|', '-', '|', '*', '*', '*', '*'],
+"    \   'A': [nr2char(0x2500), nr2char(0x2502), nr2char(0x2500), nr2char(0x2502),
+"    \         nr2char(0x250c), nr2char(0x2510), nr2char(0x2518), nr2char(0x2514)],
+"    \   'B': [nr2char(0x2500), nr2char(0x2502), nr2char(0x2500), nr2char(0x2502),
+"    \         nr2char(0x256d), nr2char(0x256e), nr2char(0x256f), nr2char(0x2570)],
+"    \ }
+const s:hlname = 'VimrcDevPopupWin'
 
 let s:current_position_index = get(s:, 'current_position_index', 0)
 
 function! utils#popupwin#notification(msg) abort
     if has('gui_running') || (!has('win32') && !has('gui_running'))
-        if hlexists(s:hlname1)
-            call popup_notification(a:msg, {
-                \ 'highlight': s:hlname2,
-                \ 'pos': 'center',
-                \ 'border': [0, 0, 0, 0],
-                \ 'padding': [1, 1, 1, 1],
-                \ })
-        else
-            echo a:msg
-        endif
+        call popup_notification(a:msg, {
+            \ 'highlight': s:hlname,
+            \ 'pos': 'center',
+            \ 'border': [0, 0, 0, 0],
+            \ 'padding': [1, 1, 1, 1],
+            \ })
     else
         echo a:msg
     endif
@@ -26,7 +28,7 @@ function! utils#popupwin#set_options(toggle_pos) abort
     if -1 != winid
         let padding_width = 2
         let maxwidth = &columns - 5 - s:get_tabsidebarcolumns()
-        let minwidth = 120
+        let minwidth = (maxwidth < 120) ? 80 : 120
         if maxwidth < minwidth
             let minwidth = maxwidth
         endif
@@ -42,7 +44,7 @@ function! utils#popupwin#set_options(toggle_pos) abort
             \ })
         if has('gui_running') || (!has('win32') && !has('gui_running'))
             call popup_setoptions(winid, {
-                \ 'highlight': s:hlname2,
+                \ 'highlight': s:hlname,
                 \ 'border': [0, 0, 0, 0],
                 \ 'padding': [0, 1, 0, 1],
                 \ })
@@ -132,30 +134,3 @@ function! s:get_tabsidebarcolumns() abort
     endif
     return d
 endfunction
-
-"const s:borderchars_list = {
-"    \   '_': ['-', '|', '-', '|', '*', '*', '*', '*'],
-"    \   'A': [nr2char(0x2500), nr2char(0x2502), nr2char(0x2500), nr2char(0x2502),
-"    \         nr2char(0x250c), nr2char(0x2510), nr2char(0x2518), nr2char(0x2514)],
-"    \   'B': [nr2char(0x2500), nr2char(0x2502), nr2char(0x2500), nr2char(0x2502),
-"    \         nr2char(0x256d), nr2char(0x256e), nr2char(0x256f), nr2char(0x2570)],
-"    \ }
-"
-"const s:borderchars_selected = '_'
-"
-"const s:hlname1 = 'VimrcDevPopupBorder'
-"function! utils#popupwin#apply_border(opts) abort
-"    if has('gui_running') || (!has('win32') && !has('gui_running'))
-"        if hlexists(s:hlname1)
-"            call extend(a:opts, {
-"                \ 'highlight': s:hlname2,
-"                \ 'border': [0, 0, 0, 0],
-"                \ 'padding': [0, 1, 0, 1],
-"                \ 'borderhighlight': repeat([s:hlname1], 4),
-"                \ 'borderchars': s:borderchars_list[s:borderchars_selected],
-"                \ }, 'force')
-"        endif
-"    endif
-"    return a:opts
-"endfunction
-

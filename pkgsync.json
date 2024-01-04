@@ -2,8 +2,8 @@
 	"packpath": "~/vim/github",
 	"plugins": {
 		"start": {
-			"drewtempelmeyer": [
-				"palenight.vim"
+			"danilo-augusto": [
+				"vim-afterglow"
 			],
 			"haya14busa": [
 				"vim-operator-flashy"
@@ -17,9 +17,6 @@
 				"vim-operator-user",
 				"vim-textobj-line",
 				"vim-textobj-user"
-			],
-			"mattn": [
-				"vim-molder"
 			],
 			"ntpeters": [
 				"vim-better-whitespace"
@@ -52,6 +49,9 @@
 		"opt": {
 			"cormacrelf": [
 				"vim-colors-github"
+			],
+			"drewtempelmeyer": [
+				"palenight.vim"
 			],
 			"tyrannicaltoucan": [
 				"vim-deep-space"

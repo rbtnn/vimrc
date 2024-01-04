@@ -30,7 +30,7 @@ function! s:toggle_terminal() abort
                 \   'hidden' : 1,
                 \   'term_highlight' : 'Terminal',
                 \   'term_finish' : 'close',
-                \   'term_kill' : 'term',
+                \   'term_kill' : 'kill',
                 \ })
         endif
         let opts = {}

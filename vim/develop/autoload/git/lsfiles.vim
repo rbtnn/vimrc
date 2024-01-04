@@ -92,7 +92,6 @@ endfunction
 function! s:search_lsfiles(rootdir, winid) abort
     call popup_settext(a:winid, 'Please wait for listing files in the repository...')
     redraw
-    let start_time = reltime()
     let query_text = git#lsfiles#data#get_query(a:rootdir)
     if empty(git#lsfiles#data#get_paths(a:rootdir))
         call git#lsfiles#data#set_paths(a:rootdir, git#internal#system(['ls-files']))

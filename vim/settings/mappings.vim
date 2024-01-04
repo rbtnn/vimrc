@@ -26,10 +26,10 @@ nnoremap <silent><C-n>    <Cmd>cnext     \| normal zz<cr>
 nnoremap <silent><C-p>    <Cmd>cprevious \| normal zz<cr>
 
 if isdirectory(expand('$VIMRC_VIM/develop'))
+    nnoremap <silent><space>  <Cmd>Filer<cr>
     nnoremap <silent><C-s>    <Cmd>GitStatus<cr>
     nnoremap <silent><C-f>    <Cmd>GitLsFiles<cr>
     nnoremap <silent><C-z>    <Cmd>ToggleTerminal<cr>
     tnoremap <silent><C-z>    <Cmd>ToggleTerminal<cr>
     tnoremap <silent><C-q>    <Cmd>TogglePopupWinPos<cr>
 endif
-
