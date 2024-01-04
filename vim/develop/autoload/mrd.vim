@@ -19,9 +19,7 @@ function! mrd#exec() abort
             \ })
         call utils#popupwin#set_options(v:false)
     catch
-        echohl Error
-        echo printf('[mrd] %s', v:exception)
-        echohl None
+        call vimrc#error(printf('[mrd] %s', v:exception))
     endtry
 endfunction
 

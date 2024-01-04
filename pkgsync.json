@@ -2,8 +2,8 @@
 	"packpath": "~/vim/github",
 	"plugins": {
 		"start": {
-			"danilo-augusto": [
-				"vim-afterglow"
+			"drewtempelmeyer": [
+				"palenight.vim"
 			],
 			"haya14busa": [
 				"vim-operator-flashy"
@@ -39,9 +39,6 @@
 				"vim-qfreplace",
 				"vim-textobj-between"
 			],
-			"tomasr": [
-				"molokai"
-			],
 			"tyru": [
 				"restart.vim"
 			]
@@ -50,8 +47,11 @@
 			"cormacrelf": [
 				"vim-colors-github"
 			],
-			"drewtempelmeyer": [
-				"palenight.vim"
+			"danilo-augusto": [
+				"vim-afterglow"
+			],
+			"tomasr": [
+				"molokai"
 			],
 			"tyrannicaltoucan": [
 				"vim-deep-space"

@@ -1,8 +1,6 @@
 
 let s:FT_NUMSTAT = 'gitdiff-numstat'
 
-
-
 function! git#diff#numstat#exec(q_bang, q_args) abort
     let context = {}
     let context['rootdir'] = git#internal#get_rootdir()
@@ -44,7 +42,7 @@ function! s:open_numstatwindow(context) abort
         let lines += [printf("%d\t%d\t%s", file['added'], file['removed'], key)]
     endfor
     let opts = {
-        \ 'title': printf(' %s ', join(a:context['cmd'])),
+        \ 'title': printf(' [git-diff-numstat] %s ', join(a:context['cmd'])),
         \ }
     let winid = popup_menu(lines, opts)
     call win_execute(winid, 'setfiletype ' .. s:FT_NUMSTAT)

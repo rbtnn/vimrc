@@ -18,10 +18,9 @@ function! s:fix_path(path) abort
 endfunction
 
 function! s:get_popupwin_options_main(basedir) abort
-    let opts = {
-        \ 'title': printf(' %s ', a:basedir)
+    return {
+        \ 'title': printf(' [filer] %s ', a:basedir)
         \ }
-    return opts
 endfunction
 
 function! s:goup_dir(path) abort
@@ -57,28 +56,12 @@ function! s:popup_callback(basedir, winid, result) abort
         let path = s:fix_path(a:basedir .. line)
         if isdirectory(path)
             call filer#exec(path)
-        elseif filereadable(path)
-            if s:can_open_in_current()
-                execute printf('edit %s', fnameescape(path))
-            else
-                execute printf('new %s', fnameescape(path))
-            endif
+        else
+            call vimrc#open_file(path)
         endif
     endif
 endfunction
 
-function! s:can_open_in_current() abort
-    let tstatus = term_getstatus(bufnr())
-    if (tstatus != 'finished') && !empty(tstatus)
-        return v:false
-    elseif !empty(getcmdwintype())
-        return v:false
-    elseif &modified
-        return v:false
-    else
-        return v:true
-    endif
-endfunction
 
 function! s:is_topdir(path) abort
     return   (a:path =~# '^/$')
@@ -99,9 +82,7 @@ function! s:search_files(basedir, winid) abort
         call win_execute(a:winid, 'call clearmatches()')
         call win_execute(a:winid, 'silent call matchadd(''Question'', ''^.*/$'')')
     catch /^Vim\%((\a\+)\)\=:E484:/
-        echohl Error
-        echo v:exception
-        echohl None
+        call vimrc#error(v:exception)
     endtry
     redraw
 endfunction

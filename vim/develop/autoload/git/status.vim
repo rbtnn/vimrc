@@ -102,7 +102,7 @@ function! s:update_title(winid) abort
         endif
     endfor
     call popup_setoptions(a:winid, {
-        \ 'title': empty(title) ? '' : printf(' %s ', join(title, ', ')),
+        \ 'title': printf(' [git-status] %s ', empty(title) ? '' : join(title, ', ')),
         \ })
 endfunction
 

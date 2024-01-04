@@ -48,35 +48,16 @@ endfunction
 function! s:get_popupwin_options_main(rootdir) abort
     let query_text = git#lsfiles#data#get_query(a:rootdir)
     let opts = {
-        \ 'title': printf(' %s ', query_text)
+        \ 'title': printf(' [git-lsfiles] %s ', query_text)
         \ }
     return opts
-endfunction
-
-function! s:can_open_in_current() abort
-    let tstatus = term_getstatus(bufnr())
-    if (tstatus != 'finished') && !empty(tstatus)
-        return v:false
-    elseif !empty(getcmdwintype())
-        return v:false
-    elseif &modified
-        return v:false
-    else
-        return v:true
-    endif
 endfunction
 
 function! s:popup_callback(rootdir, winid, result) abort
     if -1 != a:result
         let line = trim(get(getbufline(winbufnr(a:winid), a:result), 0, ''))
         let path = fnamemodify(resolve(a:rootdir .. '/' ..line), ':p:gs?\\?/?')
-        if filereadable(path)
-            if s:can_open_in_current()
-                execute printf('edit %s', fnameescape(path))
-            else
-                execute printf('new %s', fnameescape(path))
-            endif
-        endif
+        call vimrc#open_file(path)
     endif
 endfunction
 

@@ -1,6 +1,6 @@
 
 function! git#internal#echo(msg) abort
-    call utils#popupwin#notification(printf('[git] %s', a:msg))
+    call vimrc#error(printf('[git] %s', a:msg))
 endfunction
 
 function! git#internal#branch_name() abort

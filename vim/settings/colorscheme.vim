@@ -43,10 +43,12 @@ function! s:colorscheme(colors_name) abort
         colorscheme github
         highlight!       TabSideBar               guifg=#777777 guibg=#2b2d2e gui=NONE cterm=NONE
         highlight!       TabSideBarFill           guifg=NONE    guibg=#2b2d2e gui=NONE cterm=NONE
-        highlight!       TabSideBarSel            guifg=#bcbcbc guibg=#2b2d2e gui=NONE cterm=NONE
-        highlight!       TabSideBarModified       guifg=#ff6666 guibg=#2b2d2e gui=BOLD cterm=NONE
+        highlight!       TabSideBarCurTab         guifg=#bcbcbc guibg=#1b1d1e gui=NONE cterm=NONE
+        highlight!       TabSideBarCurTabSel      guifg=#bcbcbc guibg=#1b1d1e gui=BOLD cterm=NONE
         highlight!       Comment                  guifg=#bbbbbb guibg=NONE
         highlight!       Error                    guifg=#d73a49 guibg=NONE
+        highlight!       CursorLine                             guibg=NONE
+        highlight!       VimrcDevPopupWin         guifg=#ffffff guibg=#000000 gui=NONE cterm=NONE
         let g:lightline = { 'colorscheme': 'github' }
     endif
 
@@ -61,4 +63,4 @@ function! s:colorscheme(colors_name) abort
     endif
 endfunction
 
-call s:colorscheme('afterglow')
+call s:colorscheme('palenight')

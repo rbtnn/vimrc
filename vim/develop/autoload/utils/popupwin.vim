@@ -9,19 +9,6 @@ const s:hlname = 'VimrcDevPopupWin'
 
 let s:current_position_index = get(s:, 'current_position_index', 0)
 
-function! utils#popupwin#notification(msg) abort
-    if has('gui_running') || (!has('win32') && !has('gui_running'))
-        call popup_notification(a:msg, {
-            \ 'highlight': s:hlname,
-            \ 'pos': 'center',
-            \ 'border': [0, 0, 0, 0],
-            \ 'padding': [1, 1, 1, 1],
-            \ })
-    else
-        echo a:msg
-    endif
-endfunction
-
 function! utils#popupwin#set_options(toggle_pos) abort
     let i = a:toggle_pos ? (s:current_position_index + 1) % 5 : s:current_position_index
     let winid = get(popup_list(), 0, -1)

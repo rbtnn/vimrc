@@ -2,14 +2,7 @@
 function! git#diff#diff#jumpdiffline() abort
     let x = s:parse_diffoutput()
     if !empty(x)
-        if filereadable(x['path'])
-            if s:find_window_by_path(x['path'])
-                silent! execute printf(':%d', x['after_lnum'])
-            else
-                silent! execute printf('new +%d %s', x['after_lnum'], fnameescape(x['path']))
-            endif
-        endif
-        normal! zz
+        call vimrc#open_file(x['path'], x['after_lnum'])
     endif
 endfunction
 
@@ -69,25 +62,4 @@ function! s:parse_diffoutput() abort
     endif
 
     return {}
-endfunction
-
-function! s:strict_bufnr(path) abort
-    let bnr = bufnr(a:path)
-    let fname1 = fnamemodify(a:path, ':t')
-    let fname2 = fnamemodify(bufname(bnr), ':t')
-    if (-1 == bnr) || (fname1 != fname2)
-        return -1
-    else
-        return bnr
-    endif
-endfunction
-
-function! s:find_window_by_path(path) abort
-    for x in filter(getwininfo(), { _, x -> x['tabnr'] == tabpagenr() })
-        if x['bufnr'] == s:strict_bufnr(a:path)
-            execute printf(':%dwincmd w', x['winnr'])
-            return v:true
-        endif
-    endfor
-    return v:false
 endfunction
