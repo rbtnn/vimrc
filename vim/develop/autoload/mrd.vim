@@ -9,15 +9,17 @@ endif
 
 function! mrd#exec() abort
     try
-        let opts = {
-            \ 'title': ' [mrd] ',
-            \ }
-        let winid = popup_menu(mrd#get_directories(), opts)
-        call popup_setoptions(winid, {
-            \ 'filter': function('s:popup_filter'),
-            \ 'callback': function('s:popup_callback'),
-            \ })
-        call utils#popupwin#set_options(v:false)
+        if utils#popupwin#check_able_to_open('mrd')
+            let opts = {
+                \ 'title': ' [mrd] ',
+                \ }
+            let winid = popup_menu(mrd#get_directories(), opts)
+            call popup_setoptions(winid, {
+                \ 'filter': function('s:popup_filter'),
+                \ 'callback': function('s:popup_callback'),
+                \ })
+            call utils#popupwin#set_options(v:false)
+        endif
     catch
         call vimrc#error(printf('[mrd] %s', v:exception))
     endtry

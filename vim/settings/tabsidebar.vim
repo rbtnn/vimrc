@@ -8,11 +8,7 @@ if has('tabsidebar')
             for x in filter(getwininfo(), { i,x -> tnr == x['tabnr'] && ('popup' != win_gettype(x['winid']))})
                 let ft = getbufvar(x['bufnr'], '&filetype')
                 let bt = getbufvar(x['bufnr'], '&buftype')
-                let high_tab = tnr == tabpagenr()
-                    \ ? (x['winnr'] == winnr()
-                    \   ? '%#TabSideBarCurTabSel#'
-                    \   : '%#TabSideBarCurTab#')
-                    \ : '%#TabSideBar#'
+                let high_tab = tnr == tabpagenr() ? '%#TabSideBarCurTab#' : '%#TabSideBar#'
                 let fname = fnamemodify(bufname(x['bufnr']), ':t')
                 let lines += [
                     \    high_tab
@@ -40,8 +36,6 @@ if has('tabsidebar')
     set tabsidebar=%!TabSideBar()
     for s:name in [
         \ 'TabSideBar',
-        \ 'TabSideBarCurTab',
-        \ 'TabSideBarCurTabSel',
         \ 'TabSideBarFill',
         \ ]
         if !hlexists(s:name)

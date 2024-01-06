@@ -2,6 +2,9 @@
 	"packpath": "~/vim/github",
 	"plugins": {
 		"start": {
+			"AhmedAbdulrahman": [
+				"vim-aylin"
+			],
 			"drewtempelmeyer": [
 				"palenight.vim"
 			],
@@ -41,9 +44,7 @@
 			],
 			"tyru": [
 				"restart.vim"
-			]
-		},
-		"opt": {
+			],
 			"cormacrelf": [
 				"vim-colors-github"
 			],
@@ -56,6 +57,8 @@
 			"tyrannicaltoucan": [
 				"vim-deep-space"
 			]
+		},
+		"opt": {
 		}
 	}
 }

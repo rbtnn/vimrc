@@ -9,6 +9,15 @@ const s:hlname = 'VimrcDevPopupWin'
 
 let s:current_position_index = get(s:, 'current_position_index', 0)
 
+function! utils#popupwin#check_able_to_open(name) abort
+    if -1 != index(['command', 'popup'], win_gettype())
+        call vimrc#error(printf('[%s] Could not open in the command-line window!', a:name))
+        return v:false
+    else
+        return v:true
+    endif
+endfunction
+
 function! utils#popupwin#set_options(toggle_pos) abort
     let i = a:toggle_pos ? (s:current_position_index + 1) % 5 : s:current_position_index
     let winid = get(popup_list(), 0, -1)

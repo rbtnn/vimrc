@@ -32,20 +32,22 @@ function! s:toggle_terminal() abort
     if 0 < winid
         call popup_close(winid)
     else
-        let xs = s:hide_term_list()
-        if !empty(xs)
-            let bnr = xs[0]
-        else
-            let bnr = term_start(s:term_cmd, {
-                \   'hidden' : 1,
-                \   'term_highlight' : 'Terminal',
-                \   'term_finish' : 'close',
-                \   'term_kill' : 'kill',
-                \ })
+        if utils#popupwin#check_able_to_open('toggle-terminal')
+            let xs = s:hide_term_list()
+            if !empty(xs)
+                let bnr = xs[0]
+            else
+                let bnr = term_start(s:term_cmd, {
+                    \   'hidden' : 1,
+                    \   'term_highlight' : 'Terminal',
+                    \   'term_finish' : 'close',
+                    \   'term_kill' : 'kill',
+                    \ })
+            endif
+            let opts = {}
+            call popup_create(bnr, opts)
+            call utils#popupwin#set_options(v:false)
         endif
-        let opts = {}
-        call popup_create(bnr, opts)
-        call utils#popupwin#set_options(v:false)
     endif
 endfunction
 

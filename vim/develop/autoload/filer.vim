@@ -1,15 +1,17 @@
 
 function! filer#exec(basedir) abort
-    let basedir = s:fix_path(a:basedir)
     call vimrc#init()
-    let winid = popup_menu([], s:get_popupwin_options_main(basedir))
-    if -1 != winid
-        call popup_setoptions(winid, {
-            \ 'filter': function('s:popup_filter', [basedir]),
-            \ 'callback': function('s:popup_callback', [basedir]),
-            \ })
-        call utils#popupwin#set_options(v:false)
-        call s:search_files(basedir, winid)
+    if utils#popupwin#check_able_to_open('filer')
+        let basedir = s:fix_path(a:basedir)
+        let winid = popup_menu([], s:get_popupwin_options_main(basedir))
+        if -1 != winid
+            call popup_setoptions(winid, {
+                \ 'filter': function('s:popup_filter', [basedir]),
+                \ 'callback': function('s:popup_callback', [basedir]),
+                \ })
+            call utils#popupwin#set_options(v:false)
+            call s:search_files(basedir, winid)
+        endif
     endif
 endfunction
 
