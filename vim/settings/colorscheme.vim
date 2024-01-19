@@ -6,7 +6,6 @@ function! s:set_common_highlights(colors_name, c1 = '#777777', c2 = '#bcbcbc', c
     execute printf('highlight!       TabSideBarFill           guifg=NONE guibg=%s gui=NONE cterm=NONE',       normal_hl['guibg'])
     execute printf('highlight!       TabSideBarCurTab         guifg=%s   guibg=%s gui=BOLD cterm=NONE', a:c2, normal_hl['guibg'])
     execute printf('highlight!       VimrcDevPopupWin         guifg=%s   guibg=%s gui=NONE cterm=NONE', a:c3, a:c4)
-    execute printf('highlight!       CursorLine                          guibg=%s                    ',       normal_hl['guibg'])
 
     highlight! CursorIM                 guifg=NONE    guibg=#d70000
 
@@ -25,6 +24,7 @@ function! s:colorscheme(colors_name) abort
     if a:colors_name == 'aylin'
         colorscheme aylin
         call s:set_common_highlights(a:colors_name)
+        highlight!       SpecialKey               guifg=#444411
     elseif a:colors_name == 'afterglow'
         colorscheme afterglow
         call s:set_common_highlights(a:colors_name)

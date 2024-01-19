@@ -34,13 +34,13 @@ set matchpairs+=<:>
 set matchtime=1
 set nobackup
 set noignorecase
+set nonumber norelativenumber nocursorline
 set noshowmode
 set noswapfile
 set nowrap
 set nowrapscan
 set nowritebackup
 set nrformats&
-set number norelativenumber cursorline
 set pumheight=10
 set ruler
 set rulerformat=%{&fileencoding}/%{&fileformat}

@@ -47,6 +47,9 @@ function! s:popup_filter(basedir, winid, key) abort
         endif
     elseif char2nr('l') == char2nr(a:key)
         return utils#popupwin#common_filter(a:winid, "\<cr>")
+    elseif char2nr('~') == char2nr(a:key)
+        call filer#exec(expand('~'))
+        return utils#popupwin#common_filter(a:winid, "\<esc>")
     else
         return utils#popupwin#common_filter(a:winid, a:key)
     endif
