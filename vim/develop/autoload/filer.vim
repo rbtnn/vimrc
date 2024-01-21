@@ -11,6 +11,7 @@ function! filer#exec(basedir) abort
                 \ })
             call utils#popupwin#set_options(v:false)
             call s:search_files(basedir, winid)
+            call s:set_cursor_at_curr_file(basedir, winid)
         endif
     endif
 endfunction
@@ -50,6 +51,15 @@ function! s:popup_filter(basedir, winid, key) abort
     elseif char2nr('~') == char2nr(a:key)
         call filer#exec(expand('~'))
         return utils#popupwin#common_filter(a:winid, "\<esc>")
+    elseif 0x0d == char2nr(a:key)
+        let line = trim(get(getbufline(winbufnr(a:winid), lnum), 0, ''))
+        let path = s:fix_path(a:basedir .. line)
+        if s:maybe_binaryfile(path)
+            call vimrc#error('maybe a binary file!')
+            return 0
+        else
+            return utils#popupwin#common_filter(a:winid, "\<cr>")
+        endif
     else
         return utils#popupwin#common_filter(a:winid, a:key)
     endif
@@ -74,6 +84,21 @@ function! s:is_topdir(path) abort
         \ || (a:path =~# '^[A-Z]:[\/]$')
 endfunction
 
+function! s:maybe_binaryfile(path) abort
+    return 0 < len(filter(readblob(a:path, 0, 100), { i,x -> x == 0x00 }))
+endfunction
+
+function! s:set_cursor_at_curr_file(basedir, winid) abort
+    let curr_dir = expand('%:p:h')
+    let curr_fname = expand('%:p:t')
+    if s:fix_path(curr_dir) == a:basedir
+        let i = index(getbufline(winbufnr(a:winid), 1, '$'), curr_fname)
+        if -1 != i
+            call utils#popupwin#set_cursorline(a:winid, i + 1)
+        endif
+    endif
+endfunction
+
 function! s:search_files(basedir, winid) abort
     try
         call popup_settext(a:winid, '')
@@ -82,6 +107,11 @@ function! s:search_files(basedir, winid) abort
             let n = 1
         endif
         let xs = map(readdir(a:basedir)[:n], { _, x -> isdirectory(a:basedir .. '/' .. x) ? x .. '/' : x })
+        call filter(xs, { _, x
+            \ -> (x !~# '\c^NTUSER.')
+            \ && (x !~# '^\$')
+            \ && (x !~# '^desktop.ini$')
+            \ && (x !~# '^\.DS_Store$') })
         call popup_settext(a:winid, xs)
         call popup_setoptions(a:winid, s:get_popupwin_options_main(a:basedir))
         call win_execute(a:winid, 'call clearmatches()')

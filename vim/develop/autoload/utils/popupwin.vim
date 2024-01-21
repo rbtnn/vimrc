@@ -83,7 +83,7 @@ endfunction
 
 function! utils#popupwin#set_cursorline(winid, lnum) abort
     call win_execute(a:winid, printf('call setpos(".", [0, %d, 0, 0])', a:lnum))
-    "call win_execute(a:winid, 'redraw')
+    call win_execute(a:winid, 'redraw')
 endfunction
 
 function! utils#popupwin#common_filter(winid, key) abort
