@@ -4,6 +4,7 @@ let s:qfjobs = get(s:, 'qfjobs', {})
 function! qfjob#start(cmd, ...) abort
     call qfjob#kill_jobs()
     cclose
+    call setqflist([])
     let id = sha256(tempname())
     let items = []
     let opts = get(a:000, 0, {})
@@ -73,15 +74,21 @@ function s:exit_cb(items, id, opts, ...) abort
                     let xs += [x]
                     redraw
                 endif
-                echo printf('[%s] The job has finished! Please wait to build the quickfix... (%d%%)', title, len(xs) * 100 / len(a:items))
+                if get(a:opts, 'echo', v:true)
+                    echo printf('[%s] The job has finished! Please wait to build the quickfix... (%d%%)', title, len(xs) * 100 / len(a:items))
+                endif
             endfor
         endif
     catch /^Vim:Interrupt$/
         redraw
-        echo printf('[%s] Interrupt!', title)
+        if get(a:opts, 'echo', v:true)
+            echo printf('[%s] Interrupt!', title)
+        endif
     finally
         if empty(xs)
-            echo printf('[%s] No result', title)
+            if get(a:opts, 'echo', v:true)
+                echo printf('[%s] No result', title)
+            endif
         else
             call setqflist(xs)
             let bnr = bufnr()
@@ -93,6 +100,9 @@ function s:exit_cb(items, id, opts, ...) abort
             endif
         endif
         call qfjob#stop(a:id)
+        if has_key(a:opts, 'then_cb')
+            call a:opts.then_cb()
+        endif
     endtry
 endfunction
 

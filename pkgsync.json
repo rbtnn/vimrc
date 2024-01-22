@@ -5,6 +5,12 @@
 			"AhmedAbdulrahman": [
 				"vim-aylin"
 			],
+			"cormacrelf": [
+				"vim-colors-github"
+			],
+			"danilo-augusto": [
+				"vim-afterglow"
+			],
 			"drewtempelmeyer": [
 				"palenight.vim"
 			],
@@ -40,25 +46,18 @@
 			],
 			"thinca": [
 				"vim-qfreplace",
+				"vim-quickrun",
 				"vim-textobj-between"
-			],
-			"tyru": [
-				"restart.vim"
-			],
-			"cormacrelf": [
-				"vim-colors-github"
-			],
-			"danilo-augusto": [
-				"vim-afterglow"
 			],
 			"tomasr": [
 				"molokai"
 			],
 			"tyrannicaltoucan": [
 				"vim-deep-space"
+			],
+			"tyru": [
+				"restart.vim"
 			]
-		},
-		"opt": {
 		}
 	}
 }

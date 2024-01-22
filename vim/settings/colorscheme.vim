@@ -25,6 +25,7 @@ function! s:colorscheme(colors_name) abort
         colorscheme aylin
         call s:set_common_highlights(a:colors_name)
         highlight!       SpecialKey               guifg=#444411
+        highlight!       Error                    guifg=NONE    guibg=NONE    gui=undercurl
     elseif a:colors_name == 'afterglow'
         colorscheme afterglow
         call s:set_common_highlights(a:colors_name)
