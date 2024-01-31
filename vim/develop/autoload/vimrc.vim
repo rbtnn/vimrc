@@ -23,7 +23,7 @@ endfunction
 function! vimrc#open_file(path, lnum = -1) abort
     if filereadable(a:path)
         if s:find_window_by_path(a:path)
-        elseif s:can_open_in_current()
+        elseif s:can_open_in_current() && (&filetype != 'diff')
             silent! execute printf('edit %s', fnameescape(a:path))
         else
             silent! execute printf('new %s', fnameescape(a:path))

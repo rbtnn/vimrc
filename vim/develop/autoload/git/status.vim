@@ -19,11 +19,26 @@ function! git#status#exec() abort
             \ 'callback': function('s:popup_callback'),
             \ })
         call utils#popupwin#set_options(v:false)
+        call s:set_cursor_at_curr_file(winid)
         call s:fix_cursor_pos(winid)
         call s:update_title(winid)
     else
         call git#internal#echo('Working tree clean!')
         call popup_close(winid)
+    endif
+endfunction
+
+function! s:set_cursor_at_curr_file(winid) abort
+    let fname = fnamemodify(get(b:, 'gitdiff_current_path', expand('%')), ':t')
+    let lnum = 0
+    if !empty(fname)
+        for line in getbufline(winbufnr(a:winid), 1, '$')
+            let lnum += 1
+            if line =~# ('^.\{2\} "\?.*[\/]' .. fname .. '"\?$')
+                call utils#popupwin#set_cursorline(a:winid, lnum)
+                break
+            endif
+        endfor
     endif
 endfunction
 
@@ -121,7 +136,9 @@ function! s:get_current_path(winid, lnum) abort
     if -1 != a:lnum
         let rootdir = git#internal#get_rootdir()
         let line = get(getbufline(winbufnr(a:winid), a:lnum), 0, '')[3:]
-        if -1 != stridx(line, ' -> ')
+        if line =~# '^".\+"$'
+            let line = line[1:-2]
+        elseif -1 != stridx(line, ' -> ')
             let line = split(line, ' -> ')[1]
         endif
         return expand(rootdir .. '/' .. line)
