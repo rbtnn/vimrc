@@ -4,9 +4,9 @@ let g:loaded_develop_git = 1
 if executable('git')
     command!       -nargs=0                                   GitStatus    :call git#status()
     command!       -nargs=*                                   GitGrep      :call git#grep(<q-args>)
-    command!       -nargs=0                                   GitBlame     :call git#blame()
+    "command!       -nargs=0                                   GitBlame     :call git#blame()
     command! -bang -nargs=0                                   GitLsFiles   :call git#lsfiles(<q-bang>)
-    command!       -nargs=*                                   GitShow      :call git#show(<q-args>)
+    "command!       -nargs=*                                   GitShow      :call git#show(<q-args>)
     command!       -nargs=* -complete=customlist,GitDiffComp  GitDiff      :call git#diff(<q-args>)
 
     function! GitDiffComp(ArgLead, CmdLine, CursorPos) abort

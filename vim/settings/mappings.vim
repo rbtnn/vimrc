@@ -27,7 +27,7 @@ nnoremap <silent><C-p>    <Cmd>cprevious \| normal zz<cr>
 
 nnoremap <silent><space>  <Cmd>Filer<cr>
 nnoremap <silent><C-q>    <Cmd>QuickRun<cr>
-nnoremap <silent><C-s>    <Cmd>GitStatus<cr>
+nnoremap <silent><C-s>    <Cmd>GitDiff -w<cr>
 nnoremap <silent><C-f>    <Cmd>GitLsFiles<cr>
 nnoremap <silent><C-z>    <Cmd>ToggleTerminal<cr>
 tnoremap <silent><C-z>    <Cmd>ToggleTerminal<cr>

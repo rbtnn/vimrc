@@ -18,7 +18,6 @@
 				"vim-operator-flashy"
 			],
 			"itchyny": [
-				"lightline.vim",
 				"vim-parenmatch"
 			],
 			"kana": [
