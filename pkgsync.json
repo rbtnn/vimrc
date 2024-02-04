@@ -5,20 +5,8 @@
 			"AhmedAbdulrahman": [
 				"vim-aylin"
 			],
-			"cormacrelf": [
-				"vim-colors-github"
-			],
-			"danilo-augusto": [
-				"vim-afterglow"
-			],
-			"drewtempelmeyer": [
-				"palenight.vim"
-			],
 			"haya14busa": [
 				"vim-operator-flashy"
-			],
-			"itchyny": [
-				"vim-parenmatch"
 			],
 			"kana": [
 				"vim-operator-replace",
@@ -47,12 +35,6 @@
 				"vim-qfreplace",
 				"vim-quickrun",
 				"vim-textobj-between"
-			],
-			"tomasr": [
-				"molokai"
-			],
-			"tyrannicaltoucan": [
-				"vim-deep-space"
 			],
 			"tyru": [
 				"restart.vim"
