@@ -26,8 +26,8 @@ function! s:source_plugin_settings(dirname) abort
 endfunction
 
 if has('vim_starting')
-    set packpath=$VIMRC_VIM/github
-    set runtimepath=$VIMRC_VIM/develop,$VIMRUNTIME
+    set packpath=$VIMRC_VIM/develop,$VIMRC_VIM/github
+    set runtimepath=$VIMRUNTIME
 
     if has('win32') && has('gui_running')
         set linespace=0

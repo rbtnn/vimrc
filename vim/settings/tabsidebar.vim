@@ -28,7 +28,7 @@ if has('tabsidebar')
             return v:exception
         endtry
     endfunction
-    let g:tabsidebar_vertsplit = 0
+    let g:tabsidebar_vertsplit = 1
     set notabsidebaralign
     set notabsidebarwrap
     set showtabsidebar=2
