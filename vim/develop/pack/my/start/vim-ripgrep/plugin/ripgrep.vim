@@ -2,7 +2,8 @@
 let g:loaded_develop_ripgrep = 1
 
 if executable('rg')
-    command! -nargs=* RipGrep      :call s:ripgrep(<q-args>)
+    command! -nargs=* RipGrepSearch  :call s:ripgrep(<q-args>)
+    command! -nargs=* RipGrepFiles   :call ripgrep#files(<q-args>)
 
     function! s:ripgrep(q_args) abort
         let cmd = ['rg', '--vimgrep', '--glob', '!.git', '--glob', '!.svn', '--glob', '!node_modules', '-uu'] + split(a:q_args, '\s\+') + (has('win32') ? ['.\'] : ['.'])

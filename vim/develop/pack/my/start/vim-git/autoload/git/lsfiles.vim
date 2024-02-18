@@ -78,18 +78,11 @@ function! s:search_lsfiles(rootdir, winid) abort
         call git#lsfiles#data#set_paths(a:rootdir, git#internal#system(['ls-files']))
     endif
     let filtered_paths = filter(copy(git#lsfiles#data#get_paths(a:rootdir)), { _, x -> s:filter_query_text(x, query_text) })
-    let n = g:git_lsfiles_maximum - 1
-    if n < 1
-        let n = 1
-    endif
-    call popup_settext(a:winid, filtered_paths[:n])
+    let n = g:git_lsfiles_maximum < 1 ? 1 : g:git_lsfiles_maximum
+    call popup_settext(a:winid, filtered_paths[:(n - 1)])
     call popup_setoptions(a:winid, s:get_popupwin_options_main(a:rootdir))
-    if g:git_enabled_match_query
-        call win_execute(a:winid, 'call clearmatches()')
-    endif
+    call win_execute(a:winid, 'call clearmatches()')
     if !empty(query_text)
-        if g:git_enabled_match_query
-            call win_execute(a:winid, printf('silent call matchadd(''Search'', ''%s'')', '\c' .. query_text))
-        endif
+        call win_execute(a:winid, printf('silent call matchadd(''Search'', ''%s'')', '\c' .. query_text))
     endif
 endfunction

@@ -46,15 +46,15 @@ function! popupwin#set_options(toggle_pos) abort
         let opts = popup_getoptions(winid)
         if 0 == i
             call extend(opts, {
+                \ 'pos': 'center',
+                \ }, 'force')
+        elseif 1 == i
+            call extend(opts, {
                 \ 'minwidth': maxwidth, 'maxwidth': maxwidth,
                 \ 'minheight': &lines - &cmdheight, 'maxheight': &lines - &cmdheight,
                 \ 'line': 1,
                 \ 'col': 1,
                 \ 'pos': 'topleft',
-                \ }, 'force')
-        elseif 1 == i
-            call extend(opts, {
-                \ 'pos': 'center',
                 \ }, 'force')
         elseif 2 == i
             call extend(opts, {

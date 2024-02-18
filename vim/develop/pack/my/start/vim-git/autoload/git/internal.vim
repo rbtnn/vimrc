@@ -39,40 +39,27 @@ function git#internal#system(subcmd) abort
     let cmd_prefix = ['git', '--no-pager']
     let cwd = git#internal#get_rootdir()
     let lines = []
-    if has('nvim')
-        let job = jobstart(cmd_prefix + a:subcmd, {
+    let path = tempname()
+    try
+        let job = job_start(cmd_prefix + a:subcmd, {
             \ 'cwd': cwd,
-            \ 'on_stdout': function('s:system_onevent', [{ 'lines': lines, }]),
-            \ 'on_stderr': function('s:system_onevent', [{ 'lines': lines, }]),
+            \ 'out_io': 'file',
+            \ 'out_name': path,
+            \ 'err_io': 'out',
             \ })
-        call jobwait([job])
-    else
-        let path = tempname()
-        try
-            let job = job_start(cmd_prefix + a:subcmd, {
-                \ 'cwd': cwd,
-                \ 'out_io': 'file',
-                \ 'out_name': path,
-                \ 'err_io': 'out',
-                \ })
-            while 'run' == job_status(job)
-            endwhile
-            if filereadable(path)
-                let lines = readfile(path)
-            endif
-        finally
-            if filereadable(path)
-                call delete(path)
-            endif
-        endtry
-    endif
+        while 'run' == job_status(job)
+        endwhile
+        if filereadable(path)
+            let lines = readfile(path)
+        endif
+    finally
+        if filereadable(path)
+            call delete(path)
+        endif
+    endtry
     return lines
 endfunction
 
 
 
-function s:system_onevent(d, job, data, event) abort
-    let a:d['lines'] += a:data
-    sleep 1m
-endfunction
 
