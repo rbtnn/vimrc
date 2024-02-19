@@ -1,81 +1,44 @@
 
-let s:qfjobs = get(s:, 'qfjobs', {})
+let s:curr_job = get(s:, 'curr_job', v:null)
+let s:match_items = get(s:, 'match_items', [])
 
 function! qfjob#start(cmd, ...) abort
-    call qfjob#kill_jobs()
-    cclose
-    call setqflist([])
-    let id = sha256(tempname())
-    let items = []
+    call s:kill_job()
+    let s:match_items = []
+    call setqflist(s:match_items)
     let opts = get(a:000, 0, {})
-    if has('nvim')
-        let s:qfjobs[id] = jobstart(a:cmd, {
-            \ 'cwd': get(opts, 'cwd', getcwd()),
-            \ 'on_stdout': function('s:out_cb', [items]),
-            \ 'on_stderr': function('s:out_cb', [items]),
-            \ 'on_exit': function('s:exit_cb', [items, id, opts]),
-            \ })
-    else
-        let s:qfjobs[id] = job_start(a:cmd, {
-            \ 'cwd': get(opts, 'cwd', getcwd()),
-            \ 'exit_cb': function('s:exit_cb', [items, id, opts]),
-            \ 'out_cb': function('s:out_cb', [items]),
-            \ 'err_io': 'out',
-            \ })
-    endif
-    return id
+    let s:curr_job = job_start(a:cmd, {
+        \ 'cwd': get(opts, 'cwd', getcwd()),
+        \ 'close_cb': function('s:close_cb', [opts]),
+        \ 'out_cb': function('s:out_cb'),
+        \ 'err_io': 'out',
+        \ })
 endfunction
 
-function! qfjob#show_jobs() abort
-    for key in keys(s:qfjobs)
-        if s:qfjobs[key] != v:null
-            echo s:qfjobs[key]
-        endif
-    endfor
-endfunction
-
-function! qfjob#kill_jobs() abort
-    for key in keys(s:qfjobs)
-        if s:qfjobs[key] != v:null
-            call job_stop(s:qfjobs[key], 'kill')
-        endif
-    endfor
-endfunction
-
-function! qfjob#stop(id) abort
-    if get(s:qfjobs, 'id', v:null) != v:null
-        if has('nvim')
-            call jobstop(s:qfjobs[a:id])
-        else
-            if 'run' == job_status(s:qfjobs[a:id])
-                call job_stop(s:qfjobs[a:id], 'kill')
-            endif
-        endif
-    endif
-    let s:qfjobs[a:id] = v:null
-endfunction
-
-function s:out_cb(items, ch, msg, ...) abort
-    if has('nvim')
-        call extend(a:items, a:msg)
-    else
-        call extend(a:items, [a:msg])
+function! s:kill_job() abort
+    if (v:null != s:curr_job) && ('run' == job_status(s:curr_job))
+        call job_stop(s:curr_job, 'kill')
+        let s:curr_job = v:null
     endif
 endfunction
 
-function s:exit_cb(items, id, opts, ...) abort
+function s:out_cb(ch, msg, ...) abort
+    call extend(s:match_items, [a:msg])
+endfunction
+
+function s:close_cb(opts, ...) abort
     let title = get(a:opts, 'title', 'NO NAME')
     let xs = []
     try
         if has_key(a:opts, 'line_parser')
-            for item in a:items
+            for item in s:match_items
                 let x = a:opts.line_parser(item)
                 if !empty(x)
                     let xs += [x]
                     redraw
                 endif
                 if get(a:opts, 'echo', v:true)
-                    echo printf('[%s] The job has finished! Please wait to build the quickfix... (%d%%)', title, len(xs) * 100 / len(a:items))
+                    echo printf('[%s] The job has finished! Please wait to build the quickfix... (%d%%)', title, len(xs) * 100 / len(s:match_items))
                 endif
             endfor
         endif
@@ -91,18 +54,12 @@ function s:exit_cb(items, id, opts, ...) abort
             endif
         else
             call setqflist(xs)
-            let bnr = bufnr()
-            silent! copen
-            if has_key(a:opts, 'keep_cursor')
-                if a:opts.keep_cursor
-                    call win_gotoid(bufwinid(bnr))
-                endif
+            if get(a:opts, 'echo', v:true)
+                echo printf('[%s] %d results', title, len(xs))
             endif
         endif
-        call qfjob#stop(a:id)
         if has_key(a:opts, 'then_cb')
             call a:opts.then_cb()
         endif
     endtry
 endfunction
-

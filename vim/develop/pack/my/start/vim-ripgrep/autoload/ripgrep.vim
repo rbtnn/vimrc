@@ -1,6 +1,7 @@
 
 let s:query_chars = get(s:, 'query_chars', [])
 let s:curr_job = get(s:, 'curr_job', v:null)
+let s:match_items = get(s:, 'match_items', [])
 
 function! ripgrep#init() abort
     let g:ripgrep_files_maximum = get(g:, 'ripgrep_files_maximum', 100)
@@ -8,11 +9,13 @@ function! ripgrep#init() abort
         \ '--glob', '!NTUSER.DAT*',
         \ '--glob', '!.git',
         \ '--glob', '!.svn',
+        \ '--glob', '!bin',
+        \ '--glob', '!obj',
         \ '--glob', '!node_modules',
         \ '--line-buffered'
         \ ])
-    let g:ripgrep_ignore_patterns = get(g:, 'rggrep_ignore_patterns', [
-        \ 'min.js$', 'min.js.map$',
+    let g:ripgrep_ignore_patterns = get(g:, 'ripgrep_ignore_patterns', [
+        \ 'min.js$', 'min.js.map$', 'Thumbs.db$',
         \ ])
 endfunction
 
@@ -45,10 +48,9 @@ function s:line_parser(line) abort
         if !filereadable(path) && (path !~# '^[A-Z]:')
             let path = expand(fnamemodify(m[5], ':h') .. '/' .. m[1])
         endif
-        let filename = fnamemodify(path, ':t')
         let ok = v:true
         for pat in g:ripgrep_ignore_patterns
-            if filename =~# pat
+            if path =~# pat
                 let ok = v:false
                 break
             endif
@@ -98,8 +100,12 @@ function! s:popup_filter(winid, key) abort
 endfunction
 
 function! s:get_title_option() abort
+    let status = 'dead'
+    if v:null != s:curr_job
+        let status = job_status(s:curr_job)
+    endif
     return {
-        \ 'title': printf(' [ripgrep-files] %s ', join(s:query_chars, ''))
+        \ 'title': printf(' [ripgrep-files] job:%s, matches:%d, query:"%s" ', status, len(s:match_items), join(s:query_chars, ''))
         \ }
 endfunction
 
@@ -111,42 +117,59 @@ function! s:popup_callback(winid, result) abort
     endif
 endfunction
 
-function! s:search_lsfiles(winid) abort
-    call popup_setoptions(a:winid, s:get_title_option())
-    call popup_settext(a:winid, 'Please wait for listing files in the repository...')
-    redraw
-    let xs = []
+function! s:kill_job(winid) abort
     if (v:null != s:curr_job) && ('run' == job_status(s:curr_job))
-        call job_stop(s:curr_job)
+        call job_stop(s:curr_job, 'kill')
         let s:curr_job = v:null
     endif
-    let s:curr_job = job_start(['rg'] + g:ripgrep_glob_args + ['--files', '--hidden'], {
-        \ 'out_io': 'pipe',
-        \ 'out_cb': function('s:out_cb', [a:winid, xs]),
-        \ 'close_cb': function('s:close_cb', [a:winid, xs]),
-        \ 'err_io': 'out',
-        \ })
 endfunction
 
-function! s:out_cb(winid, xs, ch, msg) abort
-    let query_text = join(s:query_chars, '')
-    let xs = a:xs
-    try
-        " ignore case
-        if (a:msg =~? query_text) && (len(xs) < g:ripgrep_files_maximum)
-            let xs += [a:msg]
-            call popup_settext(a:winid, xs)
-        endif
-    catch
-        echo v:exception
-    endtry
-endfunction
-
-function! s:close_cb(winid, xs, ch) abort
+function! s:search_lsfiles(winid) abort
     call win_execute(a:winid, 'call clearmatches()')
     let query_text = join(s:query_chars, '')
     if !empty(query_text)
         call win_execute(a:winid, printf('silent call matchadd(''Search'', ''%s'')', '\c' .. query_text))
     endif
     redraw
+    let s:match_items = []
+    call popup_settext(a:winid, s:match_items)
+    call s:kill_job(a:winid)
+    let s:curr_job = job_start(['rg'] + g:ripgrep_glob_args + ['--files', '--hidden'], {
+        \ 'out_io': 'pipe',
+        \ 'out_cb': function('s:out_cb', [a:winid]),
+        \ 'close_cb': function('s:close_cb', [a:winid]),
+        \ 'err_io': 'out',
+        \ })
+endfunction
+
+function! s:out_cb(winid, ch, msg) abort
+    let query_text = join(s:query_chars, '')
+    try
+        if (-1 == index(popup_list(), a:winid)) || (g:ripgrep_files_maximum <= len(s:match_items))
+            " kill the job if close the popup window
+            call s:kill_job(a:winid)
+        else
+            " ignore case
+            if a:msg =~? query_text
+                let ok = v:true
+                for pat in g:ripgrep_ignore_patterns
+                    if a:msg =~# pat
+                        let ok = v:false
+                        break
+                    endif
+                endfor
+                if ok
+                    let s:match_items += [a:msg]
+                    call popup_settext(a:winid, s:match_items)
+                endif
+            endif
+            call popup_setoptions(a:winid, s:get_title_option())
+        endif
+    catch
+        echo v:exception
+    endtry
+endfunction
+
+function! s:close_cb(winid, ch) abort
+    call popup_setoptions(a:winid, s:get_title_option())
 endfunction
