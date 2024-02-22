@@ -27,7 +27,7 @@ nnoremap <silent><C-p>    <Cmd>cprevious \| normal zz<cr>
 
 nnoremap <silent><space>  <nop>
 
-nnoremap <silent><C-q>    <Cmd>QuickRun<cr>
-nnoremap <silent><C-s>    <Cmd>GitDiff -w<cr>
+nnoremap <silent><C-q>    <Cmd>GitDiff -w<cr>
+nnoremap <silent><C-s>    <Cmd>RipGrepLive<cr>
 nnoremap <silent><C-f>    <Cmd>RipGrepFiles<cr>
 nnoremap <silent><C-z>    <Cmd>Terminal<cr>
