@@ -18,7 +18,7 @@ endfunction
 
 
 function! s:init() abort
-    let g:ripgrep_maximum = get(g:, 'ripgrep_maximum', 100)
+    let g:ripgrep_maximum = get(g:, 'ripgrep_maximum', 1000)
     let g:ripgrep_glob_args = get(g:, 'ripgrep_glob_args', [
         \ '--glob', '!NTUSER.DAT*',
         \ '--glob', '!.git',
@@ -40,9 +40,10 @@ function! s:livegrep_callback(line) abort
     if !empty(m)
         let path = m[1]
         let lnum = str2nr(m[2])
+        let col = str2nr(m[3])
         if !filereadable(path) && (path !~# '^[A-Z]:')
             let path = expand(fnamemodify(m[5], ':h') .. '/' .. m[1])
         endif
-        call fileopener#open_file(path, lnum)
+        call fileopener#open_file(path, lnum, col)
     endif
 endfunction

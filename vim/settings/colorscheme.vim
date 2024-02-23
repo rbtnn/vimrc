@@ -1,11 +1,12 @@
 
-function! s:set_common_highlights(colors_name, c1 = '#777777', c2 = '#bcbcbc', c3 = '#ffffff', c4 = '#000000') abort
+function! s:set_common_highlights(colors_name, c1 = '#777777', c2 = '#bcbcbc', c3 = '#ffffff', c4 = '#000000', c5 = '#ecc48d') abort
     let normal_hl = hlget('Normal')[0]
 
     execute printf('highlight!       TabSideBar               guifg=%s   guibg=%s gui=NONE cterm=NONE', a:c1, normal_hl['guibg'])
     execute printf('highlight!       TabSideBarFill           guifg=NONE guibg=%s gui=NONE cterm=NONE',       normal_hl['guibg'])
     execute printf('highlight!       TabSideBarCurTab         guifg=%s   guibg=%s gui=BOLD cterm=NONE', a:c2, normal_hl['guibg'])
-    execute printf('highlight!       VimrcDevPopupWin         guifg=%s   guibg=%s gui=NONE cterm=NONE', a:c3, a:c4)
+    execute printf('highlight!       VimrcDevPWBG             guifg=%s   guibg=%s gui=NONE cterm=NONE', a:c3, a:c4)
+    execute printf('highlight!       VimrcDevPWSCH            guifg=%s   guibg=%s gui=NONE cterm=NONE', a:c5, a:c4)
 
     highlight! CursorIM                 guifg=NONE    guibg=#d70000
 
