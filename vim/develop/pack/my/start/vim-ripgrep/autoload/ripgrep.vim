@@ -18,7 +18,7 @@ endfunction
 
 
 function! s:init() abort
-    let g:ripgrep_maximum = get(g:, 'ripgrep_maximum', 1000)
+    let g:ripgrep_maximum = get(g:, 'ripgrep_maximum', 300)
     let g:ripgrep_glob_args = get(g:, 'ripgrep_glob_args', [
         \ '--glob', '!NTUSER.DAT*',
         \ '--glob', '!.git',

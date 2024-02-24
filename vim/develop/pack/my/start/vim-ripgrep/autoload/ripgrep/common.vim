@@ -24,7 +24,7 @@ function! ripgrep#common#exec(executor_id, title, prefix_cmd, post_cmd, withquer
     let s:executor_id2withquery[a:executor_id] = a:withquery
     let s:executor_id2position[a:executor_id] = get(s:executor_id2position, a:executor_id, 1)
     let s:executor_id2matchitems[a:executor_id] = get(s:executor_id2matchitems, a:executor_id, [])
-    if executable('rg') && !executable('nvim')
+    if executable('rg') && !has('nvim')
         let winid = popup_menu([], s:get_title_option(a:executor_id))
         if -1 != winid
             let maxwidth = &columns - 2 - s:get_tabsidebarcolumns()
