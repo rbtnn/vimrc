@@ -168,17 +168,18 @@ function! s:out_cb(winid, executor_id, ch, msg) abort
             " kill the job if close the popup window
             call s:kill_job(a:winid)
         else
+            let iconv_msg = iconv#exec(a:msg)
             " ignore case
-            if a:msg =~? query_text
+            if iconv_msg =~? query_text
                 let ok = v:true
                 for pat in s:executor_id2ignores[a:executor_id]
-                    if a:msg =~# pat
+                    if iconv_msg =~# pat
                         let ok = v:false
                         break
                     endif
                 endfor
                 if ok
-                    let s:executor_id2matchitems[a:executor_id] += [a:msg]
+                    let s:executor_id2matchitems[a:executor_id] += [iconv_msg]
                     call popup_settext(a:winid, s:executor_id2matchitems[a:executor_id])
                 endif
             endif
