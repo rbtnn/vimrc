@@ -53,7 +53,15 @@ function! ripgrep#common#exec(executor_id, title, prefix_cmd, post_cmd, withquer
 endfunction
 
 function! s:get_title_option(executor_id) abort
-    return { 'title': printf(' %s>%s ', s:executor_id2title[a:executor_id], join(s:executor_id2query[a:executor_id], '')) }
+    let status = 'dead'
+    if v:null != s:curr_job
+        let status = job_status(s:curr_job)
+    endif
+    return { 'title': printf(' [%4s] %s>%s ',
+        \   status,
+        \   s:executor_id2title[a:executor_id],
+        \   join(s:executor_id2query[a:executor_id], '')
+        \ )}
 endfunction
 
 function! s:get_tabsidebarcolumns() abort
@@ -168,7 +176,7 @@ function! s:out_cb(winid, executor_id, ch, msg) abort
             " kill the job if close the popup window
             call s:kill_job(a:winid)
         else
-            let iconv_msg = iconv#exec(a:msg)
+            let iconv_msg = join(map(split(a:msg, ':'), { _, x -> iconv#exec(x) }), ':')
             " ignore case
             if iconv_msg =~? query_text
                 let ok = v:true
