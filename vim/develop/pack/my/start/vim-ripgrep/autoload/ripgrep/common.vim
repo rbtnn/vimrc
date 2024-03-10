@@ -3,6 +3,9 @@ const s:hlname1 = 'VimrcDevPWBG'
 const s:hlname2 = 'VimrcDevPWSCH'
 
 let s:curr_job = get(s:, 'curr_job', v:null)
+let s:curr_timer = get(s:, 'curr_timer', v:null)
+let s:spinner_chars = ['/', '-', '\', '|']
+let s:spinner_index = 0
 
 let s:executor_id2query = get(s:, 'executor_id2query', {})
 let s:executor_id2title = get(s:, 'executor_id2title', {})
@@ -53,12 +56,13 @@ function! ripgrep#common#exec(executor_id, title, prefix_cmd, post_cmd, withquer
 endfunction
 
 function! s:get_title_option(executor_id) abort
-    let status = 'dead'
+    let status = ''
     if v:null != s:curr_job
         let status = job_status(s:curr_job)
     endif
-    return { 'title': printf(' [%4s] %s>%s ',
-        \   status,
+    let s:spinner_index = (s:spinner_index + 1) % len(s:spinner_chars)
+    return { 'title': printf(' %s %s>%s ',
+        \   (status == 'run' ? ('(' .. s:spinner_chars[s:spinner_index] .. ')') : ''),
         \   s:executor_id2title[a:executor_id],
         \   join(s:executor_id2query[a:executor_id], '')
         \ )}
@@ -137,6 +141,7 @@ function! s:job_runner(winid, executor_id, query) abort
     let s:executor_id2query[a:executor_id] = a:query
     let s:executor_id2position[a:executor_id] = 1
     call s:kill_job(a:winid)
+    call s:kill_timer()
     call s:set_text(a:winid, a:executor_id, [])
     let query_text = join(s:executor_id2query[a:executor_id], '')
     if !empty(query_text)
@@ -144,10 +149,20 @@ function! s:job_runner(winid, executor_id, query) abort
         let s:curr_job = job_start(cmd, {
             \ 'out_io': 'pipe',
             \ 'out_cb': function('s:out_cb', [a:winid, a:executor_id]),
-            \ 'close_cb': function('s:close_cb', [a:winid, a:executor_id]),
+            \ 'exit_cb': function('s:exit_cb', [a:winid, a:executor_id]),
             \ 'err_io': 'out',
             \ })
+        let s:curr_timer = timer_start(100, function('s:timer', [a:winid, a:executor_id]), { 'repeat': -1 })
+    else
+        call popup_setoptions(a:winid, s:get_title_option(a:executor_id))
     endif
+endfunction
+
+function! s:timer(winid, executor_id, timer) abort
+    if (-1 == index(popup_list(), a:winid)) || (v:null == s:curr_job) || ('dead' == job_status(s:curr_job))
+        call s:kill_timer()
+    endif
+    call popup_setoptions(a:winid, s:get_title_option(a:executor_id))
 endfunction
 
 function! s:set_text(winid, executor_id, match_items) abort
@@ -156,10 +171,16 @@ function! s:set_text(winid, executor_id, match_items) abort
     if !empty(query_text)
         call win_execute(a:winid, printf('silent call matchadd(''' .. s:hlname2 .. ''', ''%s'')', '\c' .. query_text))
     endif
-    call popup_setoptions(a:winid, s:get_title_option(a:executor_id))
     redraw
     let s:executor_id2matchitems[a:executor_id] = a:match_items
     call popup_settext(a:winid, s:executor_id2matchitems[a:executor_id])
+endfunction
+
+function! s:kill_timer() abort
+    if v:null != s:curr_timer
+        call timer_stop(s:curr_timer)
+        let s:curr_timer = v:null
+    endif
 endfunction
 
 function! s:kill_job(winid) abort
@@ -198,7 +219,7 @@ function! s:out_cb(winid, executor_id, ch, msg) abort
     endtry
 endfunction
 
-function! s:close_cb(winid, executor_id, ch) abort
+function! s:exit_cb(winid, executor_id, job, status) abort
     call popup_setoptions(a:winid, s:get_title_option(a:executor_id))
 endfunction
 

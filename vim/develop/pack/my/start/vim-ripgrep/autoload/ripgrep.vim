@@ -12,13 +12,15 @@ function! ripgrep#livegrep() abort
     call s:init()
     let prefixcmd = ['rg'] + g:ripgrep_glob_args + ['--vimgrep', '-uu']
     let postcmd = (has('win32') ? ['.\'] : ['.'])
-    call ripgrep#common#exec('ripgrep#livegrep#exec', 'livegrep', prefixcmd, postcmd, v:true, function('s:livegrep_callback'), ['(os error \d\+)', '^[^:]*\<_viminfo:'], g:ripgrep_maximum)
+    call ripgrep#common#exec('ripgrep#livegrep#exec', 'livegrep', prefixcmd, postcmd, v:true, function('s:livegrep_callback'), get(g:, 'ripgrep_ignore_patterns', [
+        \ '(os error \d\+)', '^[^:]*\<_viminfo:', '^[^:]*\<assets\>[^:]*:',
+        \ ]), g:ripgrep_maximum)
 endfunction
 
 
 
 function! s:init() abort
-    let g:ripgrep_maximum = get(g:, 'ripgrep_maximum', 300)
+    let g:ripgrep_maximum = get(g:, 'ripgrep_maximum', 100)
     let g:ripgrep_glob_args = get(g:, 'ripgrep_glob_args', [
         \ '--glob', '!NTUSER.DAT*',
         \ '--glob', '!.git',
