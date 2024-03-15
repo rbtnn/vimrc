@@ -48,6 +48,7 @@ function! ripgrep#common#exec(executor_id, title, prefix_cmd, post_cmd, withquer
             if !empty(s:executor_id2query[a:executor_id])
                 call s:set_text(winid, a:executor_id, get(s:executor_id2matchitems, a:executor_id, []))
                 call s:set_cursorline(winid, a:executor_id, s:executor_id2position[a:executor_id])
+                call win_execute(winid, 'redraw')
             else
                 call s:job_runner(winid, a:executor_id, get(s:executor_id2query, a:executor_id, []))
             endif
@@ -62,7 +63,7 @@ function! s:get_title_option(executor_id) abort
     endif
     let s:spinner_index = (s:spinner_index + 1) % len(s:spinner_chars)
     return { 'title': printf(' %s %s>%s ',
-        \   (status == 'run' ? ('(' .. s:spinner_chars[s:spinner_index] .. ')') : ''),
+        \   (status == 'run' ? ('(' .. s:spinner_chars[s:spinner_index] .. ')') : '   '),
         \   s:executor_id2title[a:executor_id],
         \   join(s:executor_id2query[a:executor_id], '')
         \ )}
@@ -146,13 +147,13 @@ function! s:job_runner(winid, executor_id, query) abort
     let query_text = join(s:executor_id2query[a:executor_id], '')
     if !empty(query_text)
         let cmd = s:executor_id2prefixcmd[a:executor_id] + (s:executor_id2withquery[a:executor_id] ? [query_text] : []) + s:executor_id2postcmd[a:executor_id]
+        let s:curr_timer = timer_start(100, function('s:timer', [a:winid, a:executor_id]), { 'repeat': -1 })
         let s:curr_job = job_start(cmd, {
             \ 'out_io': 'pipe',
             \ 'out_cb': function('s:out_cb', [a:winid, a:executor_id]),
             \ 'exit_cb': function('s:exit_cb', [a:winid, a:executor_id]),
             \ 'err_io': 'out',
             \ })
-        let s:curr_timer = timer_start(100, function('s:timer', [a:winid, a:executor_id]), { 'repeat': -1 })
     else
         call popup_setoptions(a:winid, s:get_title_option(a:executor_id))
     endif
@@ -225,6 +226,5 @@ endfunction
 
 function! s:set_cursorline(winid, executor_id, lnum) abort
     call win_execute(a:winid, printf('call setpos(".", [0, %d, 0, 0])', a:lnum))
-    call win_execute(a:winid, 'redraw')
     let s:executor_id2position[a:executor_id] = a:lnum
 endfunction
