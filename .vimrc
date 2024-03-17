@@ -1,3 +1,13 @@
+"
+" ---------------------------------------------------------------------------------------------------
+" How to setup on server
+"
+"   1. $curl https://raw.githubusercontent.com/rbtnn/vimrc/master/.vimrc        -o .vimrc
+"   2. $curl https://raw.githubusercontent.com/rbtnn/vimrc/master/pkgsync.json  -o pkgsync.json
+"   3. :PkgSyncSetup
+"   4. :PkgSync update
+" ---------------------------------------------------------------------------------------------------
+"
 scriptencoding utf-8
 let $MYVIMRC = resolve($MYVIMRC)
 let $VIMRC_VIM = expand(expand('<sfile>:h') .. '/.vim')
@@ -303,7 +313,7 @@ if v:true
         endfor
         if !exists
             if !&modified && &modifiable && empty(&buftype) && !filereadable(bufname())
-                " use the current buffer.
+            " use the current buffer.
             else
                 new
             endif
@@ -833,11 +843,11 @@ if v:true
 
     function! s:vimrc_colorscheme() abort
         let normal_hl = hlget('Normal')[0]
-        execute printf('highlight!       TabSideBar               guifg=%s   guibg=%s   gui=NONE cterm=NONE', '#777777', normal_hl['guibg'])
-        execute printf('highlight!       TabSideBarFill           guifg=NONE guibg=%s   gui=NONE cterm=NONE',            normal_hl['guibg'])
-        execute printf('highlight!       TabSideBarCurTab         guifg=%s   guibg=%s   gui=BOLD cterm=NONE', '#bcbcbc', normal_hl['guibg'])
-        execute printf('highlight!       VimrcDevPWBG             guifg=%s   guibg=%s   gui=NONE cterm=NONE', '#ffffff', '#000000')
-        execute printf('highlight!       VimrcDevPWSCH            guifg=%s   guibg=NONE gui=NONE cterm=NONE', '#ecc48d')
+        execute printf('highlight! TabSideBar               guifg=%s   guibg=%s   gui=NONE cterm=NONE', '#777777', get(normal_hl, 'guibg', 'NONE'))
+        execute printf('highlight! TabSideBarFill           guifg=NONE guibg=%s   gui=NONE cterm=NONE',            get(normal_hl, 'guibg', 'NONE'))
+        execute printf('highlight! TabSideBarCurTab         guifg=%s   guibg=%s   gui=BOLD cterm=NONE', '#bcbcbc', get(normal_hl, 'guibg', 'NONE'))
+        execute printf('highlight! VimrcDevPWBG             guifg=%s   guibg=%s   gui=NONE cterm=NONE', '#ffffff', '#000000')
+        execute printf('highlight! VimrcDevPWSCH            guifg=%s   guibg=NONE gui=NONE cterm=NONE', '#ecc48d')
         highlight! CursorIM                 guifg=NONE    guibg=#d70000
         highlight! SpecialKey               guifg=#444411
         " itchyny/vim-parenmatch
@@ -915,5 +925,9 @@ if has('vim_starting')
         autocmd ColorScheme *   : call s:vimrc_colorscheme()
     augroup END
 
-    colorscheme aylin
+    try
+        colorscheme aylin
+    catch
+        colorscheme default
+    endtry
 endif

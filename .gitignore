@@ -28,7 +28,6 @@
 .dropbox/
 .electron/
 .fern/
-.ffmrw
 .gem/
 .ghc/
 .ghost/
@@ -42,10 +41,10 @@
 .lldb/
 .local/
 .matplotlib/
+.mongodb/
 .mono/
 .motd_shown
 .mozilla/
-.mrw
 .multirust/
 .netrc
 .ngrok2/
