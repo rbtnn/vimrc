@@ -50,7 +50,8 @@ function! ripgrep#common#exec(executor_id, title, prefix_cmd, post_cmd, withquer
                 call s:set_cursorline(winid, a:executor_id, s:executor_id2position[a:executor_id])
                 call win_execute(winid, 'redraw')
             else
-                call s:job_runner(winid, a:executor_id, get(s:executor_id2query, a:executor_id, []))
+                let s:executor_id2query[a:executor_id] = get(s:executor_id2query, a:executor_id, [])
+                call s:job_runner(winid, a:executor_id)
             endif
         endif
     endif
@@ -87,22 +88,26 @@ function! s:popup_filter(executor_id, winid, key) abort
         " Ctrl-u
         if 0 < len(xs)
             call remove(xs, 0, -1)
-            call s:job_runner(a:winid, a:executor_id, xs)
+            let s:executor_id2query[a:executor_id] = xs
+            call popup_setoptions(a:winid, s:get_title_option(a:executor_id))
         endif
         return 1
     elseif ("\x80kb" == a:key) || (8 == char2nr(a:key))
         " Ctrl-h or bs
         if 0 < len(xs)
             call remove(xs, -1)
-            call s:job_runner(a:winid, a:executor_id, xs)
+            let s:executor_id2query[a:executor_id] = xs
+            call popup_setoptions(a:winid, s:get_title_option(a:executor_id))
         endif
         return 1
     elseif (0x20 <= char2nr(a:key)) && (char2nr(a:key) <= 0x7f)
-        call s:job_runner(a:winid, a:executor_id, xs + [a:key])
+        let s:executor_id2query[a:executor_id] = xs + [a:key]
+        call popup_setoptions(a:winid, s:get_title_option(a:executor_id))
         return 1
     elseif 22 == char2nr(a:key)
         " Ctrl-v
-        call s:job_runner(a:winid, a:executor_id, xs + split(@", '\zs'))
+        let s:executor_id2query[a:executor_id] = xs + split(@", '\zs')
+        call popup_setoptions(a:winid, s:get_title_option(a:executor_id))
         return 1
     elseif (10 == char2nr(a:key)) || (14 == char2nr(a:key))
         " Ctrl-n or Ctrl-j
@@ -121,7 +126,8 @@ function! s:popup_filter(executor_id, winid, key) abort
         endif
         return 1
     elseif 0x0d == char2nr(a:key)
-        return popup_filter_menu(a:winid, "\<cr>")
+        call s:job_runner(a:winid, a:executor_id)
+        return 1
     else
         if char2nr(a:key) < 0x20
             return popup_filter_menu(a:winid, "\<esc>")
@@ -138,13 +144,12 @@ function! s:popup_callback(callback, winid, result) abort
     endif
 endfunction
 
-function! s:job_runner(winid, executor_id, query) abort
-    let s:executor_id2query[a:executor_id] = a:query
+function! s:job_runner(winid, executor_id) abort
     let s:executor_id2position[a:executor_id] = 1
     call s:kill_job(a:winid)
     call s:kill_timer()
     call s:set_text(a:winid, a:executor_id, [])
-    let query_text = join(s:executor_id2query[a:executor_id], '')
+    let query_text = substitute(join(s:executor_id2query[a:executor_id], ''), "[\n\r\t]", '', 'g')
     if !empty(query_text)
         let cmd = s:executor_id2prefixcmd[a:executor_id] + (s:executor_id2withquery[a:executor_id] ? [query_text] : []) + s:executor_id2postcmd[a:executor_id]
         let s:curr_timer = timer_start(100, function('s:timer', [a:winid, a:executor_id]), { 'repeat': -1 })
@@ -168,7 +173,8 @@ endfunction
 
 function! s:set_text(winid, executor_id, match_items) abort
     call win_execute(a:winid, 'call clearmatches()')
-    let query_text = join(s:executor_id2query[a:executor_id], '')
+    let query_text = substitute(join(s:executor_id2query[a:executor_id], ''), "[\n\r\t]", '', 'g')
+    let query_text = substitute(query_text, "'", "''", 'g')
     if !empty(query_text)
         call win_execute(a:winid, printf('silent call matchadd(''' .. s:hlname2 .. ''', ''%s'')', '\c' .. query_text))
     endif
@@ -192,7 +198,7 @@ function! s:kill_job(winid) abort
 endfunction
 
 function! s:out_cb(winid, executor_id, ch, msg) abort
-    let query_text = join(s:executor_id2query[a:executor_id], '')
+    let query_text = substitute(join(s:executor_id2query[a:executor_id], ''), "[\n\r\t]", '', 'g')
     try
         if (-1 == index(popup_list(), a:winid)) || (s:executor_id2maximum[a:executor_id] <= len(s:executor_id2matchitems[a:executor_id]))
             " kill the job if close the popup window
