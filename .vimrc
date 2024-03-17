@@ -173,9 +173,6 @@ if v:true
         \ 'VimTweakEnableCaption', 'VimTweakEnableMaximize', 'VimTweakEnableTopMost',
         \ ]
 
-    const s:hlname1 = 'VimrcDevPWBG'
-    const s:hlname2 = 'VimrcDevPWSCH'
-
     let s:curr_job = get(s:, 'curr_job', v:null)
     let s:curr_timer = get(s:, 'curr_timer', v:null)
     let s:spinner_chars = ['/', '-', '\', '|']
@@ -566,7 +563,7 @@ if v:true
                 call popup_setoptions(winid, {
                     \ 'filter': function('s:popup_filter', [a:executor_id]),
                     \ 'callback': function('s:popup_callback', [a:callback]),
-                    \ 'highlight': s:hlname1,
+                    \ 'highlight': 'VimrcDevPWBG',
                     \ 'border': [0, 0, 0, 0],
                     \ 'padding': [0, 0, 0, 0],
                     \ 'wrap': 0,
@@ -710,7 +707,7 @@ if v:true
         let query_text = substitute(join(s:executor_id2query[a:executor_id], ''), "[\n\r\t]", '', 'g')
         let query_text = substitute(query_text, "'", "''", 'g')
         if !empty(query_text)
-            call win_execute(a:winid, printf('silent call matchadd(''' .. s:hlname2 .. ''', ''%s'')', '\c' .. query_text))
+            call win_execute(a:winid, printf('silent call matchadd(''VimrcDevPWSCH'', ''%s'')', '\c' .. query_text))
         endif
         redraw
         let s:executor_id2matchitems[a:executor_id] = a:match_items
@@ -842,14 +839,13 @@ if v:true
     endfunction
 
     function! s:vimrc_colorscheme() abort
-        let normal_hl = hlget('Normal')[0]
-        execute printf('highlight! TabSideBar               guifg=%s   guibg=%s   gui=NONE cterm=NONE', '#777777', get(normal_hl, 'guibg', 'NONE'))
-        execute printf('highlight! TabSideBarFill           guifg=NONE guibg=%s   gui=NONE cterm=NONE',            get(normal_hl, 'guibg', 'NONE'))
-        execute printf('highlight! TabSideBarCurTab         guifg=%s   guibg=%s   gui=BOLD cterm=NONE', '#bcbcbc', get(normal_hl, 'guibg', 'NONE'))
-        execute printf('highlight! VimrcDevPWBG             guifg=%s   guibg=%s   gui=NONE cterm=NONE', '#ffffff', '#000000')
-        execute printf('highlight! VimrcDevPWSCH            guifg=%s   guibg=NONE gui=NONE cterm=NONE', '#ecc48d')
-        highlight! CursorIM                 guifg=NONE    guibg=#d70000
-        highlight! SpecialKey               guifg=#444411
+        highlight! TabSideBar        guifg=#777777 guibg=NONE    gui=NONE cterm=NONE
+        highlight! TabSideBarFill    guifg=NONE    guibg=NONE    gui=NONE cterm=NONE
+        highlight! TabSideBarCurTab  guifg=#bcbcbc guibg=NONE    gui=BOLD cterm=NONE
+        highlight! VimrcDevPWBG      guifg=#ffffff guibg=#000000 gui=NONE cterm=NONE
+        highlight! VimrcDevPWSCH     guifg=#ecc48d guibg=NONE    gui=NONE cterm=NONE
+        highlight! CursorIM          guifg=NONE    guibg=#d70000
+        highlight! SpecialKey        guifg=#444411
         " itchyny/vim-parenmatch
         if exists('g:loaded_parenmatch')
             let g:parenmatch_highlight = 0
