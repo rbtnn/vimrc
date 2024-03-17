@@ -23,6 +23,7 @@
 				"vim-pkgsync",
 				"vim-qficonv",
 				"vim-textobj-string",
+				"vim-undofiles",
 				"vim-vimscript_indentexpr",
 				"vim-vimscript_lasterror",
 				"vim-vimscript_tagfunc",
