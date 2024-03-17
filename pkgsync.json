@@ -1,5 +1,5 @@
 {
-	"packpath": "~/vim/github",
+	"packpath": "~/.vim/github",
 	"plugins": {
 		"start": {
 			"AhmedAbdulrahman": [

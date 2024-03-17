@@ -1,6 +1,6 @@
 scriptencoding utf-8
 let $MYVIMRC = resolve($MYVIMRC)
-let $VIMRC_VIM = expand(expand('<sfile>:h') .. '/vim')
+let $VIMRC_VIM = expand(expand('<sfile>:h') .. '/.vim')
 let $VIMRC_PKGSYNC_DIR = expand('$VIMRC_VIM/github/pack/rbtnn/start/vim-pkgsync')
 
 if &compatible
@@ -86,23 +86,6 @@ endif
 
 let &cedit = "\<C-q>"
 let g:vim_indent_cont = &g:shiftwidth
-let g:restart_sessionoptions = &sessionoptions
-let g:molder_show_hidden = 1
-let g:quickrun_config = {
-    \   "_" : {
-    \       "outputter": "error",
-    \       "outputter/error/success": "buffer",
-    \       "outputter/error/error": "quickfix",
-    \   },
-    \   "java" : {
-    \       "hook/output_encode/encoding": has('win32') ? 'cp932' : &encoding,
-    \   },
-    \   "vb" : {
-    \       "command"   : "vbc",
-    \       "exec" : ['%c /nologo /out:"Prog.exe" "%s:p"', 'Prog.exe'],
-    \       "hook/output_encode/encoding": has('win32') ? 'cp932' : &encoding,
-    \   },
-    \}
 let g:term_cmd = [&shell]
 if has('win32') && executable('wmic') && has('gui_running')
     function! s:outcb(ch, mes) abort
@@ -120,6 +103,51 @@ if has('vim_starting')
     set showtabline=0
     set tabline&
     set termguicolors
+endif
+
+if has('tabsidebar')
+    function! TabSideBar() abort
+        try
+            let tnr = get(g:, 'actual_curtabpage', tabpagenr())
+            let lines = []
+            let lines += [tnr == tabpagenr() ? '%#TabSideBarCurTab#' : '%#TabSideBar#']
+            for x in filter(getwininfo(), { i,x -> tnr == x['tabnr'] && ('popup' != win_gettype(x['winid']))})
+                let ft = getbufvar(x['bufnr'], '&filetype')
+                let bt = getbufvar(x['bufnr'], '&buftype')
+                let high_tab = tnr == tabpagenr() ? '%#TabSideBarCurTab#' : '%#TabSideBar#'
+                let fname = fnamemodify(bufname(x['bufnr']), ':t')
+                let lines += [
+                    \    high_tab
+                    \ .. ' '
+                    \ .. (getbufvar(x['bufnr'], '&readonly') && empty(bt) ? '[R]' : '')
+                    \ .. (getbufvar(x['bufnr'], '&modified') && empty(bt) ? '[+]' : '')
+                    \ .. (!empty(bt)
+                    \      ? printf('[%s]', bt == 'nofile' ? ft : bt)
+                    \      : (empty(bufname(x['bufnr']))
+                    \          ? '[No Name]'
+                    \          : fname))
+                    \ ]
+            endfor
+            let lines += ['']
+            return join(lines, "\n")
+        catch
+            return v:exception
+        endtry
+    endfunction
+    let g:tabsidebar_vertsplit = 1
+    set notabsidebaralign
+    set notabsidebarwrap
+    set showtabsidebar=2
+    set tabsidebarcolumns=16
+    set tabsidebar=%!TabSideBar()
+    for s:name in [
+        \ 'TabSideBar',
+        \ 'TabSideBarFill',
+        \ ]
+        if !hlexists(s:name)
+            execute printf('highlight! %s guibg=NONE gui=NONE cterm=NONE', s:name)
+        endif
+    endfor
 endif
 
 " script functions and variables
@@ -153,68 +181,20 @@ if v:true
     let s:executor_id2position = get(s:, 'executor_id2position', {})
     let s:executor_id2matchitems = get(s:, 'executor_id2matchitems', {})
 
+    function! s:pkgsync_setup() abort
+        if !isdirectory($VIMRC_PKGSYNC_DIR)
+            let path = expand('$VIMRC_VIM/github/pack/rbtnn/start/')
+            silent! call mkdir(path, 'p')
+            call term_start(['git', 'clone', '--depth', '1', 'https://github.com/rbtnn/vim-pkgsync.git'], {
+                \ 'cwd': path,
+                \ })
+            echo 'please restart Vim!'
+        endif
+    endfunction
+
     function! s:exists_font(fname) abort
         return filereadable(expand('$USERPROFILE/AppData/Local/Microsoft/Windows/Fonts/' .. a:fname))
             \ || filereadable(expand('C:/Windows/Fonts/' .. a:fname))
-    endfunction
-
-    function! s:source_plugin_settings(dirname) abort
-        if isdirectory($VIMRC_PKGSYNC_DIR)
-            for s:setting in sort(split(globpath($VIMRC_VIM, printf('settings/plugins/%s/*', a:dirname)), '\n'))
-                for s:plugin in sort(split(globpath($VIMRC_VIM, 'github/pack/*/*/*'), '\n'))
-                    let s:x = split(s:setting, '[\/]')[-1]
-                    let s:y = split(s:plugin, '[\/]')[-1]
-                    if (tolower(s:x) == tolower(s:y .. '.vim')) || (tolower(s:x) == tolower(s:y))
-                        execute 'source' s:setting
-                    endif
-                endfor
-            endfor
-        endif
-    endfunction
-
-    function! s:colorscheme() abort
-        const colors_name = 'aylin'
-        execute 'colorscheme' colors_name
-        let normal_hl = hlget('Normal')[0]
-
-        execute printf('highlight!       TabSideBar               guifg=%s   guibg=%s   gui=NONE cterm=NONE', '#777777', normal_hl['guibg'])
-        execute printf('highlight!       TabSideBarFill           guifg=NONE guibg=%s   gui=NONE cterm=NONE',            normal_hl['guibg'])
-        execute printf('highlight!       TabSideBarCurTab         guifg=%s   guibg=%s   gui=BOLD cterm=NONE', '#bcbcbc', normal_hl['guibg'])
-        execute printf('highlight!       VimrcDevPWBG             guifg=%s   guibg=%s   gui=NONE cterm=NONE', '#ffffff', '#000000')
-        execute printf('highlight!       VimrcDevPWSCH            guifg=%s   guibg=NONE gui=NONE cterm=NONE', '#ecc48d')
-
-        highlight! CursorIM                 guifg=NONE    guibg=#d70000
-
-        " itchyny/vim-parenmatch
-        if exists('g:loaded_parenmatch')
-            let g:parenmatch_highlight = 0
-            highlight! link  ParenMatch  MatchParen
-        endif
-
-        " itchyny/vim-lightline
-        if exists('g:loaded_lightline') && !empty(colors_name)
-            let g:lightline = { 'colorscheme': colors_name }
-            call lightline#enable()
-        endif
-        highlight!       SpecialKey               guifg=#444411
-    endfunction
-
-    function! s:vb_regex() abort
-        return '^\s*\(Public\|Private\|Protected\)\?\s*\(Overridable\|Shared\)\?\s*\(Structure\|Enum\|Sub\|Function\)'
-    endfunction
-
-    function! s:vb_bufenter() abort
-        let ext = fnamemodify(bufname(), ':e')
-        if ('frm' == ext) || ('bas' == ext) || ('cls' == ext)
-            setfiletype vb
-        endif
-        if &filetype == 'vb'
-            syntax keyword vbKeyword MustOverride MustInherit ReadOnly Protected Imports Module Try Catch Overrides Overridable Throw Partial NotInheritable
-            syntax keyword vbKeyword Shared Class Finally Using Continue Of Inherits Default Region Structure AndAlso OrElse
-            syntax keyword vbKeyword Namespace Strict My MyBase IsNot Handles And Or Delegate MarshalAs Not In
-            nnoremap <buffer><nowait><silent>[[      :<C-u>call search(<SID>vb_regex(), 'b')<cr>
-            nnoremap <buffer><nowait><silent>]]      :<C-u>call search(<SID>vb_regex(), '')<cr>
-        endif
     endfunction
 
     function! s:ripgrep_files() abort
@@ -311,8 +291,6 @@ if v:true
             nnoremap <buffer><C-i> <nop>
         endif
     endfunction
-
-
 
     function! s:execute_gitdiff(ft, cmd) abort
         let exists = v:false
@@ -780,10 +758,103 @@ if v:true
         call win_execute(a:winid, printf('call setpos(".", [0, %d, 0, 0])', a:lnum))
         let s:executor_id2position[a:executor_id] = a:lnum
     endfunction
+
+    function! s:vimrc_bufferenter() abort
+        " Can't use <S-space> at :terminal
+        " https://github.com/vim/vim/issues/6040
+        tnoremap <silent><S-space>           <space>
+
+        " Smart space on wildmenu
+        cnoremap <expr><space>             (wildmenumode() && (getcmdline() =~# '[\/]$')) ? '<space><bs>' : '<space>'
+
+        " Emacs key mappings
+        if has('win32') && (&shell =~# '\<cmd\.exe$')
+            tnoremap <silent><C-p>           <up>
+            tnoremap <silent><C-n>           <down>
+            tnoremap <silent><C-b>           <left>
+            tnoremap <silent><C-f>           <right>
+            tnoremap <silent><C-e>           <end>
+            tnoremap <silent><C-a>           <home>
+            tnoremap <silent><C-u>           <esc>
+        endif
+
+        cnoremap         <C-b>        <left>
+        cnoremap         <C-f>        <right>
+        cnoremap         <C-e>        <end>
+        cnoremap         <C-a>        <home>
+
+        nnoremap <silent><C-n>    <Cmd>cnext     \| normal zz<cr>
+        nnoremap <silent><C-p>    <Cmd>cprevious \| normal zz<cr>
+
+        nnoremap <silent><space>  <nop>
+
+        if executable('git')
+            command! -nargs=* -complete=customlist,GitDiffComp  GitDiff      :call s:git_diff(<q-args>)
+            nnoremap <silent><C-q>    <Cmd>GitDiff -w<cr>
+        endif
+
+        nnoremap <silent><C-s>    <Cmd>call <SID>ripgrep_livegrep()<cr>
+        nnoremap <silent><C-f>    <Cmd>call <SID>ripgrep_files()<cr>
+        nnoremap <silent><C-z>    <Cmd>call term_start(g:term_cmd, {
+            \   'term_highlight' : 'Terminal',
+            \   'term_finish' : 'close',
+            \   'term_kill' : 'kill',
+            \ })<cr>
+        if get(g:, 'loaded_operator_replace', v:false)
+            nmap     <silent>s        <Plug>(operator-replace)
+            nmap     <silent>ss       <Plug>(operator-replace)as
+        endif
+        if get(g:, 'loaded_operator_replace', v:false)
+            map      <silent>y        <Plug>(operator-flashy)
+            nmap     <silent>Y        <Plug>(operator-flashy)$
+        endif
+        if get(g:, 'loaded_textobj_string', v:false)
+            nmap     <silent>ds       das
+            nmap     <silent>ys       yas
+            nmap     <silent>vs       vas
+        endif
+        if &filetype == 'molder'
+            nnoremap <buffer> h  <plug>(molder-up)
+            nnoremap <buffer> l  <plug>(molder-open)
+            nnoremap <buffer> t  <Cmd>call term_start(&shell, { 'cwd': b:molder_dir, })<cr>
+        endif
+        let ext = fnamemodify(bufname(), ':e')
+        if ('frm' == ext) || ('bas' == ext) || ('cls' == ext)
+            setfiletype vb
+        endif
+        if &filetype == 'vb'
+            syntax keyword vbKeyword MustOverride MustInherit ReadOnly Protected Imports Module Try Catch Overrides Overridable Throw Partial NotInheritable
+            syntax keyword vbKeyword Shared Class Finally Using Continue Of Inherits Default Region Structure AndAlso OrElse
+            syntax keyword vbKeyword Namespace Strict My MyBase IsNot Handles And Or Delegate MarshalAs Not In
+            nnoremap <buffer><nowait><silent>[[      :<C-u>call search('^\s*\(Public\|Private\|Protected\)\?\s*\(Overridable\|Shared\)\?\s*\(Structure\|Enum\|Sub\|Function\)', 'b')<cr>
+            nnoremap <buffer><nowait><silent>]]      :<C-u>call search('^\s*\(Public\|Private\|Protected\)\?\s*\(Overridable\|Shared\)\?\s*\(Structure\|Enum\|Sub\|Function\)', '')<cr>
+        endif
+    endfunction
+
+    function! s:vimrc_colorscheme() abort
+        let normal_hl = hlget('Normal')[0]
+        execute printf('highlight!       TabSideBar               guifg=%s   guibg=%s   gui=NONE cterm=NONE', '#777777', normal_hl['guibg'])
+        execute printf('highlight!       TabSideBarFill           guifg=NONE guibg=%s   gui=NONE cterm=NONE',            normal_hl['guibg'])
+        execute printf('highlight!       TabSideBarCurTab         guifg=%s   guibg=%s   gui=BOLD cterm=NONE', '#bcbcbc', normal_hl['guibg'])
+        execute printf('highlight!       VimrcDevPWBG             guifg=%s   guibg=%s   gui=NONE cterm=NONE', '#ffffff', '#000000')
+        execute printf('highlight!       VimrcDevPWSCH            guifg=%s   guibg=NONE gui=NONE cterm=NONE', '#ecc48d')
+        highlight! CursorIM                 guifg=NONE    guibg=#d70000
+        highlight! SpecialKey               guifg=#444411
+        " itchyny/vim-parenmatch
+        if exists('g:loaded_parenmatch')
+            let g:parenmatch_highlight = 0
+            highlight! link  ParenMatch  MatchParen
+        endif
+        " itchyny/vim-lightline
+        if exists('g:loaded_lightline')
+            let g:lightline = { 'colorscheme': 'aylin' }
+            call lightline#enable()
+        endif
+    endfunction
 endif
 
 if has('vim_starting')
-    set packpath=$VIMRC_VIM/develop,$VIMRC_VIM/github
+    set packpath=$VIMRC_VIM/github
     set runtimepath=$VIMRUNTIME
 
     if has('win32') && has('gui_running')
@@ -801,147 +872,48 @@ if has('vim_starting')
 
     silent! source ~/.vimrc.local
 
-    call s:source_plugin_settings('before')
+    let g:restart_sessionoptions = &sessionoptions
+    let g:molder_show_hidden = 1
+    let g:quickrun_config = {
+        \   "_" : {
+        \       "outputter": "error",
+        \       "outputter/error/success": "buffer",
+        \       "outputter/error/error": "quickfix",
+        \   },
+        \   "java" : {
+        \       "hook/output_encode/encoding": has('win32') ? 'cp932' : &encoding,
+        \   },
+        \   "vb" : {
+        \       "command"   : "vbc",
+        \       "exec" : ['%c /nologo /out:"Prog.exe" "%s:p"', 'Prog.exe'],
+        \       "hook/output_encode/encoding": has('win32') ? 'cp932' : &encoding,
+        \   },
+        \}
 
     filetype plugin indent on
     syntax enable
     packloadall
 
-    call s:source_plugin_settings('after')
+    augroup vimrc
+        autocmd!
+        " Delete unused commands, because it's an obstacle on cmdline-completion.
+        autocmd CmdlineEnter *
+            \ : for s:cmdname in s:delcmds
+            \ |     execute printf('silent! delcommand %s', s:cmdname)
+            \ | endfor
+            \ | unlet s:cmdname
+            \ | if getcmdtype() == ':'
+            \ |     set ignorecase
+            \ | endif
+        autocmd VimEnter *
+            \ : if !exists(':PkgSync')
+            \ |    execute 'command! -nargs=0 PkgSyncSetup :call <SID>pkgsync_setup()'
+            \ | endif
+        autocmd CmdlineLeave *  : set noignorecase
+        autocmd FileType help   : setlocal colorcolumn=78
+        autocmd BufEnter *      : call s:vimrc_bufferenter()
+        autocmd ColorScheme *   : call s:vimrc_colorscheme()
+    augroup END
 
-    if !isdirectory($VIMRC_PKGSYNC_DIR)
-        function! PkgSyncSetup() abort
-            let path = expand('$VIMRC_VIM/github/pack/rbtnn/start/')
-            silent! call mkdir(path, 'p')
-            call term_start(['git', 'clone', '--depth', '1', 'https://github.com/rbtnn/vim-pkgsync.git'], {
-                \ 'cwd': path,
-                \ })
-        endfunction
-        autocmd vimrc-plugins VimEnter *
-            \ :if !exists(':PkgSync')
-            \ |  execute 'command! -nargs=0 PkgSyncSetup :call PkgSyncSetup()'
-            \ |endif
-    endif
+    colorscheme aylin
 endif
-
-if has('tabsidebar')
-    function! TabSideBar() abort
-        try
-            let tnr = get(g:, 'actual_curtabpage', tabpagenr())
-            let lines = []
-            let lines += [tnr == tabpagenr() ? '%#TabSideBarCurTab#' : '%#TabSideBar#']
-            for x in filter(getwininfo(), { i,x -> tnr == x['tabnr'] && ('popup' != win_gettype(x['winid']))})
-                let ft = getbufvar(x['bufnr'], '&filetype')
-                let bt = getbufvar(x['bufnr'], '&buftype')
-                let high_tab = tnr == tabpagenr() ? '%#TabSideBarCurTab#' : '%#TabSideBar#'
-                let fname = fnamemodify(bufname(x['bufnr']), ':t')
-                let lines += [
-                    \    high_tab
-                    \ .. ' '
-                    \ .. (getbufvar(x['bufnr'], '&readonly') && empty(bt) ? '[R]' : '')
-                    \ .. (getbufvar(x['bufnr'], '&modified') && empty(bt) ? '[+]' : '')
-                    \ .. (!empty(bt)
-                    \      ? printf('[%s]', bt == 'nofile' ? ft : bt)
-                    \      : (empty(bufname(x['bufnr']))
-                    \          ? '[No Name]'
-                    \          : fname))
-                    \ ]
-            endfor
-            let lines += ['']
-            return join(lines, "\n")
-        catch
-            return v:exception
-        endtry
-    endfunction
-    let g:tabsidebar_vertsplit = 1
-    set notabsidebaralign
-    set notabsidebarwrap
-    set showtabsidebar=2
-    set tabsidebarcolumns=16
-    set tabsidebar=%!TabSideBar()
-    for s:name in [
-        \ 'TabSideBar',
-        \ 'TabSideBarFill',
-        \ ]
-        if !hlexists(s:name)
-            execute printf('highlight! %s guibg=NONE gui=NONE cterm=NONE', s:name)
-        endif
-    endfor
-endif
-
-" Can't use <S-space> at :terminal
-" https://github.com/vim/vim/issues/6040
-tnoremap <silent><S-space>           <space>
-
-" Smart space on wildmenu
-cnoremap <expr><space>             (wildmenumode() && (getcmdline() =~# '[\/]$')) ? '<space><bs>' : '<space>'
-
-" Emacs key mappings
-if has('win32') && (&shell =~# '\<cmd\.exe$')
-    tnoremap <silent><C-p>           <up>
-    tnoremap <silent><C-n>           <down>
-    tnoremap <silent><C-b>           <left>
-    tnoremap <silent><C-f>           <right>
-    tnoremap <silent><C-e>           <end>
-    tnoremap <silent><C-a>           <home>
-    tnoremap <silent><C-u>           <esc>
-endif
-
-cnoremap         <C-b>        <left>
-cnoremap         <C-f>        <right>
-cnoremap         <C-e>        <end>
-cnoremap         <C-a>        <home>
-
-nnoremap <silent><C-n>    <Cmd>cnext     \| normal zz<cr>
-nnoremap <silent><C-p>    <Cmd>cprevious \| normal zz<cr>
-
-nnoremap <silent><space>  <nop>
-
-nnoremap <silent><C-q>    <Cmd>GitDiff -w<cr>
-nnoremap <silent><C-s>    <Cmd>call <SID>ripgrep_livegrep()<cr>
-nnoremap <silent><C-f>    <Cmd>call <SID>ripgrep_files()<cr>
-nnoremap <silent><C-z>    <Cmd>call term_start(g:term_cmd, {
-    \   'term_highlight' : 'Terminal',
-    \   'term_finish' : 'close',
-    \   'term_kill' : 'kill',
-    \ })<cr>
-
-map      <silent>y        <Plug>(operator-flashy)
-nmap     <silent>Y        <Plug>(operator-flashy)$
-nmap     <silent>s        <Plug>(operator-replace)
-nmap     <silent>ss       <Plug>(operator-replace)as
-nmap     <silent>ds       das
-nmap     <silent>ys       yas
-nmap     <silent>vs       vas
-
-augroup vimrc-autocmds
-    autocmd!
-    " Delete unused commands, because it's an obstacle on cmdline-completion.
-    autocmd CmdlineEnter *
-        \ : for s:cmdname in s:delcmds
-        \ |     execute printf('silent! delcommand %s', s:cmdname)
-        \ | endfor
-        \ | unlet s:cmdname
-    autocmd FileType help :setlocal colorcolumn=78
-    autocmd CmdlineEnter *
-        \ : if getcmdtype() == ':'
-        \ |     set ignorecase
-        \ | endif
-    autocmd CmdlineLeave * :set noignorecase
-    autocmd VimEnter *
-        \ : if 2 == exists(':VimTweakSetAlpha')
-        \ |     VimTweakSetAlpha 245
-        \ | endif
-    autocmd FileType molder
-        \ :nnoremap <buffer> h  <plug>(molder-up)
-        \ |nnoremap <buffer> l  <plug>(molder-open)
-        \ |nnoremap <buffer> t  <Cmd>call term_start(&shell, { 'cwd': b:molder_dir, })<cr>
-    autocmd BufEnter * :call <SID>vb_bufenter()
-augroup END
-
-call s:colorscheme()
-
-if executable('git')
-    command! -nargs=* -complete=customlist,GitDiffComp  GitDiff      :call s:git_diff(<q-args>)
-endif
-
