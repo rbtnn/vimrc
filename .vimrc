@@ -485,7 +485,7 @@ if v:true
     endfunction
 
     function s:iconv_wrapper(text) abort
-        if has('win32') && (&encoding == 'utf-8') && exists('g:loaded_qficonv') && (len(a:text) < 500)
+        if has('win32') && (&encoding == 'utf-8') && exists('g:loaded_qficonv') && (len(a:text) < &columns)
             return qficonv#encoding#iconv_utf8(a:text, 'shift_jis')
         else
             return a:text
@@ -735,7 +735,8 @@ if v:true
                 " kill the job if close the popup window
                 call s:kill_job(a:winid)
             else
-                let iconv_msg = join(map(split(a:msg, ':'), { _, x -> s:iconv_wrapper(x) }), ':')
+                " encode only the displayed text. keep remaining text as it is.
+                let iconv_msg = join(map(split(a:msg[:&columns], ':'), { _, x -> s:iconv_wrapper(x) }), ':') .. a:msg[(&columns + 1):]
                 " ignore case
                 if iconv_msg =~? query_text
                     let ok = v:true
