@@ -28,7 +28,7 @@ set belloff=all
 set clipboard=unnamed
 
 set autoread
-set cmdheight=1
+set cmdheight=3
 set cmdwinheight=5
 set complete-=t
 set completeslash=slash
@@ -120,15 +120,15 @@ if has('tabsidebar')
         try
             let tnr = get(g:, 'actual_curtabpage', tabpagenr())
             let lines = []
-            let lines += [tnr == tabpagenr() ? '%#TabSideBarCurTab#' : '%#TabSideBar#']
+            let lines += [(tnr == tabpagenr() ? '%#TabSideBarSel' : '%#TabSideBar') .. (tnr % 2 == 0 ? 'Odd' : 'Even') .. '#']
             for x in filter(getwininfo(), { i,x -> tnr == x['tabnr'] && ('popup' != win_gettype(x['winid']))})
                 let ft = getbufvar(x['bufnr'], '&filetype')
                 let bt = getbufvar(x['bufnr'], '&buftype')
-                let high_tab = tnr == tabpagenr() ? '%#TabSideBarCurTab#' : '%#TabSideBar#'
+                let high_tab = (tnr == tabpagenr() ? '%#TabSideBarSel' : '%#TabSideBar') .. (tnr % 2 == 0 ? 'Odd' : 'Even') .. '#'
                 let fname = fnamemodify(bufname(x['bufnr']), ':t')
                 let lines += [
                     \    high_tab
-                    \ .. ' '
+                    \ .. (x['bufnr'] == bufnr() ? ' * ' : '   ')
                     \ .. (getbufvar(x['bufnr'], '&readonly') && empty(bt) ? '[R]' : '')
                     \ .. (getbufvar(x['bufnr'], '&modified') && empty(bt) ? '[+]' : '')
                     \ .. (!empty(bt)
@@ -144,7 +144,7 @@ if has('tabsidebar')
             return v:exception
         endtry
     endfunction
-    let g:tabsidebar_vertsplit = 1
+    let g:tabsidebar_vertsplit = 0
     set notabsidebaralign
     set notabsidebarwrap
     set showtabsidebar=2
@@ -152,6 +152,7 @@ if has('tabsidebar')
     set tabsidebar=%!TabSideBar()
     for s:name in [
         \ 'TabSideBar',
+        \ 'TabSideBarSel',
         \ 'TabSideBarFill',
         \ ]
         if !hlexists(s:name)
@@ -310,7 +311,7 @@ if v:true
         endfor
         if !exists
             if !&modified && &modifiable && empty(&buftype) && !filereadable(bufname())
-            " use the current buffer.
+                " use the current buffer.
             else
                 new
             endif
@@ -558,8 +559,8 @@ if v:true
         if executable('rg') && !has('nvim')
             let winid = popup_menu([], s:get_title_option(a:executor_id))
             if -1 != winid
-                let maxwidth = &columns - 2 - s:get_tabsidebarcolumns()
-                let maxheight = &lines - 3 - &cmdheight
+                let maxwidth = &columns - s:get_tabsidebarcolumns()
+                let maxheight = &lines - 1 - &cmdheight
                 call popup_setoptions(winid, {
                     \ 'filter': function('s:popup_filter', [a:executor_id]),
                     \ 'callback': function('s:popup_callback', [a:callback]),
@@ -569,8 +570,8 @@ if v:true
                     \ 'wrap': 0,
                     \ 'minwidth': maxwidth, 'maxwidth': maxwidth,
                     \ 'minheight': maxheight, 'maxheight': maxheight,
-                    \ 'line': 2,
-                    \ 'col': 2,
+                    \ 'line': 1,
+                    \ 'col': 1,
                     \ 'pos': 'topleft',
                     \ })
                 if !empty(s:executor_id2query[a:executor_id])
@@ -791,8 +792,10 @@ if v:true
         cnoremap         <C-e>        <end>
         cnoremap         <C-a>        <home>
 
-        nnoremap <silent><C-n>    <Cmd>cnext     \| normal zz<cr>
-        nnoremap <silent><C-p>    <Cmd>cprevious \| normal zz<cr>
+        nnoremap <silent><C-j>    <Cmd>tabnext<cr>
+        nnoremap <silent><C-k>    <Cmd>tabprevious<cr>
+        tnoremap <silent><C-j>    <Cmd>tabnext<cr>
+        tnoremap <silent><C-k>    <Cmd>tabprevious<cr>
 
         nnoremap <silent><space>  <nop>
 
@@ -840,13 +843,16 @@ if v:true
     endfunction
 
     function! s:vimrc_colorscheme() abort
-        highlight! TabSideBar        guifg=#777777 guibg=NONE    gui=NONE cterm=NONE
-        highlight! TabSideBarFill    guifg=NONE    guibg=NONE    gui=NONE cterm=NONE
-        highlight! TabSideBarCurTab  guifg=#bcbcbc guibg=NONE    gui=BOLD cterm=NONE
-        highlight! VimrcDevPWBG      guifg=#ffffff guibg=#000000 gui=NONE cterm=NONE
-        highlight! VimrcDevPWSCH     guifg=#ecc48d guibg=NONE    gui=NONE cterm=NONE
-        highlight! CursorIM          guifg=NONE    guibg=#d70000
-        highlight! SpecialKey        guifg=#444411
+        highlight! TabSideBarOdd      guifg=#777777 guibg=#252a36 gui=NONE cterm=NONE
+        highlight! TabSideBarEven     guifg=#777777 guibg=#2f3440 gui=NONE cterm=NONE
+        highlight! TabSideBarSelOdd   guifg=#acfcac guibg=#252a36 gui=BOLD cterm=NONE
+        highlight! TabSideBarSelEven  guifg=#acfcac guibg=#2f3440 gui=BOLD cterm=NONE
+        highlight! TabSideBarFill     guifg=NONE    guibg=NONE    gui=NONE cterm=NONE
+        highlight! VimrcDevPWBG       guifg=#ffffff guibg=#000000 gui=NONE cterm=NONE
+        highlight! VimrcDevPWSCH      guifg=#ecc48d guibg=NONE    gui=NONE cterm=NONE
+        highlight! CursorIM           guifg=NONE    guibg=#d70000
+        highlight! SpecialKey         guifg=#444411
+        highlight! NonText            guifg=#1f2430
         " itchyny/vim-parenmatch
         if exists('g:loaded_parenmatch')
             let g:parenmatch_highlight = 0
