@@ -95,12 +95,52 @@ else
 endif
 
 let &cedit = "\<C-q>"
+
+let g:vimrc = get(g:, 'vimrc', {
+    \   'term_cmd': [&shell],
+    \   'git_enabled_qficonv': v:false,
+    \   'rg_files_ignore_patterns': [
+    \     'min.js$', 'min.js.map$', 'Thumbs.db$',
+    \   ],
+    \   'rg_livegrep_ignore_patterns': [
+    \     '(os error \d\+)', '^[^:]*\<_viminfo:', '^[^:]*\<assets\>[^:]*:',
+    \   ],
+    \   'ripgrep_maximum': 100,
+    \   'ripgrep_glob_args': [
+    \     '--glob', '!NTUSER.DAT*',
+    \     '--glob', '!.git',
+    \     '--glob', '!.svn',
+    \     '--glob', '!bin',
+    \     '--glob', '!obj',
+    \     '--glob', '!node_modules',
+    \     '--line-buffered'
+    \   ],
+    \   'vb_pattern_back': '^\s*\(Public\|Private\|Protected\)\?\s*\(Overridable\|Shared\)\?\s*\(Structure\|Enum\|Sub\|Function\)',
+    \   'vb_pattern_forword': '^\s*\(Public\|Private\|Protected\)\?\s*\(Overridable\|Shared\)\?\s*\(Structure\|Enum\|Sub\|Function\)',
+    \ })
 let g:vim_indent_cont = &g:shiftwidth
-let g:term_cmd = [&shell]
+let g:restart_sessionoptions = &sessionoptions
+let g:molder_show_hidden = 1
+let g:quickrun_config = {
+    \   "_" : {
+    \       "outputter": "error",
+    \       "outputter/error/success": "buffer",
+    \       "outputter/error/error": "quickfix",
+    \   },
+    \   "java" : {
+    \       "hook/output_encode/encoding": has('win32') ? 'cp932' : &encoding,
+    \   },
+    \   "vb" : {
+    \       "command"   : "vbc",
+    \       "exec" : ['%c /nologo /out:"Prog.exe" "%s:p"', 'Prog.exe'],
+    \       "hook/output_encode/encoding": has('win32') ? 'cp932' : &encoding,
+    \   },
+    \}
+
 if has('win32') && executable('wmic') && has('gui_running')
     function! s:outcb(ch, mes) abort
         if 14393 < str2nr(trim(a:mes))
-            let g:term_cmd = ['cmd.exe', '/k', 'doskey pwd=cd && doskey ls=dir /b && set prompt=$E[32m$$$E[0m']
+            let g:vimrc.term_cmd = ['cmd.exe', '/k', 'doskey pwd=cd && doskey ls=dir /b && set prompt=$E[32m$$$E[0m']
         endif
     endfunction
     call job_start('wmic os get BuildNumber', { 'out_cb': function('s:outcb'), })
@@ -206,34 +246,17 @@ if v:true
     endfunction
 
     function! s:ripgrep_files() abort
-        call s:ripgrep_init()
-        let prefixcmd = ['rg'] + g:ripgrep_glob_args + ['--files', '--hidden']
+        let prefixcmd = ['rg'] + g:vimrc.ripgrep_glob_args + ['--files', '--hidden']
         let postcmd = []
-        call s:ripgrep_common_exec('ripgrep#files', 'files', prefixcmd, postcmd, v:false, function('s:files_callback'), get(g:, 'ripgrep_ignore_patterns', [
-            \ 'min.js$', 'min.js.map$', 'Thumbs.db$',
-            \ ]), g:ripgrep_maximum)
+        call s:ripgrep_common_exec('ripgrep#files', 'files', prefixcmd, postcmd, v:false,
+            \ function('s:files_callback'), g:vimrc.rg_files_ignore_patterns, g:vimrc.ripgrep_maximum)
     endfunction
 
     function! s:ripgrep_livegrep() abort
-        call s:ripgrep_init()
-        let prefixcmd = ['rg'] + g:ripgrep_glob_args + ['--vimgrep', '-uu']
+        let prefixcmd = ['rg'] + g:vimrc.ripgrep_glob_args + ['--vimgrep', '-uu']
         let postcmd = (has('win32') ? ['.\'] : ['.'])
-        call s:ripgrep_common_exec('ripgrep#livegrep#exec', 'livegrep', prefixcmd, postcmd, v:true, function('s:livegrep_callback'), get(g:, 'ripgrep_ignore_patterns', [
-            \ '(os error \d\+)', '^[^:]*\<_viminfo:', '^[^:]*\<assets\>[^:]*:',
-            \ ]), g:ripgrep_maximum)
-    endfunction
-
-    function! s:ripgrep_init() abort
-        let g:ripgrep_maximum = get(g:, 'ripgrep_maximum', 100)
-        let g:ripgrep_glob_args = get(g:, 'ripgrep_glob_args', [
-            \ '--glob', '!NTUSER.DAT*',
-            \ '--glob', '!.git',
-            \ '--glob', '!.svn',
-            \ '--glob', '!bin',
-            \ '--glob', '!obj',
-            \ '--glob', '!node_modules',
-            \ '--line-buffered'
-            \ ])
+        call s:ripgrep_common_exec('ripgrep#livegrep#exec', 'livegrep', prefixcmd, postcmd, v:true,
+            \ function('s:livegrep_callback'), g:vimrc.rg_livegrep_ignore_patterns, g:vimrc.ripgrep_maximum)
     endfunction
 
     function! s:files_callback(line) abort
@@ -256,7 +279,6 @@ if v:true
 
     function! s:git_diff(q_bang) abort
         if isdirectory(s:git_get_rootdir())
-            let g:git_enabled_qficonv = get(g:, 'git_enabled_qficonv', v:false)
             call s:gitdiff_open_numstatwindow(a:q_bang)
         else
             echohl Error
@@ -320,10 +342,8 @@ if v:true
         endif
         if &filetype == a:ft
             if &filetype == 'gitdiff-numstat'
-                syntax match  GitDiffNumstatAdd     '^\d\+'
-                syntax match  GitDiffNumstatDelete  '\t\d\+\t'
-                highlight default link GitDiffNumstatAdd       DiffAdd
-                highlight default link GitDiffNumstatDelete    DiffDelete
+                syntax match  DiffAdd     '^\d\+'
+                syntax match  DiffDelete  '\t\d\+\t'
             endif
             let &l:statusline = printf('[git] %s', join(a:cmd))
             let lines = filter(s:git_system(a:cmd), { _,x -> !empty(x) })
@@ -337,7 +357,7 @@ if v:true
             else
                 call s:setbuflines(lines)
                 " The lines encodes after redrawing.
-                if get(g:, 'git_enabled_qficonv', v:false)
+                if g:vimrc.git_enabled_qficonv
                     " Redraw windows because the encoding process is very slowly.
                     redraw
                     for i in range(0, len(lines) - 1)
@@ -806,7 +826,9 @@ if v:true
 
         nnoremap <silent><C-s>    <Cmd>call <SID>ripgrep_livegrep()<cr>
         nnoremap <silent><C-f>    <Cmd>call <SID>ripgrep_files()<cr>
-        nnoremap <silent><C-z>    <Cmd>call term_start(g:term_cmd, {
+        nnoremap <silent><C-z>    <Cmd>tabnew \| call term_start(g:vimrc.term_cmd,
+            \ {
+            \   'curwin' : v:true,
             \   'term_highlight' : 'Terminal',
             \   'term_finish' : 'close',
             \   'term_kill' : 'kill',
@@ -837,8 +859,8 @@ if v:true
             syntax keyword vbKeyword MustOverride MustInherit ReadOnly Protected Imports Module Try Catch Overrides Overridable Throw Partial NotInheritable
             syntax keyword vbKeyword Shared Class Finally Using Continue Of Inherits Default Region Structure AndAlso OrElse
             syntax keyword vbKeyword Namespace Strict My MyBase IsNot Handles And Or Delegate MarshalAs Not In
-            nnoremap <buffer><nowait><silent>[[      :<C-u>call search('^\s*\(Public\|Private\|Protected\)\?\s*\(Overridable\|Shared\)\?\s*\(Structure\|Enum\|Sub\|Function\)', 'b')<cr>
-            nnoremap <buffer><nowait><silent>]]      :<C-u>call search('^\s*\(Public\|Private\|Protected\)\?\s*\(Overridable\|Shared\)\?\s*\(Structure\|Enum\|Sub\|Function\)', '')<cr>
+            nnoremap <buffer><nowait><silent>[[      :<C-u>call search(g:vimrc.vb_pattern_back, 'b')<cr>
+            nnoremap <buffer><nowait><silent>]]      :<C-u>call search(g:vimrc.vb_pattern_forword, '')<cr>
         endif
     endfunction
 
@@ -872,36 +894,18 @@ if has('vim_starting')
 
     if has('win32') && has('gui_running')
         set linespace=0
-        if s:exists_font('UDEVGothic-Regular.ttf')
-            " https://github.com/yuru7/udev-gothic
-            set guifont=UDEV_Gothic:h16:cSHIFTJIS:qDRAFT
-        elseif s:exists_font('Cica-Regular.ttf')
+        if s:exists_font('Cica-Regular.ttf')
             " https://github.com/miiton/Cica
             set guifont=Cica:h16:cSHIFTJIS:qDRAFT
+        elseif s:exists_font('UDEVGothic-Regular.ttf')
+            " https://github.com/yuru7/udev-gothic
+            set guifont=UDEV_Gothic:h16:cSHIFTJIS:qDRAFT
         else
             set guifont=ＭＳ_ゴシック:h18:cSHIFTJIS:qDRAFT
         endif
     endif
 
     silent! source ~/.vimrc.local
-
-    let g:restart_sessionoptions = &sessionoptions
-    let g:molder_show_hidden = 1
-    let g:quickrun_config = {
-        \   "_" : {
-        \       "outputter": "error",
-        \       "outputter/error/success": "buffer",
-        \       "outputter/error/error": "quickfix",
-        \   },
-        \   "java" : {
-        \       "hook/output_encode/encoding": has('win32') ? 'cp932' : &encoding,
-        \   },
-        \   "vb" : {
-        \       "command"   : "vbc",
-        \       "exec" : ['%c /nologo /out:"Prog.exe" "%s:p"', 'Prog.exe'],
-        \       "hook/output_encode/encoding": has('win32') ? 'cp932' : &encoding,
-        \   },
-        \}
 
     filetype plugin indent on
     syntax enable
