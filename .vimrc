@@ -1,11 +1,12 @@
 "
 " ---------------------------------------------------------------------------------------------------
-" How to setup on server
-"
+" How to setup if git is not installed
 "   1. $curl https://raw.githubusercontent.com/rbtnn/vimrc/master/.vimrc        -o .vimrc
 "   2. $curl https://raw.githubusercontent.com/rbtnn/vimrc/master/pkgsync.json  -o pkgsync.json
-"   3. :PkgSyncSetup
-"   4. :PkgSync update
+"
+" How to install plugins
+"   1. :PkgSyncSetup
+"   2. :PkgSync update
 " ---------------------------------------------------------------------------------------------------
 "
 scriptencoding utf-8
@@ -99,22 +100,6 @@ let &cedit = "\<C-q>"
 let g:vimrc = get(g:, 'vimrc', {
     \   'term_cmd': [&shell],
     \   'git_enabled_qficonv': v:false,
-    \   'rg_files_ignore_patterns': [
-    \     'min.js$', 'min.js.map$', 'Thumbs.db$',
-    \   ],
-    \   'rg_livegrep_ignore_patterns': [
-    \     '(os error \d\+)', '^[^:]*\<_viminfo:', '^[^:]*\<assets\>[^:]*:',
-    \   ],
-    \   'ripgrep_maximum': 100,
-    \   'ripgrep_glob_args': [
-    \     '--glob', '!NTUSER.DAT*',
-    \     '--glob', '!.git',
-    \     '--glob', '!.svn',
-    \     '--glob', '!bin',
-    \     '--glob', '!obj',
-    \     '--glob', '!node_modules',
-    \     '--line-buffered'
-    \   ],
     \   'vb_pattern_back': '^\s*\(Public\|Private\|Protected\)\?\s*\(Overridable\|Shared\)\?\s*\(Structure\|Enum\|Sub\|Function\)',
     \   'vb_pattern_forword': '^\s*\(Public\|Private\|Protected\)\?\s*\(Overridable\|Shared\)\?\s*\(Structure\|Enum\|Sub\|Function\)',
     \ })
@@ -214,21 +199,6 @@ if v:true
         \ 'VimTweakEnableCaption', 'VimTweakEnableMaximize', 'VimTweakEnableTopMost',
         \ ]
 
-    let s:curr_job = get(s:, 'curr_job', v:null)
-    let s:curr_timer = get(s:, 'curr_timer', v:null)
-    let s:spinner_chars = ['/', '-', '\', '|']
-    let s:spinner_index = 0
-
-    let s:executor_id2query = get(s:, 'executor_id2query', {})
-    let s:executor_id2title = get(s:, 'executor_id2title', {})
-    let s:executor_id2prefixcmd = get(s:, 'executor_id2prefixcmd', {})
-    let s:executor_id2postcmd = get(s:, 'executor_id2postcmd', {})
-    let s:executor_id2maximum = get(s:, 'executor_id2maximum', {})
-    let s:executor_id2ignores = get(s:, 'executor_id2ignores', {})
-    let s:executor_id2withquery = get(s:, 'executor_id2withquery', {})
-    let s:executor_id2position = get(s:, 'executor_id2position', {})
-    let s:executor_id2matchitems = get(s:, 'executor_id2matchitems', {})
-
     function! s:pkgsync_setup() abort
         if !isdirectory($VIMRC_PKGSYNC_DIR)
             let path = expand('$VIMRC_VIM/github/pack/rbtnn/start/')
@@ -245,41 +215,34 @@ if v:true
             \ || filereadable(expand('C:/Windows/Fonts/' .. a:fname))
     endfunction
 
-    function! s:ripgrep_files() abort
-        let prefixcmd = ['rg'] + g:vimrc.ripgrep_glob_args + ['--files', '--hidden']
-        let postcmd = []
-        call s:ripgrep_common_exec('ripgrep#files', 'files', prefixcmd, postcmd, v:false,
-            \ function('s:files_callback'), g:vimrc.rg_files_ignore_patterns, g:vimrc.ripgrep_maximum)
-    endfunction
-
-    function! s:ripgrep_livegrep() abort
-        let prefixcmd = ['rg'] + g:vimrc.ripgrep_glob_args + ['--vimgrep', '-uu']
-        let postcmd = (has('win32') ? ['.\'] : ['.'])
-        call s:ripgrep_common_exec('ripgrep#livegrep#exec', 'livegrep', prefixcmd, postcmd, v:true,
-            \ function('s:livegrep_callback'), g:vimrc.rg_livegrep_ignore_patterns, g:vimrc.ripgrep_maximum)
-    endfunction
-
-    function! s:files_callback(line) abort
-        let path = fnamemodify(resolve(a:line), ':p:gs?\\?/?')
-        call s:open_file(path)
-    endfunction
-
-    function! s:livegrep_callback(line) abort
-        let m = matchlist(a:line, '^\s*\(.\{-\}\):\(\d\+\):\(\d\+\):\(.*\)$')
-        if !empty(m)
-            let path = m[1]
-            let lnum = str2nr(m[2])
-            let col = str2nr(m[3])
-            if !filereadable(path) && (path !~# '^[A-Z]:')
-                let path = expand(fnamemodify(m[5], ':h') .. '/' .. m[1])
-            endif
-            call s:open_file(path, lnum, col)
-        endif
-    endfunction
-
     function! s:git_diff(q_bang) abort
         if isdirectory(s:git_get_rootdir())
             call s:gitdiff_open_numstatwindow(a:q_bang)
+        else
+            echohl Error
+            echo '[git] The directory is not under git control!'
+            echohl None
+        endif
+    endfunction
+
+    function! s:git_grep(q_args) abort
+        let rootdir = s:git_get_rootdir()
+        if isdirectory(rootdir)
+            let lines = s:git_system(['grep', '--line-number', '--column', '--no-color', a:q_args])
+            call setqflist([])
+            if !empty(lines)
+                let xs = []
+                for line in lines
+                    let m = matchlist(line, '^\(.\+\):\(\d\+\):\(\d\+\):\(.*\)$')
+                    if !empty(m)
+                        let xs += [{ 'filename': expand(rootdir .. '/' .. m[1]), 'lnum': str2nr(m[2]), 'col': m[3], 'text': m[4], }]
+                    else
+                        let xs += [{ 'text': line, }]
+                    endif
+                endfor
+                call setqflist(xs)
+                copen
+            endif
         else
             echohl Error
             echo '[git] The directory is not under git control!'
@@ -314,7 +277,7 @@ if v:true
     function! s:gitdiff_open_numstatwindow(q_args) abort
         if s:execute_gitdiff('gitdiff-numstat', ['diff', '--numstat'] + split(a:q_args, '\s\+'))
             let b:gitdiff = { 'args': split(a:q_args, '\s\+'), 'rootdir': s:git_get_rootdir(), }
-            nnoremap <buffer><cr>  <Cmd>call <SID>bufferkeymap_enter()<cr>
+            nnoremap <buffer><cr>  <Cmd>call <SID>bufferkeymap_openfile()<cr>
             nnoremap <buffer>D     <Cmd>call <SID>bufferkeymap_enter()<cr>
             nnoremap <buffer>!     <Cmd>call <SID>bufferkeymap_bang()<cr>
             nnoremap <buffer><C-o> <nop>
@@ -379,6 +342,16 @@ if v:true
             let path = expand(b:gitdiff['rootdir'] .. '/' .. path)
             if filereadable(path)
                 call s:gitdiff_open_diffwindow(b:gitdiff['args'], path)
+            endif
+        endif
+    endfunction
+
+    function! s:bufferkeymap_openfile() abort
+        if &filetype == 'gitdiff-numstat'
+            let path = trim(get(split(getline('.'), "\t") , 2, ''))
+            let path = expand(b:gitdiff['rootdir'] .. '/' .. path)
+            if filereadable(path)
+                call s:open_file(path, -1)
             endif
         endif
     endfunction
@@ -566,228 +539,6 @@ if v:true
         endif
     endfunction
 
-    function! s:ripgrep_common_exec(executor_id, title, prefix_cmd, post_cmd, withquery, callback, ignores, maximum) abort
-        let s:executor_id2query[a:executor_id] = get(s:executor_id2query, a:executor_id, [])
-        let s:executor_id2title[a:executor_id] = a:title
-        let s:executor_id2prefixcmd[a:executor_id] = a:prefix_cmd
-        let s:executor_id2postcmd[a:executor_id] = a:post_cmd
-        let s:executor_id2maximum[a:executor_id] = a:maximum
-        let s:executor_id2ignores[a:executor_id] = a:ignores
-        let s:executor_id2withquery[a:executor_id] = a:withquery
-        let s:executor_id2position[a:executor_id] = get(s:executor_id2position, a:executor_id, 1)
-        let s:executor_id2matchitems[a:executor_id] = get(s:executor_id2matchitems, a:executor_id, [])
-        if executable('rg') && !has('nvim')
-            let winid = popup_menu([], s:get_title_option(a:executor_id))
-            if -1 != winid
-                let maxwidth = &columns - s:get_tabsidebarcolumns()
-                let maxheight = &lines - 1 - &cmdheight
-                call popup_setoptions(winid, {
-                    \ 'filter': function('s:popup_filter', [a:executor_id]),
-                    \ 'callback': function('s:popup_callback', [a:callback]),
-                    \ 'highlight': 'VimrcDevPWBG',
-                    \ 'border': [0, 0, 0, 0],
-                    \ 'padding': [0, 0, 0, 0],
-                    \ 'wrap': 0,
-                    \ 'minwidth': maxwidth, 'maxwidth': maxwidth,
-                    \ 'minheight': maxheight, 'maxheight': maxheight,
-                    \ 'line': 1,
-                    \ 'col': 1,
-                    \ 'pos': 'topleft',
-                    \ })
-                if !empty(s:executor_id2query[a:executor_id])
-                    call s:set_text(winid, a:executor_id, get(s:executor_id2matchitems, a:executor_id, []))
-                    call s:set_cursorline(winid, a:executor_id, s:executor_id2position[a:executor_id])
-                    call win_execute(winid, 'redraw')
-                else
-                    let s:executor_id2query[a:executor_id] = get(s:executor_id2query, a:executor_id, [])
-                    call s:job_runner(winid, a:executor_id)
-                endif
-            endif
-        endif
-    endfunction
-
-    function! s:get_title_option(executor_id) abort
-        let status = ''
-        if v:null != s:curr_job
-            let status = job_status(s:curr_job)
-        endif
-        let s:spinner_index = (s:spinner_index + 1) % len(s:spinner_chars)
-        return { 'title': printf(' %s %s>%s ',
-            \   (status == 'run' ? ('(' .. s:spinner_chars[s:spinner_index] .. ')') : '   '),
-            \   s:executor_id2title[a:executor_id],
-            \   join(s:executor_id2query[a:executor_id], '')
-            \ )}
-    endfunction
-
-    function! s:get_tabsidebarcolumns() abort
-        let d = 0
-        if has('tabsidebar')
-            if (2 == &showtabsidebar) || ((1 == &showtabsidebar) && (1 < tabpagenr('$')))
-                let d = &tabsidebarcolumns
-            endif
-        endif
-        return d
-    endfunction
-
-    function! s:popup_filter(executor_id, winid, key) abort
-        let lnum = line('.', a:winid)
-        let s:executor_id2position[a:executor_id] = lnum
-        let xs = s:executor_id2query[a:executor_id]
-        if 21 == char2nr(a:key)
-            " Ctrl-u
-            if 0 < len(xs)
-                call remove(xs, 0, -1)
-                let s:executor_id2query[a:executor_id] = xs
-                call popup_setoptions(a:winid, s:get_title_option(a:executor_id))
-            endif
-            return 1
-        elseif ("\x80kb" == a:key) || (8 == char2nr(a:key))
-            " Ctrl-h or bs
-            if 0 < len(xs)
-                call remove(xs, -1)
-                let s:executor_id2query[a:executor_id] = xs
-                call popup_setoptions(a:winid, s:get_title_option(a:executor_id))
-            endif
-            return 1
-        elseif (0x20 <= char2nr(a:key)) && (char2nr(a:key) <= 0x7f)
-            let s:executor_id2query[a:executor_id] = xs + [a:key]
-            call popup_setoptions(a:winid, s:get_title_option(a:executor_id))
-            return 1
-        elseif 22 == char2nr(a:key)
-            " Ctrl-v
-            let s:executor_id2query[a:executor_id] = xs + split(@", '\zs')
-            call popup_setoptions(a:winid, s:get_title_option(a:executor_id))
-            return 1
-        elseif (10 == char2nr(a:key)) || (14 == char2nr(a:key))
-            " Ctrl-n or Ctrl-j
-            if lnum == line('$', a:winid)
-                call s:set_cursorline(a:winid, a:executor_id, 1)
-            else
-                call s:set_cursorline(a:winid, a:executor_id, lnum + 1)
-            endif
-            return 1
-        elseif (11 == char2nr(a:key)) || (16 == char2nr(a:key))
-            " Ctrl-p or Ctrl-k
-            if lnum == 1
-                call s:set_cursorline(a:winid, a:executor_id, line('$', a:winid))
-            else
-                call s:set_cursorline(a:winid, a:executor_id, lnum - 1)
-            endif
-            return 1
-        elseif 0x12 == char2nr(a:key)
-            " Ctrl-r
-            call s:job_runner(a:winid, a:executor_id)
-            return 1
-        elseif 0x0d == char2nr(a:key)
-            return popup_filter_menu(a:winid, "\<cr>")
-        else
-            if char2nr(a:key) < 0x20
-                return popup_filter_menu(a:winid, "\<esc>")
-            else
-                return popup_filter_menu(a:winid, a:key)
-            endif
-        endif
-    endfunction
-
-    function! s:popup_callback(callback, winid, result) abort
-        if -1 != a:result
-            let line = trim(get(getbufline(winbufnr(a:winid), a:result), 0, ''))
-            call a:callback(line)
-        endif
-    endfunction
-
-    function! s:job_runner(winid, executor_id) abort
-        let s:executor_id2position[a:executor_id] = 1
-        call s:kill_job(a:winid)
-        call s:kill_timer()
-        call s:set_text(a:winid, a:executor_id, [])
-        let query_text = substitute(join(s:executor_id2query[a:executor_id], ''), "[\n\r\t]", '', 'g')
-        if !empty(query_text)
-            let cmd = s:executor_id2prefixcmd[a:executor_id] + (s:executor_id2withquery[a:executor_id] ? [query_text] : []) + s:executor_id2postcmd[a:executor_id]
-            let s:curr_timer = timer_start(100, function('s:timer', [a:winid, a:executor_id]), { 'repeat': -1 })
-            let s:curr_job = job_start(cmd, {
-                \ 'out_io': 'pipe',
-                \ 'out_cb': function('s:out_cb', [a:winid, a:executor_id]),
-                \ 'exit_cb': function('s:exit_cb', [a:winid, a:executor_id]),
-                \ 'err_io': 'out',
-                \ })
-        else
-            call popup_setoptions(a:winid, s:get_title_option(a:executor_id))
-        endif
-    endfunction
-
-    function! s:timer(winid, executor_id, timer) abort
-        if (-1 == index(popup_list(), a:winid)) || (v:null == s:curr_job) || ('dead' == job_status(s:curr_job))
-            call s:kill_timer()
-        endif
-        call popup_setoptions(a:winid, s:get_title_option(a:executor_id))
-    endfunction
-
-    function! s:set_text(winid, executor_id, match_items) abort
-        call win_execute(a:winid, 'call clearmatches()')
-        let query_text = substitute(join(s:executor_id2query[a:executor_id], ''), "[\n\r\t]", '', 'g')
-        let query_text = substitute(query_text, "'", "''", 'g')
-        if !empty(query_text)
-            call win_execute(a:winid, printf('silent call matchadd(''VimrcDevPWSCH'', ''%s'')', '\c' .. query_text))
-        endif
-        redraw
-        let s:executor_id2matchitems[a:executor_id] = a:match_items
-        call popup_settext(a:winid, s:executor_id2matchitems[a:executor_id])
-    endfunction
-
-    function! s:kill_timer() abort
-        if v:null != s:curr_timer
-            call timer_stop(s:curr_timer)
-            let s:curr_timer = v:null
-        endif
-    endfunction
-
-    function! s:kill_job(winid) abort
-        if (v:null != s:curr_job) && ('run' == job_status(s:curr_job))
-            call job_stop(s:curr_job, 'kill')
-            let s:curr_job = v:null
-        endif
-    endfunction
-
-    function! s:out_cb(winid, executor_id, ch, msg) abort
-        let query_text = substitute(join(s:executor_id2query[a:executor_id], ''), "[\n\r\t]", '', 'g')
-        try
-            if (-1 == index(popup_list(), a:winid)) || (s:executor_id2maximum[a:executor_id] <= len(s:executor_id2matchitems[a:executor_id]))
-                " kill the job if close the popup window
-                call s:kill_job(a:winid)
-            else
-                " encode only the displayed text. keep remaining text as it is.
-                let iconv_msg = join(map(split(a:msg[:&columns], ':'), { _, x -> s:iconv_wrapper(x) }), ':') .. a:msg[(&columns + 1):]
-                " ignore case
-                if iconv_msg =~? query_text
-                    let ok = v:true
-                    for pat in s:executor_id2ignores[a:executor_id]
-                        if iconv_msg =~# pat
-                            let ok = v:false
-                            break
-                        endif
-                    endfor
-                    if ok
-                        let s:executor_id2matchitems[a:executor_id] += [iconv_msg]
-                        call popup_settext(a:winid, s:executor_id2matchitems[a:executor_id])
-                    endif
-                endif
-                call popup_setoptions(a:winid, s:get_title_option(a:executor_id))
-            endif
-        catch
-            echo v:exception
-        endtry
-    endfunction
-
-    function! s:exit_cb(winid, executor_id, job, status) abort
-        call popup_setoptions(a:winid, s:get_title_option(a:executor_id))
-    endfunction
-
-    function! s:set_cursorline(winid, executor_id, lnum) abort
-        call win_execute(a:winid, printf('call setpos(".", [0, %d, 0, 0])', a:lnum))
-        let s:executor_id2position[a:executor_id] = a:lnum
-    endfunction
-
     function! s:vimrc_bufferenter() abort
         " Can't use <S-space> at :terminal
         " https://github.com/vim/vim/issues/6040
@@ -817,27 +568,29 @@ if v:true
         tnoremap <silent><C-j>    <Cmd>tabnext<cr>
         tnoremap <silent><C-k>    <Cmd>tabprevious<cr>
 
+        nnoremap <silent><C-p>    <Cmd>cprevious<cr>
+        nnoremap <silent><C-n>    <Cmd>cnext<cr>
+
         nnoremap <silent><space>  <nop>
+        nnoremap <silent><C-s>    <nop>
 
-        if executable('git')
-            command! -nargs=* -complete=customlist,GitDiffComp  GitDiff      :call s:git_diff(<q-args>)
-            nnoremap <silent><C-q>    <Cmd>GitDiff -w<cr>
-        endif
-
-        nnoremap <silent><C-s>    <Cmd>call <SID>ripgrep_livegrep()<cr>
-        nnoremap <silent><C-f>    <Cmd>call <SID>ripgrep_files()<cr>
-        nnoremap <silent><C-z>    <Cmd>tabnew \| call term_start(g:vimrc.term_cmd,
-            \ {
-            \   'curwin' : v:true,
+        nnoremap <silent><C-z>    <Cmd>call term_start(g:vimrc.term_cmd, {
             \   'term_highlight' : 'Terminal',
             \   'term_finish' : 'close',
             \   'term_kill' : 'kill',
             \ })<cr>
+
+        if executable('git')
+            command! -nargs=* -complete=customlist,GitDiffComp  GitDiff      :call s:git_diff(<q-args>)
+            command! -nargs=1                                   GitGrep      :call s:git_grep(<q-args>)
+            nnoremap <silent><C-q>    <Cmd>GitDiff -w<cr>
+        endif
+
         if get(g:, 'loaded_operator_replace', v:false)
             nmap     <silent>s        <Plug>(operator-replace)
             nmap     <silent>ss       <Plug>(operator-replace)as
         endif
-        if get(g:, 'loaded_operator_replace', v:false)
+        if get(g:, 'loaded_operator_flashy', v:false)
             map      <silent>y        <Plug>(operator-flashy)
             nmap     <silent>Y        <Plug>(operator-flashy)$
         endif
@@ -846,10 +599,25 @@ if v:true
             nmap     <silent>ys       yas
             nmap     <silent>vs       vas
         endif
-        if &filetype == 'molder'
-            nnoremap <buffer> h  <plug>(molder-up)
-            nnoremap <buffer> l  <plug>(molder-open)
-            nnoremap <buffer> t  <Cmd>call term_start(&shell, { 'cwd': b:molder_dir, })<cr>
+        if get(g:, 'loaded_molder', v:false)
+            nnoremap <silent><C-f>    <Cmd>e .<cr>
+            if &filetype == 'molder'
+                nnoremap <buffer> h  <plug>(molder-up)
+                nnoremap <buffer> l  <plug>(molder-open)
+                nnoremap <buffer> C  <Cmd>call chdir(b:molder_dir) \| verbose pwd<cr>
+                if has('win32')
+                    nnoremap <buffer> E  <Cmd>call term_start('explorer .', {
+                        \   'cwd': b:molder_dir,
+                        \   'hidden': v:true,
+                        \ })<cr>
+                endif
+                nnoremap <buffer> T  <Cmd>call term_start(g:vimrc.term_cmd, {
+                    \   'cwd': b:molder_dir,
+                    \   'term_highlight' : 'Terminal',
+                    \   'term_finish' : 'close',
+                    \   'term_kill' : 'kill',
+                    \ })<cr>
+            endif
         endif
         let ext = fnamemodify(bufname(), ':e')
         if ('frm' == ext) || ('bas' == ext) || ('cls' == ext)
@@ -872,16 +640,17 @@ if v:true
         highlight! TabSideBarFill     guifg=NONE    guibg=NONE    gui=NONE cterm=NONE
         highlight! VimrcDevPWBG       guifg=#ffffff guibg=#000000 gui=NONE cterm=NONE
         highlight! VimrcDevPWSCH      guifg=#ecc48d guibg=NONE    gui=NONE cterm=NONE
+        highlight! Cursor             guifg=#000000 guibg=#d7d7d7
         highlight! CursorIM           guifg=NONE    guibg=#d70000
         highlight! SpecialKey         guifg=#444411
         highlight! NonText            guifg=#1f2430
         " itchyny/vim-parenmatch
-        if exists('g:loaded_parenmatch')
+        if get(g:, 'loaded_parenmatch', v:false)
             let g:parenmatch_highlight = 0
             highlight! link  ParenMatch  MatchParen
         endif
         " itchyny/vim-lightline
-        if exists('g:loaded_lightline')
+        if get(g:, 'loaded_lightline', v:false)
             let g:lightline = { 'colorscheme': 'aylin' }
             call lightline#enable()
         endif
