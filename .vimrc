@@ -41,6 +41,7 @@ set foldlevelstart=999
 set foldmethod=indent
 set grepformat&
 set grepprg=internal
+set hlsearch
 set incsearch
 set isfname-==
 set keywordprg=:help
@@ -50,6 +51,7 @@ set matchtime=1
 set nobackup
 set noignorecase
 set nonumber norelativenumber nocursorline
+set noruler rulerformat&
 set noshowmode
 set noswapfile
 set nowrap
@@ -57,16 +59,16 @@ set nowrapscan
 set nowritebackup
 set nrformats&
 set pumheight=10
-set ruler
-set rulerformat=%{&fileencoding}/%{&fileformat}
 set scrolloff&
 set sessionoptions=winpos,resize,tabpages,curdir,help
 set shiftround
 set showcmd
 set showmatch
+set showtabline=0 tabline&
 set softtabstop=-1
 set synmaxcol=300
 set tags=./tags;
+set termguicolors
 set timeout timeoutlen=500 ttimeoutlen=100
 set updatetime=500
 set wildmenu
@@ -131,13 +133,40 @@ if has('win32') && executable('wmic') && has('gui_running')
     call job_start('wmic os get BuildNumber', { 'out_cb': function('s:outcb'), })
 endif
 
-if has('vim_starting')
-    set hlsearch
+if has('statusline')
+    function! StatusLine() abort
+        try
+            let id = synID(line('.'), col('.'), 0)
+            let tid = synIDtrans(id)
+            let p = id != tid && tid != 0
+            let xs = []
+            let x = bufname(bufnr())
+            if !empty(x)
+                let xs += [x]
+            endif
+            let xs += [
+                \   'lnum:' .. line('.') .. '/' .. line('$'),
+                \   'col:' .. col('.'),
+                \   'ft:' .. &fileformat,
+                \   'fe:' .. &fileencoding,
+                \ ]
+            for x in [
+                \   { 'name': 'hi', 'val': synIDattr(id, 'name'), 'expr': '!empty(x.val)', },
+                \   { 'name': 'link', 'val': synIDattr(tid, 'name'), 'expr': 'p', },
+                \   { 'name': 'fg', 'val': synIDattr(p ? tid : id, 'fg#'), 'expr': '!empty(x.val)', },
+                \   { 'name': 'bg', 'val': synIDattr(p ? tid : id, 'bg#'), 'expr': '!empty(x.val)', },
+                \ ]
+                if eval(x.expr)
+                    let xs += [x.name .. ':' .. x.val]
+                endif
+            endfor
+            return join(xs)
+        catch
+            return v:exception
+        endtry
+    endfunction
     set laststatus=2
-    set statusline&
-    set showtabline=0
-    set tabline&
-    set termguicolors
+    set statusline=%!StatusLine()
 endif
 
 if has('tabsidebar')
@@ -235,7 +264,11 @@ if v:true
                 for line in lines
                     let m = matchlist(line, '^\(.\+\):\(\d\+\):\(\d\+\):\(.*\)$')
                     if !empty(m)
-                        let xs += [{ 'filename': expand(rootdir .. '/' .. m[1]), 'lnum': str2nr(m[2]), 'col': m[3], 'text': m[4], }]
+                        let xs += [{
+                            \ 'filename': expand(rootdir .. '/' .. s:iconv_wrapper(m[1])),
+                            \ 'lnum': str2nr(m[2]),
+                            \ 'col': m[3],
+                            \ 'text': s:iconv_wrapper(m[4]), }]
                     else
                         let xs += [{ 'text': line, }]
                     endif
@@ -572,7 +605,6 @@ if v:true
         nnoremap <silent><C-n>    <Cmd>cnext<cr>
 
         nnoremap <silent><space>  <nop>
-        nnoremap <silent><C-s>    <nop>
 
         nnoremap <silent><C-z>    <Cmd>call term_start(g:vimrc.term_cmd, {
             \   'term_highlight' : 'Terminal',
@@ -584,6 +616,7 @@ if v:true
             command! -nargs=* -complete=customlist,GitDiffComp  GitDiff      :call s:git_diff(<q-args>)
             command! -nargs=1                                   GitGrep      :call s:git_grep(<q-args>)
             nnoremap <silent><C-q>    <Cmd>GitDiff -w<cr>
+            nnoremap <silent><C-s>    <Cmd>GitDiff -w upstream<cr>
         endif
 
         if get(g:, 'loaded_operator_replace', v:false)
@@ -644,6 +677,8 @@ if v:true
         highlight! CursorIM           guifg=NONE    guibg=#d70000
         highlight! SpecialKey         guifg=#444411
         highlight! NonText            guifg=#1f2430
+        highlight! link diffAdded     DiffAdd
+        highlight! link diffRemoved   DiffDelete
         " itchyny/vim-parenmatch
         if get(g:, 'loaded_parenmatch', v:false)
             let g:parenmatch_highlight = 0
@@ -657,53 +692,57 @@ if v:true
     endfunction
 endif
 
-if has('vim_starting')
-    set packpath=$VIMRC_VIM/github
-    set runtimepath=$VIMRUNTIME
+set packpath=$VIMRC_VIM/github
+set runtimepath=$VIMRUNTIME
 
-    if has('win32') && has('gui_running')
-        set linespace=0
-        if s:exists_font('Cica-Regular.ttf')
-            " https://github.com/miiton/Cica
-            set guifont=Cica:h16:cSHIFTJIS:qDRAFT
-        elseif s:exists_font('UDEVGothic-Regular.ttf')
-            " https://github.com/yuru7/udev-gothic
-            set guifont=UDEV_Gothic:h16:cSHIFTJIS:qDRAFT
-        else
-            set guifont=ＭＳ_ゴシック:h18:cSHIFTJIS:qDRAFT
-        endif
+if has('win32') && has('gui_running') && has('vim_starting')
+    set linespace=0
+    if s:exists_font('Cica-Regular.ttf')
+        " https://github.com/miiton/Cica
+        set guifont=Cica:h16:cSHIFTJIS:qDRAFT
+    elseif s:exists_font('UDEVGothic-Regular.ttf')
+        " https://github.com/yuru7/udev-gothic
+        set guifont=UDEV_Gothic:h16:cSHIFTJIS:qDRAFT
+    else
+        set guifont=ＭＳ_ゴシック:h18:cSHIFTJIS:qDRAFT
     endif
-
-    silent! source ~/.vimrc.local
-
-    filetype plugin indent on
-    syntax enable
-    packloadall
-
-    augroup vimrc
-        autocmd!
-        " Delete unused commands, because it's an obstacle on cmdline-completion.
-        autocmd CmdlineEnter *
-            \ : for s:cmdname in s:delcmds
-            \ |     execute printf('silent! delcommand %s', s:cmdname)
-            \ | endfor
-            \ | unlet s:cmdname
-            \ | if getcmdtype() == ':'
-            \ |     set ignorecase
-            \ | endif
-        autocmd VimEnter *
-            \ : if !exists(':PkgSync')
-            \ |    execute 'command! -nargs=0 PkgSyncSetup :call <SID>pkgsync_setup()'
-            \ | endif
-        autocmd CmdlineLeave *  : set noignorecase
-        autocmd FileType help   : setlocal colorcolumn=78
-        autocmd BufEnter *      : call s:vimrc_bufferenter()
-        autocmd ColorScheme *   : call s:vimrc_colorscheme()
-    augroup END
-
-    try
-        colorscheme aylin
-    catch
-        colorscheme default
-    endtry
 endif
+
+silent! source ~/.vimrc.local
+
+filetype plugin indent on
+syntax enable
+packloadall
+
+augroup vimrc
+    autocmd!
+    " Delete unused commands, because it's an obstacle on cmdline-completion.
+    autocmd CmdlineEnter *
+        \ : for s:cmdname in s:delcmds
+        \ |     execute printf('silent! delcommand %s', s:cmdname)
+        \ | endfor
+        \ | unlet s:cmdname
+        \ | if getcmdtype() == ':'
+        \ |     set ignorecase
+        \ | endif
+    autocmd VimEnter *
+        \ : if !exists(':PkgSync')
+        \ |    execute 'command! -nargs=0 PkgSyncSetup :call <SID>pkgsync_setup()'
+        \ | endif
+    autocmd CmdlineLeave *  : set noignorecase
+    autocmd FileType help   : setlocal colorcolumn=78
+    autocmd BufEnter *      : call s:vimrc_bufferenter()
+    autocmd ColorScheme *   : call s:vimrc_colorscheme()
+    autocmd WinEnter *
+        \ : if exists(':EmphasisCursor')
+        \ |     EmphasisCursor -count=3 -highlight=ModeMsg
+        \ | endif
+augroup END
+
+call s:vimrc_bufferenter()
+
+try
+    colorscheme aylin
+catch
+    colorscheme default
+endtry
