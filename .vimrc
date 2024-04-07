@@ -136,30 +136,30 @@ endif
 if has('statusline')
     function! StatusLine() abort
         try
+            let bnr = winbufnr(g:statusline_winid)
             let id = synID(line('.'), col('.'), 0)
             let tid = synIDtrans(id)
             let p = id != tid && tid != 0
             let xs = []
-            let x = bufname(bufnr())
+            let x = bufname(bnr)
             if !empty(x)
-                let xs += [x]
+                let xs += filereadable(x) ? [printf('%s(%d,%d)', fnamemodify(x, ':t'), line('.'), col('.'))] : [x]
             endif
-            let xs += [
-                \   'lnum:' .. line('.') .. '/' .. line('$'),
-                \   'col:' .. col('.'),
-                \   'ft:' .. &fileformat,
-                \   'fe:' .. &fileencoding,
-                \ ]
-            for x in [
-                \   { 'name': 'hi', 'val': synIDattr(id, 'name'), 'expr': '!empty(x.val)', },
-                \   { 'name': 'link', 'val': synIDattr(tid, 'name'), 'expr': 'p', },
-                \   { 'name': 'fg', 'val': synIDattr(p ? tid : id, 'fg#'), 'expr': '!empty(x.val)', },
-                \   { 'name': 'bg', 'val': synIDattr(p ? tid : id, 'bg#'), 'expr': '!empty(x.val)', },
-                \ ]
-                if eval(x.expr)
-                    let xs += [x.name .. ':' .. x.val]
-                endif
-            endfor
+            if getbufvar(bnr, '&buftype') != 'terminal'
+                for x in [
+                    \   { 'name': 'ft', 'val': getbufvar(bnr, '&filetype'), 'expr': '!empty(x.val)', },
+                    \   { 'name': 'ff', 'val': getbufvar(bnr, '&fileformat'), 'expr': '!empty(x.val)', },
+                    \   { 'name': 'fe', 'val': getbufvar(bnr, '&fileencoding'), 'expr': '!empty(x.val)', },
+                    \   { 'name': 'hi', 'val': synIDattr(id, 'name'), 'expr': '!empty(x.val)', },
+                    \   { 'name': 'link', 'val': synIDattr(tid, 'name'), 'expr': 'p', },
+                    \   { 'name': 'fg', 'val': synIDattr(p ? tid : id, 'fg#'), 'expr': '!empty(x.val)', },
+                    \   { 'name': 'bg', 'val': synIDattr(p ? tid : id, 'bg#'), 'expr': '!empty(x.val)', },
+                    \ ]
+                    if eval(x.expr)
+                        let xs += [x.name .. ':' .. x.val]
+                    endif
+                endfor
+            endif
             return join(xs)
         catch
             return v:exception
@@ -265,7 +265,7 @@ if v:true
                     let m = matchlist(line, '^\(.\+\):\(\d\+\):\(\d\+\):\(.*\)$')
                     if !empty(m)
                         let xs += [{
-                            \ 'filename': expand(rootdir .. '/' .. s:iconv_wrapper(m[1])),
+                            \ 'filename': rootdir .. '/' .. s:iconv_wrapper(m[1]),
                             \ 'lnum': str2nr(m[2]),
                             \ 'col': m[3],
                             \ 'text': s:iconv_wrapper(m[4]), }]
@@ -633,23 +633,11 @@ if v:true
             nmap     <silent>vs       vas
         endif
         if get(g:, 'loaded_molder', v:false)
-            nnoremap <silent><C-f>    <Cmd>e .<cr>
+            nnoremap <silent><C-f>    <Cmd>if filereadable(expand('%')) \| e %:h \| else \| e . \| endif<cr>
             if &filetype == 'molder'
                 nnoremap <buffer> h  <plug>(molder-up)
                 nnoremap <buffer> l  <plug>(molder-open)
                 nnoremap <buffer> C  <Cmd>call chdir(b:molder_dir) \| verbose pwd<cr>
-                if has('win32')
-                    nnoremap <buffer> E  <Cmd>call term_start('explorer .', {
-                        \   'cwd': b:molder_dir,
-                        \   'hidden': v:true,
-                        \ })<cr>
-                endif
-                nnoremap <buffer> T  <Cmd>call term_start(g:vimrc.term_cmd, {
-                    \   'cwd': b:molder_dir,
-                    \   'term_highlight' : 'Terminal',
-                    \   'term_finish' : 'close',
-                    \   'term_kill' : 'kill',
-                    \ })<cr>
             endif
         endif
         let ext = fnamemodify(bufname(), ':e')
@@ -662,6 +650,10 @@ if v:true
             syntax keyword vbKeyword Namespace Strict My MyBase IsNot Handles And Or Delegate MarshalAs Not In
             nnoremap <buffer><nowait><silent>[[      :<C-u>call search(g:vimrc.vb_pattern_back, 'b')<cr>
             nnoremap <buffer><nowait><silent>]]      :<C-u>call search(g:vimrc.vb_pattern_forword, '')<cr>
+        endif
+
+        if has('win32')
+            command! -nargs=0 Explorer        :!start .
         endif
     endfunction
 
@@ -692,27 +684,29 @@ if v:true
     endfunction
 endif
 
-set packpath=$VIMRC_VIM/github
-set runtimepath=$VIMRUNTIME
+if has('vim_starting')
+    set packpath=$VIMRC_VIM/github
+    set runtimepath=$VIMRUNTIME
 
-if has('win32') && has('gui_running') && has('vim_starting')
-    set linespace=0
-    if s:exists_font('Cica-Regular.ttf')
-        " https://github.com/miiton/Cica
-        set guifont=Cica:h16:cSHIFTJIS:qDRAFT
-    elseif s:exists_font('UDEVGothic-Regular.ttf')
-        " https://github.com/yuru7/udev-gothic
-        set guifont=UDEV_Gothic:h16:cSHIFTJIS:qDRAFT
-    else
-        set guifont=ＭＳ_ゴシック:h18:cSHIFTJIS:qDRAFT
+    if has('win32') && has('gui_running') && has('vim_starting')
+        set linespace=0
+        if s:exists_font('Cica-Regular.ttf')
+            " https://github.com/miiton/Cica
+            set guifont=Cica:h16:cSHIFTJIS:qDRAFT
+        elseif s:exists_font('UDEVGothic-Regular.ttf')
+            " https://github.com/yuru7/udev-gothic
+            set guifont=UDEV_Gothic:h16:cSHIFTJIS:qDRAFT
+        else
+            set guifont=ＭＳ_ゴシック:h18:cSHIFTJIS:qDRAFT
+        endif
     endif
+
+    silent! source ~/.vimrc.local
+
+    filetype plugin indent on
+    syntax enable
+    packloadall
 endif
-
-silent! source ~/.vimrc.local
-
-filetype plugin indent on
-syntax enable
-packloadall
 
 augroup vimrc
     autocmd!
