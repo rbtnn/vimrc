@@ -591,20 +591,22 @@ if v:true
             tnoremap <silent><C-u>           <esc>
         endif
 
-        cnoremap         <C-b>        <left>
-        cnoremap         <C-f>        <right>
-        cnoremap         <C-e>        <end>
-        cnoremap         <C-a>        <home>
+        cnoremap         <C-b>    <left>
+        cnoremap         <C-f>    <right>
+        cnoremap         <C-e>    <end>
+        cnoremap         <C-a>    <home>
 
         nnoremap <silent><C-j>    <Cmd>tabnext<cr>
         nnoremap <silent><C-k>    <Cmd>tabprevious<cr>
         tnoremap <silent><C-j>    <Cmd>tabnext<cr>
         tnoremap <silent><C-k>    <Cmd>tabprevious<cr>
 
-        nnoremap <silent><C-p>    <Cmd>cprevious<cr>
-        nnoremap <silent><C-n>    <Cmd>cnext<cr>
+        nnoremap <silent><C-p>    <Cmd>cprevious<cr>zz
+        nnoremap <silent><C-n>    <Cmd>cnext<cr>zz
 
-        nnoremap <silent><space>  <nop>
+        if get(g:, 'loaded_emphasiscursor', v:false)
+            nnoremap <silent><space>  <Cmd>EmphasisCursor -count=3 -highlight=ModeMsg<cr>
+        endif
 
         nnoremap <silent><C-z>    <Cmd>call term_start(g:vimrc.term_cmd, {
             \   'term_highlight' : 'Terminal',
@@ -727,10 +729,6 @@ augroup vimrc
     autocmd FileType help   : setlocal colorcolumn=78
     autocmd BufEnter *      : call s:vimrc_bufferenter()
     autocmd ColorScheme *   : call s:vimrc_colorscheme()
-    autocmd WinEnter *
-        \ : if exists(':EmphasisCursor')
-        \ |     EmphasisCursor -count=3 -highlight=ModeMsg
-        \ | endif
 augroup END
 
 call s:vimrc_bufferenter()
