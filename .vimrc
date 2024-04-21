@@ -102,6 +102,7 @@ let &cedit = "\<C-q>"
 let g:vimrc = get(g:, 'vimrc', {
     \   'term_cmd': [&shell],
     \   'git_enabled_qficonv': v:false,
+    \   'qficonv_columns': 300,
     \   'vb_pattern_back': '^\s*\(Public\|Private\|Protected\)\?\s*\(Overridable\|Shared\)\?\s*\(Structure\|Enum\|Sub\|Function\)',
     \   'vb_pattern_forword': '^\s*\(Public\|Private\|Protected\)\?\s*\(Overridable\|Shared\)\?\s*\(Structure\|Enum\|Sub\|Function\)',
     \ })
@@ -137,30 +138,11 @@ if has('statusline')
     function! StatusLine() abort
         try
             let bnr = winbufnr(g:statusline_winid)
-            let id = synID(line('.'), col('.'), 0)
-            let tid = synIDtrans(id)
-            let p = id != tid && tid != 0
-            let xs = []
-            let x = bufname(bnr)
-            if !empty(x)
-                let xs += filereadable(x) ? [printf('%s(%d,%d)', fnamemodify(x, ':t'), line('.'), col('.'))] : [x]
-            endif
-            if getbufvar(bnr, '&buftype') != 'terminal'
-                for x in [
-                    \   { 'name': 'ft', 'val': getbufvar(bnr, '&filetype'), 'expr': '!empty(x.val)', },
-                    \   { 'name': 'ff', 'val': getbufvar(bnr, '&fileformat'), 'expr': '!empty(x.val)', },
-                    \   { 'name': 'fe', 'val': getbufvar(bnr, '&fileencoding'), 'expr': '!empty(x.val)', },
-                    \   { 'name': 'hi', 'val': synIDattr(id, 'name'), 'expr': '!empty(x.val)', },
-                    \   { 'name': 'link', 'val': synIDattr(tid, 'name'), 'expr': 'p', },
-                    \   { 'name': 'fg', 'val': synIDattr(p ? tid : id, 'fg#'), 'expr': '!empty(x.val)', },
-                    \   { 'name': 'bg', 'val': synIDattr(p ? tid : id, 'bg#'), 'expr': '!empty(x.val)', },
-                    \ ]
-                    if eval(x.expr)
-                        let xs += [x.name .. ':' .. x.val]
-                    endif
-                endfor
-            endif
-            return join(xs)
+            let bt = getbufvar(bnr, '&buftype')
+            let ro = getbufvar(bnr, '&readonly')
+            let mo = getbufvar(bnr, '&modified')
+            let fn = fnamemodify(bufname(bnr), ':.')
+            return empty(bt) ? printf('%s%s%s', fn, mo ? '%#WildMenu#[+]%#StatusLine#' : '', ro ? '[R]' : '') : bt
         catch
             return v:exception
         endtry
@@ -173,36 +155,31 @@ if has('tabsidebar')
     function! TabSideBar() abort
         try
             let tnr = get(g:, 'actual_curtabpage', tabpagenr())
-            let lines = []
-            let lines += [(tnr == tabpagenr() ? '%#TabSideBarSel' : '%#TabSideBar') .. (tnr % 2 == 0 ? 'Odd' : 'Even') .. '#']
-            for x in filter(getwininfo(), { i,x -> tnr == x['tabnr'] && ('popup' != win_gettype(x['winid']))})
-                let ft = getbufvar(x['bufnr'], '&filetype')
-                let bt = getbufvar(x['bufnr'], '&buftype')
-                let high_tab = (tnr == tabpagenr() ? '%#TabSideBarSel' : '%#TabSideBar') .. (tnr % 2 == 0 ? 'Odd' : 'Even') .. '#'
-                let fname = fnamemodify(bufname(x['bufnr']), ':t')
-                let lines += [
-                    \    high_tab
-                    \ .. (x['bufnr'] == bufnr() ? ' * ' : '   ')
-                    \ .. (getbufvar(x['bufnr'], '&readonly') && empty(bt) ? '[R]' : '')
-                    \ .. (getbufvar(x['bufnr'], '&modified') && empty(bt) ? '[+]' : '')
-                    \ .. (!empty(bt)
-                    \      ? printf('[%s]', bt == 'nofile' ? ft : bt)
-                    \      : (empty(bufname(x['bufnr']))
-                    \          ? '[No Name]'
-                    \          : fname))
+            if tnr == 1
+                let lines = [
+                    \   't:' ..  tabpagenr() .. '/' .. tabpagenr('$'),
+                    \   'w:' ..  winnr() .. '/' .. winnr('$'),
+                    \   'm:' ..  mode(1),
+                    \   't:' .. &filetype,
+                    \   'f:' .. &fileformat,
+                    \   'e:' .. &fileencoding,
+                    \   'b:' ..  bufnr(),
+                    \   'l:' ..  line('.'),
+                    \   'c:' ..  col('.'),
                     \ ]
-            endfor
-            let lines += ['']
-            return join(lines, "\n")
+                return join(lines, "\n")
+            else
+                return ''
+            endif
         catch
             return v:exception
         endtry
     endfunction
-    let g:tabsidebar_vertsplit = 0
+    let g:tabsidebar_vertsplit = 1
     set notabsidebaralign
     set notabsidebarwrap
     set showtabsidebar=2
-    set tabsidebarcolumns=16
+    set tabsidebarcolumns=10
     set tabsidebar=%!TabSideBar()
     for s:name in [
         \ 'TabSideBar',
@@ -512,7 +489,7 @@ if v:true
     endfunction
 
     function s:iconv_wrapper(text) abort
-        if has('win32') && (&encoding == 'utf-8') && exists('g:loaded_qficonv') && (len(a:text) < &columns)
+        if has('win32') && (&encoding == 'utf-8') && exists('g:loaded_qficonv') && (len(a:text) < g:vimrc.qficonv_columns)
             return qficonv#encoding#iconv_utf8(a:text, 'shift_jis')
         else
             return a:text
@@ -589,6 +566,9 @@ if v:true
             tnoremap <silent><C-e>           <end>
             tnoremap <silent><C-a>           <home>
             tnoremap <silent><C-u>           <esc>
+            tnoremap <silent><C-cr>          <cr>
+            tnoremap <silent><f1>            <C-w>""
+            tnoremap <silent><f2>            <C-w>"+
         endif
 
         cnoremap         <C-b>    <left>
@@ -660,11 +640,9 @@ if v:true
     endfunction
 
     function! s:vimrc_colorscheme() abort
-        highlight! TabSideBarOdd      guifg=#777777 guibg=#252a36 gui=NONE cterm=NONE
-        highlight! TabSideBarEven     guifg=#777777 guibg=#2f3440 gui=NONE cterm=NONE
-        highlight! TabSideBarSelOdd   guifg=#acfcac guibg=#252a36 gui=BOLD cterm=NONE
-        highlight! TabSideBarSelEven  guifg=#acfcac guibg=#2f3440 gui=BOLD cterm=NONE
         highlight! TabSideBarFill     guifg=NONE    guibg=NONE    gui=NONE cterm=NONE
+        highlight! link TabSideBar    TabSideBarFill
+        highlight! link TabSideBarSel TabSideBarFill
         highlight! VimrcDevPWBG       guifg=#ffffff guibg=#000000 gui=NONE cterm=NONE
         highlight! VimrcDevPWSCH      guifg=#ecc48d guibg=NONE    gui=NONE cterm=NONE
         highlight! Cursor             guifg=#000000 guibg=#d7d7d7
