@@ -584,10 +584,6 @@ if v:true
         nnoremap <silent><C-p>    <Cmd>cprevious<cr>zz
         nnoremap <silent><C-n>    <Cmd>cnext<cr>zz
 
-        if get(g:, 'loaded_emphasiscursor', v:false)
-            nnoremap <silent><space>  <Cmd>EmphasisCursor -count=3 -highlight=ModeMsg<cr>
-        endif
-
         nnoremap <silent><C-z>    <Cmd>call term_start(g:vimrc.term_cmd, {
             \   'term_highlight' : 'Terminal',
             \   'term_finish' : 'close',
@@ -643,8 +639,6 @@ if v:true
         highlight! TabSideBarFill     guifg=NONE    guibg=NONE    gui=NONE cterm=NONE
         highlight! link TabSideBar    TabSideBarFill
         highlight! link TabSideBarSel TabSideBarFill
-        highlight! VimrcDevPWBG       guifg=#ffffff guibg=#000000 gui=NONE cterm=NONE
-        highlight! VimrcDevPWSCH      guifg=#ecc48d guibg=NONE    gui=NONE cterm=NONE
         highlight! Cursor             guifg=#000000 guibg=#d7d7d7
         highlight! CursorIM           guifg=NONE    guibg=#d70000
         highlight! SpecialKey         guifg=#444411

@@ -22,7 +22,6 @@
 			],
 			"rbtnn": [
 				"vim-ambiwidth",
-				"vim-emphasiscursor",
 				"vim-gloaded",
 				"vim-pkgsync",
 				"vim-qficonv",
