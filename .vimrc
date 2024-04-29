@@ -567,8 +567,6 @@ if v:true
             tnoremap <silent><C-a>           <home>
             tnoremap <silent><C-u>           <esc>
             tnoremap <silent><C-cr>          <cr>
-            tnoremap <silent><f1>            <C-w>""
-            tnoremap <silent><f2>            <C-w>"+
         endif
 
         cnoremap         <C-b>    <left>
@@ -616,6 +614,20 @@ if v:true
                 nnoremap <buffer> h  <plug>(molder-up)
                 nnoremap <buffer> l  <plug>(molder-open)
                 nnoremap <buffer> C  <Cmd>call chdir(b:molder_dir) \| verbose pwd<cr>
+                nnoremap <buffer> E  <Cmd>call term_start(['explorer', '.'], {
+                    \   'term_highlight' : 'Terminal',
+                    \   'term_finish' : 'close',
+                    \   'term_kill' : 'kill',
+                    \   'hidden' : v:true,
+                    \   'cwd' : b:molder_dir,
+                    \ })<cr>
+                nnoremap <buffer> !  <Cmd>call term_start(['cmd.exe', '/K', printf('start %s', getline('.'))], {
+                    \   'term_highlight' : 'Terminal',
+                    \   'term_finish' : 'close',
+                    \   'term_kill' : 'kill',
+                    \   'hidden' : v:true,
+                    \   'cwd' : b:molder_dir,
+                    \ })<cr>
             endif
         endif
         let ext = fnamemodify(bufname(), ':e')

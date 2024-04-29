@@ -70,6 +70,7 @@
 .viminfo
 .vimrc.*
 .vuerc
+.wget-hsts
 .windows-build-tools/
 .xinputrc
 .xsession-errors
