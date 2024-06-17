@@ -142,7 +142,15 @@ if has('statusline')
             let ro = getbufvar(bnr, '&readonly')
             let mo = getbufvar(bnr, '&modified')
             let fn = fnamemodify(bufname(bnr), ':.')
-            return empty(bt) ? printf('%s%s%s', fn, mo ? '%#WildMenu#[+]%#StatusLine#' : '', ro ? '[R]' : '') : bt
+            if empty(bt)
+                return printf('%s%s%s%s%%#StatusLine#',
+                    \ mo ? '%#WildMenu#' : '%#StatusLine#',
+                    \ fn,
+                    \ mo ? '[+]' : '',
+                    \ ro ? '[R]' : '')
+            else
+                return bt
+            endif
         catch
             return v:exception
         endtry
@@ -157,15 +165,15 @@ if has('tabsidebar')
             let tnr = get(g:, 'actual_curtabpage', tabpagenr())
             if tnr == 1
                 let lines = [
-                    \   't:' ..  tabpagenr() .. '/' .. tabpagenr('$'),
-                    \   'w:' ..  winnr() .. '/' .. winnr('$'),
-                    \   'm:' ..  mode(1),
-                    \   't:' .. &filetype,
-                    \   'f:' .. &fileformat,
-                    \   'e:' .. &fileencoding,
-                    \   'b:' ..  bufnr(),
-                    \   'l:' ..  line('.'),
-                    \   'c:' ..  col('.'),
+                    \   'tab:' ..  tabpagenr() .. '/' .. tabpagenr('$'),
+                    \   'win:' ..  winnr() .. '/' .. winnr('$'),
+                    \   'mode:' ..  mode(1),
+                    \   'type:' .. &filetype,
+                    \   'format:' .. &fileformat,
+                    \   'encoding:' .. &fileencoding,
+                    \   'bnr:' ..  bufnr(),
+                    \   'lnum:' ..  line('.'),
+                    \   'col:' ..  col('.'),
                     \ ]
                 return join(lines, "\n")
             else
@@ -175,11 +183,11 @@ if has('tabsidebar')
             return v:exception
         endtry
     endfunction
-    let g:tabsidebar_vertsplit = 1
+    let g:tabsidebar_vertsplit = 0
     set notabsidebaralign
     set notabsidebarwrap
     set showtabsidebar=2
-    set tabsidebarcolumns=10
+    set tabsidebarcolumns=16
     set tabsidebar=%!TabSideBar()
     for s:name in [
         \ 'TabSideBar',
@@ -648,15 +656,15 @@ if v:true
     endfunction
 
     function! s:vimrc_colorscheme() abort
-        highlight! TabSideBarFill     guifg=NONE    guibg=NONE    gui=NONE cterm=NONE
-        highlight! link TabSideBar    TabSideBarFill
-        highlight! link TabSideBarSel TabSideBarFill
-        highlight! Cursor             guifg=#000000 guibg=#d7d7d7
-        highlight! CursorIM           guifg=NONE    guibg=#d70000
-        highlight! SpecialKey         guifg=#444411
-        highlight! NonText            guifg=#1f2430
-        highlight! link diffAdded     DiffAdd
-        highlight! link diffRemoved   DiffDelete
+        highlight! link TabSideBarFill StatusLine
+        highlight! link TabSideBar     TabSideBarFill
+        highlight! link TabSideBarSel  TabSideBarFill
+        highlight! Cursor              guifg=#000000 guibg=#d7d7d7
+        highlight! CursorIM            guifg=NONE    guibg=#d70000
+        highlight! SpecialKey          guifg=#444411
+        highlight! NonText             guifg=#1f2430
+        highlight! link diffAdded      DiffAdd
+        highlight! link diffRemoved    DiffDelete
         " itchyny/vim-parenmatch
         if get(g:, 'loaded_parenmatch', v:false)
             let g:parenmatch_highlight = 0
