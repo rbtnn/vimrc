@@ -25,6 +25,7 @@
 			],
 			"rbtnn": [
 				"vim-ambiwidth",
+				"vim-gitdiff",
 				"vim-gloaded",
 				"vim-pkgsync",
 				"vim-qficonv",

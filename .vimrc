@@ -102,8 +102,6 @@ let &cedit = "\<C-q>"
 
 let g:vimrc = get(g:, 'vimrc', {
     \   'term_cmd': [&shell],
-    \   'git_enabled_qficonv': v:false,
-    \   'qficonv_columns': 300,
     \ })
 let g:vim_indent_cont = &g:shiftwidth
 let g:restart_sessionoptions = &sessionoptions
@@ -267,7 +265,7 @@ endfunction
 
 if has('vim_starting')
     set packpath=$VIMRC_VIM/github
-    set runtimepath=$VIMRUNTIME,$VIMRC_VIM
+    set runtimepath=$VIMRUNTIME
 
     if has('win32') && has('gui_running') && has('vim_starting')
         set linespace=0
