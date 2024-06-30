@@ -197,7 +197,7 @@ function! s:vimrc_init() abort
         \   'term_kill' : 'kill',
         \ })<cr>
 
-    nnoremap         <C-s>    <Cmd>GitShow<cr>
+    nnoremap         <C-s>    <Cmd>GitDiff<cr>
 
     if get(g:, 'loaded_operator_replace', v:false)
         nmap     <silent>s        <Plug>(operator-replace)
@@ -250,8 +250,9 @@ function! s:vimrc_colorscheme() abort
     highlight! Cursor              guifg=#000000 guibg=#d7d7d7
     highlight! CursorIM            guifg=NONE    guibg=#d70000
     highlight! SpecialKey          guifg=#444411
-    highlight! link diffAdded      DiffAdd
-    highlight! link diffRemoved    DiffDelete
+    highlight! DiffAdd                           gui=underline
+    highlight! DiffDelete                        gui=underline
+    highlight! DiffText            guifg=#ffaaff gui=underline
     " itchyny/vim-parenmatch
     if get(g:, 'loaded_parenmatch', v:false)
         let g:parenmatch_highlight = 0
