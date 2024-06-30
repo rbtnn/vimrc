@@ -197,10 +197,7 @@ function! s:vimrc_init() abort
         \   'term_kill' : 'kill',
         \ })<cr>
 
-    if executable('git')
-        nnoremap <silent><C-q>    <Cmd>GitDiff -w<cr>
-        nnoremap <silent><C-s>    <Cmd>GitDiff -w upstream<cr>
-    endif
+    nnoremap         <C-s>    <Cmd>GitShow<cr>
 
     if get(g:, 'loaded_operator_replace', v:false)
         nmap     <silent>s        <Plug>(operator-replace)
@@ -269,7 +266,7 @@ endfunction
 
 if has('vim_starting')
     set packpath=$VIMRC_VIM/github
-    set runtimepath=$VIMRUNTIME
+    set runtimepath=$VIMRUNTIME,$VIMRC_VIM
 
     if has('win32') && has('gui_running') && has('vim_starting')
         set linespace=0
@@ -282,10 +279,6 @@ if has('vim_starting')
         else
             set guifont=ＭＳ_ゴシック:h18:cSHIFTJIS:qDRAFT
         endif
-    endif
-
-    if filereadable(expand('$VIMRC_VIM/gitdiff.vim'))
-        source $VIMRC_VIM/gitdiff.vim
     endif
 
     silent! source ~/.vimrc.local
