@@ -157,6 +157,10 @@ function! s:exists_font(fname) abort
 endfunction
 
 function! s:vimrc_init() abort
+    if !&modified && filereadable(expand('%'))
+        silent! checktime
+    endif
+
     " Can't use <S-space> at :terminal
     " https://github.com/vim/vim/issues/6040
     tnoremap <silent><S-space>           <space>
@@ -292,6 +296,7 @@ augroup vimrc
     autocmd CmdlineEnter *
         \ : if getcmdtype() == ':'
         \ |     set ignorecase
+        \ |     silent! delcommand MANPAGER
         \ | endif
     autocmd CmdlineLeave      *    : set noignorecase
     autocmd VimEnter,BufEnter *    : call s:vimrc_init()
