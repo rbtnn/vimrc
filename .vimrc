@@ -200,6 +200,7 @@ function! s:vimrc_init() abort
         \ })<cr>
 
     nnoremap         <C-s>    <Cmd>GitDiff<cr>
+    nnoremap         <C-q>    <Cmd>NpmRun build<cr>
 
     if get(g:, 'loaded_operator_replace', v:false)
         nmap     <silent>s        <Plug>(operator-replace)
@@ -242,6 +243,9 @@ function! s:vimrc_init() abort
     endif
     if !exists(':PkgSync')
         command! -nargs=0 PkgSyncSetup :call s:pkgsync_setup()
+    endif
+    if executable('npm')
+        command! -nargs=* NpmRun  :call term_start([has('win32') ? 'npm.cmd' : 'npm', 'run'] + split(<q-args>), {})
     endif
 endfunction
 
@@ -296,12 +300,21 @@ augroup vimrc
     autocmd CmdlineEnter *
         \ : if getcmdtype() == ':'
         \ |     set ignorecase
-        \ |     silent! delcommand MANPAGER
+        \ |     call map(['MANPAGER']
+        \           + getcompletion('Textobj*','command')
+        \           + getcompletion('VimTweakD*','command')
+        \           + getcompletion('VimTweakE*','command')
+        \           + getcompletion('Strip*','command')
+        \           + getcompletion('*Whitespace','command')
+        \           + getcompletion('Toggle*','command')
+        \           , { i,x -> execute('silent! delcommand ' .. x) })
         \ | endif
     autocmd CmdlineLeave      *    : set noignorecase
     autocmd VimEnter,BufEnter *    : call s:vimrc_init()
     autocmd FileType          help : setlocal colorcolumn=78
     autocmd ColorScheme       *    : call s:vimrc_colorscheme()
+    autocmd BufEnter *.scss        : setlocal expandtab shiftwidth=2 tabstop=2
+    autocmd BufEnter *.ts,*.js     : setlocal expandtab shiftwidth=2 tabstop=2
 augroup END
 
 call s:vimrc_init()
