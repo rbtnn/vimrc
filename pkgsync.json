@@ -8,9 +8,6 @@
 			"haya14busa": [
 				"vim-operator-flashy"
 			],
-			"itchyny": [
-				"lightline.vim"
-			],
 			"kana": [
 				"vim-operator-replace",
 				"vim-operator-user",

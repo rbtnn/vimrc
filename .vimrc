@@ -33,7 +33,6 @@ set cmdheight=3
 set cmdwinheight=5
 set complete-=t
 set completeslash=slash
-set diffopt+=iwhiteall
 set expandtab shiftwidth=4 tabstop=4
 set fileencodings=ucs-bom,utf-8,cp932
 set fileformats=unix,dos
@@ -156,6 +155,64 @@ function! s:exists_font(fname) abort
         \ || filereadable(expand('C:/Windows/Fonts/' .. a:fname))
 endfunction
 
+function! s:npm_fmt() abort
+    for x in filter(getwininfo(), {i,x -> x.tabnr == tabpagenr() && x.terminal })
+        if term_getstatus(x.bufnr) == 'finished'
+            call win_execute(x.winid, 'close')
+        endif
+    endfor
+    call term_start([has('win32') ? 'npm.cmd' : 'npm', 'run', 'fmt'], {})
+endfunction
+
+function! s:remove_ansi_escape_codes(line) abort
+    return substitute(a:line, nr2char(27) .. '[\d\+m', '', 'g')
+endfunction
+
+function! s:npm_build() abort
+    let xs = []
+    let lines = []
+    let path = tempname()
+    call setqflist([])
+    redraw
+    try
+        let job = job_start([has('win32') ? 'npm.cmd' : 'npm', 'run', 'build'], {
+            \ 'out_io': 'file',
+            \ 'out_name': path,
+            \ 'err_io': 'out',
+            \ })
+        while 'run' == job_status(job)
+        endwhile
+        if filereadable(path)
+            let lines = readfile(path)
+        endif
+    finally
+        if filereadable(path)
+            call delete(path)
+        endif
+    endtry
+    let i = 0
+    while i < len(lines)
+        let m = matchlist(s:remove_ansi_escape_codes(lines[i]), '\[tsl\] ERROR in \(.\+\)(\(\d\+\),\(\d\+\))$')
+        if !empty(m)
+            let xs += [{
+                \   'filename': m[1],
+                \   'lnum': str2nr(m[2]),
+                \   'col': str2nr(m[3]),
+                \   'text': s:remove_ansi_escape_codes(lines[i + 1]),
+                \ }]
+            let i += 2
+        else
+            let xs += [{
+                \   'text': s:remove_ansi_escape_codes(lines[i]),
+                \ }]
+            let i += 1
+        endif
+    endwhile
+    call setqflist(xs)
+    call setqflist([], 'r', {'title': 'The output of "npm run build"'})
+    copen
+endfunction
+
 function! s:vimrc_init() abort
     if !&modified && filereadable(expand('%'))
         silent! checktime
@@ -193,18 +250,22 @@ function! s:vimrc_init() abort
     nnoremap <silent><C-p>    <Cmd>cprevious<cr>zz
     nnoremap <silent><C-n>    <Cmd>cnext<cr>zz
 
-    nnoremap <silent><C-z>    <Cmd>call term_start(g:vimrc.term_cmd, {
+    let g:mapleader = "s"
+
+    nnoremap     <leader>         <nop>
+    nnoremap     <leader><leader> <nop>
+    nnoremap     <leader>d        <Cmd>GitDiff<cr>
+    nnoremap     <leader>f        <Cmd>call <SID>npm_fmt()<cr>
+    nnoremap     <leader>b        <Cmd>call <SID>npm_build()<cr>
+    nnoremap     <leader>e        <Cmd>if filereadable(expand('%')) \| e %:h \| else \| e . \| endif<cr>
+    nnoremap     <leader>z        <Cmd>call term_start(g:vimrc.term_cmd, {
         \   'term_highlight' : 'Terminal',
         \   'term_finish' : 'close',
         \   'term_kill' : 'kill',
         \ })<cr>
 
-    nnoremap         <C-s>    <Cmd>GitDiff<cr>
-    nnoremap         <C-q>    <Cmd>NpmRun build<cr>
-
     if get(g:, 'loaded_operator_replace', v:false)
-        nmap     <silent>s        <Plug>(operator-replace)
-        nmap     <silent>ss       <Plug>(operator-replace)as
+        nmap     <silent>x        <Plug>(operator-replace)
     endif
     if get(g:, 'loaded_operator_flashy', v:false)
         map      <silent>y        <Plug>(operator-flashy)
@@ -216,7 +277,6 @@ function! s:vimrc_init() abort
         nmap     <silent>vs       vas
     endif
     if get(g:, 'loaded_molder', v:false)
-        nnoremap <silent><C-f>    <Cmd>if filereadable(expand('%')) \| e %:h \| else \| e . \| endif<cr>
         if &filetype == 'molder'
             nnoremap <buffer> h  <plug>(molder-up)
             nnoremap <buffer> l  <plug>(molder-open)
@@ -243,9 +303,6 @@ function! s:vimrc_init() abort
     endif
     if !exists(':PkgSync')
         command! -nargs=0 PkgSyncSetup :call s:pkgsync_setup()
-    endif
-    if executable('npm')
-        command! -nargs=* NpmRun  :call term_start([has('win32') ? 'npm.cmd' : 'npm', 'run'] + split(<q-args>), {})
     endif
 endfunction
 
@@ -313,8 +370,10 @@ augroup vimrc
     autocmd VimEnter,BufEnter *    : call s:vimrc_init()
     autocmd FileType          help : setlocal colorcolumn=78
     autocmd ColorScheme       *    : call s:vimrc_colorscheme()
+    autocmd BufEnter *.css         : setlocal expandtab shiftwidth=2 tabstop=2
     autocmd BufEnter *.scss        : setlocal expandtab shiftwidth=2 tabstop=2
     autocmd BufEnter *.ts,*.js     : setlocal expandtab shiftwidth=2 tabstop=2
+    autocmd BufEnter *.tsx,*.jsx   : setlocal expandtab shiftwidth=2 tabstop=2
 augroup END
 
 call s:vimrc_init()
