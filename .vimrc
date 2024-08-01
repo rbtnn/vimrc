@@ -155,13 +155,22 @@ function! s:exists_font(fname) abort
         \ || filereadable(expand('C:/Windows/Fonts/' .. a:fname))
 endfunction
 
-function! s:npm_fmt() abort
+function! s:close_terms() abort
     for x in filter(getwininfo(), {i,x -> x.tabnr == tabpagenr() && x.terminal })
         if term_getstatus(x.bufnr) == 'finished'
             call win_execute(x.winid, 'close')
         endif
     endfor
+endfunction
+
+function! s:npm_fmt() abort
+    call s:close_terms()
     call term_start([has('win32') ? 'npm.cmd' : 'npm', 'run', 'fmt'], {})
+endfunction
+
+function! s:npm_jest() abort
+    call s:close_terms()
+    call term_start([has('win32') ? 'npm.cmd' : 'npm', 'run', 'jest'], {})
 endfunction
 
 function! s:remove_ansi_escape_codes(line) abort
@@ -173,6 +182,7 @@ function! s:npm_build() abort
     let lines = []
     let path = tempname()
     call setqflist([])
+    call setqflist([], 'r', {'title': 'Executing "npm run build"'})
     redraw
     try
         let job = job_start([has('win32') ? 'npm.cmd' : 'npm', 'run', 'build'], {
@@ -209,7 +219,7 @@ function! s:npm_build() abort
         endif
     endwhile
     call setqflist(xs)
-    call setqflist([], 'r', {'title': 'The output of "npm run build"'})
+    call setqflist([], 'r', {'title': 'The output of "npm run build"' })
     copen
 endfunction
 
@@ -257,6 +267,7 @@ function! s:vimrc_init() abort
     nnoremap     <leader>d        <Cmd>GitDiff<cr>
     nnoremap     <leader>f        <Cmd>call <SID>npm_fmt()<cr>
     nnoremap     <leader>b        <Cmd>call <SID>npm_build()<cr>
+    nnoremap     <leader>j        <Cmd>call <SID>npm_jest()<cr>
     nnoremap     <leader>e        <Cmd>if filereadable(expand('%')) \| e %:h \| else \| e . \| endif<cr>
     nnoremap     <leader>z        <Cmd>call term_start(g:vimrc.term_cmd, {
         \   'term_highlight' : 'Terminal',
