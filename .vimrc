@@ -177,50 +177,46 @@ function! s:remove_ansi_escape_codes(line) abort
     return substitute(a:line, nr2char(27) .. '[\d\+m', '', 'g')
 endfunction
 
+function! s:npm_build_out_cb(ch, msg) abort
+    let m = matchlist(s:remove_ansi_escape_codes(a:msg), '\[tsl\] ERROR in \(.\+\)(\(\d\+\),\(\d\+\))$')
+    if !empty(m)
+        call setqflist([{
+            \   'filename': m[1],
+            \   'lnum': str2nr(m[2]),
+            \   'col': str2nr(m[3]),
+            \   'text': s:remove_ansi_escape_codes(a:msg),
+            \ }], 'a')
+    else
+        call setqflist([{
+            \   'text': s:remove_ansi_escape_codes(a:msg),
+            \ }], 'a')
+    endif
+endfunction
+
+function! s:npm_build_exit_cb(cmd, ch, status) abort
+    echohl Title
+    echo printf('%s "%s"!', (a:status == 0 ? 'Succeeded' : 'Failed'), a:cmd)
+    echohl None
+endfunction
+
+let s:npm_build_job = v:null
+
 function! s:npm_build() abort
-    let xs = []
-    let lines = []
-    let path = tempname()
+    const cmd = 'npm run build'
     call setqflist([])
-    call setqflist([], 'r', {'title': 'Executing "npm run build"'})
-    redraw
-    try
-        let job = job_start([has('win32') ? 'npm.cmd' : 'npm', 'run', 'build'], {
-            \ 'out_io': 'file',
-            \ 'out_name': path,
-            \ 'err_io': 'out',
-            \ })
-        while 'run' == job_status(job)
-        endwhile
-        if filereadable(path)
-            let lines = readfile(path)
-        endif
-    finally
-        if filereadable(path)
-            call delete(path)
-        endif
-    endtry
-    let i = 0
-    while i < len(lines)
-        let m = matchlist(s:remove_ansi_escape_codes(lines[i]), '\[tsl\] ERROR in \(.\+\)(\(\d\+\),\(\d\+\))$')
-        if !empty(m)
-            let xs += [{
-                \   'filename': m[1],
-                \   'lnum': str2nr(m[2]),
-                \   'col': str2nr(m[3]),
-                \   'text': s:remove_ansi_escape_codes(lines[i + 1]),
-                \ }]
-            let i += 2
-        else
-            let xs += [{
-                \   'text': s:remove_ansi_escape_codes(lines[i]),
-                \ }]
-            let i += 1
-        endif
-    endwhile
-    call setqflist(xs)
-    call setqflist([], 'r', {'title': 'The output of "npm run build"' })
-    copen
+    if s:npm_build_job != v:null
+        call job_stop(s:npm_build_job, 'kill')
+        let s:npm_build_job = v:null
+    endif
+    echohl Title
+    echo printf('Start "%s"!', cmd)
+    echohl None
+    let s:npm_build_job = job_start([has('win32') ? 'npm.cmd' : 'npm', 'run', 'build'], {
+        \ 'out_io': 'pipe',
+        \ 'err_io': 'out',
+        \ 'out_cb': function('s:npm_build_out_cb'),
+        \ 'exit_cb': function('s:npm_build_exit_cb', [cmd]),
+        \ })
 endfunction
 
 function! s:vimrc_init() abort
@@ -264,6 +260,7 @@ function! s:vimrc_init() abort
 
     nnoremap     <leader>         <nop>
     nnoremap     <leader><leader> <nop>
+    " https://github.com/rbtnn/vimrc/tree/adf7bb43a14aee4fa90eac8e8f14a77aa8455501/vim/local/pack/dev/start/vim-git/autoload/git
     nnoremap     <leader>d        <Cmd>GitDiff<cr>
     nnoremap     <leader>f        <Cmd>call <SID>npm_fmt()<cr>
     nnoremap     <leader>b        <Cmd>call <SID>npm_build()<cr>
