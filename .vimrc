@@ -224,6 +224,8 @@ function! s:vimrc_init() abort
         silent! checktime
     endif
 
+    cabbrev W  w
+
     " Can't use <S-space> at :terminal
     " https://github.com/vim/vim/issues/6040
     tnoremap <silent><S-space>           <space>
@@ -260,8 +262,7 @@ function! s:vimrc_init() abort
 
     nnoremap     <leader>         <nop>
     nnoremap     <leader><leader> <nop>
-    " https://github.com/rbtnn/vimrc/tree/adf7bb43a14aee4fa90eac8e8f14a77aa8455501/vim/local/pack/dev/start/vim-git/autoload/git
-    nnoremap     <leader>d        <Cmd>GitDiff<cr>
+    nnoremap     <leader>d        <Cmd>GitUnifiedDiff<cr>
     nnoremap     <leader>f        <Cmd>call <SID>npm_fmt()<cr>
     nnoremap     <leader>b        <Cmd>call <SID>npm_build()<cr>
     nnoremap     <leader>j        <Cmd>call <SID>npm_jest()<cr>
