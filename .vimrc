@@ -130,8 +130,16 @@ if has('tabsidebar')
     set notabsidebaralign
     set notabsidebarwrap
     set showtabsidebar=2
-    set tabsidebarcolumns=2
-    set tabsidebar=%{nr2char(0x20)}
+    set tabsidebarcolumns=3
+    function! Tabsidebar() abort
+        try
+            let tnr = g:actual_curtabpage
+            return printf("%%#TabSideBarT%d#%s%d", tnr % 5 + 1, tabpagenr() == tnr ? '*' : ' ', tnr)
+        catch
+            return "ERR"
+        endtry
+    endfunction
+    set tabsidebar=%!Tabsidebar()
     for s:name in ['TabSideBar', 'TabSideBarSel', 'TabSideBarFill']
         if !hlexists(s:name)
             execute printf('highlight! %s guibg=NONE gui=NONE cterm=NONE', s:name)
@@ -319,6 +327,11 @@ function! s:vimrc_colorscheme() abort
     highlight! link TabSideBarFill StatusLine
     highlight! link TabSideBar     TabSideBarFill
     highlight! link TabSideBarSel  TabSideBarFill
+    highlight! TabSideBarT1        guifg=#000000 guibg=#e74645
+    highlight! TabSideBarT2        guifg=#000000 guibg=#fb7756
+    highlight! TabSideBarT3        guifg=#000000 guibg=#facd60
+    highlight! TabSideBarT4        guifg=#000000 guibg=#fdfa66
+    highlight! TabSideBarT5        guifg=#000000 guibg=#1ac0c6
     highlight! Cursor              guifg=#000000 guibg=#d7d7d7
     highlight! CursorIM            guifg=NONE    guibg=#d70000
     highlight! SpecialKey          guifg=#444411
