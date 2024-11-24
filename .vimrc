@@ -163,68 +163,46 @@ function! s:exists_font(fname) abort
         \ || filereadable(expand('C:/Windows/Fonts/' .. a:fname))
 endfunction
 
-function! s:close_terms() abort
-    for x in filter(getwininfo(), {i,x -> x.tabnr == tabpagenr() && x.terminal })
-        if term_getstatus(x.bufnr) == 'finished'
-            call win_execute(x.winid, 'close')
+function! s:bsfm_build_and_deploy_exit_cb(ps, i, ch, status) abort
+    if a:status == 0
+        if a:ch != v:null
+            for x in filter(getwininfo(), {i,x -> x.tabnr == tabpagenr() && x.terminal })
+                if x.bufnr == ch_getbufnr(a:ch, "out")
+                    if term_getstatus(x.bufnr) == 'finished'
+                        call win_execute(x.winid, 'close')
+                    endif
+                endif
+            endfor
         endif
-    endfor
+        if a:i < len(a:ps)
+            let s:bsfm_job = term_start(a:ps[a:i]['command'], {
+                \ 'cwd': a:ps[a:i]['cwd'],
+                \ 'exit_cb': function('s:bsfm_build_and_deploy_exit_cb', [a:ps, a:i + 1]),
+                \ })
+        endif
+    endif
 endfunction
 
-function! s:npm_fmt() abort
-    call s:close_terms()
-    call term_start([has('win32') ? 'npm.cmd' : 'npm', 'run', 'fmt'], {})
-endfunction
-
-function! s:npm_jest() abort
-    call s:close_terms()
-    call term_start([has('win32') ? 'npm.cmd' : 'npm', 'run', 'jest'], {})
-endfunction
-
-function! s:remove_ansi_escape_codes(line) abort
-    return substitute(a:line, nr2char(27) .. '[\d\+m', '', 'g')
-endfunction
-
-function! s:npm_build_out_cb(ch, msg) abort
-    let m = matchlist(s:remove_ansi_escape_codes(a:msg), '\[tsl\] ERROR in \(.\+\)(\(\d\+\),\(\d\+\))$')
-    if !empty(m)
-        call setqflist([{
-            \   'filename': m[1],
-            \   'lnum': str2nr(m[2]),
-            \   'col': str2nr(m[3]),
-            \   'text': s:remove_ansi_escape_codes(a:msg),
-            \ }], 'a')
+function! s:bsfm_build_and_deploy() abort
+    const ps = [
+        \   {
+        \     'cwd': 'ghost-cms/theme/scripts',
+        \     'command': [has('win32') ? 'npm.cmd' : 'npm', 'run', 'fmt'],
+        \   },
+        \   {
+        \     'cwd': 'ghost-cms/theme/scripts',
+        \     'command': [has('win32') ? 'npm.cmd' : 'npm', 'run', 'build'],
+        \   },
+        \   {
+        \     'cwd': 'ghost-cms/deploy-theme',
+        \     'command': ['node', 'index.js'],
+        \   },
+        \ ]
+    if fnamemodify(getcwd(), ":t") == "backspacefm-infra"
+        call s:bsfm_build_and_deploy_exit_cb(ps, 0, v:null, 0)
     else
-        call setqflist([{
-            \   'text': s:remove_ansi_escape_codes(a:msg),
-            \ }], 'a')
+        echo "[bsfm_build_and_deploy] please cd backspacefm-infra directory!"
     endif
-endfunction
-
-function! s:npm_build_exit_cb(cmd, ch, status) abort
-    echohl Title
-    echo printf('%s "%s"!', (a:status == 0 ? 'Succeeded' : 'Failed'), a:cmd)
-    echohl None
-endfunction
-
-let s:npm_build_job = v:null
-
-function! s:npm_build() abort
-    const cmd = 'npm run build'
-    call setqflist([])
-    if s:npm_build_job != v:null
-        call job_stop(s:npm_build_job, 'kill')
-        let s:npm_build_job = v:null
-    endif
-    echohl Title
-    echo printf('Start "%s"!', cmd)
-    echohl None
-    let s:npm_build_job = job_start([has('win32') ? 'npm.cmd' : 'npm', 'run', 'build'], {
-        \ 'out_io': 'pipe',
-        \ 'err_io': 'out',
-        \ 'out_cb': function('s:npm_build_out_cb'),
-        \ 'exit_cb': function('s:npm_build_exit_cb', [cmd]),
-        \ })
 endfunction
 
 function! s:vimrc_init() abort
@@ -271,9 +249,7 @@ function! s:vimrc_init() abort
     nnoremap     <leader>         <nop>
     nnoremap     <leader><leader> <nop>
     nnoremap     <leader>d        <Cmd>GitUnifiedDiff<cr>
-    nnoremap     <leader>f        <Cmd>call <SID>npm_fmt()<cr>
-    nnoremap     <leader>b        <Cmd>call <SID>npm_build()<cr>
-    nnoremap     <leader>j        <Cmd>call <SID>npm_jest()<cr>
+    nnoremap     <leader>b        <Cmd>call <SID>bsfm_build_and_deploy()<cr>
     nnoremap     <leader>e        <Cmd>if filereadable(expand('%')) \| e %:h \| else \| e . \| endif<cr>
     nnoremap     <leader>z        <Cmd>call term_start(g:vimrc.term_cmd, {
         \   'term_highlight' : 'Terminal',
