@@ -130,11 +130,18 @@ if has('tabsidebar')
     set notabsidebaralign
     set notabsidebarwrap
     set showtabsidebar=2
-    set tabsidebarcolumns=3
+    set tabsidebarcolumns=20
     function! Tabsidebar() abort
         try
             let tnr = g:actual_curtabpage
-            return printf("%%#TabSideBarT%d#%s%d", tnr % 5 + 1, tabpagenr() == tnr ? '*' : ' ', tnr)
+            let bname = fnamemodify(bufname(filter(getwininfo(), { i,x -> x.tabnr == tnr })[0].bufnr), ":t")
+            if empty(bname)
+                let bname = '[No Name]'
+            endif
+            return printf("%%#TabSideBarT%d#%s%d: %s",
+                \ tnr % 5 + 1, tabpagenr() == tnr ? '*' : ' ',
+                \ tnr,
+                \ bname)
         catch
             return "ERR"
         endtry
@@ -163,7 +170,7 @@ function! s:exists_font(fname) abort
         \ || filereadable(expand('C:/Windows/Fonts/' .. a:fname))
 endfunction
 
-function! s:bsfm_build_and_deploy_exit_cb(ps, i, ch, status) abort
+function! s:build_and_deploy_exit_cb(ps, i, ch, status) abort
     if a:status == 0
         if a:ch != v:null
             for x in filter(getwininfo(), {i,x -> x.tabnr == tabpagenr() && x.terminal })
@@ -177,32 +184,42 @@ function! s:bsfm_build_and_deploy_exit_cb(ps, i, ch, status) abort
         if a:i < len(a:ps)
             let s:bsfm_job = term_start(a:ps[a:i]['command'], {
                 \ 'cwd': a:ps[a:i]['cwd'],
-                \ 'exit_cb': function('s:bsfm_build_and_deploy_exit_cb', [a:ps, a:i + 1]),
+                \ 'exit_cb': function('s:build_and_deploy_exit_cb', [a:ps, a:i + 1]),
                 \ })
         endif
     endif
 endfunction
 
-function! s:bsfm_build_and_deploy() abort
-    const ps = [
-        \   {
-        \     'cwd': 'ghost-cms/theme/scripts',
-        \     'command': [has('win32') ? 'npm.cmd' : 'npm', 'run', 'fmt'],
-        \   },
-        \   {
-        \     'cwd': 'ghost-cms/theme/scripts',
-        \     'command': [has('win32') ? 'npm.cmd' : 'npm', 'run', 'build'],
-        \   },
-        \   {
-        \     'cwd': 'ghost-cms/deploy-theme',
-        \     'command': ['node', 'index.js'],
-        \   },
-        \ ]
-    if fnamemodify(getcwd(), ":t") == "backspacefm-infra"
-        call s:bsfm_build_and_deploy_exit_cb(ps, 0, v:null, 0)
-    else
-        echo "[bsfm_build_and_deploy] please cd backspacefm-infra directory!"
-    endif
+function! s:build_and_deploy() abort
+    let build_and_deploy_settings = get(g:, 'build_and_deploy_settings', {})
+    let curr_dirname = fnamemodify(getcwd(), ":t")
+    for dirname in keys(build_and_deploy_settings)
+        if curr_dirname == dirname
+            call s:build_and_deploy_exit_cb(build_and_deploy_settings[dirname], 0, v:null, 0)
+            return
+        endif
+    endfor
+    echohl Error
+    echo printf("[build_and_deploy] the current directory could not be matched any projects: %s", curr_dirname)
+    echohl None
+endfunction
+
+function! s:git_cd_rootdir(path = '.') abort
+    let xs = split(fnamemodify(a:path, ':p'), '[\/]')
+    let prefix = (has('mac') || has('linux')) ? '/' : ''
+    while !empty(xs)
+        let path = prefix .. join(xs + ['.git'], '/')
+        if isdirectory(path) || filereadable(path)
+            let rootdir = prefix .. join(xs, '/')
+            if !empty(chdir(rootdir))
+                echo 'changed to git rootdir:'
+                verbose pwd
+                return
+            endif
+        endif
+        call remove(xs, -1)
+    endwhile
+    echo 'could not find a git rootdir!'
 endfunction
 
 function! s:vimrc_init() abort
@@ -248,8 +265,9 @@ function! s:vimrc_init() abort
 
     nnoremap     <leader>         <nop>
     nnoremap     <leader><leader> <nop>
+    nnoremap     <leader>b        <Cmd>BuildAndDeploy<cr>
+    nnoremap     <leader>c        <Cmd>GitCdRootDir<cr>
     nnoremap     <leader>d        <Cmd>GitUnifiedDiff<cr>
-    nnoremap     <leader>b        <Cmd>call <SID>bsfm_build_and_deploy()<cr>
     nnoremap     <leader>e        <Cmd>if filereadable(expand('%')) \| e %:h \| else \| e . \| endif<cr>
     nnoremap     <leader>z        <Cmd>call term_start(g:vimrc.term_cmd, {
         \   'term_highlight' : 'Terminal',
@@ -265,9 +283,10 @@ function! s:vimrc_init() abort
         nmap     <silent>Y        <Plug>(operator-flashy)$
     endif
     if get(g:, 'loaded_textobj_string', v:false)
-        nmap     <silent>ds       das
-        nmap     <silent>ys       yas
-        nmap     <silent>vs       vas
+        nmap     <silent>ds       dis
+        nmap     <silent>ys       yis
+        nmap     <silent>vs       vis
+        nmap     <silent>xs       xis
     endif
     if get(g:, 'loaded_molder', v:false)
         if &filetype == 'molder'
@@ -294,6 +313,8 @@ function! s:vimrc_init() abort
         command! -nargs=0 WinExplorer        :!start .
         command! -nargs=0 WinMaximize        :simalt~x
     endif
+    command! -nargs=0 GitCdRootDir     :call s:git_cd_rootdir()
+    command! -nargs=0 BuildAndDeploy   :call s:build_and_deploy()
     if !exists(':PkgSync')
         command! -nargs=0 PkgSyncSetup :call s:pkgsync_setup()
     endif
