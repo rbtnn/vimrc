@@ -1,14 +1,3 @@
-"
-" ---------------------------------------------------------------------------------------------------
-" How to setup if git is not installed
-"   1. $curl https://raw.githubusercontent.com/rbtnn/vimrc/master/.vimrc        -o .vimrc
-"   2. $curl https://raw.githubusercontent.com/rbtnn/vimrc/master/pkgsync.json  -o pkgsync.json
-"
-" How to install plugins
-"   1. :PkgSyncSetup
-"   2. :PkgSync update
-" ---------------------------------------------------------------------------------------------------
-"
 scriptencoding utf-8
 let $MYVIMRC = resolve($MYVIMRC)
 let $VIMRC_VIM = expand(expand('<sfile>:h') .. '/.vim')
@@ -134,24 +123,22 @@ if has('tabsidebar')
     function! Tabsidebar() abort
         try
             let tnr = g:actual_curtabpage
-            let bname = fnamemodify(bufname(filter(getwininfo(), { i,x -> x.tabnr == tnr })[0].bufnr), ":t")
-            if empty(bname)
-                let bname = '[No Name]'
-            endif
-            return printf("%%#TabSideBarT%d#%s%d: %s",
-                \ tnr % 5 + 1, tabpagenr() == tnr ? '*' : ' ',
-                \ tnr,
-                \ bname)
+            let s = printf("\n TABPAGE %d.\n", tnr)
+            for x in filter(getwininfo(), { i,x -> x.tabnr == tnr })
+                let bname = fnamemodify(bufname(x.bufnr), ":t")
+                if empty(bname)
+                    let bname = '[No Name]'
+                endif
+                let s = s .. printf("  %s%s\n",
+                    \ ((tabpagenr() == x.tabnr) && (winnr() == x.winnr) ? '*' : ' '),
+                    \ bname)
+            endfor
+            return s
         catch
             return "ERR"
         endtry
     endfunction
     set tabsidebar=%!Tabsidebar()
-    for s:name in ['TabSideBar', 'TabSideBarSel', 'TabSideBarFill']
-        if !hlexists(s:name)
-            execute printf('highlight! %s guibg=NONE gui=NONE cterm=NONE', s:name)
-        endif
-    endfor
 endif
 
 function! s:pkgsync_setup() abort
@@ -163,11 +150,6 @@ function! s:pkgsync_setup() abort
             \ })
         echo 'please restart Vim!'
     endif
-endfunction
-
-function! s:exists_font(fname) abort
-    return filereadable(expand('$USERPROFILE/AppData/Local/Microsoft/Windows/Fonts/' .. a:fname))
-        \ || filereadable(expand('C:/Windows/Fonts/' .. a:fname))
 endfunction
 
 function! s:build_and_deploy_exit_cb(ps, i, ch, status) abort
@@ -182,7 +164,7 @@ function! s:build_and_deploy_exit_cb(ps, i, ch, status) abort
             endfor
         endif
         if a:i < len(a:ps)
-            let s:bsfm_job = term_start(a:ps[a:i]['command'], {
+            call term_start(a:ps[a:i]['command'], {
                 \ 'cwd': a:ps[a:i]['cwd'],
                 \ 'exit_cb': function('s:build_and_deploy_exit_cb', [a:ps, a:i + 1]),
                 \ })
@@ -202,24 +184,6 @@ function! s:build_and_deploy() abort
     echohl Error
     echo printf("[build_and_deploy] the current directory could not be matched any projects: %s", curr_dirname)
     echohl None
-endfunction
-
-function! s:git_cd_rootdir(path = '.') abort
-    let xs = split(fnamemodify(a:path, ':p'), '[\/]')
-    let prefix = (has('mac') || has('linux')) ? '/' : ''
-    while !empty(xs)
-        let path = prefix .. join(xs + ['.git'], '/')
-        if isdirectory(path) || filereadable(path)
-            let rootdir = prefix .. join(xs, '/')
-            if !empty(chdir(rootdir))
-                echo 'changed to git rootdir:'
-                verbose pwd
-                return
-            endif
-        endif
-        call remove(xs, -1)
-    endwhile
-    echo 'could not find a git rootdir!'
 endfunction
 
 function! s:vimrc_init() abort
@@ -267,7 +231,7 @@ function! s:vimrc_init() abort
     nnoremap     <leader><leader> <nop>
     nnoremap     <leader>b        <Cmd>BuildAndDeploy<cr>
     nnoremap     <leader>c        <Cmd>GitCdRootDir<cr>
-    nnoremap     <leader>d        <Cmd>GitUnifiedDiff<cr>
+    nnoremap     <leader>d        <Cmd>GitUnifiedDiff -w<cr>
     nnoremap     <leader>e        <Cmd>if filereadable(expand('%')) \| e %:h \| else \| e . \| endif<cr>
     nnoremap     <leader>z        <Cmd>call term_start(g:vimrc.term_cmd, {
         \   'term_highlight' : 'Terminal',
@@ -313,7 +277,6 @@ function! s:vimrc_init() abort
         command! -nargs=0 WinExplorer        :!start .
         command! -nargs=0 WinMaximize        :simalt~x
     endif
-    command! -nargs=0 GitCdRootDir     :call s:git_cd_rootdir()
     command! -nargs=0 BuildAndDeploy   :call s:build_and_deploy()
     if !exists(':PkgSync')
         command! -nargs=0 PkgSyncSetup :call s:pkgsync_setup()
@@ -322,14 +285,7 @@ endfunction
 
 function! s:vimrc_colorscheme() abort
     highlight! link TabSideBarFill StatusLine
-    highlight! link TabSideBar     TabSideBarFill
-    highlight! link TabSideBarSel  TabSideBarFill
-    highlight! TabSideBarT1        guifg=#000000 guibg=#e74645
-    highlight! TabSideBarT2        guifg=#000000 guibg=#fb7756
-    highlight! TabSideBarT3        guifg=#000000 guibg=#facd60
-    highlight! TabSideBarT4        guifg=#000000 guibg=#fdfa66
-    highlight! TabSideBarT5        guifg=#000000 guibg=#1ac0c6
-    highlight! Cursor              guifg=#000000 guibg=#d7d7d7
+    highlight! Cursor              guifg=#000000 guibg=#d7d7d7 gui=none
     highlight! CursorIM            guifg=NONE    guibg=#d70000
     highlight! SpecialKey          guifg=#444411
     highlight! DiffAdd             guifg=#000000    guibg=#53ff60
@@ -350,22 +306,7 @@ endfunction
 if has('vim_starting')
     set packpath=$VIMRC_VIM/github
     set runtimepath=$VIMRUNTIME
-
-    if has('win32') && has('gui_running') && has('vim_starting')
-        set linespace=0
-        if s:exists_font('Cica-Regular.ttf')
-            " https://github.com/miiton/Cica
-            set guifont=Cica:h16:cSHIFTJIS:qDRAFT
-        elseif s:exists_font('UDEVGothic-Regular.ttf')
-            " https://github.com/yuru7/udev-gothic
-            set guifont=UDEV_Gothic:h16:cSHIFTJIS:qDRAFT
-        else
-            set guifont=ＭＳ_ゴシック:h18:cSHIFTJIS:qDRAFT
-        endif
-    endif
-
     silent! source ~/.vimrc.local
-
     filetype plugin indent on
     syntax enable
     packloadall
