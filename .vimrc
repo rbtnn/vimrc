@@ -60,6 +60,7 @@ set tags=./tags;
 set termguicolors
 set timeout timeoutlen=500 ttimeoutlen=100
 set updatetime=500
+set wildignore=*/node_modules/**
 set wildmenu
 
 " https://github.com/vim/vim/commit/3908ef5017a6b4425727013588f72cc7343199b9
@@ -228,7 +229,7 @@ function! s:vimrc_init() abort
     let g:mapleader = "s"
 
     nnoremap     <leader>         <nop>
-    nnoremap     <leader><leader> <nop>
+    nnoremap     <leader><leader> :GitGrep<space>
     nnoremap     <leader>b        <Cmd>BuildAndDeploy<cr>
     nnoremap     <leader>c        <Cmd>GitCdRootDir<cr>
     nnoremap     <leader>d        <Cmd>GitUnifiedDiff -w<cr>
@@ -283,14 +284,45 @@ function! s:vimrc_init() abort
     endif
 endfunction
 
+function! s:select_string_i()
+    try
+        let w:string_ids = get(w:, 'string_ids', [])
+        for id in w:string_ids
+            silent! call matchdelete(id, win_getid())
+        endfor
+        let w:string_ids = []
+        let line = getline('.')
+        let xs = split(line, '\zs')
+        let pairs = textobj#string#parse(xs)
+        let lnum = line('.')
+        let col = col('.')
+        for pair in pairs
+            if (col < pair.begin_col) || ((pair.begin_col <= col) && (col <= pair.end_col))
+                let head_pos = pair.begin_col
+                let head_pos += line[head_pos - 1] == '@' ? 2 : 1
+                let len = pair.end_col - pair.begin_col - 1
+                if 0 < len
+                    let w:string_ids += [
+                        \ matchaddpos('StringUnderline', [
+                        \ [lnum, head_pos, len],
+                        \ ])]
+                endif
+                break
+            endif
+        endfor
+    catch
+    endtry
+endfunction
+
 function! s:vimrc_colorscheme() abort
     highlight! link TabSideBarFill StatusLine
+    highlight! StringUnderline                                 gui=underline cterm=underline
     highlight! Cursor              guifg=#000000 guibg=#d7d7d7 gui=none
     highlight! CursorIM            guifg=NONE    guibg=#d70000
     highlight! SpecialKey          guifg=#444411
-    highlight! DiffAdd             guifg=#000000    guibg=#53ff60
-    highlight! DiffDelete          guifg=#000000    guibg=#ff5560
-    highlight! DiffText            guifg=#000000    guibg=#aa33aa
+    highlight! DiffAdd             guifg=#000000 guibg=#53ff60
+    highlight! DiffDelete          guifg=#000000 guibg=#ff5560
+    highlight! DiffText            guifg=#000000 guibg=#aa33aa
     " itchyny/vim-parenmatch
     if get(g:, 'loaded_parenmatch', v:false)
         let g:parenmatch_highlight = 0
@@ -330,6 +362,7 @@ augroup vimrc
     autocmd VimEnter,BufEnter *    : call s:vimrc_init()
     autocmd FileType          help : setlocal colorcolumn=78
     autocmd ColorScheme       *    : call s:vimrc_colorscheme()
+    autocmd CursorMoved       *    : call s:select_string_i()
     autocmd BufEnter *.css         : setlocal expandtab shiftwidth=2 tabstop=2
     autocmd BufEnter *.scss        : setlocal expandtab shiftwidth=2 tabstop=2
     autocmd BufEnter *.ts,*.js     : setlocal expandtab shiftwidth=2 tabstop=2
@@ -343,3 +376,4 @@ try
 catch
     colorscheme default
 endtry
+
