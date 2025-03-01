@@ -125,6 +125,7 @@ init.local.cmd
 nightlybuild-tabsidebar-for-windows/
 node_modules/
 ntuser.*
+pkgsync.json
 python_games/
 source/
 tags
