@@ -107,6 +107,7 @@ if $TERM =~# 'xterm-'
 endif
 
 let g:vim_indent_cont = &g:shiftwidth
+let g:molder_show_hidden = 1
 
 if has('vim_starting')
   set packpath=$VIMRC_VIM/github
@@ -119,18 +120,25 @@ endif
 
 augroup vimrc
   autocmd!
-  autocmd VimEnter * :call s:vimrc_init()
+  autocmd VimEnter,BufEnter * :call s:vimrc_init()
 augroup END
 
 function! s:vimrc_init() abort
   if has('win32') && executable('wmic') && has('gui_running')
-    let g:vimrc_term_cmd = []
-    function! s:outcb(ch, mes) abort
-      if 14393 < str2nr(trim(a:mes))
-        let g:vimrc_term_cmd = ['cmd.exe', '/k', 'doskey pwd=cd && doskey ls=dir /b && set prompt=$E[32m$$$E[0m']
-      endif
-    endfunction
-    call job_start('wmic os get BuildNumber', { 'out_cb': function('s:outcb'), })
+    if has('vim_starting')
+      let g:vimrc_term_cmd = []
+      function! s:outcb(ch, mes) abort
+        if 14393 < str2nr(trim(a:mes))
+          let g:vimrc_term_cmd = ['cmd.exe', '/k', 'doskey pwd=cd && doskey ls=dir /b && set prompt=$E[32m$$$E[0m']
+        endif
+      endfunction
+      call job_start('wmic os get BuildNumber', { 'out_cb': function('s:outcb'), })
+    endif
+    command! -nargs=0 Terminal :call term_start(g:vimrc_term_cmd, {
+      \   'term_highlight' : 'Terminal',
+      \   'term_finish' : 'close',
+      \   'term_kill' : 'kill',
+      \ })
   endif
 
   if exists(':PkgSync')
@@ -145,6 +153,9 @@ function! s:vimrc_init() abort
       \             "kana": [
       \                 "vim-operator-replace",
       \                 "vim-operator-user",
+      \             ],
+      \             "mattn": [
+      \               "vim-molder"
       \             ],
       \             "rbtnn": [
       \                 "vim-ambiwidth",
@@ -205,13 +216,23 @@ function! s:vimrc_init() abort
   nnoremap <silent><C-p>    <Cmd>cprevious<cr>zz
   nnoremap <silent><C-n>    <Cmd>cnext<cr>zz
 
+  if get(g:, 'loaded_molder', v:false)
+    if &filetype == 'molder'
+      nnoremap <buffer> h  <plug>(molder-up)
+      nnoremap <buffer> l  <plug>(molder-open)
+      nnoremap <buffer> C  <Cmd>call chdir(b:molder_dir) \| verbose pwd<cr>
+    endif
+  endif
+
   if get(g:, 'loaded_operator_replace', v:false)
     nmap     <silent>x        <Plug>(operator-replace)
   endif
 
-  try
-    colorscheme aylin
-  catch
-    colorscheme default
-  endtry
+  if has('vim_starting')
+    try
+      colorscheme aylin
+    catch
+      colorscheme default
+    endtry
+  endif
 endfunction
