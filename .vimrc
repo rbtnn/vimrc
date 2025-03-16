@@ -76,8 +76,8 @@ if has('tabsidebar')
   let g:tabsidebar_vertsplit = 0
   set notabsidebaralign
   set notabsidebarwrap
-  set showtabsidebar=2
-  set tabsidebarcolumns=20
+  set showtabsidebar=1
+  set tabsidebarcolumns=10
   function! Tabsidebar() abort
     try
       let tnr = g:actual_curtabpage
@@ -116,11 +116,17 @@ if has('vim_starting')
   filetype plugin indent on
   syntax enable
   packloadall
+  try
+    colorscheme aylin
+  catch
+    colorscheme default
+  endtry
 endif
 
 augroup vimrc
   autocmd!
   autocmd VimEnter,BufEnter * :call s:vimrc_init()
+  autocmd ColorScheme       * :highlight! link TabSideBarFill StatusLine
 augroup END
 
 function! s:vimrc_init() abort
@@ -226,13 +232,5 @@ function! s:vimrc_init() abort
 
   if get(g:, 'loaded_operator_replace', v:false)
     nmap     <silent>x        <Plug>(operator-replace)
-  endif
-
-  if has('vim_starting')
-    try
-      colorscheme aylin
-    catch
-      colorscheme default
-    endtry
   endif
 endfunction
