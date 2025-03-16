@@ -1,9 +1,9 @@
-
 *.log
 *.swp
 .DS_Store
-.nuget/
+.gitignore
+.*
+.*/
 bin/
 tags
 tags-ja
-
