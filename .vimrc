@@ -73,7 +73,6 @@ else
 endif
 
 if has('tabsidebar')
-  let g:tabsidebar_vertsplit = 0
   set notabsidebaralign
   set notabsidebarwrap
   set showtabsidebar=1
@@ -99,7 +98,7 @@ if has('tabsidebar')
   set tabsidebar=%!Tabsidebar()
 endif
 
-let &cedit = "\<C-q>"
+let &cedit = "\<C-f>"
 
 if $TERM =~# 'xterm-'
   let &t_SI = "\e[5 q"
@@ -221,6 +220,8 @@ function! s:vimrc_init() abort
 
   nnoremap <silent><C-p>    <Cmd>cprevious<cr>zz
   nnoremap <silent><C-n>    <Cmd>cnext<cr>zz
+
+  nnoremap <silent>s        <Cmd>GitUnifiedDiff -w<cr>
 
   if get(g:, 'loaded_molder', v:false)
     if &filetype == 'molder'
