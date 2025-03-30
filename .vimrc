@@ -73,10 +73,11 @@ else
 endif
 
 if has('tabsidebar')
+  set fillchars+=tabsidebar:\|
   set notabsidebaralign
   set notabsidebarwrap
   set showtabsidebar=1
-  set tabsidebarcolumns=10
+  set tabsidebarcolumns=20
   function! Tabsidebar() abort
     try
       let tnr = g:actual_curtabpage
@@ -129,23 +130,6 @@ augroup vimrc
 augroup END
 
 function! s:vimrc_init() abort
-  if has('win32') && executable('wmic') && has('gui_running')
-    if has('vim_starting')
-      let g:vimrc_term_cmd = []
-      function! s:outcb(ch, mes) abort
-        if 14393 < str2nr(trim(a:mes))
-          let g:vimrc_term_cmd = ['cmd.exe', '/k', 'doskey pwd=cd && doskey ls=dir /b && set prompt=$E[32m$$$E[0m']
-        endif
-      endfunction
-      call job_start('wmic os get BuildNumber', { 'out_cb': function('s:outcb'), })
-    endif
-    command! -nargs=0 Terminal :call term_start(g:vimrc_term_cmd, {
-      \   'term_highlight' : 'Terminal',
-      \   'term_finish' : 'close',
-      \   'term_kill' : 'kill',
-      \ })
-  endif
-
   if exists(':PkgSync')
     " pkgsync.json is managed by .vimrc 
     call writefile([json_encode({
