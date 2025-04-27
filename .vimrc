@@ -28,7 +28,7 @@ set hlsearch
 set incsearch
 set isfname-==
 set keywordprg=:help
-set laststatus=1
+set laststatus=2
 set list listchars=tab:-->
 set matchpairs+=<:>
 set matchtime=1
@@ -113,6 +113,7 @@ endif
 
 let g:vim_indent_cont = &g:shiftwidth
 let g:molder_show_hidden = 1
+let g:lightline = { 'colorscheme': 'onedark', } 
 
 if has('vim_starting')
   set packpath=$VIMRC_VIM/github
@@ -122,7 +123,7 @@ if has('vim_starting')
   syntax enable
   packloadall
   try
-    colorscheme habamax
+    colorscheme onedark
   catch
     colorscheme default
   endtry
@@ -145,8 +146,14 @@ function! s:vimrc_init() abort
       \                 "vim-operator-replace",
       \                 "vim-operator-user",
       \             ],
+      \             "itchyny": [
+      \               "lightline.vim"
+      \             ],
       \             "mattn": [
       \               "vim-molder"
+      \             ],
+      \             "joshdick": [
+      \               "onedark.vim"
       \             ],
       \             "rbtnn": [
       \                 "vim-ambiwidth",
@@ -222,3 +229,7 @@ function! s:vimrc_init() abort
     nmap     <silent>x        <Plug>(operator-replace)
   endif
 endfunction
+
+if !has('vim_starting')
+  call s:vimrc_init()
+endif
