@@ -41,7 +41,10 @@ set noswapfile
 set nowrap
 set nowrapscan
 set nowritebackup
-set nrformats& nrformats+=unsigned nrformats-=octal
+set nrformats& nrformats-=octal
+if has('patch-8.2.0860')
+  set nrformats+=unsigned
+endif
 set pumheight=10
 set scrolloff&
 set sessionoptions=winpos,resize,tabpages,curdir,help
@@ -57,7 +60,9 @@ set timeout timeoutlen=500 ttimeoutlen=100
 set updatetime=500
 set wildignore=*/node_modules/**
 set wildmenu
-set wildoptions=pum
+if has('patch-8.2.4325')
+  set wildoptions=pum
+endif
 
 if has('persistent_undo')
   set undofile
@@ -99,7 +104,7 @@ if has('tabsidebar')
   set tabsidebar=%!Tabsidebar()
 endif
 
-let &cedit = "\<C-f>"
+let &cedit = "\<C-q>"
 
 if $TERM =~# 'xterm-'
   let &t_SI = "\e[5 q"
@@ -117,7 +122,7 @@ if has('vim_starting')
   syntax enable
   packloadall
   try
-    colorscheme aylin
+    colorscheme habamax
   catch
     colorscheme default
   endtry
@@ -136,9 +141,6 @@ function! s:vimrc_init() abort
       \     "packpath": "~/.vim/github",
       \     "plugins": {
       \         "start": {
-      \             "AhmedAbdulrahman": [
-      \                 "vim-aylin"
-      \             ],
       \             "kana": [
       \                 "vim-operator-replace",
       \                 "vim-operator-user",
@@ -196,6 +198,7 @@ function! s:vimrc_init() abort
   cnoremap         <C-a>    <home>
 
   nnoremap         v        <C-v>
+  nnoremap         Y        y$
 
   nnoremap <silent><C-j>    <Cmd>tabnext<cr>
   nnoremap <silent><C-k>    <Cmd>tabprevious<cr>
@@ -205,7 +208,7 @@ function! s:vimrc_init() abort
   nnoremap <silent><C-p>    <Cmd>cprevious<cr>zz
   nnoremap <silent><C-n>    <Cmd>cnext<cr>zz
 
-  nnoremap <silent>s        <Cmd>GitUnifiedDiff -w<cr>
+  nnoremap <expr>s          get(t:, 'vimrc_s_keymapping', '<Cmd>GitUnifiedDiff -w<cr>')
 
   if get(g:, 'loaded_molder', v:false)
     if &filetype == 'molder'
