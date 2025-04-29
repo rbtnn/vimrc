@@ -149,6 +149,15 @@ function! s:vimrc_init() abort
       \             "itchyny": [
       \               "lightline.vim"
       \             ],
+      \             "tweekmonster": [
+      \               "helpful.vim"
+      \             ],
+      \             "tyru": [
+      \               "restart.vim"
+      \             ],
+      \             "haya14busa": [
+      \               "vim-operator-flashy"
+      \             ],
       \             "mattn": [
       \               "vim-molder"
       \             ],
@@ -205,7 +214,13 @@ function! s:vimrc_init() abort
   cnoremap         <C-a>    <home>
 
   nnoremap         v        <C-v>
-  nnoremap         Y        y$
+
+  if get(g:, 'loaded_operator_flashy', v:false)
+    map              y        <Plug>(operator-flashy)
+    nmap             Y        <Plug>(operator-flashy)$
+  else
+    nnoremap         Y        y$
+  endif
 
   nnoremap <silent><C-j>    <Cmd>tabnext<cr>
   nnoremap <silent><C-k>    <Cmd>tabprevious<cr>
