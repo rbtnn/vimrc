@@ -58,6 +58,7 @@ set tags=./tags;
 set termguicolors
 set timeout timeoutlen=500 ttimeoutlen=100
 set updatetime=500
+set virtualedit=block
 set wildignore=*/node_modules/**
 set wildmenu
 if has('patch-8.2.4325')
@@ -115,6 +116,14 @@ let g:vim_indent_cont = &g:shiftwidth
 let g:molder_show_hidden = 1
 let g:lightline = { 'colorscheme': 'onedark', } 
 
+augroup vimrc
+  autocmd!
+  autocmd VimEnter,BufEnter * :call s:vimrc_init()
+  autocmd ColorScheme       * :highlight! link TabSideBarSel  WildMenu
+  autocmd ColorScheme       * :highlight! link tabSideBarFill Visual
+  autocmd ColorScheme       * :highlight!      PmenuSel       guifg=NONE guibg=#013F7F
+augroup END
+
 if has('vim_starting')
   set packpath=$VIMRC_VIM/github
   set runtimepath=$VIMRUNTIME
@@ -129,11 +138,43 @@ if has('vim_starting')
   endtry
 endif
 
-augroup vimrc
-  autocmd!
-  autocmd VimEnter,BufEnter * :call s:vimrc_init()
-  autocmd ColorScheme       * :highlight! link TabSideBarFill StatusLine
-augroup END
+function! VimLoadAction(target, q_args) abort
+  let bnr = term_dumpload(expand(g:vimrc_vimrepo_dir .. '/src/testdir/' .. a:target .. '/' .. a:q_args))
+  let wid = win_getid()
+  let pid = popup_create(bnr, { 'border': [], })
+  let pos = popup_getpos(win_getid())
+  let width = pos['core_width']
+  let height = pos['core_height']
+  call popup_setoptions(pid, {
+    \   'title': printf(' width:%d, height:%d ', width, height),
+    \   'minwidth': width, 'maxwidth': width, 'minheight': height, 'maxheight': height,
+    \ })
+  call win_execute(wid, 'close')
+endfunction
+
+function! VimLoadList(target, ArgLead, CmdLine, CursorPos) abort
+  let xs = []
+  for x in readdir(expand(g:vimrc_vimrepo_dir .. '/src/testdir/' .. a:target))
+    if -1 == match(a:CmdLine, x)
+      let xs += [x]
+    endif
+  endfor
+  return filter(xs, { i,x -> -1 != match(x, a:ArgLead) })
+endfunction
+
+function! VimLoadListDumps(ArgLead, CmdLine, CursorPos) abort
+  return VimLoadList('dumps', a:ArgLead, a:CmdLine, a:CursorPos)
+endfunction
+
+function! VimLoadListFaileds(ArgLead, CmdLine, CursorPos) abort
+  return VimLoadList('failed', a:ArgLead, a:CmdLine, a:CursorPos)
+endfunction
+
+function! s:exit_cb(job, status) abort
+  new
+  set buftype=nofile
+  put=readfile(expand('~/work/vim/src/testdir/test.log'))
+endfunction
 
 function! s:vimrc_init() abort
   if exists(':PkgSync')
@@ -213,7 +254,42 @@ function! s:vimrc_init() abort
   cnoremap         <C-e>    <end>
   cnoremap         <C-a>    <home>
 
+  " Windows OS treats Ctrl-v as Paste.
+  inoremap         <C-g>    <C-x><C-v>
+
   nnoremap         v        <C-v>
+
+  if !empty(matchstr(readfile('/proc/version')[0], 'microsoft.*-WSL'))
+    command! SendWinClipboard  :call system('/mnt/c/Windows/System32/clip.exe', @")
+
+    let g:vimrc_vimrepo_dir = '~/work/vim'
+    command! -nargs=0 VimClean
+      \ : call term_start(['make', 'clean'], {
+      \   'term_name': 'VimClean',
+      \   'cwd': expand(g:vimrc_vimrepo_dir),
+      \ })
+    command! -nargs=0 VimBuild
+      \ : call term_start(['make'], {
+      \   'term_name': 'VimBuild',
+      \   'cwd': expand(g:vimrc_vimrepo_dir),
+      \ })
+    command! -nargs=0 VimTags
+      \ : call term_start(['make', 'tags'], {
+      \   'term_name': 'VimTags',
+      \   'cwd': expand(g:vimrc_vimrepo_dir .. '/runtime/doc'),
+      \ })
+    command! -nargs=0 VimTestRun
+      \ : tabnew
+      \ | call term_start(['make', 'clean', 'test_codestyle.res', 'test_options_all.res', 'test_tabsidebar.res', 'report'], {
+      \   'term_name': 'VimTestRun',
+      \   'curwin': v:true,
+      \   'cwd': expand(g:vimrc_vimrepo_dir .. '/src/testdir'),
+      \ })
+    command! -nargs=1 -complete=customlist,VimLoadListDumps   VimLoadDumps
+      \ : call VimLoadAction('dumps', <q-args>)
+    command! -nargs=1 -complete=customlist,VimLoadListFaileds VimLoadFailed
+      \ : call VimLoadAction('failed', <q-args>)
+  endif
 
   if get(g:, 'loaded_operator_flashy', v:false)
     map              y        <Plug>(operator-flashy)
@@ -230,7 +306,8 @@ function! s:vimrc_init() abort
   nnoremap <silent><C-p>    <Cmd>cprevious<cr>zz
   nnoremap <silent><C-n>    <Cmd>cnext<cr>zz
 
-  nnoremap <expr>s          get(t:, 'vimrc_s_keymapping', '<Cmd>GitUnifiedDiff -w<cr>')
+  nnoremap <expr>s          get(t:, 'vimrc_small_s_keymapping', '<Cmd>GitUnifiedDiff -w<cr>')
+  nnoremap <expr>S          get(t:, 'vimrc_capital_s_keymapping', printf('<Cmd>GitUnifiedDiff -w upstream/%s<cr>', get(readdir(gitdiff#get_rootdir() .. '/.git/refs/remotes/upstream'), 0, '')))
 
   if get(g:, 'loaded_molder', v:false)
     if &filetype == 'molder'
