@@ -15,6 +15,7 @@ endif
 set autoread
 set belloff=all
 set clipboard=unnamed
+set colorcolumn=78
 set complete-=t
 set completeslash=slash
 set expandtab shiftwidth=2 tabstop=2
@@ -78,13 +79,8 @@ else
   set noundofile
 endif
 
-if has('tabsidebar')
-  set fillchars+=tabsidebar:\|
-  set notabsidebaralign
-  set notabsidebarwrap
-  set showtabsidebar=1
-  set tabsidebarcolumns=20
-  function! Tabsidebar() abort
+if has('tabpanel')
+  function! Tabpanel() abort
     try
       let tnr = g:actual_curtabpage
       let s = printf("\n TABPAGE %d.\n", tnr)
@@ -102,7 +98,11 @@ if has('tabsidebar')
       return "ERR"
     endtry
   endfunction
-  set tabsidebar=%!Tabsidebar()
+  set tabpanel=%!Tabpanel()
+  set showtabpanel=1
+  if exists('+tabpanelopt')
+    set tabpanelopt=vert:\|
+  endif
 endif
 
 let &cedit = "\<C-q>"
@@ -119,8 +119,7 @@ let g:lightline = { 'colorscheme': 'onedark', }
 augroup vimrc
   autocmd!
   autocmd VimEnter,BufEnter * :call s:vimrc_init()
-  autocmd ColorScheme       * :highlight! link TabSideBarSel  WildMenu
-  autocmd ColorScheme       * :highlight! link tabSideBarFill Visual
+  autocmd ColorScheme       * :highlight! link TabPanelFill TabSideBar
   autocmd ColorScheme       * :highlight!      PmenuSel       guifg=NONE guibg=#013F7F
 augroup END
 
@@ -170,6 +169,14 @@ function! VimLoadListFaileds(ArgLead, CmdLine, CursorPos) abort
   return VimLoadList('failed', a:ArgLead, a:CmdLine, a:CursorPos)
 endfunction
 
+function! ScreenCapture() abort
+  let s = []
+  for row in range(1, &lines - 1)
+    let s += [join(map(range(1,&columns), {_,col -> nr2char(screenchar(row, col))}), '')]
+  endfor
+  return join(s, '')
+endfunction
+
 function! s:exit_cb(job, status) abort
   new
   set buftype=nofile
@@ -209,6 +216,7 @@ function! s:vimrc_init() abort
       \                 "vim-ambiwidth",
       \                 "vim-gitdiff",
       \                 "vim-gloaded",
+      \                 "vim-mrw",
       \                 "vim-pkgsync",
       \             ],
       \             "thinca": [
@@ -255,9 +263,9 @@ function! s:vimrc_init() abort
   cnoremap         <C-a>    <home>
 
   " Windows OS treats Ctrl-v as Paste.
-  inoremap         <C-g>    <C-x><C-v>
+  nnoremap         V        <C-v>
 
-  nnoremap         v        <C-v>
+  command! ScreenCapture  :echo ScreenCapture()
 
   if !empty(matchstr(readfile('/proc/version')[0], 'microsoft.*-WSL'))
     command! SendWinClipboard  :call system('/mnt/c/Windows/System32/clip.exe', @")
@@ -280,7 +288,14 @@ function! s:vimrc_init() abort
       \ })
     command! -nargs=0 VimTestRun
       \ : tabnew
-      \ | call term_start(['make', 'clean', 'test_codestyle.res', 'test_options_all.res', 'test_tabsidebar.res', 'report'], {
+      \ | call term_start(['make', 'clean', 'test_codestyle.res', 'test_options_all.res', 'test_tabpanel.res', 'report'], {
+      \   'term_name': 'VimTestRun',
+      \   'curwin': v:true,
+      \   'cwd': expand(g:vimrc_vimrepo_dir .. '/src/testdir'),
+      \ })
+    command! -nargs=0 VimTestRunOptionsAll
+      \ : tabnew
+      \ | call term_start(['make', 'clean', 'test_options_all.res', 'report'], {
       \   'term_name': 'VimTestRun',
       \   'curwin': v:true,
       \   'cwd': expand(g:vimrc_vimrepo_dir .. '/src/testdir'),
@@ -306,8 +321,14 @@ function! s:vimrc_init() abort
   nnoremap <silent><C-p>    <Cmd>cprevious<cr>zz
   nnoremap <silent><C-n>    <Cmd>cnext<cr>zz
 
+  nnoremap <silent>X        <Cmd>echo screenrow() .. ',' .. screencol() screenpos(win_getid(), 1, 1)<cr>
+
   nnoremap <expr>s          get(t:, 'vimrc_small_s_keymapping', '<Cmd>GitUnifiedDiff -w<cr>')
   nnoremap <expr>S          get(t:, 'vimrc_capital_s_keymapping', printf('<Cmd>GitUnifiedDiff -w upstream/%s<cr>', get(readdir(gitdiff#get_rootdir() .. '/.git/refs/remotes/upstream'), 0, '')))
+
+  if get(g:, 'loaded_mrw', v:false)
+    nnoremap <silent><space>    <Cmd>MRW<cr>
+  endif
 
   if get(g:, 'loaded_molder', v:false)
     if &filetype == 'molder'
