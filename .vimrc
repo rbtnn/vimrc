@@ -293,13 +293,6 @@ function! s:vimrc_init() abort
       \   'curwin': v:true,
       \   'cwd': expand(g:vimrc_vimrepo_dir .. '/src/testdir'),
       \ })
-    command! -nargs=0 VimTestRunOptionsAll
-      \ : tabnew
-      \ | call term_start(['make', 'clean', 'test_options_all.res', 'report'], {
-      \   'term_name': 'VimTestRun',
-      \   'curwin': v:true,
-      \   'cwd': expand(g:vimrc_vimrepo_dir .. '/src/testdir'),
-      \ })
     command! -nargs=1 -complete=customlist,VimLoadListDumps   VimLoadDumps
       \ : call VimLoadAction('dumps', <q-args>)
     command! -nargs=1 -complete=customlist,VimLoadListFaileds VimLoadFailed
