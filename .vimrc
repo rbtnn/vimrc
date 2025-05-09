@@ -119,8 +119,10 @@ let g:lightline = { 'colorscheme': 'onedark', }
 augroup vimrc
   autocmd!
   autocmd VimEnter,BufEnter * :call s:vimrc_init()
-  autocmd ColorScheme       * :highlight! link TabPanelFill TabSideBar
-  autocmd ColorScheme       * :highlight!      PmenuSel       guifg=NONE guibg=#013F7F
+  autocmd ColorScheme       * :highlight! link TabPanel     Pmenu
+  autocmd ColorScheme       * :highlight! link TabPanelSel  PmenuSel
+  autocmd ColorScheme       * :highlight! link TabPanelFill Pmenu
+  autocmd ColorScheme       * :highlight!      PmenuSel     guifg=NONE guibg=#013F7F
 augroup END
 
 if has('vim_starting')
@@ -175,12 +177,6 @@ function! ScreenCapture() abort
     let s += [join(map(range(1,&columns), {_,col -> nr2char(screenchar(row, col))}), '')]
   endfor
   return join(s, '')
-endfunction
-
-function! s:exit_cb(job, status) abort
-  new
-  set buftype=nofile
-  put=readfile(expand('~/work/vim/src/testdir/test.log'))
 endfunction
 
 function! s:vimrc_init() abort
@@ -267,36 +263,38 @@ function! s:vimrc_init() abort
 
   command! ScreenCapture  :echo ScreenCapture()
 
-  if !empty(matchstr(readfile('/proc/version')[0], 'microsoft.*-WSL'))
-    command! SendWinClipboard  :call system('/mnt/c/Windows/System32/clip.exe', @")
+  if filereadable('/proc/version')
+    if !empty(matchstr(readfile('/proc/version')[0], 'microsoft.*-WSL'))
+      command! SendWinClipboard  :call system('/mnt/c/Windows/System32/clip.exe', @")
 
-    let g:vimrc_vimrepo_dir = '~/work/vim'
-    command! -nargs=0 VimClean
-      \ : call term_start(['make', 'clean'], {
-      \   'term_name': 'VimClean',
-      \   'cwd': expand(g:vimrc_vimrepo_dir),
-      \ })
-    command! -nargs=0 VimBuild
-      \ : call term_start(['make'], {
-      \   'term_name': 'VimBuild',
-      \   'cwd': expand(g:vimrc_vimrepo_dir),
-      \ })
-    command! -nargs=0 VimTags
-      \ : call term_start(['make', 'tags'], {
-      \   'term_name': 'VimTags',
-      \   'cwd': expand(g:vimrc_vimrepo_dir .. '/runtime/doc'),
-      \ })
-    command! -nargs=0 VimTestRun
-      \ : tabnew
-      \ | call term_start(['make', 'clean', 'test_codestyle.res', 'test_options_all.res', 'test_tabpanel.res', 'report'], {
-      \   'term_name': 'VimTestRun',
-      \   'curwin': v:true,
-      \   'cwd': expand(g:vimrc_vimrepo_dir .. '/src/testdir'),
-      \ })
-    command! -nargs=1 -complete=customlist,VimLoadListDumps   VimLoadDumps
-      \ : call VimLoadAction('dumps', <q-args>)
-    command! -nargs=1 -complete=customlist,VimLoadListFaileds VimLoadFailed
-      \ : call VimLoadAction('failed', <q-args>)
+      let g:vimrc_vimrepo_dir = '~/work/vim'
+      command! -nargs=0 VimClean
+        \ : call term_start(['make', 'clean'], {
+        \   'term_name': 'VimClean',
+        \   'cwd': expand(g:vimrc_vimrepo_dir),
+        \ })
+      command! -nargs=0 VimBuild
+        \ : call term_start(['make'], {
+        \   'term_name': 'VimBuild',
+        \   'cwd': expand(g:vimrc_vimrepo_dir),
+        \ })
+      command! -nargs=0 VimTags
+        \ : call term_start(['make', 'tags'], {
+        \   'term_name': 'VimTags',
+        \   'cwd': expand(g:vimrc_vimrepo_dir .. '/runtime/doc'),
+        \ })
+      command! -nargs=0 VimTestRun
+        \ : tabnew
+        \ | call term_start(['make', 'clean', 'test_codestyle.res', 'test_options_all.res', 'test_tabpanel.res', 'report'], {
+        \   'term_name': 'VimTestRun',
+        \   'curwin': v:true,
+        \   'cwd': expand(g:vimrc_vimrepo_dir .. '/src/testdir'),
+        \ })
+      command! -nargs=1 -complete=customlist,VimLoadListDumps   VimLoadDumps
+        \ : call VimLoadAction('dumps', <q-args>)
+      command! -nargs=1 -complete=customlist,VimLoadListFaileds VimLoadFailed
+        \ : call VimLoadAction('failed', <q-args>)
+    endif
   endif
 
   if get(g:, 'loaded_operator_flashy', v:false)
