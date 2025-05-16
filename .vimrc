@@ -100,9 +100,8 @@ if has('tabpanel')
   endfunction
   set tabpanel=%!Tabpanel()
   set showtabpanel=1
-  if exists('+tabpanelopt')
-    set tabpanelopt=vert:\|
-  endif
+  set tabpanelopt&
+  set fillchars=tpl_vert:\|
 endif
 
 let &cedit = "\<C-q>"

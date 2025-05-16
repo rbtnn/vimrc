@@ -3,7 +3,7 @@ if (0 -ne (Get-Process -Name gvim -ErrorAction Ignore).Length){
     Exit
 }
 
-$url = 'https://github.com/rbtnn/nightlybuild-tabsidebar-for-windows/releases/latest'
+$url = 'https://github.com/rbtnn/vim-nightlybuild-for-windows/releases/latest'
 Write-Host ($url + "を取得しています。")
 $res = Invoke-WebRequest $url -UseBasicParsing -Headers @{ "Accept" = "application/json" }
 $tag_name = (ConvertFrom-Json $res).tag_name
@@ -12,9 +12,9 @@ if (-not $tag_name){
     Exit
 }
 
-$zipname = 'nightlybuild-tabsidebar-for-windows-' + $tag_name
+$zipname = 'vim-nightlybuild-for-windows-' + $tag_name
 if (-not (Test-Path ($zipname + '.zip'))){
-    $url = 'https://github.com/rbtnn/nightlybuild-tabsidebar-for-windows/releases/download/' + $tag_name + '/nightlybuild-tabsidebar-for-windows.zip'
+    $url = 'https://github.com/rbtnn/vim-nightlybuild-for-windows/releases/download/' + $tag_name + '/vim-nightlybuild-for-windows.zip'
     Write-Host ($url + "を取得しています。")
     Invoke-WebRequest $url -UseBasicParsing -OutFile ($zipname + '.zip')
 }
@@ -25,8 +25,8 @@ if (Test-Path $zipname){
 }
 Expand-Archive ($zipname + '.zip')
 
-$src = $zipname + '/nightlybuild-tabsidebar-for-windows'
-$dest = $env:USERPROFILE + '/nightlybuild-tabsidebar-for-windows'
+$src = $zipname + '/vim-nightlybuild-for-windows'
+$dest = $env:USERPROFILE + '/vim-nightlybuild-for-windows'
 Write-Host ($dest + "を更新しています。")
 if (Test-Path $dest){
     Remove-Item -Recurse $dest
