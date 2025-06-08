@@ -63,7 +63,7 @@ endif
 
 set showcmd
 set showmode
-set tabline=%=%{getcwd()}%= showtabline=2
+set tabline=%=%{trim(execute('verbose\ pwd'))}%= showtabline=2
 set statusline& laststatus=2 
 set rulerformat& ruler 
 
@@ -106,8 +106,8 @@ if has('tabpanel')
   endfunction
   set tabpanel=%!Tabpanel()
   set showtabpanel=1
-  set fillchars+=tpl_vert:│
-  set tabpanelopt=vert
+  "set fillchars+=tpl_vert:│
+  "set tabpanelopt=vert
 endif
 
 let &cedit = "\<C-q>"
@@ -126,6 +126,7 @@ augroup vimrc
   autocmd ColorScheme       * :highlight! link TabPanel     Pmenu
   autocmd ColorScheme       * :highlight! link TabPanelSel  PmenuSel
   autocmd ColorScheme       * :highlight! link TabPanelFill Pmenu
+  autocmd ColorScheme       * :highlight! link TabLineFill  Pmenu
   autocmd ColorScheme       * :highlight!      PmenuSel     guifg=NONE guibg=#013F7F
 augroup END
 
