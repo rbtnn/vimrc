@@ -122,12 +122,19 @@ let g:molder_show_hidden = 1
 
 augroup vimrc
   autocmd!
-  autocmd VimEnter,BufEnter * :call s:vimrc_init()
-  autocmd ColorScheme       * :highlight! link TabPanel     Pmenu
-  autocmd ColorScheme       * :highlight! link TabPanelSel  PmenuSel
-  autocmd ColorScheme       * :highlight! link TabPanelFill Pmenu
-  autocmd ColorScheme       * :highlight! link TabLineFill  Pmenu
-  autocmd ColorScheme       * :highlight!      PmenuSel     guifg=NONE guibg=#013F7F
+  autocmd VimEnter,BufEnter           * :call s:vimrc_init()
+  autocmd ColorScheme                 * :highlight! link TabPanel         Pmenu
+  autocmd ColorScheme                 * :highlight! link TabPanelSel      PmenuSel
+  autocmd ColorScheme                 * :highlight! link TabPanelFill     Pmenu
+  autocmd ColorScheme                 * :highlight! link TabLineFill      Pmenu
+  autocmd ColorScheme                 * :highlight! link StatusLine       Pmenu
+  autocmd ColorScheme                 * :highlight! link StatusLineNC     Pmenu
+  autocmd ColorScheme                 * :highlight! link StatusLineTerm   Pmenu
+  autocmd ColorScheme                 * :highlight! link StatusLineTermNC Pmenu
+  autocmd ColorScheme                 * :highlight!      PmenuSel     guifg=NONE guibg=#013F7F
+  autocmd FileType           javascript :set expandtab shiftwidth=4 tabstop=4
+  autocmd FileType           typescript :set expandtab shiftwidth=4 tabstop=4
+  autocmd FileType      typescriptreact :set expandtab shiftwidth=4 tabstop=4
 augroup END
 
 if has('vim_starting')
