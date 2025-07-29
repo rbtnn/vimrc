@@ -151,18 +151,6 @@ if has('vim_starting')
   endtry
 endif
 
-function! s:git_main_diff() abort
-  let path = gitdiff#get_rootdir() .. '/.git/refs/remotes/upstream'
-  if isdirectory(path)
-    let brs = readdir(path)
-    if -1 != index(brs, 'main')
-      GitUnifiedDiff -w upstream/main
-    elseif -1 != index(brs, 'master')
-      GitUnifiedDiff -w upstream/master
-    endif
-  endif
-endfunction
-
 function! s:vimrc_init() abort
   if exists(':PkgSync')
     " pkgsync.json is managed by .vimrc 
@@ -193,8 +181,6 @@ function! s:vimrc_init() abort
       \                 "vim-ambiwidth",
       \                 "vim-gitdiff",
       \                 "vim-gloaded",
-      \                 "vim-layout",
-      \                 "vim-mrw",
       \                 "vim-pkgsync",
       \             ],
       \             "thinca": [
@@ -265,15 +251,9 @@ function! s:vimrc_init() abort
   nnoremap <silent><C-p>    <Cmd>cprevious<cr>zz
   nnoremap <silent><C-n>    <Cmd>cnext<cr>zz
 
-  "nnoremap <silent>X        <Cmd>echo screenrow() .. ',' .. screencol() screenpos(win_getid(), 1, 1)<cr>
+  nnoremap <silent><C-f>    <Cmd>GitLsFiles<cr>
 
-  nnoremap       s          <Cmd>GitUnifiedDiff -w<cr>
-
-  nnoremap       S          <Cmd>call <SID>git_main_diff()<cr>
-
-  if get(g:, 'loaded_mrw', v:false)
-    nnoremap <silent><space>    <Cmd>MRW<cr>
-  endif
+  nnoremap s                <Cmd>GitUnifiedDiff -w<cr>
 
   if get(g:, 'loaded_molder', v:false)
     if &filetype == 'molder'
