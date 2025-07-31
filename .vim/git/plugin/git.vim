@@ -8,11 +8,9 @@ command!       -nargs=* GitVimDiff       :call git#vimdiff#exec(<q-args>)
 
 let g:git_config = {
   \   'common': {
-  \     'popupwin_border': [1, 1, 1, 1],
-  \     'popupwin_padding': [0, 0, 0, 0],
   \     'popupwin_minwidth': 60,
   \     'popupwin_minheight': 1,
-  \     'popupwin_maxheight': 10,
+  \     'popupwin_maxheight': 20,
   \   },
   \   'lsfiles': {
   \     'caches': {},

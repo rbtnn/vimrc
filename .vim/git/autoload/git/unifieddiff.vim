@@ -10,17 +10,9 @@ function! git#unifieddiff#exec(q_args) abort
   if empty(lines)
     call git#echo_error('No modified files!')
   else
-    let winid = popup_menu(lines, {
+    let winid = git#popup_menu_ex(rootdir, join(['git'] + cmd), lines, {
       \   'filter': function('s:popup_filter'),
       \   'callback': function('s:popup_callback', [a:q_args, rootdir, lines]),
-      \   'title': printf(' [%s] %s ',
-      \     git#get_branch_name(rootdir),
-      \     join(['git'] + cmd)),
-      \   'minheight': g:git_config.common.popupwin_minheight,
-      \   'maxheight': g:git_config.common.popupwin_maxheight,
-      \   'minwidth': g:git_config.common.popupwin_minwidth,
-      \   'border': g:git_config.common.popupwin_border,
-      \   'padding': g:git_config.common.popupwin_padding,
       \ })
     call win_execute(winid, 'runtime syntax/diff.vim')
     call win_execute(winid, 'call matchadd("diffAdded", "^\\d\\+")')

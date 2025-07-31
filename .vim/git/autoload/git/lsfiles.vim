@@ -6,19 +6,11 @@ function! git#lsfiles#exec(q_bang) abort
 
   let rootdir = git#get_rootdir()
   let d = s:build_path2status()
-  let winid = popup_menu([], {
+  let winid = git#popup_menu_ex(rootdir, git#get_github_url(rootdir, 'origin'), [], {
     \   'filter': function('s:popup_filter', [rootdir, d]),
     \   'callback': function('s:popup_callback', [rootdir]),
     \   'wrap': 0,
     \   'scrollbar': 0,
-    \   'title': printf(' [%s] %s ',
-    \     git#get_branch_name(rootdir),
-    \     git#get_github_url(rootdir, 'origin')),
-    \   'minheight': g:git_config.common.popupwin_minheight,
-    \   'maxheight': g:git_config.common.popupwin_maxheight,
-    \   'minwidth': g:git_config.common.popupwin_minwidth,
-    \   'border': g:git_config.common.popupwin_border,
-    \   'padding': g:git_config.common.popupwin_padding,
     \ })
   call s:set_prompt(winid, rootdir, get(g:git_config.lsfiles.caches, rootdir, ''))
   call s:update_window_async(rootdir, winid, d)

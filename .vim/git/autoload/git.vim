@@ -103,6 +103,26 @@ function! git#open_file(path, lnum, exclude_curr_win) abort
   endif
 endfunction
 
+function git#popup_menu_ex(rootdir, title, lines, opts) abort
+  return popup_menu(a:lines, extend({
+    \   'borderchars': [nr2char(0x2500), nr2char(0x2502), nr2char(0x2500), nr2char(0x2502),
+    \                   nr2char(0x256d), nr2char(0x256e), nr2char(0x256f), nr2char(0x2570)],
+    \   'borderhighlight': ['Normal'],
+    \   'highlight': 'Normal',
+    \   'pos': 'topleft',
+    \   'line': (&lines - g:git_config.common.popupwin_maxheight) / 2,
+    \   'col': (&columns - g:git_config.common.popupwin_minwidth) / 2,
+    \   'title': printf(' [%s] %s ',
+    \     git#get_branch_name(a:rootdir),
+    \     a:title),
+    \   'minheight': g:git_config.common.popupwin_minheight,
+    \   'maxheight': g:git_config.common.popupwin_maxheight,
+    \   'minwidth': g:git_config.common.popupwin_minwidth,
+    \   'border': [1, 1, 1, 1],
+    \   'padding': [0, 1, 0, 1],
+    \ }, a:opts, 'force'))
+endfunction
+
 function git#git_system(cwd, subcmd) abort
   let cmd_prefix = ['git', '--no-pager']
   let lines = []
