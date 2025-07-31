@@ -15,6 +15,7 @@ endif
 set autoread
 set belloff=all
 set clipboard=unnamed
+set cmdheight=3
 set colorcolumn&
 set complete-=t
 set completeslash=slash
@@ -131,7 +132,7 @@ augroup vimrc
   autocmd ColorScheme                 * :highlight! link TabPanelSel      PmenuSel
   autocmd ColorScheme                 * :highlight! link TabPanelFill     Normal
   autocmd ColorScheme                 * :highlight!      PmenuSel     guifg=NONE guibg=#013F7F
-  autocmd ColorScheme                 * :highlight!      Normal                  guibg=NONE
+  autocmd ColorScheme                 * :highlight!      Normal                  guibg=#080808
   autocmd ColorScheme                 * :highlight!      Terminal                guibg=NONE
   autocmd FileType           javascript :set expandtab shiftwidth=4 tabstop=4
   autocmd FileType           typescript :set expandtab shiftwidth=4 tabstop=4

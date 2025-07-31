@@ -13,7 +13,7 @@ let g:git_config = {
   \     'popupwin_maxheight': 20,
   \   },
   \   'lsfiles': {
-  \     'caches': {},
+  \     'prompt_caches': {},
   \     'prompt_lnum': 1,
   \     'prompt_string': '>',
   \     'prompt_cursor': '|',

@@ -12,7 +12,7 @@ function! git#lsfiles#exec(q_bang) abort
     \   'wrap': 0,
     \   'scrollbar': 0,
     \ })
-  call s:set_prompt(winid, rootdir, get(g:git_config.lsfiles.caches, rootdir, ''))
+  call s:set_prompt(winid, rootdir, get(g:git_config.lsfiles.prompt_caches, rootdir, ''))
   call s:update_window_async(rootdir, winid, d)
 endfunction
 
@@ -142,7 +142,7 @@ endfunction
 function! s:set_prompt(winid, rootdir, query) abort
   let bnr = winbufnr(a:winid)
   call setbufline(bnr, g:git_config.lsfiles.prompt_lnum, g:git_config.lsfiles.prompt_string .. a:query .. g:git_config.lsfiles.prompt_cursor)
-  let g:git_config.lsfiles.caches[a:rootdir] = a:query
+  let g:git_config.lsfiles.prompt_caches[a:rootdir] = a:query
 endfunction
 
 function! s:get_query_from_prompt(winid) abort

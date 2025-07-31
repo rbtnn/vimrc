@@ -54,7 +54,7 @@ function! git#set_position_of(winid, rootdir, head_regex) abort
       endif
     endfor
   else
-    let curr_bufpath = substitute(expand('%:p'), a:rootdir .. '/\?', '', '')
+    let curr_bufpath = substitute(git#fix_path(expand('%:p')), a:rootdir .. '/\?', '', '')
   endif
   if !empty(curr_bufpath)
     echo win_execute(a:winid, printf('call search(''^%s%s$'')', a:head_regex, curr_bufpath))
