@@ -15,7 +15,7 @@ endif
 set autoread
 set belloff=all
 set clipboard=unnamed
-set colorcolumn=78
+set colorcolumn&
 set complete-=t
 set completeslash=slash
 set expandtab shiftwidth=2 tabstop=2
@@ -60,10 +60,11 @@ set wildmenu
 if has('patch-8.2.4325')
   set wildoptions=pum
 endif
+set fillchars=vert:│
 
 set showcmd
 set showmode
-set tabline=%=%{trim(execute('verbose\ pwd'))}%= showtabline=2
+set tabline& showtabline=0
 set statusline& laststatus=2 
 set rulerformat& ruler 
 
@@ -106,8 +107,8 @@ if has('tabpanel')
   endfunction
   set tabpanel=%!Tabpanel()
   set showtabpanel=1
-  "set fillchars+=tpl_vert:│
-  "set tabpanelopt=vert
+  set fillchars+=tpl_vert:│
+  set tabpanelopt=vert
 endif
 
 let &cedit = "\<C-q>"
@@ -119,19 +120,19 @@ endif
 
 let g:vim_indent_cont = &g:shiftwidth
 let g:molder_show_hidden = 1
+let g:lightline = {
+  \ 'colorscheme': 'onedark',
+  \ }
 
 augroup vimrc
   autocmd!
   autocmd VimEnter,BufEnter           * :call s:vimrc_init()
-  autocmd ColorScheme                 * :highlight! link TabPanel         Pmenu
+  autocmd ColorScheme                 * :highlight! link TabPanel         Normal
   autocmd ColorScheme                 * :highlight! link TabPanelSel      PmenuSel
-  autocmd ColorScheme                 * :highlight! link TabPanelFill     Pmenu
-  autocmd ColorScheme                 * :highlight! link TabLineFill      Pmenu
-  autocmd ColorScheme                 * :highlight! link StatusLine       Pmenu
-  autocmd ColorScheme                 * :highlight! link StatusLineNC     Pmenu
-  autocmd ColorScheme                 * :highlight! link StatusLineTerm   Pmenu
-  autocmd ColorScheme                 * :highlight! link StatusLineTermNC Pmenu
+  autocmd ColorScheme                 * :highlight! link TabPanelFill     Normal
   autocmd ColorScheme                 * :highlight!      PmenuSel     guifg=NONE guibg=#013F7F
+  autocmd ColorScheme                 * :highlight!      Normal                  guibg=NONE
+  autocmd ColorScheme                 * :highlight!      Terminal                guibg=NONE
   autocmd FileType           javascript :set expandtab shiftwidth=4 tabstop=4
   autocmd FileType           typescript :set expandtab shiftwidth=4 tabstop=4
   autocmd FileType      typescriptreact :set expandtab shiftwidth=4 tabstop=4
@@ -139,7 +140,7 @@ augroup END
 
 if has('vim_starting')
   set packpath=$VIMRC_VIM/github
-  set runtimepath=$VIMRUNTIME,$VIMRC_VIM/vimdev
+  set runtimepath=$VIMRUNTIME,$VIMRC_VIM/git,$VIMRC_VIM/vimdev
   silent! source ~/.vimrc.local
   filetype plugin indent on
   syntax enable
@@ -158,6 +159,9 @@ function! s:vimrc_init() abort
       \     "packpath": "~/.vim/github",
       \     "plugins": {
       \         "start": {
+      \             "itchyny": [
+      \                 "lightline.vim",
+      \             ],
       \             "kana": [
       \                 "vim-operator-replace",
       \                 "vim-operator-user",
@@ -179,7 +183,6 @@ function! s:vimrc_init() abort
       \             ],
       \             "rbtnn": [
       \                 "vim-ambiwidth",
-      \                 "vim-gitdiff",
       \                 "vim-gloaded",
       \                 "vim-pkgsync",
       \             ],
@@ -251,9 +254,8 @@ function! s:vimrc_init() abort
   nnoremap <silent><C-p>    <Cmd>cprevious<cr>zz
   nnoremap <silent><C-n>    <Cmd>cnext<cr>zz
 
-  nnoremap <silent><C-f>    <Cmd>GitLsFiles<cr>
-
-  nnoremap s                <Cmd>GitUnifiedDiff -w<cr>
+  nnoremap <space>          <Cmd>GitUnifiedDiff -w<cr>
+  nnoremap s                <Cmd>GitLsFiles<cr>
 
   if get(g:, 'loaded_molder', v:false)
     if &filetype == 'molder'
