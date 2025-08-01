@@ -4,13 +4,13 @@ function! git#lsfiles#exec(q_bang) abort
     return
   endif
 
-  let rootdir = git#get_rootdir()
-  let d = s:build_path2status()
-  let winid = git#popup_menu_ex(rootdir, git#get_github_url(rootdir, 'origin'), [], {
+  const rootdir = git#get_rootdir()
+  const d = s:build_path2status()
+  const winid = git#popup_menu_ex(rootdir, rootdir, [], {
     \   'filter': function('s:popup_filter', [rootdir, d]),
     \   'callback': function('s:popup_callback', [rootdir]),
     \   'wrap': 0,
-    \   'scrollbar': 0,
+    \   'scrollbar': 1,
     \ })
   call s:set_prompt(winid, rootdir, get(g:git_config.lsfiles.prompt_caches, rootdir, ''))
   call s:update_window_async(rootdir, winid, d)
@@ -20,7 +20,7 @@ endfunction
 
 function! s:popup_filter(rootdir, d, winid, key) abort
   let xs = split(s:get_query_from_prompt(a:winid), '\zs')
-  let lnum = line('.', a:winid)
+  const lnum = line('.', a:winid)
   if 21 == char2nr(a:key)
     " Ctrl-u
     if 0 < len(xs)
@@ -28,6 +28,13 @@ function! s:popup_filter(rootdir, d, winid, key) abort
       call s:set_prompt(a:winid, a:rootdir, join(xs, ''))
       call s:update_window_async(a:rootdir, a:winid, a:d)
     endif
+    return 1
+  elseif 4 == char2nr(a:key)
+    " Ctrl-d
+    const line = get(getbufline(winbufnr(a:winid), lnum), 0, '')
+    call git#unifieddiff#show_diff_with_path(
+      \ g:git_config.lsfiles.diff_args,
+      \ trim(line[3:]))
     return 1
   elseif 10 == char2nr(a:key) || 14 == char2nr(a:key)
     " Ctrl-j or Ctrl-n
@@ -66,8 +73,8 @@ function! s:popup_filter(rootdir, d, winid, key) abort
 endfunction
 
 function! s:popup_callback(rootdir, winid, result) abort
-  let line = get(getbufline(winbufnr(a:winid), a:result), 0, '')
-  let path = a:rootdir .. '/' .. trim(line[3:])
+  const line = get(getbufline(winbufnr(a:winid), a:result), 0, '')
+  const path = a:rootdir .. '/' .. trim(line[3:])
   call git#open_file(path, -1, v:false)
 endfunction
 
@@ -76,8 +83,8 @@ function! s:update_window_async(rootdir, winid, d) abort
     call job_stop(s:job)
     unlet s:job
   endif
-  let bnr = winbufnr(a:winid)
-  let query = s:get_query_from_prompt(a:winid)
+  const bnr = winbufnr(a:winid)
+  const query = s:get_query_from_prompt(a:winid)
   silent! call deletebufline(bnr, g:git_config.lsfiles.prompt_lnum + 1, '$')
   let s:job = job_start(['git', '--no-pager', 'ls-files'], {
     \ 'callback': function('s:job_callback', [a:winid, a:rootdir, bnr, query, a:d]),
@@ -97,11 +104,10 @@ function! s:update_window_async(rootdir, winid, d) abort
 endfunction
 
 function! s:job_exit_cb(winid, rootdir, ch, status) abort
-  let curr_lnum = line('.', a:winid)
-  if curr_lnum == g:git_config.lsfiles.prompt_lnum
+  if line('.', a:winid) == g:git_config.lsfiles.prompt_lnum
     call s:set_cursorline(a:winid, g:git_config.lsfiles.prompt_lnum + 1)
   endif
-  let bnr = winbufnr(a:winid)
+  const bnr = winbufnr(a:winid)
   let lines = getbufline(bnr, g:git_config.lsfiles.prompt_lnum + 1, '$')
   for j in range(0, len(lines) - 1)
     let jv = len(trim(lines[j][:3]))
@@ -119,35 +125,33 @@ function! s:job_exit_cb(winid, rootdir, ch, status) abort
 endfunction
 
 function! s:job_callback(winid, rootdir, bnr, query, d, ch, line) abort
-  try
-    let last_lnum = line('$', a:winid)
-    if last_lnum < g:git_config.common.popupwin_maxheight
-      if empty(a:query) || (a:line =~ a:query)
-        let status = ''
-        if has_key(a:d, a:line)
-          let status = a:d[a:line]
-        endif
-        let line = getbufline(a:bnr, last_lnum)[0]
-        if empty(line)
-          call setbufline(a:bnr, last_lnum, printf('%2s %s', status, a:line))
-        else
-          call appendbufline(a:bnr, last_lnum, printf('%2s %s', status, a:line))
-        endif
+  const last_lnum = line('$', a:winid)
+  if last_lnum < g:git_config.lsfiles.max_displayed
+    const status = has_key(a:d, a:line) ? a:d[a:line] : ''
+    const display_line = printf('%2s %s', status, a:line)
+    if empty(a:query) || (display_line =~ a:query)
+      if empty(getbufline(a:bnr, last_lnum)[0])
+        call setbufline(a:bnr, last_lnum, display_line)
+      else
+        call appendbufline(a:bnr, last_lnum, display_line)
       endif
     endif
-  catch
-  endtry
+  endif
 endfunction
 
 function! s:set_prompt(winid, rootdir, query) abort
-  let bnr = winbufnr(a:winid)
-  call setbufline(bnr, g:git_config.lsfiles.prompt_lnum, g:git_config.lsfiles.prompt_string .. a:query .. g:git_config.lsfiles.prompt_cursor)
+  call setbufline(
+    \ winbufnr(a:winid),
+    \ g:git_config.lsfiles.prompt_lnum,
+    \ g:git_config.lsfiles.prompt_string .. a:query .. g:git_config.lsfiles.prompt_cursor)
   let g:git_config.lsfiles.prompt_caches[a:rootdir] = a:query
 endfunction
 
 function! s:get_query_from_prompt(winid) abort
-  let bnr = winbufnr(a:winid)
-  return getbufline(bnr, g:git_config.lsfiles.prompt_lnum)[0][1:-2]
+  return getbufline(
+    \ winbufnr(a:winid),
+    \ g:git_config.lsfiles.prompt_lnum
+    \ )[0][1:-2]
 endfunction
 
 function! s:set_cursorline(winid, lnum) abort

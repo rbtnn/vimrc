@@ -14,6 +14,8 @@ let g:git_config = {
   \   },
   \   'lsfiles': {
   \     'prompt_caches': {},
+  \     'max_displayed': 100,
+  \     'diff_args': '-w',
   \     'prompt_lnum': 1,
   \     'prompt_string': '>',
   \     'prompt_cursor': '|',

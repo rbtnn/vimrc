@@ -21,6 +21,10 @@ function! git#unifieddiff#exec(q_args) abort
   endif
 endfunction
 
+function! git#unifieddiff#show_diff_with_path(args, path) abort
+  call s:show_diff_with_path(a:args, git#get_rootdir(), a:path)
+endfunction
+
 
 
 function! s:popup_filter(winid, key) abort

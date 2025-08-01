@@ -25,25 +25,6 @@ function! git#get_branch_name(rootdir) abort
   return ''
 endfunction
 
-function! git#get_github_url(rootdir, name) abort
-  let path = expand(a:rootdir .. '/.git/config')
-  let curr_branch = ''
-  if filereadable(path)
-    for line in readfile(path)
-      let m1 = matchlist(line, '^\[.*"\(.*\)"\]$')
-      let m2 = matchlist(line, '^\s*url = \(.*\)$')
-      if !empty(m1)
-        let curr_branch = m1[1]
-      elseif !empty(m2)
-        if a:name == curr_branch
-          return m2[1]
-        endif
-      endif
-    endfor
-  endif
-  return ''
-endfunction
-
 function! git#set_position_of(winid, rootdir, head_regex) abort
   let curr_bufpath = ''
   if &filetype == 'diff'

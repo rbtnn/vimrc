@@ -22,6 +22,7 @@ set completeslash=slash
 set expandtab shiftwidth=2 tabstop=2
 set fileencodings=ucs-bom,utf-8,cp932
 set fileformats=unix,dos
+set fillchars=vert:│
 set foldlevelstart=999
 set foldmethod=indent
 set grepformat&
@@ -41,16 +42,18 @@ set nowrap
 set nowrapscan
 set nowritebackup
 set nrformats& nrformats-=octal
-if has('patch-8.2.0860')
-  set nrformats+=unsigned
-endif
 set pumheight=10
+set rulerformat& ruler 
 set scrolloff&
 set sessionoptions=winpos,resize,tabpages,curdir,help
 set shiftround
+set showcmd
 set showmatch
+set showmode
 set softtabstop=-1
+set statusline& laststatus=2 
 set synmaxcol=300
+set tabline& showtabline=0
 set tags=./tags;
 set termguicolors
 set timeout timeoutlen=500 ttimeoutlen=100
@@ -58,16 +61,18 @@ set updatetime=500
 set virtualedit=block
 set wildignore=*/node_modules/**
 set wildmenu
+
+if has('patch-8.2.0860')
+  set nrformats+=unsigned
+endif
+
+if has('patch-9.1.1590')
+  set autocomplete
+endif
+
 if has('patch-8.2.4325')
   set wildoptions=pum
 endif
-set fillchars=vert:│
-
-set showcmd
-set showmode
-set tabline& showtabline=0
-set statusline& laststatus=2 
-set rulerformat& ruler 
 
 if has('persistent_undo')
   set undofile
@@ -121,9 +126,7 @@ endif
 
 let g:vim_indent_cont = &g:shiftwidth
 let g:molder_show_hidden = 1
-let g:lightline = {
-  \ 'colorscheme': 'onedark',
-  \ }
+let g:lightline = { 'colorscheme': 'onedark', }
 
 augroup vimrc
   autocmd!
@@ -153,46 +156,30 @@ if has('vim_starting')
   endtry
 endif
 
+function! s:add_plugin(j, x) abort
+  let xs = split(a:x, '/')
+  if !has_key(a:j.plugins.start, xs[0])
+    let a:j.plugins.start[xs[0]] = []
+  endif
+  let a:j.plugins.start[xs[0]] += [xs[1]]
+endfunction
+
 function! s:vimrc_init() abort
   if exists(':PkgSync')
-    " pkgsync.json is managed by .vimrc 
-    call writefile([json_encode({
-      \     "packpath": "~/.vim/github",
-      \     "plugins": {
-      \         "start": {
-      \             "itchyny": [
-      \                 "lightline.vim",
-      \             ],
-      \             "kana": [
-      \                 "vim-operator-replace",
-      \                 "vim-operator-user",
-      \             ],
-      \             "tweekmonster": [
-      \               "helpful.vim"
-      \             ],
-      \             "tyru": [
-      \               "restart.vim"
-      \             ],
-      \             "haya14busa": [
-      \               "vim-operator-flashy"
-      \             ],
-      \             "mattn": [
-      \               "vim-molder"
-      \             ],
-      \             "joshdick": [
-      \               "onedark.vim"
-      \             ],
-      \             "rbtnn": [
-      \                 "vim-ambiwidth",
-      \                 "vim-gloaded",
-      \                 "vim-pkgsync",
-      \             ],
-      \             "thinca": [
-      \                 "vim-qfreplace",
-      \             ],
-      \         }
-      \     }
-      \ })], expand('~/pkgsync.json'))
+    let j = { 'packpath': '~/.vim/github', 'plugins': { 'start': {} } }
+    call s:add_plugin(j, 'haya14busa/vim-operator-flashy')
+    call s:add_plugin(j, 'itchyny/lightline.vim')
+    call s:add_plugin(j, 'joshdick/onedark.vim')
+    call s:add_plugin(j, 'kana/vim-operator-replace')
+    call s:add_plugin(j, 'kana/vim-operator-user')
+    call s:add_plugin(j, 'mattn/vim-molder')
+    call s:add_plugin(j, 'rbtnn/vim-ambiwidth')
+    call s:add_plugin(j, 'rbtnn/vim-gloaded')
+    call s:add_plugin(j, 'rbtnn/vim-pkgsync')
+    call s:add_plugin(j, 'thinca/vim-qfreplace')
+    call s:add_plugin(j, 'tweekmonster/helpful.vim')
+    call s:add_plugin(j, 'tyru/restart.vim')
+    call writefile([json_encode(j)], expand('~/pkgsync.json'))
   else
     function! s:pkgsync_setup() abort
       if !isdirectory(expand('$VIMRC_VIM/github/pack/rbtnn/start/vim-pkgsync'))
@@ -255,7 +242,7 @@ function! s:vimrc_init() abort
   nnoremap <silent><C-p>    <Cmd>cprevious<cr>zz
   nnoremap <silent><C-n>    <Cmd>cnext<cr>zz
 
-  nnoremap <space>          <Cmd>GitUnifiedDiff -w<cr>
+  nnoremap <space>          <Cmd>execute isdirectory(expand('%:h')) ? 'e %:h' : 'e .'<cr>
   nnoremap s                <Cmd>GitLsFiles<cr>
 
   if get(g:, 'loaded_molder', v:false)
