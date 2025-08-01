@@ -1,4 +1,6 @@
 
+let s:PROMPT_LNUM = 1
+
 function! git#lsfiles#exec(q_bang) abort
   if !git#check_git()
     return
@@ -8,14 +10,17 @@ function! git#lsfiles#exec(q_bang) abort
   const winid = git#popup_menu_ex(ctx.rootdir, ctx.rootdir, [], {
     \   'filter': function('s:popup_filter', [ctx]),
     \   'callback': function('s:popup_callback', [ctx]),
-    \   'wrap': 0,
-    \   'scrollbar': 1,
+    \   'cursorline': 0,
     \ })
   call s:set_prompt(winid, ctx, get(g:git_config.lsfiles.prompt_caches, ctx.rootdir, ''))
   call s:update_window_async(winid, ctx)
 endfunction
 
 
+
+function! s:calc_info_width() abort
+  return len(g:git_config.lsfiles.cursor_string) + 3
+endfunction
 
 function! s:popup_filter(ctx, winid, key) abort
   let xs = split(a:ctx.query, '\zs')
@@ -33,22 +38,26 @@ function! s:popup_filter(ctx, winid, key) abort
     const line = get(getbufline(winbufnr(a:winid), lnum), 0, '')
     call git#unifieddiff#show_diff_with_path(
       \ g:git_config.lsfiles.diff_args,
-      \ trim(line[3:]))
+      \ trim(line[(s:calc_info_width()):]))
+    return 1
+  elseif 7 == char2nr(a:key)
+    " Ctrl-g
+    call s:set_cursorpos(a:winid, s:PROMPT_LNUM + 1)
     return 1
   elseif 10 == char2nr(a:key) || 14 == char2nr(a:key)
     " Ctrl-j or Ctrl-n
     if lnum == line('$', a:winid)
-      call s:set_cursorline(a:winid, g:git_config.lsfiles.prompt_lnum)
+      call s:set_cursorpos(a:winid, s:PROMPT_LNUM + 1)
     else
-      call s:set_cursorline(a:winid, lnum + 1)
+      call s:set_cursorpos(a:winid, lnum + 1)
     endif
     return 1
   elseif 11 == char2nr(a:key) || 16 == char2nr(a:key)
     " Ctrl-k or Ctrl-p
-    if lnum == 1
-      call s:set_cursorline(a:winid, line('$', a:winid))
+    if lnum == 1 || lnum == 2
+      call s:set_cursorpos(a:winid, line('$', a:winid))
     else
-      call s:set_cursorline(a:winid, lnum - 1)
+      call s:set_cursorpos(a:winid, lnum - 1)
     endif
     return 1
   elseif ("\x80kb" == a:key) || (8 == char2nr(a:key))
@@ -72,9 +81,9 @@ function! s:popup_filter(ctx, winid, key) abort
 endfunction
 
 function! s:popup_callback(ctx, winid, result) abort
-  if g:git_config.lsfiles.prompt_lnum != a:result && -1 != a:result
+  if s:PROMPT_LNUM != a:result && -1 != a:result
     const line = get(getbufline(winbufnr(a:winid), a:result), 0, '')
-    const path = a:ctx.rootdir .. '/' .. trim(line[3:])
+    const path = a:ctx.rootdir .. '/' .. trim(line[(s:calc_info_width()):])
     call git#open_file(path, -1, v:false)
   endif
 endfunction
@@ -93,33 +102,43 @@ function! s:update_window_async(winid, ctx) abort
     \ })
 endfunction
 
+function! s:win_matchadd(winid, hiname, regex) abort
+  call win_execute(a:winid,
+    \ printf('call matchadd(%s, %s)',
+    \ string(a:hiname),
+    \ string(a:regex)))
+endfunction
+
 function! s:job_exit_cb(winid, ctx, ch, status) abort
+  const cursor_len = len(g:git_config.lsfiles.cursor_string)
   const bnr = winbufnr(a:winid)
   silent! call deletebufline(bnr, len(a:ctx.lines) + 2, '$')
   call win_execute(a:winid, 'call clearmatches()')
-  call win_execute(a:winid, printf('call matchadd("Title", %s)', string('\%1l' .. '^' .. g:git_config.lsfiles.prompt_string)))
-  call win_execute(a:winid, printf('call matchadd("Directory", %s)', string('\%1l' .. g:git_config.lsfiles.prompt_cursor .. '$')))
-  call win_execute(a:winid, printf('call matchadd("ErrorMsg", %s)', string('\%>1l[ MADRCU]\{2,2\} ')))
+  call s:win_matchadd(a:winid, 'Title', '\%1l' .. '^' .. g:git_config.lsfiles.prompt_string)
+  call s:win_matchadd(a:winid, 'Directory', '\%1l' .. g:git_config.lsfiles.prompt_cursor .. '$')
+  call s:win_matchadd(a:winid, 'ErrorMsg', '\%>1l' .. repeat('.', cursor_len) .. '\zs[ MADRCU]\{2,2\} ')
+  call s:win_matchadd(a:winid, 'Question', '\%>1l' .. g:git_config.lsfiles.cursor_string)
   try
     if !empty(a:ctx.query)
-      call win_execute(a:winid, printf('call matchadd("Search", %s)', string('\%>1l' .. a:ctx.query)))
+      call s:win_matchadd(a:winid, 'Search', '\%>1l' .. a:ctx.query)
     endif
   catch
   endtry
-  call s:set_cursorline(a:winid, g:git_config.lsfiles.prompt_lnum)
-  call git#set_position_of(a:winid, a:ctx.rootdir, '...')
-  if line('.', a:winid) <= g:git_config.lsfiles.prompt_lnum
-    call s:set_cursorline(a:winid, g:git_config.lsfiles.prompt_lnum + 1)
-    call win_execute(a:winid, 'redraw')
+  call s:set_cursorpos(a:winid, s:PROMPT_LNUM)
+  call git#set_position_of(a:winid, a:ctx.rootdir, repeat('.', s:calc_info_width()))
+  if line('.', a:winid) <= s:PROMPT_LNUM
+    call s:set_cursorpos(a:winid, s:PROMPT_LNUM + 1)
   endif
+  call s:draw_cursor(a:winid)
 endfunction
 
 function! s:job_callback(winid, ctx, ch, line) abort
+  const cursor_len = len(g:git_config.lsfiles.cursor_string)
   const bnr = winbufnr(a:winid)
   const last_lnum = len(a:ctx.lines) + 1
   if last_lnum < g:git_config.lsfiles.max_displayed
     const status = has_key(a:ctx.status, a:line) ? a:ctx.status[a:line] : ''
-    const display_line = printf('%2s %s', status, a:line)
+    const display_line = printf('%s%2s %s', repeat(' ', cursor_len), status, a:line)
     if empty(a:ctx.query) || (display_line =~ a:ctx.query)
       call appendbufline(bnr, last_lnum, display_line)
       let a:ctx.lines += [display_line]
@@ -130,14 +149,31 @@ endfunction
 function! s:set_prompt(winid, ctx, new_query) abort
   call setbufline(
     \ winbufnr(a:winid),
-    \ g:git_config.lsfiles.prompt_lnum,
+    \ s:PROMPT_LNUM,
     \ g:git_config.lsfiles.prompt_string .. a:new_query .. g:git_config.lsfiles.prompt_cursor)
   let a:ctx.query = a:new_query
   let g:git_config.lsfiles.prompt_caches[a:ctx.rootdir] = a:new_query
 endfunction
 
-function! s:set_cursorline(winid, lnum) abort
-  call win_execute(a:winid, printf('call setpos(".", [0, %d, 0, 0])', a:lnum))
+function! s:set_cursorpos(winid, new_lnum) abort
+  call win_execute(a:winid, printf('call setpos(".", [0, %d, 0, 0])', a:new_lnum))
+  call s:draw_cursor(a:winid)
+endfunction
+
+function! s:draw_cursor(winid) abort
+  const cursor_len = len(g:git_config.lsfiles.cursor_string)
+  const curr_lnum = line('.', a:winid)
+  for lnum in range(line('w0', a:winid), line('w$', a:winid))
+    if s:PROMPT_LNUM != lnum
+      let oldline = get(getbufline(winbufnr(a:winid), lnum), 0)
+      let newline = curr_lnum == lnum
+        \ ? g:git_config.lsfiles.cursor_string .. oldline[cursor_len:]
+        \ : repeat(' ', len(g:git_config.lsfiles.cursor_string)) .. oldline[cursor_len:]
+      if oldline != newline
+        call setbufline(winbufnr(a:winid), lnum, newline)
+      endif
+    endif
+  endfor
 endfunction
 
 function! s:make_context() abort

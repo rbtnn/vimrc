@@ -9,6 +9,7 @@ command!       -nargs=* GitVimDiff       :call git#vimdiff#exec(<q-args>)
 let g:git_config = {
   \   'common': {
   \     'popupwin_minwidth': 60,
+  \     'popupwin_maxwidth': 80,
   \     'popupwin_minheight': 1,
   \     'popupwin_maxheight': 20,
   \   },
@@ -16,9 +17,9 @@ let g:git_config = {
   \     'prompt_caches': {},
   \     'max_displayed': 100,
   \     'diff_args': '-w',
-  \     'prompt_lnum': 1,
   \     'prompt_string': '>',
   \     'prompt_cursor': '|',
+  \     'cursor_string': '->',
   \   },
   \   'unifieddiff': {
   \     'buffer_name': 'git_unifieddiff',

@@ -91,6 +91,8 @@ function git#popup_menu_ex(rootdir, title, lines, opts) abort
     \   'borderhighlight': ['Normal'],
     \   'highlight': 'Normal',
     \   'pos': 'topleft',
+    \   'wrap': 1,
+    \   'scrollbar': 1,
     \   'line': (&lines - g:git_config.common.popupwin_maxheight) / 2,
     \   'col': (&columns - g:git_config.common.popupwin_minwidth) / 2,
     \   'title': printf(' [%s] %s ',
@@ -99,6 +101,7 @@ function git#popup_menu_ex(rootdir, title, lines, opts) abort
     \   'minheight': g:git_config.common.popupwin_minheight,
     \   'maxheight': g:git_config.common.popupwin_maxheight,
     \   'minwidth': g:git_config.common.popupwin_minwidth,
+    \   'maxwidth': g:git_config.common.popupwin_maxwidth,
     \   'border': [1, 1, 1, 1],
     \   'padding': [0, 1, 0, 1],
     \ }, a:opts, 'force'))
