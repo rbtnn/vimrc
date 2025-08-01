@@ -51,7 +51,7 @@ set showcmd
 set showmatch
 set showmode
 set softtabstop=-1
-set statusline& laststatus=2 
+set laststatus=2 
 set synmaxcol=300
 set tabline& showtabline=0
 set tags=./tags;
@@ -68,6 +68,7 @@ endif
 
 if has('patch-9.1.1590')
   set autocomplete
+  set complete+=o
 endif
 
 if has('patch-8.2.4325')
