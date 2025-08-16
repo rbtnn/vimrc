@@ -10,7 +10,7 @@ function! git#grep#exec(q_args) abort
     let m = matchlist(line, '^\(.\+\):\(\d\+\):\(\d\+\):\(.*\)$')
     if !empty(m)
       let xs += [{
-        \ 'filename': m[1],
+        \ 'filename': expand(rootdir .. '/' .. m[1]),
         \ 'lnum': str2nr(m[2]),
         \ 'col': str2nr(m[3]),
         \ 'text': m[4],
