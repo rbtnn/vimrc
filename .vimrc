@@ -89,33 +89,10 @@ else
 endif
 
 if has('tabpanel')
-  function! Tabpanel() abort
-    try
-      let tnr = g:actual_curtabpage
-      let lines = ['', printf(" TABPAGE %d.", tnr)]
-      for x in filter(getwininfo(), { i,x -> x.tabnr == tnr })
-        let bname = fnamemodify(bufname(x.bufnr), ":t")
-        let modified = getbufvar(x.bufnr, "&modified")
-        if empty(bname)
-          let bname = '[No Name]'
-        endif
-        let lines += [
-          \ '  '
-          \ .. ((tabpagenr() == x.tabnr) && (winnr() == x.winnr) ? '*' : ' ')
-          \ .. bname
-          \ .. (modified ? '[+]' : '')
-          \ ]
-      endfor
-      let lines += ['']
-      return join(lines, "\n")
-    catch
-      return "ERR"
-    endtry
-  endfunction
-  set tabpanel=%!Tabpanel()
+  set tabpanel=%!tabpanel#exec()
   set showtabpanel=1
   set fillchars+=tpl_vert:│
-  set tabpanelopt=vert
+  set tabpanelopt=vert,columns:24
 endif
 
 let &cedit = "\<C-q>"
@@ -133,7 +110,7 @@ augroup vimrc
   autocmd!
   autocmd VimEnter,BufEnter           * :call s:vimrc_init()
   autocmd ColorScheme                 * :highlight! link TabPanel         Normal
-  autocmd ColorScheme                 * :highlight! link TabPanelSel      PmenuSel
+  autocmd ColorScheme                 * :highlight! link TabPanelSel      Normal
   autocmd ColorScheme                 * :highlight! link TabPanelFill     Normal
   autocmd ColorScheme                 * :highlight!      PmenuSel     guifg=NONE guibg=#013F7F
   autocmd ColorScheme                 * :highlight!      Normal                  guibg=#080808
@@ -173,10 +150,12 @@ function! s:vimrc_init() abort
     call s:add_plugin(j, 'joshdick/onedark.vim')
     call s:add_plugin(j, 'kana/vim-operator-replace')
     call s:add_plugin(j, 'kana/vim-operator-user')
+    call s:add_plugin(j, 'lambdalisue/vim-glyph-palette')
     call s:add_plugin(j, 'mattn/vim-molder')
     call s:add_plugin(j, 'rbtnn/vim-ambiwidth')
     call s:add_plugin(j, 'rbtnn/vim-gloaded')
     call s:add_plugin(j, 'rbtnn/vim-pkgsync')
+    call s:add_plugin(j, 'ryanoasis/vim-devicons')
     call s:add_plugin(j, 'thinca/vim-qfreplace')
     call s:add_plugin(j, 'tweekmonster/helpful.vim')
     call s:add_plugin(j, 'tyru/restart.vim')
@@ -194,9 +173,6 @@ function! s:vimrc_init() abort
     endfunction
     command! -nargs=0 PkgSyncSetup :call s:pkgsync_setup()
   endif
-
-  cabbrev W   write
-  cabbrev So  source
 
   " Can't use <S-space> at :terminal
   " https://github.com/vim/vim/issues/6040
@@ -256,6 +232,10 @@ function! s:vimrc_init() abort
 
   if get(g:, 'loaded_operator_replace', v:false)
     nmap     <silent>x        <Plug>(operator-replace)
+  endif
+
+  if get(g:, 'loaded_glyph_palette', v:false)
+    call glyph_palette#apply()
   endif
 endfunction
 
