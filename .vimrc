@@ -62,6 +62,10 @@ set virtualedit=block
 set wildignore=*/node_modules/**
 set wildmenu
 
+if has('patch-9.1.1835')
+  set pumborder=round
+endif
+
 if has('patch-8.2.0860')
   set nrformats+=unsigned
 endif
@@ -219,8 +223,9 @@ function! s:vimrc_init() abort
   nnoremap <silent><C-p>    <Cmd>cprevious<cr>zz
   nnoremap <silent><C-n>    <Cmd>cnext<cr>zz
 
-  nnoremap <space>          <Cmd>execute isdirectory(expand('%:h')) ? 'e %:h' : 'e .'<cr>
-  nnoremap s                <Cmd>GitLsFiles<cr>
+  "nnoremap <space>          <Cmd>execute isdirectory(expand('%:h')) ? 'e %:h' : 'e .'<cr>
+  nnoremap <space>          <Cmd>GitLsFiles<cr>
+  nnoremap s                <Cmd>GitUnifiedDiff<cr>
 
   if get(g:, 'loaded_molder', v:false)
     if &filetype == 'molder'
