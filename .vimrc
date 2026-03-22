@@ -2,6 +2,12 @@ set makeencoding=char
 scriptencoding utf-8
 
 let $VIMRC_VIM = expand(expand('<sfile>:h') .. '/.vim')
+if !exists('s:is_windowsterminal')
+  let s:is_windowsterminal = v:false
+  if filereadable('/proc/version')
+    let s:is_windowsterminal = !empty(matchstr(readfile('/proc/version')[0], 'microsoft.*-WSL'))
+  endif
+endif
 
 language messages C
 
@@ -102,7 +108,13 @@ endif
 let &cedit = "\<C-q>"
 
 if $TERM =~# 'xterm-'
-  let &t_SI = "\e[5 q"
+  " Insert Mode: change to a steady bar
+  if s:is_windowsterminal
+    let &t_SI = "\e[6 q"
+  else
+    let &t_SI = "\e[5 q"
+  endif
+  " Normal Mode: change to a steady block
   let &t_EI = "\e[2 q"
 endif
 
@@ -119,9 +131,6 @@ augroup vimrc
   autocmd ColorScheme                 * :highlight!      PmenuSel     guifg=NONE guibg=#013F7F
   autocmd ColorScheme                 * :highlight!      Normal                  guibg=#080808
   autocmd ColorScheme                 * :highlight!      Terminal                guibg=NONE
-  autocmd FileType           javascript :set expandtab shiftwidth=4 tabstop=4
-  autocmd FileType           typescript :set expandtab shiftwidth=4 tabstop=4
-  autocmd FileType      typescriptreact :set expandtab shiftwidth=4 tabstop=4
 augroup END
 
 if has('vim_starting')
@@ -202,10 +211,8 @@ function! s:vimrc_init() abort
   " Windows OS treats Ctrl-v as Paste.
   nnoremap         V        <C-v>
 
-  if filereadable('/proc/version')
-    if !empty(matchstr(readfile('/proc/version')[0], 'microsoft.*-WSL'))
-      command! SendWinClipboard  :call system('/mnt/c/Windows/System32/clip.exe', @")
-    endif
+  if s:is_windowsterminal
+    command! SendWinClipboard  :call system('/mnt/c/Windows/System32/clip.exe', @")
   endif
 
   if get(g:, 'loaded_operator_flashy', v:false)
