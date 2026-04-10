@@ -48,7 +48,6 @@ set nowrap
 set nowrapscan
 set nowritebackup
 set nrformats& nrformats-=octal
-set pumheight=10
 set rulerformat& ruler 
 set scrolloff&
 set sessionoptions=winpos,resize,tabpages,curdir,help
@@ -68,8 +67,8 @@ set virtualedit=block
 set wildignore=*/node_modules/**
 set wildmenu
 
-if has('patch-9.1.1835')
-  set pumborder=round
+if has('patch-9.2.0318')
+  set pumopt=opacity:90,height:10,border:single
 endif
 
 if has('patch-8.2.0860')
@@ -128,6 +127,7 @@ augroup vimrc
   autocmd ColorScheme                 * :highlight! link TabPanel         Normal
   autocmd ColorScheme                 * :highlight! link TabPanelSel      Normal
   autocmd ColorScheme                 * :highlight! link TabPanelFill     Normal
+  autocmd ColorScheme                 * :highlight!      Pmenu                   guibg=NONE
   autocmd ColorScheme                 * :highlight!      PmenuSel     guifg=NONE guibg=#013F7F
   autocmd ColorScheme                 * :highlight!      Normal                  guibg=#080808
   autocmd ColorScheme                 * :highlight!      Terminal                guibg=NONE
