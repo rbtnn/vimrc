@@ -28,7 +28,7 @@ set completeslash=slash
 set expandtab shiftwidth=2 tabstop=2
 set fileencodings=ucs-bom,utf-8,cp932
 set fileformats=unix,dos
-set fillchars=vert:│
+set fillchars=vert:\│,tpl_vert:\|
 set foldlevelstart=999
 set foldmethod=indent
 set grepformat&
@@ -37,6 +37,7 @@ set hlsearch
 set incsearch
 set isfname-==
 set keywordprg=:help
+set laststatus=2
 set list listchars=tab:-->
 set matchpairs+=<:>
 set matchtime=1
@@ -47,8 +48,8 @@ set noswapfile
 set nowrap
 set nowrapscan
 set nowritebackup
-set nrformats& nrformats-=octal
-set rulerformat& ruler 
+set nrformats& nrformats-=octal nrformats+=unsigned
+set rulerformat& ruler
 set scrolloff&
 set sessionoptions=winpos,resize,tabpages,curdir,help
 set shiftround
@@ -56,9 +57,9 @@ set showcmd
 set showmatch
 set showmode
 set softtabstop=-1
-set laststatus=2 
 set synmaxcol=300
 set tabline& showtabline=0
+set tabpanel& showtabpanel=1 tabpanelopt=vert
 set tags=./tags;
 set termguicolors
 set timeout timeoutlen=500 ttimeoutlen=100
@@ -66,22 +67,15 @@ set updatetime=500
 set virtualedit=block
 set wildignore=*/node_modules/**
 set wildmenu
+set wildoptions=pum
 
 if has('patch-9.2.0318')
   set pumopt=opacity:90,height:10,border:single
 endif
 
-if has('patch-8.2.0860')
-  set nrformats+=unsigned
-endif
-
 if has('patch-9.1.1590')
   set autocomplete
   set complete+=o
-endif
-
-if has('patch-8.2.4325')
-  set wildoptions=pum
 endif
 
 if has('persistent_undo')
@@ -95,13 +89,6 @@ if has('persistent_undo')
   silent! call mkdir(&undodir, 'p')
 else
   set noundofile
-endif
-
-if has('tabpanel')
-  set tabpanel=%!tabpanel#exec()
-  set showtabpanel=1
-  set fillchars+=tpl_vert:│
-  set tabpanelopt=vert,columns:24
 endif
 
 let &cedit = "\<C-q>"
@@ -118,8 +105,8 @@ if $TERM =~# 'xterm-'
 endif
 
 let g:vim_indent_cont = &g:shiftwidth
+let g:netrw_menu = 0
 let g:molder_show_hidden = 1
-let g:lightline = { 'colorscheme': 'onedark', }
 
 augroup vimrc
   autocmd!
@@ -127,64 +114,28 @@ augroup vimrc
   autocmd ColorScheme                 * :highlight! link TabPanel         Normal
   autocmd ColorScheme                 * :highlight! link TabPanelSel      Normal
   autocmd ColorScheme                 * :highlight! link TabPanelFill     Normal
-  autocmd ColorScheme                 * :highlight!      Pmenu                   guibg=NONE
-  autocmd ColorScheme                 * :highlight!      PmenuSel     guifg=NONE guibg=#013F7F
-  autocmd ColorScheme                 * :highlight!      Normal                  guibg=#080808
   autocmd ColorScheme                 * :highlight!      Terminal                guibg=NONE
 augroup END
 
 if has('vim_starting')
   set packpath=$VIMRC_VIM/github
-  set runtimepath=$VIMRUNTIME,$VIMRC_VIM/git,$VIMRC_VIM/vimdev
+  set runtimepath=$VIMRUNTIME,$VIMRC_VIM/github
   silent! source ~/.vimrc.local
   filetype plugin indent on
   syntax enable
   packloadall
   try
-    colorscheme onedark
+    colorscheme habamax
   catch
-    colorscheme default
   endtry
 endif
 
-function! s:add_plugin(j, x) abort
-  let xs = split(a:x, '/')
-  if !has_key(a:j.plugins.start, xs[0])
-    let a:j.plugins.start[xs[0]] = []
-  endif
-  let a:j.plugins.start[xs[0]] += [xs[1]]
-endfunction
-
 function! s:vimrc_init() abort
-  if exists(':PkgSync')
-    let j = { 'packpath': '~/.vim/github', 'plugins': { 'start': {} } }
-    call s:add_plugin(j, 'haya14busa/vim-operator-flashy')
-    call s:add_plugin(j, 'itchyny/lightline.vim')
-    call s:add_plugin(j, 'joshdick/onedark.vim')
-    call s:add_plugin(j, 'kana/vim-operator-replace')
-    call s:add_plugin(j, 'kana/vim-operator-user')
-    call s:add_plugin(j, 'lambdalisue/vim-glyph-palette')
-    call s:add_plugin(j, 'mattn/vim-molder')
-    call s:add_plugin(j, 'rbtnn/vim-ambiwidth')
-    call s:add_plugin(j, 'rbtnn/vim-gloaded')
-    call s:add_plugin(j, 'rbtnn/vim-pkgsync')
-    call s:add_plugin(j, 'ryanoasis/vim-devicons')
-    call s:add_plugin(j, 'thinca/vim-qfreplace')
-    call s:add_plugin(j, 'tweekmonster/helpful.vim')
-    call s:add_plugin(j, 'tyru/restart.vim')
-    call writefile([json_encode(j)], expand('~/pkgsync.json'))
-  else
-    function! s:pkgsync_setup() abort
-      if !isdirectory(expand('$VIMRC_VIM/github/pack/rbtnn/start/vim-pkgsync'))
-        let path = expand('$VIMRC_VIM/github/pack/rbtnn/start/')
-        silent! call mkdir(path, 'p')
-        call term_start(['git', 'clone', '--depth', '1', 'https://github.com/rbtnn/vim-pkgsync.git'], {
-          \ 'cwd': path,
-          \ })
-        echo 'please restart Vim!'
-      endif
-    endfunction
-    command! -nargs=0 PkgSyncSetup :call s:pkgsync_setup()
+  " Windows OS treats Ctrl-v as Paste.
+  nnoremap         V        <C-v>
+
+  if s:is_windowsterminal
+    command! SendWinClipboard  :call system('/mnt/c/Windows/System32/clip.exe', @")
   endif
 
   " Can't use <S-space> at :terminal
@@ -215,13 +166,6 @@ function! s:vimrc_init() abort
     command! SendWinClipboard  :call system('/mnt/c/Windows/System32/clip.exe', @")
   endif
 
-  if get(g:, 'loaded_operator_flashy', v:false)
-    map              y        <Plug>(operator-flashy)
-    nmap             Y        <Plug>(operator-flashy)$
-  else
-    nnoremap         Y        y$
-  endif
-
   nnoremap <silent><C-j>    <Cmd>tabnext<cr>
   nnoremap <silent><C-k>    <Cmd>tabprevious<cr>
   tnoremap <silent><C-j>    <Cmd>tabnext<cr>
@@ -230,24 +174,36 @@ function! s:vimrc_init() abort
   nnoremap <silent><C-p>    <Cmd>cprevious<cr>zz
   nnoremap <silent><C-n>    <Cmd>cnext<cr>zz
 
-  "nnoremap <space>          <Cmd>execute isdirectory(expand('%:h')) ? 'e %:h' : 'e .'<cr>
-  nnoremap <space>          <Cmd>GitLsFiles<cr>
-  nnoremap s                <Cmd>GitUnifiedDiff<cr>
-
-  if get(g:, 'loaded_molder', v:false)
-    if &filetype == 'molder'
-      nnoremap <buffer> h  <plug>(molder-up)
-      nnoremap <buffer> l  <plug>(molder-open)
-      nnoremap <buffer> C  <Cmd>call chdir(b:molder_dir) \| verbose pwd<cr>
-    endif
-  endif
-
   if get(g:, 'loaded_operator_replace', v:false)
     nmap     <silent>x        <Plug>(operator-replace)
   endif
 
-  if get(g:, 'loaded_glyph_palette', v:false)
-    call glyph_palette#apply()
+  if get(g:, 'loaded_gitdiff', v:false)
+    nnoremap s                <Cmd>GitUnifiedDiff<cr>
+  endif
+
+  command! -nargs=0 SetupPlugins :call s:vimrc_setup_plugins()
+endfunction
+
+function! s:vimrc_setup_plugins() abort
+  call s:vimrc_git_clone_or_pull('haya14busa', 'vim-operator-flashy')
+  call s:vimrc_git_clone_or_pull('kana', 'vim-operator-replace')
+  call s:vimrc_git_clone_or_pull('kana', 'vim-operator-user')
+  call s:vimrc_git_clone_or_pull('mattn', 'vim-molder')
+  call s:vimrc_git_clone_or_pull('rbtnn', 'vim-ambiwidth')
+  call s:vimrc_git_clone_or_pull('rbtnn', 'vim-gitdiff')
+  call s:vimrc_git_clone_or_pull('rbtnn', 'vim-gloaded')
+  call s:vimrc_git_clone_or_pull('thinca', 'vim-qfreplace')
+endfunction
+
+function! s:vimrc_git_clone_or_pull(user, name) abort
+  let path = expand('$VIMRC_VIM/github/pack/my/start/')
+  let opt = { 'term_finish': 'close', }
+  silent! call mkdir(path, 'p')
+  if isdirectory(expand(path .. '/' .. a:name))
+    call term_start(['git', '-C', path .. '/' .. a:name, 'pull'], opt)
+  else
+    call term_start(['git', '-C', path, 'clone', '--depth', '1', 'https://github.com/' .. a:user .. '/' .. a:name .. '.git'], opt)
   endif
 endfunction
 
