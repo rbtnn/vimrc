@@ -28,7 +28,7 @@ set completeslash=slash
 set expandtab shiftwidth=2 tabstop=2
 set fileencodings=ucs-bom,utf-8,cp932
 set fileformats=unix,dos
-set fillchars=vert:\│,tpl_vert:\|
+set fillchars=vert:\│
 set foldlevelstart=999
 set foldmethod=indent
 set grepformat&
@@ -59,7 +59,6 @@ set showmode
 set softtabstop=-1
 set synmaxcol=300
 set tabline& showtabline=0
-set tabpanel& showtabpanel=1 tabpanelopt=vert
 set tags=./tags;
 set termguicolors
 set timeout timeoutlen=500 ttimeoutlen=100
@@ -68,6 +67,11 @@ set virtualedit=block
 set wildignore=*/node_modules/**
 set wildmenu
 set wildoptions=pum
+
+if has('tabpanel')
+  set fillchars+=tpl_vert:\|
+  set tabpanel& showtabpanel=1 tabpanelopt=vert
+endif
 
 if has('patch-9.2.0318')
   set pumopt=opacity:90,height:10,border:single
